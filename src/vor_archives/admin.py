@@ -3,8 +3,8 @@ from django.contrib.contenttypes.admin import GenericTabularInline
 from mptt.admin import DraggableMPTTAdmin
 
 from . import models
+from .mixins import RestrictedContentTypeAdminMixin
 
-# TODO: Fix ContentTypes list (to many) for select in admin panel
 
 # ─── Generic inlines ─────────────────────────────────────────────────────────
 
@@ -102,7 +102,8 @@ class GameAdmin(AWorkAdmin):
 
 
 @admin.register(models.WorkRelation)
-class WorkRelationAdmin(admin.ModelAdmin):
+class WorkRelationAdmin(RestrictedContentTypeAdminMixin, admin.ModelAdmin):
+    restricted_ct_fields = ("source_content_type", "target_content_type")
     list_display = ("source", "target", "relation_type")
     list_filter = ("relation_type",)
 
@@ -111,7 +112,8 @@ class WorkRelationAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.UserWork)
-class UserWorkAdmin(admin.ModelAdmin):
+class UserWorkAdmin(RestrictedContentTypeAdminMixin, admin.ModelAdmin):
+    restricted_ct_fields = ("work_content_type",)
     list_display = ("user", "work", "status", "rating", "progress", "date_added")
     list_filter = ("status", "rating")
     search_fields = ("user__username",)
@@ -143,7 +145,8 @@ class CollectionAdmin(DraggableMPTTAdmin):
 
 
 @admin.register(models.CollectionItem)
-class CollectionItemAdmin(admin.ModelAdmin):
+class CollectionItemAdmin(RestrictedContentTypeAdminMixin, admin.ModelAdmin):
+    restricted_ct_fields = ("work_content_type",)
     list_display = ("collection", "work", "order")
     list_filter = ("collection",)
 

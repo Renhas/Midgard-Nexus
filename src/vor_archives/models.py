@@ -1,10 +1,9 @@
 from decimal import Decimal
 
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.utils import timezone
 from mptt.models import MPTTModel, TreeForeignKey
 
 from .constants import (
@@ -13,8 +12,9 @@ from .constants import (
     UserWorkStatusChoices,
     WorkRelationTypeChoices,
 )
+from .validators import validate_gfk
 
-# TODO: ID check for GenericFK
+# TODO: Fix cyclic WorkRelation connections
 
 # ─── Person, Platform, Genres ────────────────────────────────────────────────
 
@@ -81,6 +81,29 @@ class AWork(models.Model):
         choices=AgeRatingChoices.choices,
         blank=True,
         null=True,
+    )
+
+    relations_source = GenericRelation(
+        "WorkRelation",
+        related_query_name='%(app_label)s_%(class)s_source',
+        content_type_field="source_content_type",
+        object_id_field="source_object_id",
+    )
+    relations_target = GenericRelation(
+        "WorkRelation",
+        related_query_name='%(app_label)s_%(class)s_target',
+        content_type_field="target_content_type",
+        object_id_field="target_object_id",
+    )
+    user_works = GenericRelation(
+        "UserWork",
+        content_type_field="work_content_type",
+        object_id_field="work_object_id",
+    )
+    collection_items = GenericRelation(
+        "CollectionItem",
+        content_type_field="work_content_type",
+        object_id_field="work_object_id",
     )
 
     class Meta:
@@ -154,6 +177,15 @@ class WorkRelation(models.Model):
     def __str__(self):
         return f"{self.source} → {self.relation_type} → {self.target}"
 
+    def clean(self):
+        super().clean()
+        validate_gfk(self.source_content_type, self.source_object_id)
+        validate_gfk(self.target_content_type, self.target_object_id)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
 
 # ─── UserWork ────────────────────────────────────────────────────────────────
 
@@ -196,7 +228,12 @@ class UserWork(models.Model):
     def __str__(self):
         return f"{self.user} — {self.work} ({self.status})"
 
+    def clean(self):
+        super().clean()
+        validate_gfk(self.work_content_type, self.work_object_id)
+
     def save(self, *args, **kwargs):
+        self.full_clean()
         super().save(*args, **kwargs)
 
 
@@ -268,6 +305,14 @@ class CollectionItem(models.Model):
 
     def __str__(self):
         return f"Item in {self.collection}: {self.work}"
+
+    def clean(self):
+        super().clean()
+        validate_gfk(self.work_content_type, self.work_object_id)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
 
 # ─── FeedItem ────────────────────────────────────────────────────────────────
