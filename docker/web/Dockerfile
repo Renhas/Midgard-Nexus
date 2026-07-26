@@ -20,6 +20,7 @@ RUN pip install --upgrade pip && \
 COPY . .
 
 COPY docker/web/entrypoint.sh /entrypoint.sh
+RUN sed -i 's/\r$//' /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 RUN addgroup --system django && \
