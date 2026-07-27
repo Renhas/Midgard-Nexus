@@ -13,7 +13,6 @@ class AgeRatingChoices(models.TextChoices):
 
 class WorkRelationTypeChoices(models.TextChoices):
     SEQUEL = ("sequel", "Sequel")
-    PREQUEL = ("prequel", "Prequel")
     SPIN_OFF = ("spin_off", "Spin-off")
     ADAPTATION = ("adaptation", "Adaptation")
     REMAKE = ("remake", "Remake")

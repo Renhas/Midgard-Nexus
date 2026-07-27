@@ -1,6 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.contrib.contenttypes.models import ContentType
 
+
 def validate_gfk(ct: ContentType | None, obj_id: int | None) -> None:
     """
     Проверяет, что объект с заданным content_type и object_id существует.
@@ -14,3 +15,4 @@ def validate_gfk(ct: ContentType | None, obj_id: int | None) -> None:
         raise ValidationError(
             f"Объект с типом {ct} и ID {obj_id} не существует."
         )
+    

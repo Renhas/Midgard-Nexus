@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.exceptions import ValidationError
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
 
@@ -12,9 +13,8 @@ from .constants import (
     UserWorkStatusChoices,
     WorkRelationTypeChoices,
 )
-from .validators import validate_gfk
+from .validators import validate_gfk, CycleChecker
 
-# TODO: Fix cyclic WorkRelation connections
 
 # ─── Person, Platform, Genres ────────────────────────────────────────────────
 
@@ -181,10 +181,28 @@ class WorkRelation(models.Model):
         super().clean()
         validate_gfk(self.source_content_type, self.source_object_id)
         validate_gfk(self.target_content_type, self.target_object_id)
+        checker = CycleChecker(items_out=self.__get_outgoing, items_in=self.__get_incoming)
+        target_key = (self.target_content_type_id, self.target_object_id) # type: ignore
+        source_key = (self.source_content_type_id, self.source_object_id) # type: ignore
+        if checker.check(target_key, source_key):
+            raise ValidationError("Цикличное создание недопустимо")
 
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
+
+    def __get_outgoing(self, key):
+        return WorkRelation.objects.filter(
+            source_content_type_id=key[0],
+            source_object_id=key[1],
+            ).exclude(pk=self.pk).values_list('target_content_type_id', 'target_object_id')
+
+    def __get_incoming(self, key):
+            return WorkRelation.objects.filter(
+                target_content_type_id=key[0],
+                target_object_id=key[1],
+                relation_type='other',
+                ).exclude(pk=self.pk).values_list('source_content_type_id', 'source_object_id')
 
 
 # ─── UserWork ────────────────────────────────────────────────────────────────
