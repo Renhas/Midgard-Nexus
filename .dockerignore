@@ -1,19 +1,32 @@
-__pycache__
+# Python артефакты
+**/__pycache__/
 *.pyc
 *.pyo
 *.egg-info
-.mypy_cache
-.pytest_cache
+
+# Кэш линтеров и тестов
+.mypy_cache/
+.pytest_cache/
+*.log
+
+# Окружение и IDE
 .git
 .gitignore
+.vscode/
+.idea/
+.DS_Store
+*.md
+
+# Конфигурация и секреты
 .env
 .env.*
-*.md
-.vscode
-.idea
-.DS_Store
-migrations
-staticfiles
-media
-db.sqlite3
-*.log
+
+# Рантайм папки
+staticfiles/
+media/
+
+# Локальные тяжелые папки проекта
+.koda/
+.venv/
+
+*.sqlite3

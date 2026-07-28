@@ -23,12 +23,12 @@ COPY docker/web/entrypoint.sh /entrypoint.sh
 RUN sed -i 's/\r$//' /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+RUN apt-get update && apt-get install -y --no-install-recommends gosu && rm -rf /var/lib/apt/lists/*
+
 RUN addgroup --system django && \
     adduser --system --ingroup django django
 
 RUN chown -R django:django /app
-
-USER django
 
 EXPOSE 8000
 
