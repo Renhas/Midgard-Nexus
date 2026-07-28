@@ -305,6 +305,16 @@ class Collection(MPTTModel):
     def __str__(self):
         return f"Collection: {self.name} ({self.user})"
 
+    def clean(self):
+        if not self.parent:
+            return
+        if self.parent.pk == self.pk:
+            raise ValidationError('Объект не может быть своим родителем.')
+        if not self.pk:
+            return
+        if self.parent.pk in self.get_descendants().values_list('pk', flat=True):
+            raise ValidationError('Нельзя установить потомка в качестве родителя.')
+
 
 # ─── CollectionItem ──────────────────────────────────────────────────────────
 
