@@ -13,7 +13,7 @@ from .constants import (
     UserWorkStatusChoices,
     WorkRelationTypeChoices,
 )
-from .validators import validate_gfk, CycleChecker
+from .validators import validate_gfk, validate_relation_type, CycleChecker
 
 
 # ─── Person, Platform, Genres ────────────────────────────────────────────────
@@ -174,6 +174,20 @@ class WorkRelation(models.Model):
         choices=WorkRelationTypeChoices.choices,
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["source_content_type", "source_object_id", "target_content_type", "target_object_id",],
+                name="unique_relation_direction",
+            ),
+        ]
+        indexes = [
+            models.Index(
+                fields=["target_content_type", "target_object_id",],
+                name="idx_workrelation_target",
+            ),
+        ]
+
     def __str__(self):
         return f"{self.source} → {self.relation_type} → {self.target}"
 
@@ -182,6 +196,9 @@ class WorkRelation(models.Model):
         validate_gfk(self.source_content_type, self.source_object_id)
         validate_gfk(self.target_content_type, self.target_object_id)
         checker = CycleChecker(items_out=self.__get_outgoing, items_in=self.__get_incoming)
+        validate_relation_type(self.source_content_type, self.target_content_type, self.relation_type)
+        if self.__other_relation_exists():
+            raise ValidationError("Между данными объектами уже есть связь")
         target_key = (self.target_content_type_id, self.target_object_id) # type: ignore
         source_key = (self.source_content_type_id, self.source_object_id) # type: ignore
         if checker.check(target_key, source_key):
@@ -195,14 +212,22 @@ class WorkRelation(models.Model):
         return WorkRelation.objects.filter(
             source_content_type_id=key[0],
             source_object_id=key[1],
-            ).exclude(pk=self.pk).values_list('target_content_type_id', 'target_object_id')
+        ).exclude(pk=self.pk).values_list('target_content_type_id', 'target_object_id')
 
     def __get_incoming(self, key):
-            return WorkRelation.objects.filter(
-                target_content_type_id=key[0],
-                target_object_id=key[1],
-                relation_type='other',
-                ).exclude(pk=self.pk).values_list('source_content_type_id', 'source_object_id')
+        return WorkRelation.objects.filter(
+            target_content_type_id=key[0],
+            target_object_id=key[1],
+            relation_type='other',
+        ).exclude(pk=self.pk).values_list('source_content_type_id', 'source_object_id')
+
+    def __other_relation_exists(self):
+        return WorkRelation.objects.filter(
+            source_content_type=self.target_content_type,
+            source_object_id=self.target_object_id,
+            target_content_type=self.source_content_type,
+            target_object_id=self.source_object_id,
+        ).exclude(pk=self.pk).exists()
 
 
 # ─── UserWork ────────────────────────────────────────────────────────────────
