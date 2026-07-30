@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Главная — Midgard Nexus{% endblock %}
+
+{% block content %}
+<div class="home-center">
+    <div class="container py-5">
+        <h1 class="text-center mb-5">Midgard Nexus</h1>
+
+        <div class="row g-4 justify-content-center">
+            {% for module in modules %}
+            <div class="col-12 col-md-6 col-xl-4 module-item">
+                <a href="{% url module.url_name|add:':index' %}"
+                   class="text-decoration-none text-reset">
+                    <div class="card h-100 module-card border-0 shadow-sm"
+                         style="border-left: 4px solid {{ module.color }}; --card-accent: {{ module.color }};">
+                        <div class="card-body p-4 d-flex flex-column justify-content-between">
+                            <div class="text-center">
+                                <div class="icon-circle mx-auto mb-3"
+                                     style="background-color: {{ module.color }}20; color: {{ module.color }};">
+                                    <i class="{{ module.icon }} display-6"></i>
+                                </div>
+                                <h5 class="mb-3 fw-bold">{{ module.name }}</h5>
+                                <p class="card-text">{{ module.description }}</p>
+                                {% if module.url_name != 'vor_archives' %}
+                                <small class="text-secondary">WIP</small>
+                                {% endif %}
+                            </div>
+                            <span class="small">
+                                {% if module.url_name == 'vor_archives' %}
+                                    <i class="bi bi-door-open fs-5"></i> Перейти
+                                {% else %}
+                                    <i class="bi bi-door-closed fs-5"></i> Перейти
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

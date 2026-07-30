@@ -1,0 +1,245 @@
+/* ============================================
+   Midgard Nexus — Custom Styles
+   ============================================ */
+
+/* === CSS Variables === */
+:root {
+    --bg-primary: #0B1120;
+    --bg-card: #1A233A;
+    --bg-input: #151D2E;
+    --text-primary: #E2E8F0;
+    --text-secondary: #94A3B8;
+    --accent-hover: #6366F1;
+    --success: #34D399;
+    --error: #F87171;
+    --border: #334155;
+
+    /* Module accents */
+    --accent-vor: #A78BFA;
+    --accent-fafnir: #60A5FA;
+    --accent-kvasir: #FB923C;
+}
+
+/* === Global Body === */
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* === Custom scrollbar === */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-hover);
+}
+
+/* ============================================
+    Home page — module cards
+    ============================================ */
+.home-center {
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.module-card {
+    background-color: var(--bg-card);
+    border-color: var(--border) !important;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.module-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 2rem var(--card-accent, rgba(99, 102, 241, 0.35)) !important;
+}
+
+/* === Module cards entrance animation === */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.module-item {
+    opacity: 0;
+    animation: fadeInUp 1s ease forwards;
+}
+
+.module-item:nth-child(1) { animation-delay: 0.1s; }
+.module-item:nth-child(2) { animation-delay: 0.3s; }
+.module-item:nth-child(3) { animation-delay: 0.5s; }
+
+.icon-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   Login page
+   ============================================ */
+.login-card {
+    background-color: var(--bg-card);
+    border-color: var(--border) !important;
+}
+.login-card .card-body {
+    background-color: var(--bg-card);
+}
+
+.input-group .input-group-text {
+    background-color: var(--bg-input);
+    border-color: var(--border);
+    color: var(--text-secondary);
+}
+.input-group .form-control {
+    background-color: var(--bg-input);
+    border-color: var(--border);
+    color: var(--text-primary);
+}
+.input-group .form-control::placeholder {
+    color: var(--text-secondary);
+}
+.input-group .form-control:focus {
+    background-color: var(--bg-input);
+    border-color: var(--accent-hover);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+}
+
+/* ============================================
+   Navbar overrides
+   ============================================ */
+.navbar-spacer {
+    height: 56px;
+}
+
+.navbar {
+    background-color: var(--bg-card) !important;
+    border-bottom: 1px solid var(--border);
+}
+.navbar-dark .nav-link {
+    color: var(--text-secondary) !important;
+}
+.navbar-dark .nav-link:hover,
+.navbar-dark .nav-link.active {
+    color: var(--text-primary) !important;
+    background-color: rgba(99, 102, 241, 0.15);
+}
+.navbar-dark .nav-link.active {
+    color: var(--accent-hover) !important;
+}
+.navbar-dark .btn-outline-light {
+    color: var(--text-secondary);
+    border-color: var(--border);
+}
+.navbar-dark .btn-outline-light:hover {
+    color: var(--text-primary);
+    background-color: rgba(99, 102, 241, 0.15);
+    border-color: var(--accent-hover);
+}
+.navbar-dark .dropdown-toggle:hover {
+    color: var(--text-primary);
+    background-color: rgba(99, 102, 241, 0.15);
+    border-color: var(--accent-hover);
+}
+
+/* ============================================
+   Card overrides
+   ============================================ */
+.card {
+    background-color: var(--bg-card);
+    border-color: var(--border);
+}
+.module-card .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+    color: var(--text-primary);
+}
+
+.card-body {
+    color: var(--text-primary);
+}
+.card-text {
+    color: var(--text-secondary) !important;
+}
+
+/* ============================================
+   Alert overrides
+   ============================================ */
+.alert-danger {
+    background-color: rgba(248, 113, 113, 0.15);
+    border-color: var(--error);
+    color: var(--error);
+}
+
+/* ============================================
+   Button overrides
+   ============================================ */
+.btn-primary {
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+}
+.btn-primary:hover {
+    background-color: #4F46E5;
+    border-color: #4F46E5;
+}
+
+/* ============================================
+   Text color helpers
+   ============================================ */
+.text-primary {
+    color: var(--accent-hover) !important;
+}
+.text-muted {
+    color: var(--text-secondary) !important;
+}
+
+/* ============================================
+   Form overrides
+   ============================================ */
+.form-label {
+    color: var(--text-primary);
+}
+.form-text {
+    color: var(--text-secondary) !important;
+}
+.invalid-feedback {
+    color: var(--error);
+}
+
+/* ============================================
+   Dropdown overrides
+   ============================================ */
+.dropdown-menu {
+    background-color: var(--bg-card);
+    border-color: var(--border);
+}
+.dropdown-item {
+    color: var(--text-primary);
+}
+.dropdown-item:hover {
+    background-color: rgba(99, 102, 241, 0.15);
+    color: var(--text-primary);
+}
+.dropdown-divider {
+    border-top-color: var(--border);
+}

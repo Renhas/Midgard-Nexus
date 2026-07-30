@@ -1,0 +1,13 @@
+{% extends "base_app.html" %}
+
+{% block title %}{{ module_name }} — Midgard Nexus{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-center justify-content-center min-vh-100">
+    <div class="text-center">
+        <i class="{{ module_icon }} display-1 mb-4" style="color: {{ module_color }};"></i>
+        <h2 class="text-secondary">Work in Progress</h2>
+        <p class="text-muted">Раздел "{{ module_name }}" находится в разработке</p>
+    </div>
+</div>
+{% endblock %}

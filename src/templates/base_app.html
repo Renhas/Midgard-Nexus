@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block header %}
+<nav class="navbar navbar-dark fixed-top">
+    <div class="container-fluid">
+        <!-- Left: Home + Module Icons -->
+        <div class="d-flex align-items-center gap-2">
+            <a class="btn btn-outline-light btn-sm" href="{% url 'home' %}" title="Главная">
+                <i class="bi bi-house-fill"></i>
+            </a>
+            <div class="vr bg-secondary opacity-50"></div>
+            <a class="btn btn-outline-light btn-sm" href="{% url 'vor_archives:index' %}" title="{{ modules.0.name }}">
+                <i class="bi bi-book fs-4"></i>
+            </a>
+            <a class="btn btn-outline-light btn-sm" href="{% url 'fafnir_cave:index' %}" title="{{ modules.1.name }}">
+                <i class="bi bi-currency-exchange fs-4"></i>
+            </a>
+            <a class="btn btn-outline-light btn-sm" href="{% url 'kvasir_records:index' %}" title="{{ modules.2.name }}">
+                <i class="bi bi-fire fs-4"></i>
+            </a>
+        </div>
+
+        <!-- Right: Search + Avatar -->
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-light btn-sm" type="button" title="Поиск">
+                <i class="bi bi-search"></i>
+            </button>
+
+            <!-- Avatar Dropdown -->
+            <div class="dropdown" x-data="{ open: false }">
+                <button class="btn btn-outline-light btn-sm dropdown-toggle d-flex align-items-center gap-2"
+                        type="button"
+                        @click="open = !open"
+                        @click.outside="open = false"
+                        :aria-expanded="open">
+                    <i class="bi bi-person-circle"></i>
+                    <span class="d-none d-sm-inline">{{ user.get_full_name|default:user.username }}</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" :class="{ 'show': open }">
+                    <li><a class="dropdown-item" href="{% url 'admin:index' %}">
+                        <i class="bi bi-gear"></i> Настройки
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right"></i> Выйти
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="navbar-spacer"></div>
+{% endblock %}
