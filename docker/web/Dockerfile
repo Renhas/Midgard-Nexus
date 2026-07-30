@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     gcc \
     postgresql-client \
+    gosu \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
@@ -23,7 +25,11 @@ COPY docker/web/entrypoint.sh /entrypoint.sh
 RUN sed -i 's/\r$//' /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-RUN apt-get update && apt-get install -y --no-install-recommends gosu && rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /app/src/static/vendor
+COPY docker/web/download_static.sh /app/download_static.sh
+RUN chmod +x /app/download_static.sh
+
+RUN /app/download_static.sh
 
 RUN addgroup --system django && \
     adduser --system --ingroup django django
