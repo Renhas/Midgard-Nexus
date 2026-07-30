@@ -1,5 +1,8 @@
 #!/bin/sh
 
+mkdir -p /app/staticfiles /app/media
+chown -R django:django /app/staticfiles /app/media
+
 echo "⏳ Waiting for database..."
 
 while ! pg_isready -h db -p 5432 -U ${DB_USER} -d ${DB_NAME}; do
@@ -21,12 +24,14 @@ email = os.environ.get('DJANGO_SUPERUSER_EMAIL')
 password = os.environ.get('DJANGO_SUPERUSER_PASSWORD')
 if not User.objects.filter(username=username).exists():
     User.objects.create_superuser(username, email, password)
-    print('Superuser created.')
+    print('👤 Superuser created.')
 else:
-    print('Superuser already exists.')
+    print('👤 Superuser already exists.')
     "
 fi
 
 python src/manage.py collectstatic --noinput
 
-exec "$@"
+echo "🚀 Server starting..."
+
+exec gosu django "$@"
