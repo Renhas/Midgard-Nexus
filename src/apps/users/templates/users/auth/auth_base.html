@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title|default:"Аутентификация" }} — Midgard Nexus{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-sm-6 col-md-5 col-lg-4">
+            <div class="text-center mb-4">
+                <a href="{% url 'home' %}" class="hexagon-home-btn" title="Главная">
+                    <i class="bi bi-house-fill"></i>
+                </a>
+                <h2 class="mt-2">{% block heading %}Аутентификация{% endblock %}</h2>
+            </div>
+
+            <div class="card shadow-sm border-0 login-card">
+                <div class="card-body p-4">
+                    {% block form %}{% endblock %}
+                </div>
+            </div>
+
+            {% block footer %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

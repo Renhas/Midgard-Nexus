@@ -21,7 +21,7 @@
         <div class="row g-4 justify-content-center">
             {% for module in modules %}
             <div class="col-12 col-md-6 col-xl-4 module-item">
-                <a href="{% if not user.is_authenticated %}{% url 'login' %}?next={% url module.url_name|add:':index' %}{% else %}{% url module.url_name|add:':index' %}{% endif %}"
+                <a href="{% if not user.is_authenticated %}{% url 'users:login' %}?next={% url module.url_name|add:':index' %}{% else %}{% url module.url_name|add:':index' %}{% endif %}"
                    class="text-decoration-none text-reset">
                     <div class="card h-100 module-card border-0 shadow-sm"
                          style="border-left: 4px solid {{ module.color }}; --card-accent: {{ module.color }};">
