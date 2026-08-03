@@ -25,6 +25,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('users/', include('apps.users.urls')),  # Added for user profiles
     # Apps
     path('library/', include('apps.vor_archives.urls')),
     path('finances/', include('apps.fafnir_cave.urls')),

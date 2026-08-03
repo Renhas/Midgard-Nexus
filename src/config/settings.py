@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',  # Added for authentication
     # Local apps
     'apps.users',
     'apps.vor_archives',
@@ -127,6 +128,10 @@ TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 
 USE_TZ = True
+
+# Site ID for django.contrib.sites
+SITE_ID = 1
+
 
 
 # Static files (CSS, JavaScript, Images)
