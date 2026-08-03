@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',  # Added for authentication
     # Local apps
     'apps.users',
     'apps.vor_archives',
@@ -74,6 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'config.context_processors.modules',
             ],
         },
     },
@@ -102,13 +104,7 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
@@ -126,6 +122,10 @@ TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 
 USE_TZ = True
+
+# Site ID for django.contrib.sites
+SITE_ID = 1
+
 
 
 # Static files (CSS, JavaScript, Images)
@@ -146,3 +146,35 @@ MEDIA_ROOT = BASE_DIR.parent / 'media'
 
 # Custom user model
 AUTH_USER_MODEL = 'users.User'
+
+
+# Application modules
+# Authentication settings
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
+
+# Application modules
+MODULES = [
+    {
+        'name': "Vör's Archives",
+        'description': 'Личная медиатека произведений',
+        'icon': 'bi-book-half',
+        'url_name': 'vor_archives',
+        'color': '#A78BFA',
+    },
+    {
+        'name': "Fafnir's Cave",
+        'description': 'Учёт и анализ финансовых операций',
+        'icon': 'bi-piggy-bank-fill',
+        'url_name': 'fafnir_cave',
+        'color': '#60A5FA',
+    },
+    {
+        'name': "Kvasir's Records",
+        'description': 'Рецепты, заметки и кулинарные идеи',
+        'icon': 'bi-fork-knife',
+        'url_name': 'kvasir_records',
+        'color': '#FB923C',
+    },
+]

@@ -1,0 +1,9 @@
+from django.urls import path
+
+from . import views
+
+app_name = 'vor_archives'
+
+urlpatterns = [
+    path('', views.index, name='index'),
+]
