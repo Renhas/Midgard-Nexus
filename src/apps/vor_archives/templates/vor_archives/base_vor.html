@@ -1,0 +1,233 @@
+{% extends "base_app.html" %}
+
+{% block title %}{{ module_name }} — Midgard Nexus{% endblock %}
+
+{% block extra_head %}
+<style>
+    [x-cloak] { display: none !important; }
+
+    /* === 3-segment layout === */
+    .vor-layout {
+        position: relative;
+        min-height: calc(100vh - 56px);
+    }
+
+    /* === Sidebars (15 % of viewport width each) === */
+    .vor-sidebar {
+        position: fixed;
+        top: 56px;
+        bottom: 0;
+        width: 15vw;
+        min-width: 180px;
+        max-width: 220px;
+        background-color: var(--bg-card);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.3s ease;
+        z-index: 1000;
+        overflow: hidden;
+    }
+
+    .vor-sidebar-left  { left: 0; }
+    .vor-sidebar-right {
+        right: 0;
+        border-left: 1px solid var(--border);
+        border-right: none;
+    }
+
+    .vor-sidebar.collapsed {
+        z-index: 999;
+    }
+    .vor-sidebar-left.collapsed  { transform: translateX(-100%); }
+    .vor-sidebar-right.collapsed { transform: translateX(100%); }
+
+    /* === Expand handle (top-edge, same style as toggle) === */
+    .vor-expand {
+        position: fixed;
+        top: calc(56px + 0.75rem);
+        z-index: 1001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+        transition: all 0.2s ease;
+    }
+    .vor-expand:hover {
+        color: var(--accent-hover);
+        border-color: var(--accent-hover);
+        background-color: rgba(167, 145, 255, 0.1);
+    }
+    .expand-left  { left: 0; }
+    .expand-right { right: 0; }
+    .vor-expand i { font-size: 1.1rem; }
+
+    /* === Sidebar body (holds toggle + nav) === */
+    .vor-sidebar-body {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding-top: 0.5rem;
+    }
+
+    /* === Sidebar toggle button === */
+    .vor-sidebar-toggle {
+        align-self: flex-end;
+        margin: 0.25rem 0.5rem 0.25rem 0;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+        transition: all 0.2s ease;
+    }
+    .vor-sidebar-toggle:hover {
+        color: var(--accent-hover);
+        border-color: var(--accent-hover);
+        background-color: rgba(167, 145, 255, 0.1);
+    }
+    .toggle-left  { margin-right: auto; margin-left: 0.5rem; }
+    .toggle-right { margin-left: auto; margin-right: 0.5rem; }
+    .vor-sidebar-toggle i { font-size: 1.1rem; }
+
+    /* === Navigation buttons === */
+    .vor-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0 0.75rem;
+        flex-grow: 1;
+    }
+
+    .vor-nav-btn {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 0.6rem 1rem;
+        border-radius: 0.375rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+        gap: 0.5rem;
+    }
+    .vor-nav-btn:hover {
+        color: var(--text-primary);
+        background-color: rgba(167, 145, 255, 0.1);
+        border-color: var(--border);
+    }
+    .vor-nav-btn.active {
+        color: var(--accent-vor);
+        border-color: var(--accent-vor);
+        background-color: rgba(167, 145, 255, 0.1);
+    }
+    .vor-nav-label {
+        flex-grow: 1;
+        text-align: center;
+        font-weight: 500;
+    }
+    .vor-nav i { width: 1.25rem; text-align: center; }
+
+    .vor-content-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border);
+    }
+
+    /* === Center content (70 %) === */
+    .vor-center {
+        margin-left: 15vw;
+        margin-right: 15vw;
+        padding: 1.5rem;
+        transition: margin-left 0.3s ease, margin-right 0.3s ease;
+    }
+    .vor-center.left-collapsed  { margin-left: 0; }
+    .vor-center.right-collapsed { margin-right: 0; }
+
+    /* === Toast notification (bottom of screen) === */
+    .vor-toast {
+        position: fixed;
+        bottom: 1.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.375rem;
+        background-color: var(--bg-card);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(4px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="vor-layout" x-data="{ leftOpen: true, rightOpen: true }">
+    <!-- Left sidebar (15 %) -->
+    <aside class="vor-sidebar vor-sidebar-left" :class="{ collapsed: !leftOpen }">
+        <div class="vor-sidebar-body">
+            <button type="button" class="vor-sidebar-toggle toggle-left"
+                    @click="leftOpen = !leftOpen" title="Скрыть панель">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <nav class="vor-nav">
+                <a href="{% url 'vor_archives:dashboard' %}"
+                   class="vor-nav-btn{% if active_section == 'dashboard' %} active{% endif %}">
+                    <i class="bi bi-bar-chart-line"></i>
+                    <span class="vor-nav-label">Дашборд</span>
+                </a>
+                {% block collection_nav %}
+                <a href="{% url 'vor_archives:index' %}"
+                   class="vor-nav-btn{% if active_section == 'collection' %} active{% endif %}">
+                    <i class="bi bi-collection"></i>
+                    <span class="vor-nav-label">Коллекция</span>
+                </a>
+                {% endblock %}
+            </nav>
+        </div>
+    </aside>
+    <button type="button"
+            class="vor-expand expand-left"
+            x-cloak
+            :class="{ 'd-none': leftOpen }"
+            @click="leftOpen = true" title="Показать панель">
+        <i class="bi bi-chevron-right"></i>
+    </button>
+
+    <!-- Center content (70 %) -->
+    <div class="vor-center"
+         :class="{ 'left-collapsed': !leftOpen, 'right-collapsed': !rightOpen }">
+        {% block vor_content %}{% endblock %}
+    </div>
+
+    <!-- Right sidebar (15 %) -->
+    <aside class="vor-sidebar vor-sidebar-right" :class="{ collapsed: !rightOpen }">
+        <div class="vor-sidebar-body">
+            <button type="button" class="vor-sidebar-toggle toggle-right"
+                @click="rightOpen = !rightOpen" title="Скрыть панель">
+            <i class="bi bi-chevron-right"></i>
+            </button>
+            {% block right_content %}{% endblock %}
+        </div>
+    </aside>
+    <button type="button"
+            class="vor-expand expand-right"
+            x-cloak
+            :class="{ 'd-none': rightOpen }"
+            @click="rightOpen = true" title="Показать панель">
+        <i class="bi bi-chevron-left"></i>
+    </button>
+
+    <!-- Page-level notifications -->
+    {% block page_notifications %}{% endblock %}
+</div>
+{% endblock %}

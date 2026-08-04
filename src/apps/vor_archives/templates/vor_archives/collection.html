@@ -1,0 +1,34 @@
+{% extends "vor_archives/base_vor.html" %}
+
+{% block collection_nav %}
+<a href="#"
+   class="vor-nav-btn active"
+   @click.prevent="$dispatch('collection-update')">
+    <i class="bi bi-collection"></i>
+    <span class="vor-nav-label">Коллекция</span>
+</a>
+{% endblock %}
+
+{% block page_notifications %}
+<div x-data="{ visible: false }"
+    @collection-update.window="visible = true; setTimeout(() => visible = false, 3000)"
+    :class="{ 'd-none': !visible }"
+    x-cloak
+     class="vor-toast">
+    <i class="bi bi-arrow-clockwise"></i>
+    <span>Коллекция обновлена</span>
+</div>
+{% endblock %}
+
+{% block vor_content %}
+<div class="card vor-content-card">
+    <div class="card-body p-4 text-center">
+        <i class="{{ module_icon }} display-2 mb-3" style="color: {{ module_color }};"></i>
+        <h2 class="text-secondary mb-3">Коллекция</h2>
+        <p class="text-muted">Раздел "{{ module_name }}" находится в разработке</p>
+        <p class="text-secondary small">
+            Нажмите кнопку «Коллекция» в боковой панели, чтобы имитировать обновление.
+        </p>
+    </div>
+</div>
+{% endblock %}
