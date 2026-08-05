@@ -1,0 +1,57 @@
+
+/* ============================================
+   Login page
+   ============================================ */
+.login-card {
+    background-color: var(--bg-card);
+    border-color: var(--border) !important;
+}
+.login-card .card-body {
+    background-color: var(--bg-card);
+}
+
+.input-group .input-group-text {
+    background-color: var(--bg-input);
+    border-color: var(--border);
+    color: var(--text-secondary);
+}
+.input-group .form-control {
+    background-color: var(--bg-input);
+    border-color: var(--border);
+    color: var(--text-primary);
+}
+.input-group .form-control::placeholder {
+    color: var(--text-secondary);
+}
+.input-group .form-control:focus {
+    background-color: var(--bg-input);
+    border-color: var(--accent-hover);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+}
+
+.hexagon-home-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    background-color: var(--accent-hover);
+    color: var(--bg-primary);
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35));
+}
+.hexagon-home-btn:hover {
+    background-color: #4F46E5;
+    color: var(--bg-primary);
+    transform: translateY(-2px);
+}
+.hexagon-home-btn:active {
+    transform: translateY(0);
+}
+.hexagon-home-btn i {
+    font-size: 1.5rem;
+    line-height: 1;
+}
