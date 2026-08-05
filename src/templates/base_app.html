@@ -1,4 +1,10 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+{% endblock %}
 
 {% block header %}
 <nav class="navbar navbar-dark fixed-top">

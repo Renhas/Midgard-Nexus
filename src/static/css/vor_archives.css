@@ -1,0 +1,41 @@
+/* ============================================
+    VOR Archives — Navigation buttons
+    ============================================ */
+
+/* === Navigation buttons === */
+.vor-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0 0.75rem;
+    flex-grow: 1;
+}
+
+.vor-nav-btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.6rem 1rem;
+    border-radius: 0.375rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    gap: 0.5rem;
+}
+.vor-nav-btn:hover {
+    color: var(--text-primary);
+    background-color: rgba(167, 145, 255, 0.1);
+    border-color: var(--border);
+}
+.vor-nav-btn.active {
+    color: var(--accent-vor);
+    border-color: var(--accent-vor);
+    background-color: rgba(167, 145, 255, 0.1);
+}
+.vor-nav-label {
+    flex-grow: 1;
+    text-align: center;
+    font-weight: 500;
+}
+.vor-nav i { width: 1.25rem; text-align: center; }
