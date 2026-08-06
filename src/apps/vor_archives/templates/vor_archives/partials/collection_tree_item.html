@@ -11,7 +11,7 @@
     </div>
     <div x-show="expanded" style="padding-left: 16px;">
         {% for child in collection.get_children.all %}
-            {% include "vor_archives/collection_tree_item.html" with collection=child %}
+            {% include "vor_archives/partials/collection_tree_item.html" with collection=child %}
         {% endfor %}
     </div>
 </div>

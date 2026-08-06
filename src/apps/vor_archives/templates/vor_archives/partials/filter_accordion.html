@@ -1,0 +1,26 @@
+{% load static %}
+
+<div class="sidebar-accordion"
+     x-data="{ expanded: false }"
+     {% if show_condition %}x-show="{{ show_condition }}"{% endif %}>
+    <button type="button" class="sidebar-btn sidebar-btn-full sidebar-btn-accordion"
+            @click="expanded = !expanded">
+        <span>{{ title }}</span>
+        <i class="bi bi-chevron-right" x-bind:class="{ 'bi-rotate-90': expanded }"></i>
+    </button>
+    <div class="sidebar-accordion-body" x-show="expanded" x-cloak>
+        {% if nested %}
+            {% for sub in nested %}
+                {% include 'vor_archives/partials/filter_accordion.html' with title=sub.title options=sub.options name=sub.name show_condition=sub.show_condition only %}
+            {% endfor %}
+        {% else %}
+            {% for option in options %}
+                <label class="sidebar-filter-item">
+                    <input type="checkbox" name="{{ name }}" value="{{ option.value }}" class="hidden-checkbox">
+                    <span class="custom-checkbox"></span>
+                    {{ option.label }}
+                </label>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>

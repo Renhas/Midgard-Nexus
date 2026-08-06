@@ -36,7 +36,7 @@
         </div>
         <div class="sidebar-collections-list">
             {% for collection in collections %}
-                {% include "vor_archives/collection_tree_item.html" with collection=collection %}
+                {% include "vor_archives/partials/collection_tree_item.html" with collection=collection %}
             {% endfor %}
         </div>
         <button type="button"
@@ -57,6 +57,95 @@
     class="custom-toast">
     <i class="bi bi-arrow-clockwise"></i>
     <span>Коллекция обновлена</span>
+</div>
+{% endblock %}
+
+{% block right_content %}
+
+<div class="sidebar-nav"
+     x-data="{ 
+        workTypes: {{ work_types|default:'[]'|safe }},
+        viewMode: 'list',
+        sortField: '{{ sort_field_default|default:'custom' }}',
+        sortAsc: '{{ sort_order_asc|default:True }}',
+        toggleType(type) {
+            const index = this.workTypes.indexOf(type);
+            if (index > -1) {
+                this.workTypes.splice(index, 1);
+            } else {
+                this.workTypes.push(type);
+            }
+            this.$dispatch('update-filters');
+        }
+        }">
+    
+    <h6 class="sidebar-filters-title text-uppercase text-muted small fw-semibold mb-3">
+        Отображение
+    </h6>
+    <div class="sidebar-nav-row">
+        <button type="button"
+                class="sidebar-btn sidebar-btn-display"
+                :class="{ 'active': viewMode === 'list' }"
+                @click="viewMode = 'list'"
+                title="Список">
+            <i class="bi bi-list-ul"></i>
+        </button>
+        <button type="button"
+                class="sidebar-btn sidebar-btn-display"
+                :class="{ 'active': viewMode === 'grid' }"
+                @click="viewMode = 'grid'"
+                title="Плитки">
+            <i class="bi bi-grid"></i>
+        </button>
+    </div>
+    {# ========== ПРАВАЯ ПАНЕЛЬ — ТИПЫ ============ #}
+    <div class="sidebar-nav-row">
+        <button type="button"
+                class="sidebar-btn sidebar-btn-type"
+                :class="{ 'active': workTypes.includes('book') }"
+                @click="toggleType('book')"
+                title="Книги">
+            <i class="icon-book-text"></i>
+        </button>
+        <button type="button"
+                class="sidebar-btn sidebar-btn-type"
+                :class="{ 'active': workTypes.includes('film') }"
+                @click="toggleType('film')"
+                title="Фильмы">
+            <i class="icon-clapperboard"></i>
+        </button>
+        <button type="button"
+                class="sidebar-btn sidebar-btn-type"
+                :class="{ 'active': workTypes.includes('game') }"
+                @click="toggleType('game')"
+                title="Игры">
+            <i class="icon-gamepad-2"></i>
+        </button>
+    </div>
+    {# ========== ПРАВАЯ ПАНЕЛЬ — СОРТИРОВКА ============ #}
+    <div class="sidebar-nav-row">
+        <button type="button"
+                class="sidebar-btn sidebar-btn-icon"
+                @click="sortAsc = !sortAsc"
+                title="Изменить направление">
+            <i class="bi" :class="sortAsc ? 'bi-sort-down-alt ' : 'bi-sort-up-alt '"></i>
+        </button>
+        <select class="sidebar-select" x-model="sortField">
+            {% for field in sort_fields %}
+                <option value="{{ field.value }}">{{ field.label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+     {# ========== ПРАВАЯ ПАНЕЛЬ — ФИЛЬТРЫ ========= #}
+    <div class="sidebar-filters">
+        <h6 class="sidebar-filters-title text-uppercase text-muted small fw-semibold mb-3">
+            Фильтры
+        </h6>
+        {% include 'vor_archives/partials/filter_accordion.html' with title='Статус' options=status_options name='status' %}
+        {% include 'vor_archives/partials/filter_accordion.html' with title='Возрастной рейтинг' options=age_rating_options name='age_rating' %}
+        {% include 'vor_archives/partials/filter_accordion.html' with title='Жанры' nested=genres_nested %}
+        {% include 'vor_archives/partials/filter_accordion.html' with title='Платформы' options=platform_options name='platform' show_condition="workTypes.includes('game')" %}
+    </div>
 </div>
 {% endblock %}
 

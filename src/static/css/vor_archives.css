@@ -2,14 +2,18 @@
     VOR Archives — Styles
     ============================================ */
 
-/* === Sidebar Navigation Buttons === */
+/* ============================================
+    Buttons
+    ============================================ */
 
 .sidebar-nav {
+    flex: 1; 
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     padding: 0.5rem;
     height: 100%;
+    overflow: hidden;
 }
 
 .sidebar-nav-row {
@@ -19,7 +23,9 @@
 }
 
 .sidebar-nav-row .sidebar-btn-add,
-.sidebar-nav-row .sidebar-btn-delete {
+.sidebar-nav-row .sidebar-btn-delete,
+.sidebar-nav-row .sidebar-btn-type,
+.sidebar-nav-row .sidebar-btn-display {
     flex: 1;
 }
 
@@ -49,6 +55,12 @@
 
 .sidebar-btn:active {
     transform: scale(0.96);
+}
+
+.sidebar-btn.active {
+    color: var(--accent-vor);
+    border-color: var(--accent-vor);
+    background-color: rgba(167, 145, 255, 0.12);
 }
 
 .sidebar-btn-primary {
@@ -100,6 +112,10 @@
     margin: 0.25rem 0;
 }
 
+/* ============================================
+    Collections
+    ============================================ */
+
 .sidebar-collections {
     flex: 1;
     display: flex;
@@ -114,15 +130,6 @@
     color: var(--text-secondary);
     padding: 0.25rem 0.5rem;
     font-weight: 600;
-}
-
-.sidebar-collections-list {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
 }
 
 .collection-item {
@@ -183,4 +190,177 @@
 
 .collection-item {
     white-space: nowrap;
+}
+
+
+
+/* ============================================
+    Filters
+    ============================================ */
+
+.sidebar-filters {
+    flex: 1;
+    display: flex;
+    overflow-y: auto;
+    overflow-x: auto;
+    min-height: 0; 
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem 0.5rem 0 0.5rem;
+}
+
+.sidebar-filters-title {
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.sidebar-accordion {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-accordion-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem 0 0.25rem 0;
+}
+
+.sidebar-filter-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.15rem 0;
+    position: relative;
+    padding-left: 0.5rem;
+}
+
+.sidebar-filter-item input[type="checkbox"] {
+    accent-color: var(--accent-hover);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.sidebar-btn-accordion {
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.35rem 0.65rem;
+}
+
+.sidebar-btn-accordion i {
+    transition: transform 0.2s ease;
+}
+
+.sidebar-accordion .sidebar-accordion {
+    margin-left: 0.75rem;
+    padding-left: 0.5rem;
+    border-left: 1px solid var(--border);
+    margin-top: 0.25rem;
+}
+
+.sidebar-accordion .sidebar-accordion .sidebar-accordion-body {
+    border-left: none;
+    padding-left: 0;
+}
+
+.sidebar-accordion .sidebar-accordion .sidebar-btn-accordion {
+    padding-left: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    border-color: transparent;
+}
+
+.sidebar-accordion-body .sidebar-accordion-body {
+    padding-left: 0.75rem;
+    border-left: 1px solid var(--border);
+    margin-left: 0.25rem;
+}
+
+.hidden-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.custom-checkbox {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    border: 2px solid var(--border);
+    background-color: var(--bg-input);
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.sidebar-filter-item:hover .custom-checkbox {
+    border-color: var(--accent-hover);
+}
+
+/* Состояние checked */
+.hidden-checkbox:checked + .custom-checkbox {
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+}
+
+.hidden-checkbox:checked + .custom-checkbox::after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background-color: var(--bg-primary);
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    background-color: var(--bg-primary);
+}
+
+/* Фокус (для доступности) */
+.hidden-checkbox:focus + .custom-checkbox {
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+}
+
+/* ============================================
+    Sorting
+    ============================================ */
+
+.sidebar-select {
+    flex: 1;
+    padding: 0.35rem 0.65rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--border);
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394A3B8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.65rem center;
+    background-size: 12px;
+    padding-right: 2rem;
+}
+
+.sidebar-select:hover {
+    border-color: var(--accent-hover);
+}
+
+.sidebar-select:focus {
+    outline: none;
+    border-color: var(--accent-hover);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
