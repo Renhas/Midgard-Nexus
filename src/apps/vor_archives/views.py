@@ -1,8 +1,9 @@
+from django.db.models import prefetch_related_objects
 from django.conf import settings
 from django.shortcuts import render
 
 from .constants import AgeRatingChoices, UserWorkStatusChoices
-from .models import Collection, Platform, BookGenre, FilmGenre, GameGenre
+from .models import Collection, Platform, BookGenre, FilmGenre, GameGenre, UserWork
 
 def _module_context():
     """Возвращает общие переменные шаблона для модуля vor_archives."""
@@ -40,6 +41,10 @@ def index(request):
         {'value': 'status', 'label': 'Статус'},
         {'value': 'date_added', 'label': 'Дата добавления'},
     ]
+    user_works = UserWork.objects.filter(
+        user=request.user,
+    ).select_related('work_content_type').order_by('order_position', '-date_added')
+    prefetch_related_objects(user_works, 'work') # type: ignore
     return render(request, 'vor_archives/artworks.html', {
         'module_name': module['name'],
         'module_icon': module['icon'],
@@ -54,6 +59,7 @@ def index(request):
         'sort_field_default': 'custom',
         'sort_order_asc': True,
         'work_types': work_types_default,
+        'user_works': user_works,
     })
 
 
