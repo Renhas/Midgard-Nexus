@@ -173,8 +173,14 @@
 
 .sidebar-collections-list {
     flex: 1;
-    overflow: auto;
+    overflow-x: auto;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 0.125rem;
+    min-width: 0;
+}
+
+.collection-item {
+    white-space: nowrap;
 }

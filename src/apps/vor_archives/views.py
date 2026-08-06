@@ -11,7 +11,7 @@ def index(request):
     """Главная страница модуля «Библиотека» — страница произведений."""
     from .models import Collection
     module = _module_context()
-    collections = Collection.objects.filter(parent=None)
+    collections = Collection.objects.filter(user=request.user, parent=None)
     return render(request, 'vor_archives/artworks.html', {
         'module_name': module['name'],
         'module_icon': module['icon'],
