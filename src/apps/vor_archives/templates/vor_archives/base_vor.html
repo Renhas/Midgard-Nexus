@@ -1,11 +1,34 @@
 {% extends "base_app.html" %}
 {% load static %}
 
-{% block title %}{{ module_name }} — Midgard Nexus{% endblock %}
+{% block title %}{{ module_name }}{% endblock %}
 
 {% block extra_head %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/vor_archives.css' %}">
+{% endblock %}
+
+{% block header_center %}
+<div class="btn-group btn-group-sm" role="group">
+    <a href="{% url 'vor_archives:index' %}"
+       class="nav-btn{% if active_section == 'artworks' %} active{% endif %}"
+       title="Произведения">
+        <i class="bi bi-collection header-icon"></i>
+        <span class="vor-nav-label">Произведения</span>
+    </a>
+    <a href="{% url 'vor_archives:attributes' %}"
+       class="nav-btn{% if active_section == 'attributes' %} active{% endif %}"
+       title="Аттрибуты">
+        <i class="bi bi-tags header-icon"></i>
+        <span class="vor-nav-label">Аттрибуты</span>
+    </a>
+    <a href="{% url 'vor_archives:dashboard' %}"
+       class="nav-btn{% if active_section == 'dashboard' %} active{% endif %}"
+       title="Дашборд">
+        <i class="bi bi-bar-chart-line header-icon"></i>
+        <span class="vor-nav-label">Дашборд</span>
+    </a>
+</div>
 {% endblock %}
 
 {% block content %}
@@ -17,20 +40,7 @@
                     @click="leftOpen = !leftOpen" title="Скрыть панель">
                 <i class="bi bi-chevron-left"></i>
             </button>
-            <nav class="vor-nav">
-                <a href="{% url 'vor_archives:dashboard' %}"
-                   class="vor-nav-btn{% if active_section == 'dashboard' %} active{% endif %}">
-                    <i class="bi bi-bar-chart-line"></i>
-                    <span class="vor-nav-label">Дашборд</span>
-                </a>
-                {% block collection_nav %}
-                <a href="{% url 'vor_archives:index' %}"
-                   class="vor-nav-btn{% if active_section == 'collection' %} active{% endif %}">
-                    <i class="bi bi-collection"></i>
-                    <span class="vor-nav-label">Коллекция</span>
-                </a>
-                {% endblock %}
-            </nav>
+            {% block left_content %}{% endblock %}
         </div>
     </aside>
     <button type="button"

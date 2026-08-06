@@ -1,0 +1,16 @@
+{% extends "vor_archives/base_vor.html" %}
+
+{% block title %}{{ block.super }} - Аттрибуты{% endblock %}
+
+{% block vor_content %}
+<div class="card content-card">
+    <div class="card-body p-4 text-center">
+        <i class="{{ module_icon }} display-2 mb-3" style="color: {{ module_color }};"></i>
+        <h2 class="text-secondary mb-3">Аттрибуты</h2>
+        <p class="text-muted">Раздел "{{ module_name }}" находится в разработке</p>
+        <p class="text-secondary small">
+            Здесь скоро будут доступны инструменты управления атрибутами.
+        </p>
+    </div>
+</div>
+{% endblock %}

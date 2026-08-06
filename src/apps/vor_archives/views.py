@@ -10,11 +10,11 @@ def _module_context():
 def index(request):
     """Главная страница модуля «Библиотека» — страница коллекции."""
     module = _module_context()
-    return render(request, 'vor_archives/collection.html', {
+    return render(request, 'vor_archives/artworks.html', {
         'module_name': module['name'],
         'module_icon': module['icon'],
         'module_color': module['color'],
-        'active_section': 'collection',
+        'active_section': 'artworks',
     })
 
 
@@ -26,4 +26,15 @@ def dashboard(request):
         'module_icon': module['icon'],
         'module_color': module['color'],
         'active_section': 'dashboard',
+    })
+
+
+def attributes(request):
+    """Страница атрибутов модуля «Библиотека»."""
+    module = _module_context()
+    return render(request, 'vor_archives/attributes.html', {
+        'module_name': module['name'],
+        'module_icon': module['icon'],
+        'module_color': module['color'],
+        'active_section': 'attributes',
     })

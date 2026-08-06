@@ -11,25 +11,30 @@
     <div class="container-fluid">
         <!-- Left: Home + Module Icons -->
         <div class="d-flex align-items-center gap-2">
-            <a class="btn btn-outline-light btn-sm" href="{% url 'home' %}" title="Главная">
-                <i class="bi bi-house-fill fs-5"></i>
+            <a class="nav-btn icon-only" href="{% url 'home' %}" title="Главная">
+                <i class="bi bi-house-fill header-icon"></i>
             </a>
             <div class="vr bg-secondary opacity-50"></div>
-            <a class="btn btn-outline-light btn-sm" href="{% url 'vor_archives:index' %}" title="{{ modules.0.name }}">
-                <i class="{{ modules.0.icon }} fs-5"></i>
+            <a class="nav-btn icon-only" href="{% url 'vor_archives:index' %}" title="{{ modules.0.name }}">
+                <i class="{{ modules.0.icon }} header-icon"></i>
             </a>
-            <a class="btn btn-outline-light btn-sm" href="{% url 'fafnir_cave:index' %}" title="{{ modules.1.name }}">
-                <i class="{{ modules.1.icon }} fs-5"></i>
+            <a class="nav-btn icon-only" href="{% url 'fafnir_cave:index' %}" title="{{ modules.1.name }}">
+                <i class="{{ modules.1.icon }} header-icon"></i>
             </a>
-            <a class="btn btn-outline-light btn-sm" href="{% url 'kvasir_records:index' %}" title="{{ modules.2.name }}">
-                <i class="{{ modules.2.icon }} fs-5"></i>
+            <a class="nav-btn icon-only" href="{% url 'kvasir_records:index' %}" title="{{ modules.2.name }}">
+                <i class="{{ modules.2.icon }} header-icon"></i>
             </a>
+        </div>
+
+        <!-- Center: overridable by child templates -->
+        <div class="d-flex align-items-center gap-2">
+            {% block header_center %}{% endblock %}
         </div>
 
         <!-- Right: Search + Avatar -->
         <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-outline-light btn-sm" type="button" title="Поиск">
-                <i class="bi bi-search fs-5"></i>
+            <button class="nav-btn icon-only" type="button" title="Поиск">
+                <i class="bi bi-search header-icon"></i>
             </button>
 
         {% include 'partials/user_avatar_dropdown.html' with btn_class='btn-outline-light' %}

@@ -18,6 +18,8 @@
     --accent-vor: #A78BFA;
     --accent-fafnir: #60A5FA;
     --accent-kvasir: #FB923C;
+
+    --header-icon-size: 1.5rem;
 }
 
 /* === Global Body === */
@@ -129,6 +131,58 @@ body {
     color: var(--text-primary);
     background-color: rgba(99, 102, 241, 0.15);
     border-color: var(--accent-hover);
+}
+
+/* ============================================
+   Nav buttons
+   ============================================ */
+
+.nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.8rem;        /* как btn-sm */
+    border-radius: 0.375rem;
+    border: 1px solid transparent;
+    background-color: transparent;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;            /* как btn-sm */
+    line-height: 1.5;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.nav-btn:hover {
+    color: var(--text-primary);
+    background-color: rgba(167, 145, 255, 0.1);
+    border-color: var(--border);
+}
+
+.nav-btn:active {
+    transform: scale(0.96);
+}
+
+.nav-btn.active {
+    color: var(--accent-vor);
+    border-color: var(--accent-vor);
+    background-color: rgba(167, 145, 255, 0.1);
+}
+
+.nav-btn .header-icon {
+    font-size: var(--header-icon-size);
+    line-height: 1;
+}
+
+.nav-btn .header-icon + span {
+    font-weight: 500;
+}
+
+.nav-btn.icon-only {
+    padding: 0.4rem 0.5rem;
+    aspect-ratio: 1 / 1;
 }
 
 /* ============================================
