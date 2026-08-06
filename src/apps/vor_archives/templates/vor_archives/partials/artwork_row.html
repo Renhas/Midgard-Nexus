@@ -1,0 +1,27 @@
+{% load vor_archives_extras %}
+<div class="artwork-row">
+    <div class="artwork-row-type">
+        <i class="{{ user_work|get_work_type_icon }}"></i>
+    </div>
+    <div class="artwork-row-title" title="{{ user_work.work.title }}">
+        {{ user_work.work.title }}
+    </div>
+    <div class="artwork-row-year">
+        {% if user_work.work.release_date %}
+            {{ user_work.work.release_date|date:'Y' }}
+        {% endif %}
+    </div>
+    <div class="artwork-row-status status-{{ user_work.status }}">
+        {{ user_work.get_status_display }}
+    </div>
+    <div class="artwork-row-rating">
+        {% if user_work.rating %}
+            {{ user_work.rating }}
+        {% else %}
+            —
+        {% endif %}
+    </div>
+    <div class="artwork-row-progress">
+        {{ user_work|format_progress }}
+    </div>
+</div>

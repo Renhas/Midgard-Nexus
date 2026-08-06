@@ -1,0 +1,81 @@
+{% extends "base_app.html" %}
+{% load static %}
+
+{% block title %}{{ module_name }}{% endblock %}
+
+{% block extra_head %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/vor_archives.css' %}">
+{% endblock %}
+
+{% block header_center %}
+<div class="btn-group btn-group-sm" role="group">
+    <a href="{% url 'vor_archives:index' %}"
+       class="nav-btn{% if active_section == 'artworks' %} active{% endif %}"
+       title="Произведения">
+        <i class="bi bi-collection header-icon"></i>
+        <span class="vor-nav-label">Произведения</span>
+    </a>
+    <a href="{% url 'vor_archives:attributes' %}"
+       class="nav-btn{% if active_section == 'attributes' %} active{% endif %}"
+       title="Аттрибуты">
+        <i class="bi bi-tags header-icon"></i>
+        <span class="vor-nav-label">Аттрибуты</span>
+    </a>
+    <a href="{% url 'vor_archives:dashboard' %}"
+       class="nav-btn{% if active_section == 'dashboard' %} active{% endif %}"
+       title="Дашборд">
+        <i class="bi bi-bar-chart-line header-icon"></i>
+        <span class="vor-nav-label">Дашборд</span>
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="layout" x-data="{ leftOpen: true, rightOpen: true }">
+    <!-- Left sidebar (15 %) -->
+    <aside class="sidebar sidebar-left" :class="{ collapsed: !leftOpen }">
+        <div class="sidebar-body">
+            <button type="button" class="sidebar-toggle toggle-left"
+                    @click="leftOpen = !leftOpen" title="Скрыть панель">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            {% block left_content %}{% endblock %}
+        </div>
+    </aside>
+    <button type="button"
+            class="expand expand-left"
+            x-cloak
+            :class="{ 'd-none': leftOpen }"
+            @click="leftOpen = true" title="Показать панель">
+        <i class="bi bi-chevron-right"></i>
+    </button>
+
+    <!-- Center content (70 %) -->
+    <div class="center"
+         :class="{ 'left-collapsed': !leftOpen, 'right-collapsed': !rightOpen }">
+        {% block vor_content %}{% endblock %}
+    </div>
+
+    <!-- Right sidebar (15 %) -->
+    <aside class="sidebar sidebar-right" :class="{ collapsed: !rightOpen }">
+        <div class="sidebar-body">
+            <button type="button" class="sidebar-toggle toggle-right"
+                @click="rightOpen = !rightOpen" title="Скрыть панель">
+            <i class="bi bi-chevron-right"></i>
+            </button>
+            {% block right_content %}{% endblock %}
+        </div>
+    </aside>
+    <button type="button"
+            class="expand expand-right"
+            x-cloak
+            :class="{ 'd-none': rightOpen }"
+            @click="rightOpen = true" title="Показать панель">
+        <i class="bi bi-chevron-left"></i>
+    </button>
+
+    <!-- Page-level notifications -->
+    {% block page_notifications %}{% endblock %}
+</div>
+{% endblock %}

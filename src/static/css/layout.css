@@ -1,0 +1,108 @@
+/* ============================================
+    Midgard Nexus — Layout Styles
+    ============================================ */
+
+/* === 3-segment layout === */
+.layout {
+    position: relative;
+    min-height: calc(100vh - 56px);
+}
+
+/* === Sidebars (15 % of viewport width each) === */
+.sidebar {
+    position: fixed;
+    top: 56px;
+    bottom: 0;
+    width: 15vw;
+    min-width: 180px;
+    max-width: 220px;
+    background-color: var(--bg-card);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.sidebar-left  { left: 0; }
+.sidebar-right {
+    right: 0;
+    border-left: 1px solid var(--border);
+    border-right: none;
+}
+
+.sidebar.collapsed {
+    z-index: 999;
+}
+.sidebar-left.collapsed  { transform: translateX(-100%); }
+.sidebar-right.collapsed { transform: translateX(100%); }
+
+/* === Expand handle (top-edge, same style as toggle) === */
+.expand {
+    position: fixed;
+    top: calc(56px + 0.75rem);
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+.expand:hover {
+    color: var(--accent-hover);
+    border-color: var(--accent-hover);
+    background-color: rgba(167, 145, 255, 0.1);
+}
+.expand-left  { left: 0; }
+.expand-right { right: 0; }
+.expand i { font-size: 1.1rem; }
+
+/* === Sidebar body (holds toggle + nav) === */
+.sidebar-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-top: 0.5rem;
+}
+
+/* === Sidebar toggle button === */
+.sidebar-toggle {
+    align-self: flex-end;
+    margin: 0.25rem 0.5rem 0.25rem 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+.sidebar-toggle:hover {
+    color: var(--accent-hover);
+    border-color: var(--accent-hover);
+    background-color: rgba(167, 145, 255, 0.1);
+}
+.toggle-left  { margin-right: auto; margin-left: 0.5rem; }
+.toggle-right { margin-left: auto; margin-right: 0.5rem; }
+.sidebar-toggle i { font-size: 1.1rem; }
+
+.content-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+}
+
+/* === Center content (70 %) === */
+.center {
+    margin-left: 15vw;
+    margin-right: 15vw;
+    padding: 1.5rem;
+    transition: margin-left 0.3s ease, margin-right 0.3s ease;
+}
+.center.left-collapsed  { margin-left: 0; }
+.center.right-collapsed { margin-right: 0; }
