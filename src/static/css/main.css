@@ -183,6 +183,17 @@ body {
     font-weight: 500;
 }
 
+.home-icon {
+    width: var(--header-icon-size);
+    height: var(--header-icon-size);
+    color: var(--text-secondary);
+    display: block;
+}
+
+.nav-btn:hover .home-icon {
+    color: var(--text-primary);
+}
+
 .nav-btn.icon-only {
     padding: 0.4rem 0.5rem;
     aspect-ratio: 1 / 1;
