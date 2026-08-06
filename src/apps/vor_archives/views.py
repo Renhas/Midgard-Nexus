@@ -8,13 +8,16 @@ def _module_context():
 
 
 def index(request):
-    """Главная страница модуля «Библиотека» — страница коллекции."""
+    """Главная страница модуля «Библиотека» — страница произведений."""
+    from .models import Collection
     module = _module_context()
+    collections = Collection.objects.filter(parent=None)
     return render(request, 'vor_archives/artworks.html', {
         'module_name': module['name'],
         'module_icon': module['icon'],
         'module_color': module['color'],
         'active_section': 'artworks',
+        'collections': collections,
     })
 
 
