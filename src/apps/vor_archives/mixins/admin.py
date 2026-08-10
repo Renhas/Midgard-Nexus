@@ -1,6 +1,6 @@
 from django.contrib.contenttypes.models import ContentType
 
-ALLOWED_MODELS = ["book", "film", "series", "game"]
+ALLOWED_MODELS = ["book", "film", "game"]
 ALLOWED_CONTENTTYPES = ContentType.objects.filter(model__in=ALLOWED_MODELS, app_label='vor_archives')
 
 class RestrictedContentTypeAdminMixin:

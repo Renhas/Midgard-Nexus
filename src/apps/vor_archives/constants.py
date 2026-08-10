@@ -10,6 +10,10 @@ class AgeRatingChoices(models.TextChoices):
     RATING_16 = ("16+", "16+")
     RATING_18 = ("18+", "18+")
 
+class FilmTypeChoices(models.TextChoices):
+    MOVIE = ("movie", "Movie")
+    TV_SHOW = ("tv_show", "TV Show")
+
 
 class WorkRelationTypeChoices(models.TextChoices):
     SEQUEL = ("sequel", "Sequel")
