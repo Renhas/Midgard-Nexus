@@ -5,10 +5,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 from mptt.models import MPTTModel, TreeForeignKey
 
 from .constants import (
     AgeRatingChoices,
+    FilmTypeChoices,
     FeedItemActionTypeChoices,
     UserWorkStatusChoices,
     WorkRelationTypeChoices,
@@ -16,7 +18,7 @@ from .constants import (
 from .validators import validate_gfk, validate_relation_type, CycleChecker
 
 
-# ─── Person, Platform, Genres ────────────────────────────────────────────────
+# ─── Person, Platform, Genres, Tag ────────────────────────────────────────────────
 
 
 class Person(models.Model):
@@ -50,14 +52,6 @@ class FilmGenre(models.Model):
         return self.name
 
 
-class SeriesGenre(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    description = models.TextField(blank=True)
-
-    def __str__(self):
-        return self.name
-
-
 class GameGenre(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True)
@@ -65,6 +59,12 @@ class GameGenre(models.Model):
     def __str__(self):
         return self.name
 
+class Tag(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
 
 # ─── Abstract base ───────────────────────────────────────────────────────────
 
@@ -75,12 +75,11 @@ class AWork(models.Model):
     description = models.TextField(blank=True)
     cover = models.ImageField(upload_to="covers/", blank=True, null=True)
     authors = models.ManyToManyField(Person, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True)
     external_link = models.URLField(max_length=500, blank=True, null=True)
     age_rating = models.CharField(
-        max_length=3,
         choices=AgeRatingChoices.choices,
         blank=True,
-        null=True,
     )
 
     relations_source = GenericRelation(
@@ -127,19 +126,39 @@ class Book(AWork):
 class Film(AWork):
     duration_minutes = models.PositiveIntegerField()
     genres = models.ManyToManyField(FilmGenre, blank=True)
+    episode_count = models.PositiveIntegerField(blank=True, null=True)
+    film_type = models.CharField(choices=FilmTypeChoices.choices)
+
+    class Meta(AWork.Meta):
+        abstract = False
+        constraints = [
+            models.CheckConstraint(
+                name="check_episode_count_by_type",
+                condition=(
+                    Q(film_type=FilmTypeChoices.MOVIE, episode_count__isnull=True) |
+                    Q(film_type=FilmTypeChoices.TV_SHOW, episode_count__isnull=False)
+                )
+            )
+        ]
+
+    def clean(self):
+        super().clean()
+        if self.episode_count and self.film_type != FilmTypeChoices.TV_SHOW:
+            raise ValidationError({
+                'episode_count': 'Only for TV Shows'
+            })
+        if not self.episode_count and self.film_type == FilmTypeChoices.TV_SHOW:
+            raise ValidationError({
+                'episode_count': 'Must be not null for TV Shows'
+            })
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Film: {self.title}"
-
-
-class Series(AWork):
-    total_episodes = models.PositiveIntegerField()
-    episode_duration_minutes = models.PositiveIntegerField()
-    genres = models.ManyToManyField(SeriesGenre, blank=True)
-
-    def __str__(self):
-        return f"Series: {self.title}"
-
+    
 
 class Game(AWork):
     platforms = models.ManyToManyField(Platform, blank=True)

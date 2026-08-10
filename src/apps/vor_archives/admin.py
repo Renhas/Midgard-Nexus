@@ -24,7 +24,7 @@ class CollectionItemInline(GenericTabularInline):
     extra = 0
 
 
-# ─── Person & Platform ───────────────────────────────────────────────────────
+# ─── Person, Platform & Tags ───────────────────────────────────────────────────────
 
 
 @admin.register(models.Person)
@@ -35,6 +35,11 @@ class PersonAdmin(admin.ModelAdmin):
 
 @admin.register(models.Platform)
 class PlatformAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+    search_fields = ("name",)
+
+@admin.register(models.Tag)
+class TagAdmin(admin.ModelAdmin):
     list_display = ("name",)
     search_fields = ("name",)
 
@@ -50,12 +55,6 @@ class BookGenreAdmin(admin.ModelAdmin):
 
 @admin.register(models.FilmGenre)
 class FilmGenreAdmin(admin.ModelAdmin):
-    list_display = ("name",)
-    search_fields = ("name",)
-
-
-@admin.register(models.SeriesGenre)
-class SeriesGenreAdmin(admin.ModelAdmin):
     list_display = ("name",)
     search_fields = ("name",)
 
@@ -85,11 +84,6 @@ class BookAdmin(AWorkAdmin):
 @admin.register(models.Film)
 class FilmAdmin(AWorkAdmin):
     list_display = ("title", "duration_minutes", "release_date", "age_rating")
-
-
-@admin.register(models.Series)
-class SeriesAdmin(AWorkAdmin):
-    list_display = ("title", "total_episodes", "episode_duration_minutes", "release_date", "age_rating")
 
 
 @admin.register(models.Game)
