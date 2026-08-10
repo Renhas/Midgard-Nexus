@@ -1,5 +1,7 @@
 from django import template
 
+from ..constants import FilmTypeChoices
+
 register = template.Library()
 
 
@@ -12,7 +14,6 @@ def get_work_type_icon(user_work):
     icons = {
         'book': 'icon-book-text',
         'film': 'icon-clapperboard',
-        'series': 'icon-film',
         'game': 'icon-gamepad-2',
     }
     return icons.get(model_name, 'bi bi-collection')
@@ -24,14 +25,18 @@ def format_progress(user_work):
         return '—'
     work = user_work.work
     model_name = work._meta.model_name
-    progress = user_work.progress or 0
+    progress = round(user_work.progress) or 0
 
     if model_name == 'book':
-        max_pages = getattr(work, 'pages', 0)
+        max_pages = work.pages
         return f'{progress}/{max_pages} стр.'
-    elif model_name == 'film':
-        duration = getattr(work, 'duration_minutes', 0)
-        return f'{progress}/{duration} мин.'
     elif model_name == 'game':
         return f'{progress} ч.'
+    elif model_name == 'film':
+        f_type = work.film_type
+        if f_type == FilmTypeChoices.MOVIE:
+            duration = work.duration_minutes
+            return f'{progress}/{duration} мин.'
+        if f_type == FilmTypeChoices.TV_SHOW:
+            return f"{progress}/{work.episode_count} эп."
     return '—'

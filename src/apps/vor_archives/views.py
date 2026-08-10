@@ -3,7 +3,7 @@ from django.conf import settings
 from django.shortcuts import render
 
 from .constants import AgeRatingChoices, UserWorkStatusChoices
-from .models import Collection, Platform, BookGenre, FilmGenre, GameGenre, UserWork
+from .models import Collection, Platform, BookGenre, FilmGenre, GameGenre, UserWork, Tag
 
 def _module_context():
     """Возвращает общие переменные шаблона для модуля vor_archives."""
@@ -17,6 +17,7 @@ def index(request):
     status_options = [{'value': v, 'label': l} for v, l in UserWorkStatusChoices.choices]
     age_rating_options = [{'value': v, 'label': l} for v, l in AgeRatingChoices.choices]
     platform_options = [{'value': p.id, 'label': p.name} for p in Platform.objects.all()] # type: ignore
+    tags_options = [{'value': p.id, 'label': p.name} for p in Tag.objects.all()] # type: ignore
     genre_models = [
         ('book', BookGenre, 'Книги'),
         ('film', FilmGenre, 'Фильмы'),
@@ -53,6 +54,7 @@ def index(request):
         'collections': collections,
         'status_options': status_options,
         'age_rating_options': age_rating_options,
+        'tags_options': tags_options,
         'platform_options': platform_options,
         'genres_nested': genres_nested,
         'sort_fields': sort_fields,
