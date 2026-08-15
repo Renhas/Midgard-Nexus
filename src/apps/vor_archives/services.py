@@ -36,6 +36,24 @@ def user_has_work(user, work) -> bool:
     ).exists()
 
 
+def user_owned_work_ids(user, type_key):
+    model = get_work_model(type_key)
+    ct = ContentType.objects.get_for_model(model)
+    return UserWork.objects.filter(
+        user=user,
+        work_content_type=ct,
+    ).values_list("work_object_id", flat=True)
+
+
+def user_has_work_title(user, type_key, title) -> bool:
+    title = (title or "").strip()
+    if not title:
+        return False
+    model = get_work_model(type_key)
+    owned_ids = user_owned_work_ids(user, type_key)
+    return model.objects.filter(pk__in=owned_ids, title__iexact=title).exists()
+
+
 def orphan_works(user_works):
     """Произведения, у которых после удаления этих UserWork не останется привязок."""
     user_works = list(user_works)

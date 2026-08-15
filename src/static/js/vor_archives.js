@@ -98,34 +98,55 @@
 
         Alpine.data("vorAddOverlay", (opts = {}) => ({
             workType: opts.workType || "book",
-            title: opts.title || "",
+            workTitle: opts.workTitle || "",
             selectedWorkId: null,
+            alreadyOwned: false,
             filmType: "movie",
             setType(type) {
                 this.workType = type;
                 this.clearSelection();
-                const suggestions = document.getElementById("work-suggestions");
-                if (suggestions) {
-                    suggestions.innerHTML = "";
-                }
-                if (this.title.trim()) {
-                    this.$nextTick(() => {
-                        const input = document.getElementById("add-title-input");
-                        if (input) {
-                            htmx.trigger(input, "input");
-                        }
-                    });
-                }
+                this.refreshSearch();
+            },
+            onTitleInput() {
+                this.clearSelection();
             },
             selectWork(id) {
                 this.selectedWorkId = Number(id);
+                this.clearSuggestions();
             },
             clearSelection() {
                 this.selectedWorkId = null;
+                this.alreadyOwned = false;
                 const preview = document.getElementById("add-preview");
                 if (preview) {
                     preview.innerHTML = "";
                 }
+            },
+            clearSuggestions() {
+                const suggestions = document.getElementById("work-suggestions");
+                if (suggestions) {
+                    suggestions.innerHTML = "";
+                }
+            },
+            refreshSearch() {
+                this.clearSuggestions();
+                const query = String(this.workTitle || "").trim();
+                if (!query) {
+                    return;
+                }
+                const input = document.getElementById("add-title-input");
+                const url = input?.dataset.searchUrl;
+                if (!url) {
+                    return;
+                }
+                const params = new URLSearchParams({
+                    work_type: this.workType,
+                    q: query,
+                });
+                htmx.ajax("GET", `${url}?${params.toString()}`, {
+                    target: "#work-suggestions",
+                    swap: "innerHTML",
+                });
             },
         }));
     });

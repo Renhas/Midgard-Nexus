@@ -16,6 +16,8 @@ from .services import (
     get_work,
     orphan_works,
     user_has_work,
+    user_has_work_title,
+    user_owned_work_ids,
     work_type_key,
 )
 
@@ -229,6 +231,12 @@ def artwork_add(request):
         forms = _add_work_forms(type_key, request.POST, request.FILES)
         work_form = forms[f"{type_key}_form"]
         user_work_form = UserWorkForm(request.POST)
+        title_value = request.POST.get("title", "")
+        if user_has_work_title(request.user, type_key, title_value):
+            work_form.add_error(
+                "title",
+                "Произведение с таким названием уже есть в вашем списке",
+            )
         if work_form.is_valid() and user_work_form.is_valid():
             work = work_form.save()
             create_work_and_attach(request.user, work, user_work_form)
@@ -238,7 +246,7 @@ def artwork_add(request):
             "work_form": work_form,
             "work_type": type_key,
             "user_work_form": user_work_form,
-            "title_value": request.POST.get("title", ""),
+            "title_value": title_value,
             "create_errors": True,
             "progress_unit": _progress_unit(type_key=type_key),
         })
@@ -270,12 +278,22 @@ def artwork_search(request):
     query = (request.GET.get("q") or request.GET.get("title") or "").strip()
     model = WORK_MODELS.get(type_key)
     works = []
+    already_owned = False
     if model and len(query) >= 1:
-        works = model.objects.filter(title__icontains=query).order_by("title")[:10]
+        owned_ids = user_owned_work_ids(request.user, type_key)
+        already_owned = model.objects.filter(
+            pk__in=owned_ids, title__iexact=query
+        ).exists()
+        works = list(
+            model.objects.filter(title__icontains=query)
+            .exclude(pk__in=owned_ids)
+            .order_by("title")[:10]
+        )
     return render(request, "vor_archives/partials/work_suggestions.html", {
         "works": works,
         "work_type": type_key,
         "query": query,
+        "already_owned": already_owned,
     })
 
 

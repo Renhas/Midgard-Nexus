@@ -1,5 +1,5 @@
 <div class="vor-overlay"
-     x-data="vorAddOverlay({ workType: '{{ work_type|default:'book' }}', title: '{{ title_value|default:''|escapejs }}' })">
+     x-data="vorAddOverlay({ workType: '{{ work_type|default:'book' }}', workTitle: '{{ title_value|default:''|escapejs }}' })">
     <div class="vor-overlay-bar">
         <button type="button" class="sidebar-btn" @click="$store.vorArtworks.closeOverlay()">
             <i class="bi bi-arrow-left"></i>
@@ -26,10 +26,11 @@
                    class="form-control"
                    type="text"
                    name="q"
-                   x-model="title"
-                   @input="clearSelection()"
+                   x-model="workTitle"
+                   @input="onTitleInput()"
                    placeholder="Начните вводить название…"
                    autocomplete="off"
+                   data-search-url="{% url 'vor_archives:artwork_search' %}"
                    hx-get="{% url 'vor_archives:artwork_search' %}"
                    hx-trigger="input changed delay:300ms"
                    hx-include="[name='work_type']"
@@ -41,7 +42,7 @@
         <div id="add-preview" x-show="selectedWorkId"></div>
 
         <form class="vor-create-form"
-              x-show="title.trim() && !selectedWorkId"
+              x-show="workTitle.trim() && !selectedWorkId && !alreadyOwned"
               {% if not create_errors %}x-cloak{% endif %}
               hx-post="{% url 'vor_archives:artwork_add' %}"
               hx-target="#vor-overlay"
@@ -49,7 +50,7 @@
               hx-encoding="multipart/form-data">
             {% csrf_token %}
             <input type="hidden" name="work_type" :value="workType">
-            <input type="hidden" name="title" :value="title">
+            <input type="hidden" name="title" :value="workTitle">
 
             {% if work_form.non_field_errors %}
                 <div class="vor-field-errors">{{ work_form.non_field_errors }}</div>

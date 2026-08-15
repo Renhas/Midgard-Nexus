@@ -1,25 +1,25 @@
 {% load vor_archives_extras %}
-{% if query %}
-    {% if works %}
-        <ul class="vor-suggestions-list">
-            {% for work in works %}
-                <li>
-                    <button type="button"
-                            class="vor-suggestion-item"
-                            @click="selectWork({{ work.pk }})"
-                            hx-get="{% url 'vor_archives:artwork_preview' %}?type={{ work_type }}&work_id={{ work.pk }}"
-                            hx-target="#add-preview"
-                            hx-swap="innerHTML">
-                        <i class="{{ work|get_model_icon }}"></i>
-                        <span class="vor-suggestion-title">{{ work.title }}</span>
-                        {% if work.release_date %}
-                            <span class="vor-suggestion-year">{{ work.release_date|date:'Y' }}</span>
-                        {% endif %}
-                    </button>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <div class="vor-suggestions-empty">Совпадений нет — будет создано новое произведение</div>
-    {% endif %}
+<div hidden x-init="alreadyOwned = {{ already_owned|yesno:'true,false' }}"></div>
+{% if already_owned %}
+    <div class="vor-add-warning">Это произведение уже есть в вашем списке</div>
+{% endif %}
+{% if works %}
+    <ul class="vor-suggestions-list">
+        {% for work in works %}
+            <li>
+                <button type="button"
+                        class="vor-suggestion-item"
+                        @click="selectWork({{ work.pk }})"
+                        hx-get="{% url 'vor_archives:artwork_preview' %}?type={{ work_type }}&work_id={{ work.pk }}"
+                        hx-target="#add-preview"
+                        hx-swap="innerHTML">
+                    <i class="{{ work|get_model_icon }}"></i>
+                    <span class="vor-suggestion-title">{{ work.title }}</span>
+                    {% if work.release_date %}
+                        <span class="vor-suggestion-year">{{ work.release_date|date:'Y' }}</span>
+                    {% endif %}
+                </button>
+            </li>
+        {% endfor %}
+    </ul>
 {% endif %}
