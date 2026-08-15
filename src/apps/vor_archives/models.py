@@ -281,6 +281,12 @@ class UserWork(models.Model):
     owned_platforms = models.ManyToManyField(Platform, blank=True)
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "work_content_type", "work_object_id"],
+                name="unique_user_work",
+            ),
+        ]
         indexes = [
             models.Index(fields=["work_content_type", "work_object_id"]),
             models.Index(fields=["user", "order_position"]),

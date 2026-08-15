@@ -5,12 +5,15 @@
 {% block left_content %}
 <div class="sidebar-nav">
     <div class="sidebar-nav-row">
-        <a href="{% url 'vor_archives:index' %}"
-           class="sidebar-btn sidebar-btn-primary"
-           title="Все произведения">
+        <button type="button"
+                class="sidebar-btn sidebar-btn-primary"
+                title="Все произведения"
+                hx-get="{% url 'vor_archives:artwork_list' %}"
+                hx-target="#artwork-list"
+                hx-swap="outerHTML">
             <i class="bi bi-collection"></i>
             <span>Все произведения</span>
-        </a>
+        </button>
         <button type="button"
                 class="sidebar-btn sidebar-btn-icon"
                 title="Поиск">
@@ -20,13 +23,36 @@
     <div class="sidebar-nav-row">
         <button type="button"
                 class="sidebar-btn sidebar-btn-add"
-                title="Добавить">
+                title="Добавить"
+                x-show="!$store.vorArtworks.deleteMode"
+                hx-get="{% url 'vor_archives:artwork_add' %}"
+                hx-target="#vor-overlay"
+                hx-swap="innerHTML">
             <i class="bi bi-plus-circle"></i>
         </button>
         <button type="button"
+                class="sidebar-btn sidebar-btn-grow"
+                title="Выйти из режима"
+                x-show="$store.vorArtworks.deleteMode"
+                x-cloak
+                @click="$store.vorArtworks.exitDeleteMode()">
+            Выйти из режима
+        </button>
+        <button type="button"
                 class="sidebar-btn sidebar-btn-delete"
-                title="Удалить">
+                title="Удалить"
+                x-show="!$store.vorArtworks.deleteMode"
+                @click="$store.vorArtworks.enterDeleteMode()">
             <i class="bi bi-trash"></i>
+        </button>
+        <button type="button"
+                class="sidebar-btn sidebar-btn-delete"
+                title="Подтвердить"
+                x-show="$store.vorArtworks.deleteMode"
+                x-cloak
+                :disabled="!$store.vorArtworks.selectedIds.length"
+                @click="$store.vorArtworks.openPreview()">
+            Подтвердить
         </button>
     </div>
     <hr class="sidebar-divider">
@@ -50,22 +76,12 @@
 {% endblock %}
 
 {% block vor_content %}
-<div class="artwork-list">
-    <div class="artwork-list-header">
-        <div class="artwork-row-type"></div>
-        <div class="artwork-row-title">Название</div>
-        <div class="artwork-row-year">Год</div>
-        <div class="artwork-row-status">Статус</div>
-        <div class="artwork-row-rating">Рейтинг</div>
-        <div class="artwork-row-progress">Прогресс</div>
-    </div>
-    {% for user_work in user_works %}
-        {% include "vor_archives/partials/artwork_row.html" with user_work=user_work %}
-    {% empty %}
-        <div class="text-center text-muted py-4">
-            Произведения не найдены
-        </div>
-    {% endfor %}
+<div id="artwork-list"
+     class="artwork-list"
+     hx-get="{% url 'vor_archives:artwork_list' %}"
+     hx-trigger="load"
+     hx-swap="outerHTML">
+    <div class="text-center text-muted py-4">Загрузка…</div>
 </div>
 {% endblock %}
 
@@ -159,6 +175,10 @@
 {% endblock %}
 
 {% block page_notifications %}
+{% csrf_token %}
+<div id="vor-overlay"></div>
+<div id="vor-modal"
+     data-vor-delete-preview="{% url 'vor_archives:artwork_delete_preview' %}"></div>
 <div x-data="{ visible: false }"
     @collection-update.window="visible = true; setTimeout(() => visible = false, 3000)"
     :class="{ 'd-none': !visible }"

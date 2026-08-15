@@ -5,18 +5,25 @@ from ..constants import FilmTypeChoices
 register = template.Library()
 
 
+WORK_TYPE_ICONS = {
+    'book': 'icon-book-text',
+    'film': 'icon-clapperboard',
+    'game': 'icon-gamepad-2',
+}
+
+
+@register.filter
+def get_model_icon(obj):
+    if not obj:
+        return 'bi bi-collection'
+    return WORK_TYPE_ICONS.get(obj._meta.model_name, 'bi bi-collection')
+
+
 @register.filter
 def get_work_type_icon(user_work):
     if not user_work or not hasattr(user_work, 'work'):
         return ''
-    work = user_work.work
-    model_name = work._meta.model_name
-    icons = {
-        'book': 'icon-book-text',
-        'film': 'icon-clapperboard',
-        'game': 'icon-gamepad-2',
-    }
-    return icons.get(model_name, 'bi bi-collection')
+    return get_model_icon(user_work.work)
 
 
 @register.filter

@@ -25,7 +25,8 @@
 .sidebar-nav-row .sidebar-btn-add,
 .sidebar-nav-row .sidebar-btn-delete,
 .sidebar-nav-row .sidebar-btn-type,
-.sidebar-nav-row .sidebar-btn-display {
+.sidebar-nav-row .sidebar-btn-display,
+.sidebar-nav-row .sidebar-btn-grow {
     flex: 1;
 }
 
@@ -477,4 +478,402 @@
 }
 .status-dropped {
     color: var(--error);
+}
+
+.artwork-row-check {
+    width: 1.25rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.artwork-row-actions {
+    width: 2rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.artwork-row-delete {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.artwork-row:hover .artwork-row-delete {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.artwork-row.is-selected {
+    border-color: var(--action-delete);
+    background-color: rgba(239, 68, 68, 0.08);
+}
+
+.sidebar-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ============================================
+    Overlay
+    ============================================ */
+
+#vor-overlay:not(:empty) {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1020;
+    background-color: var(--bg-primary);
+    overflow: auto;
+}
+
+.vor-overlay {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 1.5rem 2rem;
+}
+
+.vor-overlay-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: var(--bg-primary);
+    padding: 0.25rem 0 0.75rem;
+}
+
+.vor-overlay-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.vor-type-switch {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.vor-overlay-body {
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.vor-overlay-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(260px, 0.9fr);
+    gap: 1.25rem;
+}
+
+.vor-overlay-section {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 1rem 1.15rem;
+    margin-bottom: 1rem;
+}
+
+.vor-overlay-section h3,
+.vor-overlay-section h4 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    margin-bottom: 0.85rem;
+}
+
+.vor-overlay-section fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+}
+
+.vor-overlay-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+}
+
+.vor-field {
+    margin-bottom: 0.75rem;
+}
+
+.vor-field-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.3rem;
+}
+
+.vor-field .form-control,
+.vor-field .form-select,
+.vor-add-search .form-control {
+    background-color: var(--bg-input);
+    border-color: var(--border);
+    color: var(--text-primary);
+}
+
+.vor-field .form-control:focus,
+.vor-field .form-select:focus,
+.vor-add-search .form-control:focus {
+    background-color: var(--bg-input);
+    border-color: var(--accent-hover);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+}
+
+.vor-field-check {
+    margin-top: 0.5rem;
+}
+
+.vor-check-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.vor-field-errors,
+.vor-field-errors ul {
+    color: var(--error);
+    font-size: 0.8rem;
+    margin: 0.25rem 0 0;
+    padding-left: 1rem;
+}
+
+.vor-field.has-error .form-control,
+.vor-field.has-error .form-select {
+    border-color: var(--error);
+}
+
+.vor-dl {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.vor-dl-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.9rem;
+}
+
+.vor-dl-row span {
+    color: var(--text-secondary);
+}
+
+.vor-dl-row strong {
+    color: var(--text-primary);
+    font-weight: 500;
+    text-align: right;
+}
+
+.vor-detail-cover {
+    width: 120px;
+    height: auto;
+    border-radius: 0.375rem;
+    margin-bottom: 0.75rem;
+}
+
+.vor-detail-desc {
+    margin-top: 0.75rem;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+}
+
+.vor-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+    cursor: pointer;
+}
+
+/* ============================================
+    Add / suggestions
+    ============================================ */
+
+.vor-add-search {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.vor-suggestions {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: 2;
+}
+
+.vor-suggestions-list {
+    list-style: none;
+    margin: 0.25rem 0 0;
+    padding: 0.25rem;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.375rem;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.vor-suggestion-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.6rem;
+    border: 0;
+    background: transparent;
+    color: var(--text-primary);
+    text-align: left;
+    border-radius: 0.25rem;
+}
+
+.vor-suggestion-item:hover {
+    background-color: rgba(167, 145, 255, 0.12);
+}
+
+.vor-suggestion-title {
+    flex: 1;
+}
+
+.vor-suggestion-year {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.vor-suggestions-empty {
+    margin-top: 0.35rem;
+    padding: 0.5rem 0.65rem;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.375rem;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+}
+
+.vor-preview-card {
+    display: flex;
+    gap: 1rem;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.vor-preview-cover {
+    width: 96px;
+    height: 128px;
+    object-fit: cover;
+    border-radius: 0.375rem;
+    flex-shrink: 0;
+}
+
+.vor-preview-cover-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-input);
+    color: var(--text-secondary);
+    font-size: 1.75rem;
+}
+
+.vor-preview-title {
+    font-size: 1.15rem;
+    margin-bottom: 0.25rem;
+}
+
+.vor-preview-meta,
+.vor-preview-desc {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.vor-preview-already {
+    margin-top: 0.75rem;
+    color: var(--accent-vor);
+}
+
+.vor-attach-form {
+    margin-top: 0.85rem;
+}
+
+/* ============================================
+    Delete modal
+    ============================================ */
+
+.vor-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    top: 56px;
+    z-index: 1025;
+    background-color: rgba(11, 17, 32, 0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.vor-modal {
+    width: min(480px, 100%);
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 1.25rem 1.35rem;
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.4);
+}
+
+.vor-modal-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.65rem;
+}
+
+.vor-modal-text {
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+}
+
+.vor-modal-warning {
+    border: 1px solid var(--action-delete);
+    background-color: rgba(239, 68, 68, 0.08);
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.vor-orphan-list {
+    max-height: 160px;
+    overflow-y: auto;
+    margin: 0.5rem 0 0;
+    padding-left: 1.15rem;
+}
+
+.vor-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+@media (max-width: 900px) {
+    .vor-overlay-columns {
+        grid-template-columns: 1fr;
+    }
 }

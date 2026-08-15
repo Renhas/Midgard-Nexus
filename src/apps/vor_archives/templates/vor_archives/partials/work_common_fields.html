@@ -1,0 +1,10 @@
+{% if show_title %}
+    {% include "vor_archives/partials/form_field.html" with field=form.title %}
+{% endif %}
+{% include "vor_archives/partials/form_field.html" with field=form.release_date %}
+{% include "vor_archives/partials/form_field.html" with field=form.description %}
+{% include "vor_archives/partials/form_field.html" with field=form.cover %}
+{% include "vor_archives/partials/form_field.html" with field=form.authors %}
+{% include "vor_archives/partials/form_field.html" with field=form.tags %}
+{% include "vor_archives/partials/form_field.html" with field=form.external_link %}
+{% include "vor_archives/partials/form_field.html" with field=form.age_rating %}

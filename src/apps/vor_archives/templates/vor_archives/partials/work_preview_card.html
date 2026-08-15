@@ -1,0 +1,46 @@
+{% load vor_archives_extras %}
+<div class="vor-preview-card" x-data="{ attaching: {{ attaching|yesno:'true,false' }} }">
+    {% if work.cover %}
+        <img class="vor-preview-cover" src="{{ work.cover.url }}" alt="{{ work.title }}">
+    {% else %}
+        <div class="vor-preview-cover vor-preview-cover-empty">
+            <i class="{{ work|get_model_icon }}"></i>
+        </div>
+    {% endif %}
+    <div class="vor-preview-body">
+        <h3 class="vor-preview-title">{{ work.title }}</h3>
+        <p class="vor-preview-meta">
+            {% if work.release_date %}{{ work.release_date|date:'Y' }}{% endif %}
+            {% if work.age_rating %} · {{ work.get_age_rating_display }}{% endif %}
+        </p>
+        {% if work.description %}
+            <p class="vor-preview-desc">{{ work.description|truncatewords:40 }}</p>
+        {% endif %}
+        {% if already %}
+            <p class="vor-preview-already">Уже в вашем списке</p>
+        {% else %}
+            <button type="button"
+                    class="sidebar-btn sidebar-btn-add"
+                    x-show="!attaching"
+                    @click="attaching = true">
+                Добавить в мой список
+            </button>
+            <form x-show="attaching"
+                  x-cloak
+                  class="vor-attach-form"
+                  hx-post="{% url 'vor_archives:artwork_attach' %}"
+                  hx-target="#add-preview"
+                  hx-swap="innerHTML"
+                  hx-encoding="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="work_type" value="{{ work_type }}">
+                <input type="hidden" name="work_id" value="{{ work.pk }}">
+                <div class="vor-overlay-section">
+                    <h4>Ваша информация</h4>
+                    {% include "vor_archives/partials/user_work_fields.html" with form=user_work_form progress_unit=progress_unit alpine_platforms="workType === 'game'" %}
+                </div>
+                <button type="submit" class="sidebar-btn sidebar-btn-add">Сохранить</button>
+            </form>
+        {% endif %}
+    </div>
+</div>

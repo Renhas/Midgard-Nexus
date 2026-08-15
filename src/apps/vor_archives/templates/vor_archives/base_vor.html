@@ -8,6 +8,11 @@
     <link rel="stylesheet" href="{% static 'css/vor_archives.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'js/vor_archives.js' %}"></script>
+{% endblock %}
+
 {% block header_center %}
 <div class="btn-group btn-group-sm" role="group">
     <a href="{% url 'vor_archives:index' %}"
