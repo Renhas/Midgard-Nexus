@@ -1,23 +1,29 @@
+from decimal import Decimal, InvalidOperation
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import prefetch_related_objects
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from .constants import AgeRatingChoices, FilmTypeChoices, UserWorkStatusChoices
-from .forms import WORK_FORMS, UserWorkForm
+from .forms import WORK_FORMS, UserWorkEditForm, UserWorkForm
+from .templatetags.vor_archives_extras import get_progress_info
 from .models import BookGenre, Collection, FilmGenre, GameGenre, Platform, Tag, UserWork
 from .services import (
     WORK_MODELS,
     attach_work,
     create_work_and_attach,
     delete_user_works,
+    get_user_work,
     get_work,
     orphan_works,
     user_has_work,
     user_has_work_title,
     user_owned_work_ids,
+    work_relation_items,
     work_type_key,
 )
 
@@ -154,11 +160,27 @@ def artwork_list(request):
     )
 
 
-def _detail_context(request, user_work, work_form, user_work_form, editing=False, global_edit=False):
-    work = user_work.work
+def _prefetch_work(work, user_work=None):
     type_key = work_type_key(work)
+    related = ["authors", "tags", "genres"]
+    if type_key == "game":
+        related.append("platforms")
+    prefetch_related_objects([work], *related)
+    if user_work is not None:
+        prefetch_related_objects([user_work], "owned_platforms")
+    return type_key
+
+
+def _detail_context(request, work, user_work=None, work_form=None, user_work_form=None, editing=False, global_edit=False):
+    type_key = work_type_key(work)
+    owned = user_work is not None
+    progress_meta = (get_progress_info(user_work) or {}) if owned else {}
+    owned_platform_ids = []
+    if owned:
+        owned_platform_ids = list(user_work.owned_platforms.values_list("pk", flat=True))
     return {
         "user_work": user_work,
+        "owned": owned,
         "work": work,
         "work_type": type_key,
         "work_form": work_form,
@@ -167,7 +189,40 @@ def _detail_context(request, user_work, work_form, user_work_form, editing=False
         "editing": editing,
         "global_edit": global_edit,
         "progress_unit": _progress_unit(work),
-        "hide_platforms": type_key != "game",
+        "progress_meta": progress_meta,
+        "hide_platforms": type_key != "game" or not owned,
+        "owned_platform_ids": owned_platform_ids,
+        "status_choices": UserWorkStatusChoices.choices,
+        "work_relations": work_relation_items(work),
+        "overlay_opts": {
+            "editing": editing,
+            "globalEdit": global_edit,
+            "owned": owned,
+            "filmType": getattr(work, "film_type", None) or "movie",
+            "status": user_work.status if owned else "planning",
+            "statusChoices": [
+                {"value": value, "label": label}
+                for value, label in UserWorkStatusChoices.choices
+            ],
+            "rating": (user_work.rating or 0) if owned else 0,
+            "isHidden": user_work.is_hidden if owned else False,
+            "progress": progress_meta.get("value", 0),
+            "progressMax": progress_meta.get("maximum"),
+            "progressUnit": progress_meta.get("unit", ""),
+            "progressStep": progress_meta.get("step", 1),
+            "timesCompleted": user_work.times_completed if owned else 0,
+            "lastCompletedDate": (
+                user_work.last_completed_date.strftime("%d.%m.%Y")
+                if owned and user_work.last_completed_date
+                else ""
+            ),
+            "quickUrl": (
+                reverse("vor_archives:artwork_quick", args=[user_work.pk])
+                if owned
+                else ""
+            ),
+            "listUrl": reverse("vor_archives:artwork_list"),
+        },
     }
 
 
@@ -178,33 +233,50 @@ def artwork_detail(request, uw_id):
     work = user_work.work
     if work is None:
         return HttpResponseBadRequest("Произведение не найдено")
-    type_key = work_type_key(work)
+    return _artwork_overlay_response(request, work, user_work)
+
+
+@login_required(login_url=LOGIN_URL)
+@require_http_methods(["GET", "POST"])
+def artwork_work(request, type_key, work_id):
+    if type_key not in WORK_MODELS:
+        return HttpResponseBadRequest("Неизвестный тип")
+    work = get_work(type_key, work_id)
+    user_work = get_user_work(request.user, work)
+    return _artwork_overlay_response(request, work, user_work)
+
+
+def _artwork_overlay_response(request, work, user_work=None):
+    type_key = _prefetch_work(work, user_work)
     work_form_class = _work_form_class(type_key)
-    prefetch_related_objects([user_work], "owned_platforms")
-    related = ["authors", "tags", "genres"]
-    if type_key == "game":
-        related.append("platforms")
-    prefetch_related_objects([work], *related)
 
     if request.method == "POST":
-        user_work_form = UserWorkForm(request.POST, instance=user_work)
         global_edit = request.POST.get("global_edit") == "1" and request.user.is_staff
+        user_work_form = (
+            UserWorkEditForm(request.POST, instance=user_work)
+            if user_work is not None
+            else None
+        )
         if global_edit:
             work_form = work_form_class(request.POST, request.FILES, instance=work)
-            if user_work_form.is_valid() and work_form.is_valid():
-                user_work_form.save()
+            user_ok = user_work_form is None or user_work_form.is_valid()
+            if user_ok and work_form.is_valid():
+                if user_work_form is not None:
+                    user_work_form.save()
                 work_form.save()
                 return _list_response(request, '{"vor:close-overlay": true}')
-        else:
+        elif user_work_form is not None:
             work_form = work_form_class(instance=work)
             if user_work_form.is_valid():
                 user_work_form.save()
                 return _list_response(request, '{"vor:close-overlay": true}')
+        else:
+            return HttpResponseBadRequest("Недостаточно прав")
         return render(
             request,
             "vor_archives/partials/artwork_overlay.html",
             _detail_context(
-                request, user_work, work_form, user_work_form,
+                request, work, user_work, work_form, user_work_form,
                 editing=True, global_edit=global_edit,
             ),
         )
@@ -213,11 +285,77 @@ def artwork_detail(request, uw_id):
         request,
         "vor_archives/partials/artwork_overlay.html",
         _detail_context(
-            request, user_work,
+            request, work, user_work,
             work_form_class(instance=work),
-            UserWorkForm(instance=user_work),
+            UserWorkEditForm(instance=user_work) if user_work is not None else None,
         ),
     )
+
+
+@login_required(login_url=LOGIN_URL)
+@require_POST
+def artwork_quick(request, uw_id):
+    user_work = get_object_or_404(UserWork, pk=uw_id, user=request.user)
+    field = request.POST.get("field")
+    value = request.POST.get("value", "")
+
+    if field == "status":
+        if value not in {choice[0] for choice in UserWorkStatusChoices.choices}:
+            return HttpResponseBadRequest("Некорректный статус")
+        user_work.status = value
+        if value == UserWorkStatusChoices.COMPLETED:
+            meta = get_progress_info(user_work)
+            if meta and meta["maximum"] is not None:
+                user_work.progress = Decimal(str(meta["maximum"]))
+        elif value == UserWorkStatusChoices.IN_PROGRESS:
+            user_work.progress = Decimal("0")
+    elif field == "progress":
+        try:
+            progress = Decimal(value)
+        except (InvalidOperation, TypeError, ValueError):
+            return HttpResponseBadRequest("Некорректный прогресс")
+        if progress < 0:
+            progress = Decimal("0")
+        meta = get_progress_info(user_work)
+        if meta and meta["maximum"] is not None:
+            maximum = Decimal(str(meta["maximum"]))
+            progress = min(progress, maximum)
+            if progress >= maximum:
+                user_work.status = UserWorkStatusChoices.COMPLETED
+        user_work.progress = progress
+    elif field == "rating":
+        if value in ("", "0"):
+            user_work.rating = None
+        else:
+            try:
+                rating = int(value)
+            except (TypeError, ValueError):
+                return HttpResponseBadRequest("Некорректный рейтинг")
+            if rating < 1 or rating > 10:
+                return HttpResponseBadRequest("Некорректный рейтинг")
+            user_work.rating = rating
+    elif field == "is_hidden":
+        user_work.is_hidden = value in ("1", "true", "True")
+    elif field == "times_completed":
+        try:
+            times_completed = int(value)
+        except (TypeError, ValueError):
+            return HttpResponseBadRequest("Некорректное число завершений")
+        user_work.times_completed = max(times_completed, 0)
+    else:
+        return HttpResponseBadRequest("Неизвестное поле")
+
+    user_work.save()
+    return JsonResponse({
+        "status": user_work.status,
+        "progress": float(user_work.progress or 0),
+        "times_completed": user_work.times_completed,
+        "last_completed_date": (
+            user_work.last_completed_date.strftime("%d.%m.%Y")
+            if user_work.last_completed_date
+            else ""
+        ),
+    })
 
 
 @login_required(login_url=LOGIN_URL)

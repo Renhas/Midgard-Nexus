@@ -1,6 +1,7 @@
 {% load vor_archives_extras %}
+{{ overlay_opts|json_script:"vor-detail-opts" }}
 <div class="vor-overlay"
-     x-data="vorDetailOverlay({ editing: {{ editing|yesno:'true,false' }}, globalEdit: {{ global_edit|yesno:'true,false' }}, filmType: '{{ work.film_type|default:'movie' }}' })">
+     x-data="vorDetailOverlay(JSON.parse(document.getElementById('vor-detail-opts').textContent))">
     <div class="vor-overlay-bar">
         <button type="button" class="sidebar-btn" @click="$store.vorArtworks.closeOverlay()">
             <i class="bi bi-arrow-left"></i>
@@ -8,168 +9,268 @@
         </button>
         <div class="vor-overlay-bar-right">
             {% if is_staff %}
-                <label class="vor-toggle" x-show="editing" x-cloak>
-                    <input type="checkbox" x-model="globalEdit">
-                    <span>Глобальное редактирование</span>
-                </label>
+                <button type="button"
+                        class="sidebar-btn sidebar-btn-primary"
+                        x-show="!editing"
+                        @click="editing = true">
+                    Редактировать
+                </button>
+                <button type="button"
+                        class="sidebar-btn"
+                        x-show="editing"
+                        x-cloak
+                        @click="editing = false">
+                    Отмена
+                </button>
             {% endif %}
-            <button type="button"
-                    class="sidebar-btn sidebar-btn-primary"
-                    x-show="!editing"
-                    @click="editing = true">
-                Редактировать
-            </button>
-            <button type="button"
-                    class="sidebar-btn"
-                    x-show="editing"
-                    x-cloak
-                    @click="editing = false; globalEdit = false">
-                Отмена
-            </button>
         </div>
     </div>
 
     <form class="vor-overlay-body"
+          {% if owned %}
           hx-post="{% url 'vor_archives:artwork_detail' user_work.pk %}"
+          {% elif is_staff %}
+          hx-post="{% url 'vor_archives:artwork_work' work_type work.pk %}"
+          {% endif %}
           hx-target="#vor-overlay"
           hx-swap="innerHTML"
           hx-encoding="multipart/form-data">
         {% csrf_token %}
-        <input type="hidden" name="global_edit" :value="globalEdit ? '1' : '0'">
+        <input type="hidden" name="global_edit" value="1">
 
         {% if work_form.non_field_errors %}
             <div class="vor-field-errors">{{ work_form.non_field_errors }}</div>
         {% endif %}
-        {% if user_work_form.non_field_errors %}
+        {% if user_work_form and user_work_form.non_field_errors %}
             <div class="vor-field-errors">{{ user_work_form.non_field_errors }}</div>
         {% endif %}
 
-        <div class="vor-overlay-columns">
-            <div class="vor-overlay-main">
-                <section class="vor-overlay-section">
-                    <h3>Общая информация</h3>
-                    <div x-show="!editing">
-                        <div class="vor-dl">
-                            {% if work.cover %}
-                                <img class="vor-detail-cover" src="{{ work.cover.url }}" alt="{{ work.title }}">
+        <h1 class="vor-view-title">{{ work.title }}</h1>
+
+        <div class="vor-view-hero">
+            {% if work.cover %}
+                <img class="vor-view-cover" src="{{ work.cover.url }}" alt="{{ work.title }}">
+            {% else %}
+                <div class="vor-view-cover vor-view-cover-empty">
+                    <i class="{{ work|get_model_icon }}"></i>
+                </div>
+            {% endif %}
+
+            <div class="vor-view-info">
+                <div class="vor-view-row vor-view-topline">
+                    <span class="vor-view-type">
+                        <i class="{{ work|get_model_icon }}"></i>
+                        <span>{{ work|work_type_label }}{% if work_type == 'film' %} ({{ work.get_film_type_display }}){% endif %}</span>
+                    </span>
+                    {% if work.age_rating %}
+                        <span class="vor-age-badge" data-age="{{ work.age_rating }}" title="{{ work.get_age_rating_display }}">{{ work.age_rating }}</span>
+                    {% endif %}
+                    {% if work.release_date or work.external_link %}
+                        <span class="vor-release">
+                            {% if work.release_date %}
+                                <span class="vor-field-label">Релиз:</span>
+                                <span class="vor-field-value">{{ work.release_date|date:'d.m.Y' }}</span>
                             {% endif %}
-                            <div class="vor-dl-row">
-                                <span>Название</span>
-                                <strong>{{ work.title }}</strong>
-                            </div>
-                            <div class="vor-dl-row">
-                                <span>Дата выхода</span>
-                                <strong>{% if work.release_date %}{{ work.release_date|date:'d.m.Y' }}{% else %}—{% endif %}</strong>
-                            </div>
-                            <div class="vor-dl-row">
-                                <span>Возрастной рейтинг</span>
-                                <strong>{{ work.get_age_rating_display|default:'—' }}</strong>
-                            </div>
-                            <div class="vor-dl-row">
-                                <span>Авторы</span>
-                                <strong>{% for author in work.authors.all %}{{ author.name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</strong>
-                            </div>
-                            <div class="vor-dl-row">
-                                <span>Теги</span>
-                                <strong>{% for tag in work.tags.all %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</strong>
-                            </div>
                             {% if work.external_link %}
-                                <div class="vor-dl-row">
-                                    <span>Ссылка</span>
-                                    <strong><a href="{{ work.external_link }}" target="_blank" rel="noopener">{{ work.external_link }}</a></strong>
-                                </div>
+                                <a class="vor-view-link" href="{{ work.external_link }}" target="_blank" rel="noopener" title="Ссылка">
+                                    <i class="bi bi-box-arrow-up-right"></i>
+                                </a>
                             {% endif %}
-                            {% if work.description %}
-                                <p class="vor-detail-desc">{{ work.description }}</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <fieldset x-show="editing" x-cloak :disabled="!globalEdit">
-                        {% include "vor_archives/partials/work_common_fields.html" with form=work_form show_title=True %}
-                    </fieldset>
-                </section>
+                        </span>
+                    {% endif %}
+                </div>
 
-                <section class="vor-overlay-section">
-                    <h3>О произведении</h3>
-                    <div x-show="!editing">
-                        <div class="vor-dl">
-                            {% if work_type == 'book' %}
-                                <div class="vor-dl-row"><span>Страниц</span><strong>{{ work.pages }}</strong></div>
-                                <div class="vor-dl-row">
-                                    <span>Жанры</span>
-                                    <strong>{% for g in work.genres.all %}{{ g.name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</strong>
-                                </div>
-                            {% elif work_type == 'film' %}
-                                <div class="vor-dl-row"><span>Тип</span><strong>{{ work.get_film_type_display }}</strong></div>
-                                <div class="vor-dl-row"><span>Длительность</span><strong>{{ work.duration_minutes }} мин.</strong></div>
-                                {% if work.film_type == 'tv_show' %}
-                                    <div class="vor-dl-row"><span>Эпизодов</span><strong>{{ work.episode_count }}</strong></div>
-                                {% endif %}
-                                <div class="vor-dl-row">
-                                    <span>Жанры</span>
-                                    <strong>{% for g in work.genres.all %}{{ g.name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</strong>
-                                </div>
-                            {% elif work_type == 'game' %}
-                                <div class="vor-dl-row">
-                                    <span>Платформы</span>
-                                    <strong>{% for p in work.platforms.all %}{{ p.name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</strong>
-                                </div>
-                                <div class="vor-dl-row">
-                                    <span>Жанры</span>
-                                    <strong>{% for g in work.genres.all %}{{ g.name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</strong>
-                                </div>
-                            {% endif %}
+                {% if work_type == 'game' and work.platforms.all %}
+                    <div class="vor-view-row vor-view-labeled">
+                        <span class="vor-field-label">Платформы:</span>
+                        <div class="vor-view-platforms">
+                            {% for platform in work.platforms.all %}
+                                <span class="vor-platform{% if owned %}{% if platform.pk in owned_platform_ids %} is-owned{% else %} is-other{% endif %}{% endif %}">
+                                    {{ platform.name }}
+                                </span>
+                            {% endfor %}
                         </div>
                     </div>
-                    <fieldset x-show="editing" x-cloak :disabled="!globalEdit">
-                        {% if work_type == 'book' %}
-                            {% include "vor_archives/partials/form_field.html" with field=work_form.pages %}
-                            {% include "vor_archives/partials/form_field.html" with field=work_form.genres %}
-                        {% elif work_type == 'film' %}
-                            {% include "vor_archives/partials/form_field.html" with field=work_form.film_type %}
-                            {% include "vor_archives/partials/form_field.html" with field=work_form.duration_minutes %}
-                            <div x-show="filmType === 'tv_show'" x-cloak>
-                                {% include "vor_archives/partials/form_field.html" with field=work_form.episode_count %}
+                {% elif work_type == 'book' %}
+                    <div class="vor-view-row vor-view-labeled">
+                        <span class="vor-field-label">Страницы:</span>
+                        <span class="vor-field-value">{{ work.pages }}</span>
+                    </div>
+                {% elif work_type == 'film' and work.duration_minutes %}
+                    <div class="vor-view-row vor-view-labeled">
+                        <span class="vor-field-label">
+                            {% if work.film_type == 'tv_show' %}Длительность эпизода:{% else %}Длительность фильма:{% endif %}
+                        </span>
+                        <span class="vor-field-value">{{ work.duration_minutes }} мин.</span>
+                    </div>
+                {% endif %}
+
+                {% include "vor_archives/partials/chip_row.html" with label="Авторы:" items=work.authors.all tip_field="bio" %}
+                {% include "vor_archives/partials/chip_row.html" with label="Жанры:" items=work.genres.all tip_field="description" %}
+                {% include "vor_archives/partials/chip_row.html" with label="Теги:" items=work.tags.all tip_field="description" %}
+            </div>
+
+            <aside class="vor-view-relations">
+                <h3 class="vor-relations-title">Связи</h3>
+                <div class="vor-relations-list">
+                    {% for item in work_relations %}
+                        <a class="vor-relation-item"
+                           href="{% url 'vor_archives:artwork_work' item.type_key item.work_id %}"
+                           hx-get="{% url 'vor_archives:artwork_work' item.type_key item.work_id %}"
+                           hx-target="#vor-overlay"
+                           hx-swap="innerHTML">
+                            {% if item.cover_url %}
+                                <img class="vor-relation-cover" src="{{ item.cover_url }}" alt="{{ item.title }}">
+                            {% else %}
+                                <div class="vor-relation-cover vor-relation-cover-empty">
+                                    <i class="{{ item.icon }}"></i>
+                                </div>
+                            {% endif %}
+                            <div class="vor-relation-meta">
+                                <div class="vor-relation-title" title="{{ item.title }}">{{ item.title }}</div>
+                                <div class="vor-relation-type">{{ item.label }}</div>
                             </div>
-                            {% include "vor_archives/partials/form_field.html" with field=work_form.genres %}
-                        {% elif work_type == 'game' %}
-                            {% include "vor_archives/partials/form_field.html" with field=work_form.platforms %}
-                            {% include "vor_archives/partials/form_field.html" with field=work_form.genres %}
-                        {% endif %}
-                    </fieldset>
-                </section>
-            </div>
+                        </a>
+                    {% empty %}
+                        <div class="vor-relations-empty">Нет связей</div>
+                    {% endfor %}
+                </div>
+            </aside>
 
-            <div class="vor-overlay-side">
-                <section class="vor-overlay-section">
-                    <h3>Ваша информация</h3>
-                    <div x-show="!editing">
-                        <div class="vor-dl">
-                            <div class="vor-dl-row"><span>Статус</span><strong>{{ user_work.get_status_display }}</strong></div>
-                            <div class="vor-dl-row"><span>Рейтинг</span><strong>{{ user_work.rating|default:'—' }}</strong></div>
-                            <div class="vor-dl-row"><span>Прогресс</span><strong>{{ user_work|format_progress }}</strong></div>
-                            <div class="vor-dl-row"><span>Порядок</span><strong>{{ user_work.order_position }}</strong></div>
-                            <div class="vor-dl-row"><span>Скрыто</span><strong>{% if user_work.is_hidden %}Да{% else %}Нет{% endif %}</strong></div>
-                            {% if work_type == 'game' %}
-                                <div class="vor-dl-row">
-                                    <span>Платформы</span>
-                                    <strong>{% for p in user_work.owned_platforms.all %}{{ p.name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</strong>
-                                </div>
-                            {% endif %}
-                            <div class="vor-dl-row"><span>Добавлено</span><strong>{{ user_work.date_added|date:'d.m.Y H:i' }}</strong></div>
-                            <div class="vor-dl-row"><span>Прохождений</span><strong>{{ user_work.times_completed }}</strong></div>
-                            <div class="vor-dl-row"><span>Последнее прохождение</span><strong>{% if user_work.last_completed_date %}{{ user_work.last_completed_date|date:'d.m.Y' }}{% else %}—{% endif %}</strong></div>
-                        </div>
+            {% if owned %}
+            <div class="vor-view-cover-controls">
+                <div class="vor-status-dropdown" @click.outside="statusOpen = false">
+                    <button type="button"
+                            class="sidebar-select vor-status-select"
+                            :class="'status-' + status"
+                            @click="statusOpen = !statusOpen">
+                        <span x-text="statusLabel()"></span>
+                    </button>
+                    <div class="vor-status-menu" x-show="statusOpen" x-cloak>
+                        {% for value, label in status_choices %}
+                            <button type="button"
+                                    class="vor-status-option status-{{ value }}"
+                                    :class="{ 'is-current': status === '{{ value }}' }"
+                                    @click="setStatus('{{ value }}')">
+                                {{ label }}
+                            </button>
+                        {% endfor %}
                     </div>
-                    <fieldset x-show="editing" x-cloak :disabled="!editing">
-                        {% include "vor_archives/partials/user_work_fields.html" with form=user_work_form progress_unit=progress_unit hide_platforms=hide_platforms %}
-                    </fieldset>
-                </section>
+                </div>
+                <div class="vor-progress-row">
+                    <span class="vor-field-label">Прогресс:</span>
+                    <div class="vor-progress"
+                         :class="{ 'is-editing': progressEditing }"
+                         :style="{ '--progress-ch': progressCh() + 'ch' }">
+                        <span class="vor-progress-text">
+                            <span class="vor-progress-value"
+                                  x-show="!progressEditing"
+                                  :class="{ 'is-hot': progressHover || progressEditing }"
+                                  @mouseenter="progressHover = true"
+                                  @mouseleave="progressHover = false"
+                                  @click="startProgressEdit()"
+                                  x-text="progressValueLabel()">{{ progress_meta.display_value|default:'0' }}</span>
+                            <input class="vor-progress-input"
+                                   x-show="progressEditing"
+                                   x-ref="progressInput"
+                                   x-model="progressDraft"
+                                   @keydown.enter.prevent="commitProgress()"
+                                   @keydown.escape.prevent="cancelProgressEdit()"
+                                   @blur="commitProgress()">
+                            <span class="vor-progress-suffix" x-text="progressSuffix()">
+                                {% if progress_meta.maximum != None %}/{{ progress_meta.maximum }} {% endif %}{{ progress_meta.unit }}
+                            </span>
+                        </span>
+                        <button type="button" class="vor-progress-btn vor-progress-btn-plus" @click="nudgeProgress(1)" title="Увеличить">+</button>
+                        <button type="button" class="vor-progress-btn" @click="nudgeProgress(-1)" title="Уменьшить">−</button>
+                    </div>
+                </div>
+                <div class="vor-stars" @mouseleave="hoverRating = 0">
+                    {% for star in "12345" %}
+                        <span class="vor-star" :class="starState({{ forloop.counter }})">
+                            <i class="bi bi-star vor-star-empty"></i>
+                            <i class="bi bi-star-fill vor-star-fill"></i>
+                            <button type="button"
+                                    class="vor-star-hit left"
+                                    @mouseenter="hoverRating = {{ forloop.counter }} * 2 - 1"
+                                    @click="setRating({{ forloop.counter }} * 2 - 1)"></button>
+                            <button type="button"
+                                    class="vor-star-hit right"
+                                    @mouseenter="hoverRating = {{ forloop.counter }} * 2"
+                                    @click="setRating({{ forloop.counter }} * 2)"></button>
+                        </span>
+                    {% endfor %}
+                    <span class="vor-rating-number" x-text="ratingLabel()">{% if owned %}{{ user_work.rating|default:'—' }}{% else %}—{% endif %}</span>
+                </div>
+                <div class="vor-view-meta">
+                    <div class="vor-view-meta-row">Добавлено {{ user_work.date_added|date:'d.m.Y' }}</div>
+                    <div class="vor-view-meta-row" x-show="lastCompletedDate || timesCompleted > 0" x-cloak>
+                        Завершено <span x-text="lastCompletedDate">{{ user_work.last_completed_date|date:'d.m.Y' }}</span>
+                        <span class="vor-view-counter"
+                              :class="{ 'is-hot': counterHover || counterEditing }"
+                              @mouseenter="counterHover = true"
+                              @mouseleave="counterHover = false"
+                              @click="startCounterEdit()">
+                            <span x-show="!counterEditing" x-text="timesCompleted">{{ user_work.times_completed }}</span>
+                            <input class="vor-view-counter-input"
+                                   x-show="counterEditing"
+                                   x-ref="counterInput"
+                                   x-model="counterDraft"
+                                   :style="{ width: Math.max(String(counterDraft || '0').length, 1) + 'ch' }"
+                                   @click.stop
+                                   @keydown.enter.prevent="commitCounter()"
+                                   @keydown.escape.prevent="cancelCounterEdit()"
+                                   @blur="commitCounter()">
+                        </span>
+                    </div>
+                </div>
+                <label class="vor-switch">
+                    <input type="checkbox"
+                           class="vor-switch-input"
+                           x-model="isHidden"
+                           @change="saveField('is_hidden', isHidden ? '1' : '0')">
+                    <span class="vor-switch-track" aria-hidden="true">
+                        <span class="vor-switch-thumb"></span>
+                    </span>
+                    <span>Приватное</span>
+                </label>
             </div>
+            {% endif %}
+
+            <p class="vor-view-desc">{% if work.description %}{{ work.description }}{% else %}Описание произведения отсутствует{% endif %}</p>
         </div>
 
-        <div class="vor-overlay-footer" x-show="editing" x-cloak>
-            <button type="submit" class="sidebar-btn sidebar-btn-add">Сохранить</button>
+        <div class="vor-edit-fields" x-show="editing" x-cloak>
+            <fieldset>
+                <h3>Общая информация</h3>
+                {% include "vor_archives/partials/work_common_fields.html" with form=work_form show_title=True %}
+            </fieldset>
+            <fieldset>
+                <h3>О произведении</h3>
+                {% if work_type == 'book' %}
+                    {% include "vor_archives/partials/form_field.html" with field=work_form.pages %}
+                    {% include "vor_archives/partials/form_field.html" with field=work_form.genres %}
+                {% elif work_type == 'film' %}
+                    {% include "vor_archives/partials/form_field.html" with field=work_form.film_type %}
+                    {% include "vor_archives/partials/form_field.html" with field=work_form.duration_minutes %}
+                    <div x-show="filmType === 'tv_show'" x-cloak>
+                        {% include "vor_archives/partials/form_field.html" with field=work_form.episode_count %}
+                    </div>
+                    {% include "vor_archives/partials/form_field.html" with field=work_form.genres %}
+                {% elif work_type == 'game' %}
+                    {% include "vor_archives/partials/form_field.html" with field=work_form.platforms %}
+                    {% include "vor_archives/partials/form_field.html" with field=work_form.genres %}
+                {% endif %}
+            </fieldset>
+            {% if owned and work_type == 'game' %}
+                <fieldset>
+                    <h3>Ваша информация</h3>
+                    {% include "vor_archives/partials/form_field.html" with field=user_work_form.owned_platforms %}
+                </fieldset>
+            {% endif %}
+            <div class="vor-overlay-footer">
+                <button type="submit" class="sidebar-btn sidebar-btn-add">Сохранить</button>
+            </div>
         </div>
     </form>
 </div>

@@ -3,7 +3,8 @@ from django.db import transaction
 from django.db.models import Count, Q, prefetch_related_objects
 from django.shortcuts import get_object_or_404
 
-from .models import Book, FeedItem, Film, Game, UserWork
+from .constants import WorkRelationTypeChoices
+from .models import Book, FeedItem, Film, Game, UserWork, WorkRelation
 
 WORK_MODELS = {
     "book": Book,
@@ -27,13 +28,17 @@ def work_type_key(work) -> str:
     return work._meta.model_name
 
 
-def user_has_work(user, work) -> bool:
+def get_user_work(user, work):
     ct = ContentType.objects.get_for_model(work)
     return UserWork.objects.filter(
         user=user,
         work_content_type=ct,
         work_object_id=work.pk,
-    ).exists()
+    ).first()
+
+
+def user_has_work(user, work) -> bool:
+    return get_user_work(user, work) is not None
 
 
 def user_owned_work_ids(user, type_key):
@@ -133,6 +138,73 @@ def attach_work(user, type_key, work_id, cleaned_user_data=None):
     if created and m2m_platforms is not None:
         user_work.owned_platforms.set(m2m_platforms)
     return user_work, created
+
+
+WORK_TYPE_ICONS = {
+    "book": "icon-book-text",
+    "film": "icon-clapperboard",
+    "game": "icon-gamepad-2",
+}
+
+RELATION_LABELS = {
+    WorkRelationTypeChoices.SEQUEL: ("Продолжение", "Предыстория"),
+    WorkRelationTypeChoices.SPIN_OFF: ("Спин-офф", "Оригинал"),
+    WorkRelationTypeChoices.ADAPTATION: ("Адаптация", "Первоисточник"),
+    WorkRelationTypeChoices.REMAKE: ("Ремейк", "Оригинал"),
+    WorkRelationTypeChoices.OTHER: ("Связано", "Связано"),
+}
+
+
+def _relation_cover_url(work):
+    cover = getattr(work, "cover", None)
+    if not cover:
+        return ""
+    try:
+        return cover.url
+    except ValueError:
+        return ""
+
+
+def _relation_item(work, label):
+    return {
+        "title": work.title,
+        "cover_url": _relation_cover_url(work),
+        "label": label,
+        "icon": WORK_TYPE_ICONS.get(work._meta.model_name, "bi bi-collection"),
+        "type_key": work._meta.model_name,
+        "work_id": work.pk,
+    }
+
+
+def work_relation_items(work):
+    """Связанные произведения с подписью относительно текущего."""
+    ct = ContentType.objects.get_for_model(work)
+    items = []
+    outgoing = WorkRelation.objects.filter(
+        source_content_type=ct,
+        source_object_id=work.pk,
+    )
+    incoming = WorkRelation.objects.filter(
+        target_content_type=ct,
+        target_object_id=work.pk,
+    )
+    for relation in outgoing:
+        other = relation.target
+        if other is None:
+            continue
+        outgoing_label, _incoming_label = RELATION_LABELS.get(
+            relation.relation_type, ("Связано", "Связано")
+        )
+        items.append(_relation_item(other, outgoing_label))
+    for relation in incoming:
+        other = relation.source
+        if other is None:
+            continue
+        _outgoing_label, incoming_label = RELATION_LABELS.get(
+            relation.relation_type, ("Связано", "Связано")
+        )
+        items.append(_relation_item(other, incoming_label))
+    return items
 
 
 def create_work_and_attach(user, work, user_work_form):

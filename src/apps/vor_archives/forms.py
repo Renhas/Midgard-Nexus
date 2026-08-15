@@ -25,7 +25,6 @@ class UserWorkForm(StyledModelForm):
             "rating",
             "progress",
             "is_hidden",
-            "order_position",
             "owned_platforms",
         )
         labels = {
@@ -33,7 +32,6 @@ class UserWorkForm(StyledModelForm):
             "rating": "Рейтинг",
             "progress": "Прогресс",
             "is_hidden": "Скрыто",
-            "order_position": "Порядок",
             "owned_platforms": "Платформы",
         }
         widgets = {
@@ -135,6 +133,16 @@ class GameForm(WorkBaseForm):
             **WorkBaseForm.Meta.widgets,
             "platforms": forms.SelectMultiple(attrs={"size": 4}),
             "genres": forms.SelectMultiple(attrs={"size": 4}),
+        }
+
+
+class UserWorkEditForm(StyledModelForm):
+    class Meta:
+        model = UserWork
+        fields = ("owned_platforms",)
+        labels = {"owned_platforms": "Платформы"}
+        widgets = {
+            "owned_platforms": forms.SelectMultiple(attrs={"size": 4}),
         }
 
 

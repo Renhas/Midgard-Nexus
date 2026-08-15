@@ -15,5 +15,7 @@ urlpatterns = [
     path("artworks/attach/", views.artwork_attach, name="artwork_attach"),
     path("artworks/delete/preview/", views.artwork_delete_preview, name="artwork_delete_preview"),
     path("artworks/delete/", views.artwork_delete, name="artwork_delete"),
+    path("artworks/<int:uw_id>/quick/", views.artwork_quick, name="artwork_quick"),
     path("artworks/<int:uw_id>/", views.artwork_detail, name="artwork_detail"),
+    path("works/<str:type_key>/<int:work_id>/", views.artwork_work, name="artwork_work"),
 ]
