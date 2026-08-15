@@ -25,8 +25,7 @@
 .sidebar-nav-row .sidebar-btn-add,
 .sidebar-nav-row .sidebar-btn-delete,
 .sidebar-nav-row .sidebar-btn-type,
-.sidebar-nav-row .sidebar-btn-display,
-.sidebar-nav-row .sidebar-btn-grow {
+.sidebar-nav-row .sidebar-btn-display {
     flex: 1;
 }
 
@@ -480,6 +479,25 @@
     color: var(--error);
 }
 
+.artwork-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.artwork-item .artwork-row {
+    flex: 1;
+    min-width: 0;
+}
+
+.artwork-row-delete-slot {
+    width: 2rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .artwork-row-check {
     width: 1.25rem;
     flex-shrink: 0;
@@ -488,22 +506,34 @@
     justify-content: center;
 }
 
-.artwork-row-actions {
-    width: 2rem;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+.artwork-row-check .custom-checkbox.is-checked,
+.artwork-row-check .custom-checkbox.is-checked:hover {
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+}
+
+.artwork-row-check .custom-checkbox.is-checked::after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background-color: var(--bg-primary);
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
 }
 
 .artwork-row-delete {
     opacity: 0;
-    pointer-events: none;
 }
 
-.artwork-row:hover .artwork-row-delete {
+.artwork-item:hover .artwork-row-delete {
     opacity: 1;
-    pointer-events: auto;
 }
 
 .artwork-row.is-selected {

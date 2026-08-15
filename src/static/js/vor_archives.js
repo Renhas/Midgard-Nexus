@@ -168,16 +168,13 @@
             if (!store?.deleteMode) {
                 return;
             }
-            const row = event.target.closest(".artwork-row");
-            if (!row) {
-                return;
-            }
-            if (event.target.closest(".artwork-row-check")) {
+            const item = event.target.closest(".artwork-item");
+            if (!item || event.target.closest(".artwork-row-delete")) {
                 return;
             }
             event.preventDefault();
             event.stopPropagation();
-            const id = Number(row.dataset.uwId);
+            const id = Number(item.dataset.uwId);
             if (id) {
                 store.toggleSelected(id);
             }

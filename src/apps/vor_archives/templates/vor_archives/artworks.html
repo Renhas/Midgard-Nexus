@@ -31,12 +31,12 @@
             <i class="bi bi-plus-circle"></i>
         </button>
         <button type="button"
-                class="sidebar-btn sidebar-btn-grow"
-                title="Выйти из режима"
+                class="sidebar-btn sidebar-btn-add"
+                title="Отменить"
                 x-show="$store.vorArtworks.deleteMode"
                 x-cloak
                 @click="$store.vorArtworks.exitDeleteMode()">
-            Выйти из режима
+            <i class="bi bi-x-circle"></i>
         </button>
         <button type="button"
                 class="sidebar-btn sidebar-btn-delete"
@@ -52,7 +52,7 @@
                 x-cloak
                 :disabled="!$store.vorArtworks.selectedIds.length"
                 @click="$store.vorArtworks.openPreview()">
-            Подтвердить
+            <i class="bi bi-check-lg"></i>
         </button>
     </div>
     <hr class="sidebar-divider">
