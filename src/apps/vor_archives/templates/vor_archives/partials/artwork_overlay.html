@@ -3,137 +3,438 @@
 <div class="vor-overlay"
      x-data="vorDetailOverlay(JSON.parse(document.getElementById('vor-detail-opts').textContent))">
     <div class="vor-overlay-bar">
-        <button type="button" class="sidebar-btn" @click="$store.vorArtworks.closeOverlay()">
+        <button type="button" class="sidebar-btn" @click="leaveOr($store.vorArtworks.closeOverlay.bind($store.vorArtworks))">
             <i class="bi bi-arrow-left"></i>
             <span>Назад</span>
         </button>
         <div class="vor-overlay-bar-right">
             {% if is_staff %}
                 <button type="button"
-                        class="sidebar-btn sidebar-btn-primary"
+                        class="sidebar-btn sidebar-btn-icon"
                         x-show="!editing"
-                        @click="editing = true">
-                    Редактировать
+                        title="Редактировать"
+                        @click="startEdit()">
+                    <i class="bi bi-pencil"></i>
                 </button>
                 <button type="button"
                         class="sidebar-btn"
                         x-show="editing"
                         x-cloak
-                        @click="editing = false">
-                    Отмена
+                        title="Отменить"
+                        @click="cancelEdit()">
+                    <i class="bi bi-x-circle"></i>
+                    <span>Отмена</span>
+                </button>
+                <button type="button"
+                        class="sidebar-btn sidebar-btn-add"
+                        x-show="editing"
+                        x-cloak
+                        title="Сохранить"
+                        @click="saveEdit()">
+                    <i class="bi bi-floppy2"></i>
+                    <span>Сохранить</span>
                 </button>
             {% endif %}
         </div>
     </div>
 
     <form class="vor-overlay-body"
+          x-ref="editForm"
           {% if owned %}
           hx-post="{% url 'vor_archives:artwork_detail' user_work.pk %}"
-          {% elif is_staff %}
+          {% else %}
           hx-post="{% url 'vor_archives:artwork_work' work_type work.pk %}"
           {% endif %}
           hx-target="#vor-overlay"
           hx-swap="innerHTML"
-          hx-encoding="multipart/form-data">
+          hx-encoding="multipart/form-data"
+          @submit="prepareSubmit($event)">
         {% csrf_token %}
         <input type="hidden" name="global_edit" value="1">
+        <input type="hidden" name="cover_clear" :value="coverCleared ? '1' : ''">
+        <input type="hidden" name="relations_json" :value="relationsJson()">
+        <input type="file" name="cover" x-ref="coverInput" class="vor-cover-file" accept="image/*" @change="onCoverSelected($event)">
+        <template x-for="id in authorIds()" :key="'a'+id">
+            <input type="hidden" name="authors" :value="id">
+        </template>
+        <template x-for="id in genreIds()" :key="'g'+id">
+            <input type="hidden" name="genres" :value="id">
+        </template>
+        <template x-for="id in tagIds()" :key="'t'+id">
+            <input type="hidden" name="tags" :value="id">
+        </template>
+        <template x-for="id in platformIds()" :key="'p'+id">
+            <input type="hidden" name="platforms" :value="id">
+        </template>
 
         {% if work_form.non_field_errors %}
             <div class="vor-field-errors">{{ work_form.non_field_errors }}</div>
         {% endif %}
-        {% if user_work_form and user_work_form.non_field_errors %}
-            <div class="vor-field-errors">{{ user_work_form.non_field_errors }}</div>
-        {% endif %}
 
-        <h1 class="vor-view-title">{{ work.title }}</h1>
+        <h1 class="vor-view-title" x-show="!editing">{{ work.title }}</h1>
+        <input class="vor-view-title vor-inline-title"
+               name="title"
+               x-show="editing"
+               x-cloak
+               x-model="title"
+               maxlength="255"
+               required>
 
         <div class="vor-view-hero">
-            {% if work.cover %}
-                <img class="vor-view-cover" src="{{ work.cover.url }}" alt="{{ work.title }}">
-            {% else %}
-                <div class="vor-view-cover vor-view-cover-empty">
-                    <i class="{{ work|get_model_icon }}"></i>
+            <div class="vor-cover-wrap">
+                <img class="vor-view-cover"
+                     x-show="coverPreview"
+                     :src="coverPreview"
+                     :alt="title">
+                <div class="vor-view-cover vor-view-cover-empty" x-show="!coverPreview">
+                    <i class="{{ work|get_model_icon }}" x-show="!editing"></i>
+                    <button type="button"
+                            class="vor-cover-btn vor-cover-btn-upload"
+                            x-show="editing"
+                            x-cloak
+                            title="Загрузить обложку"
+                            @click="$refs.coverInput.click()">
+                        <i class="bi bi-upload"></i>
+                    </button>
                 </div>
-            {% endif %}
+                <div class="vor-cover-actions" x-show="editing && coverPreview" x-cloak>
+                    <button type="button"
+                            class="vor-cover-btn vor-cover-btn-edit"
+                            title="Заменить обложку"
+                            @click="$refs.coverInput.click()">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button type="button"
+                            class="vor-cover-btn vor-cover-btn-clear"
+                            title="Очистить обложку"
+                            @click="clearCover()">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+                <div class="vor-cover-warning" x-show="coverWarning" x-cloak x-text="coverWarning"></div>
+            </div>
 
-            <div class="vor-view-info">
+            <div class="vor-view-info" :class="{ 'is-editing': editing }">
                 <div class="vor-view-row vor-view-topline">
                     <span class="vor-view-type">
                         <i class="{{ work|get_model_icon }}"></i>
                         <span>{{ work|work_type_label }}{% if work_type == 'film' %} ({{ work.get_film_type_display }}){% endif %}</span>
                     </span>
-                    {% if work.age_rating %}
-                        <span class="vor-age-badge" data-age="{{ work.age_rating }}" title="{{ work.get_age_rating_display }}">{{ work.age_rating }}</span>
-                    {% endif %}
-                    {% if work.release_date or work.external_link %}
-                        <span class="vor-release">
-                            {% if work.release_date %}
-                                <span class="vor-field-label">Релиз:</span>
-                                <span class="vor-field-value">{{ work.release_date|date:'d.m.Y' }}</span>
-                            {% endif %}
-                            {% if work.external_link %}
-                                <a class="vor-view-link" href="{{ work.external_link }}" target="_blank" rel="noopener" title="Ссылка">
-                                    <i class="bi bi-box-arrow-up-right"></i>
-                                </a>
-                            {% endif %}
-                        </span>
-                    {% endif %}
-                </div>
-
-                {% if work_type == 'game' and work.platforms.all %}
-                    <div class="vor-view-row vor-view-labeled">
-                        <span class="vor-field-label">Платформы:</span>
-                        <div class="vor-view-platforms">
-                            {% for platform in work.platforms.all %}
-                                <span class="vor-platform{% if owned %}{% if platform.pk in owned_platform_ids %} is-owned{% else %} is-other{% endif %}{% endif %}">
-                                    {{ platform.name }}
-                                </span>
-                            {% endfor %}
+                    <div class="vor-age-wrap" x-show="editing || ageRating" @click.outside="ageOpen = false">
+                        <button type="button"
+                                class="vor-age-badge"
+                                :data-age="ageRating"
+                                :disabled="!editing"
+                                :title="ageLabel()"
+                                @click="editing && (ageOpen = !ageOpen)">
+                            <span x-text="ageRating || '—'">{% if work.age_rating %}{{ work.age_rating }}{% endif %}</span>
+                        </button>
+                        <div class="vor-age-menu" x-show="editing && ageOpen" x-cloak>
+                            <button type="button"
+                                    class="vor-age-option"
+                                    data-age=""
+                                    @click="setAgeRating('')">
+                                Нет
+                            </button>
+                            <template x-for="opt in ageChoices" :key="opt.value">
+                                <button type="button"
+                                        class="vor-age-option"
+                                        :data-age="opt.value"
+                                        :class="{ 'is-current': ageRating === opt.value }"
+                                        @click="setAgeRating(opt.value)"
+                                        x-text="opt.label"></button>
+                            </template>
                         </div>
                     </div>
-                {% elif work_type == 'book' %}
-                    <div class="vor-view-row vor-view-labeled">
-                        <span class="vor-field-label">Страницы:</span>
-                        <span class="vor-field-value">{{ work.pages }}</span>
+                    <input type="hidden" name="age_rating" :value="ageRating">
+                    <span class="vor-release" x-show="editing || releaseDate || externalLink">
+                        <span class="vor-field-label" x-show="editing || releaseDate">Релиз:</span>
+                        <span class="vor-field-value" x-show="!editing && releaseDate" x-text="formatDate(releaseDate)">
+                            {% if work.release_date %}{{ work.release_date|date:'d.m.Y' }}{% endif %}
+                        </span>
+                        <div class="vor-date-wrap" x-show="editing" x-cloak @click.outside="dateOpen = false">
+                            <button type="button" class="vor-date-trigger" @click="dateOpen = !dateOpen">
+                                <span x-text="releaseDate ? formatDate(releaseDate) : 'Выбрать'"></span>
+                                <i class="bi bi-calendar3"></i>
+                            </button>
+                            <div class="vor-date-popup" x-show="dateOpen" x-cloak>
+                                <div class="vor-date-nav">
+                                    <button type="button" class="sidebar-btn sidebar-btn-icon" @click="shiftMonth(-1)">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </button>
+                                    <span x-text="dateMonthLabel()"></span>
+                                    <button type="button" class="sidebar-btn sidebar-btn-icon" @click="shiftMonth(1)">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </button>
+                                </div>
+                                <div class="vor-date-week">
+                                    <template x-for="day in ['Пн','Вт','Ср','Чт','Пт','Сб','Вс']" :key="day">
+                                        <span x-text="day"></span>
+                                    </template>
+                                </div>
+                                <div class="vor-date-grid">
+                                    <template x-for="cell in dateCells()" :key="cell.key">
+                                        <button type="button"
+                                                class="vor-date-day"
+                                                :class="{ 'is-muted': !cell.current, 'is-selected': cell.iso === releaseDate }"
+                                                @click="setReleaseDate(cell.iso)"
+                                                x-text="cell.day"></button>
+                                    </template>
+                                </div>
+                                <button type="button" class="vor-date-clear" @click="setReleaseDate('')">Очистить</button>
+                            </div>
+                        </div>
+                        <input type="hidden" name="release_date" :value="releaseDate">
+                        <div class="vor-link-wrap" x-show="editing || externalLink" @click.outside="linkOpen = false">
+                            <button type="button"
+                                    class="vor-view-link"
+                                    x-show="editing"
+                                    title="Ссылка"
+                                    @click="openLinkEditor()">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </button>
+                            <a class="vor-view-link"
+                               x-show="!editing && externalLink"
+                               :href="externalLink"
+                               target="_blank"
+                               rel="noopener"
+                               title="Ссылка">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </a>
+                            <div class="vor-link-popup" x-show="editing && linkOpen" x-cloak>
+                                <input class="vor-link-input"
+                                       type="url"
+                                       x-ref="linkInput"
+                                       x-model="externalLink"
+                                       placeholder="https://">
+                            </div>
+                        </div>
+                        <input type="hidden" name="external_link" :value="externalLink">
+                    </span>
+                </div>
+
+                {% if work_type == 'game' %}
+                    {% if work.platforms.all %}
+                        <div class="vor-view-row vor-view-labeled vor-view-attrs" x-show="!editing">
+                            <span class="vor-field-label">Платформы:</span>
+                            <div class="vor-chip-list" x-data="vorChipOverflow()" :class="{ 'is-open': popupOpen }">
+                                {% for platform in work.platforms.all %}
+                                    <span class="vor-chip"
+                                          data-chip
+                                          :class="{ 'is-off': platformOff({{ platform.pk }}), 'is-toggle': canTogglePlatform() }"
+                                          @click="togglePlatform({{ platform.pk }})"
+                                          @mouseenter="placeTip($el)">
+                                        {{ platform.name }}
+                                    </span>
+                                {% endfor %}
+                                <div class="vor-chip-more-wrap"
+                                     x-ref="moreWrap"
+                                     x-show="hiddenCount > 0"
+                                     x-cloak
+                                     @click.outside="popupOpen = false">
+                                    <button type="button"
+                                            class="vor-chip vor-chip-more"
+                                            x-ref="more"
+                                            @click="togglePopup()">+<span x-text="hiddenCount"></span></button>
+                                    <div class="vor-chip-popup" x-ref="popup" x-show="popupOpen" x-cloak>
+                                        <div class="vor-chip-popup-body">
+                                            {% for platform in work.platforms.all %}
+                                                <span class="vor-chip"
+                                                      x-show="{{ forloop.counter0 }} >= visibleCount"
+                                                      :class="{ 'is-off': platformOff({{ platform.pk }}), 'is-toggle': canTogglePlatform() }"
+                                                      @click="togglePlatform({{ platform.pk }})"
+                                                      @mouseenter="placeTip($el)">
+                                                    {{ platform.name }}
+                                                </span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div x-show="editing" x-cloak>
+                        {% include "vor_archives/partials/chip_editor.html" with label="Платформы:" kind="platforms" %}
                     </div>
-                {% elif work_type == 'film' and work.duration_minutes %}
-                    <div class="vor-view-row vor-view-labeled">
+                {% elif work_type == 'book' %}
+                    <div class="vor-view-row vor-view-labeled" x-show="editing || pages">
+                        <span class="vor-field-label">Страницы:</span>
+                        <span class="vor-field-value" x-show="!editing" x-text="pages">{{ work.pages }}</span>
+                        <input class="vor-inline-number"
+                               type="number"
+                               min="1"
+                               name="pages"
+                               x-show="editing"
+                               x-cloak
+                               x-model="pages">
+                    </div>
+                {% elif work_type == 'film' %}
+                    <div class="vor-view-row vor-view-labeled" x-show="editing || durationMinutes">
                         <span class="vor-field-label">
                             {% if work.film_type == 'tv_show' %}Длительность эпизода:{% else %}Длительность фильма:{% endif %}
                         </span>
-                        <span class="vor-field-value">{{ work.duration_minutes }} мин.</span>
+                        <span class="vor-field-value" x-show="!editing">
+                            <span x-text="durationMinutes">{{ work.duration_minutes }}</span> мин.
+                        </span>
+                        <span class="vor-inline-number-wrap" x-show="editing" x-cloak>
+                            <input class="vor-inline-number"
+                                   type="number"
+                                   min="1"
+                                   name="duration_minutes"
+                                   x-model="durationMinutes">
+                            <span class="vor-field-value">мин.</span>
+                        </span>
                     </div>
+                    {% if work.film_type == 'tv_show' %}
+                        <div class="vor-view-row vor-view-labeled" x-show="editing || episodeCount">
+                            <span class="vor-field-label">Эпизоды:</span>
+                            <span class="vor-field-value" x-show="!editing" x-text="episodeCount">{{ work.episode_count }}</span>
+                            <input class="vor-inline-number"
+                                   type="number"
+                                   min="1"
+                                   name="episode_count"
+                                   x-show="editing"
+                                   x-cloak
+                                   x-model="episodeCount">
+                        </div>
+                    {% endif %}
+                    <input type="hidden" name="film_type" value="{{ work.film_type }}">
                 {% endif %}
 
-                {% include "vor_archives/partials/chip_row.html" with label="Авторы:" items=work.authors.all tip_field="bio" %}
-                {% include "vor_archives/partials/chip_row.html" with label="Жанры:" items=work.genres.all tip_field="description" %}
-                {% include "vor_archives/partials/chip_row.html" with label="Теги:" items=work.tags.all tip_field="description" %}
+                <div class="vor-view-info-group" x-show="!editing">
+                    {% include "vor_archives/partials/chip_row.html" with label="Авторы:" items=work.authors.all tip_field="bio" %}
+                    {% include "vor_archives/partials/chip_row.html" with label="Жанры:" items=work.genres.all tip_field="description" %}
+                    {% include "vor_archives/partials/chip_row.html" with label="Теги:" items=work.tags.all tip_field="description" %}
+                </div>
+                <div class="vor-view-info-group" x-show="editing" x-cloak>
+                    {% include "vor_archives/partials/chip_editor.html" with label="Авторы:" kind="authors" %}
+                    {% include "vor_archives/partials/chip_editor.html" with label="Жанры:" kind="genres" %}
+                    {% include "vor_archives/partials/chip_editor.html" with label="Теги:" kind="tags" %}
+                </div>
             </div>
 
             <aside class="vor-view-relations">
-                <h3 class="vor-relations-title">Связи</h3>
-                <div class="vor-relations-list">
-                    {% for item in work_relations %}
-                        <a class="vor-relation-item"
-                           href="{% url 'vor_archives:artwork_work' item.type_key item.work_id %}"
-                           hx-get="{% url 'vor_archives:artwork_work' item.type_key item.work_id %}"
-                           hx-target="#vor-overlay"
-                           hx-swap="innerHTML">
-                            {% if item.cover_url %}
-                                <img class="vor-relation-cover" src="{{ item.cover_url }}" alt="{{ item.title }}">
-                            {% else %}
+                <div class="vor-relations-head">
+                    <div class="vor-relations-head-side">
+                        <button type="button"
+                                class="sidebar-btn sidebar-btn-icon vor-relations-head-btn"
+                                x-show="editing && relAdding"
+                                x-cloak
+                                title="Назад"
+                                @click="cancelRelationAdd()">
+                            <i class="bi bi-arrow-left"></i>
+                        </button>
+                    </div>
+                    <h3 class="vor-relations-title" x-text="relAdding ? 'Добавление' : 'Связи'">Связи</h3>
+                    <div class="vor-relations-head-side">
+                        <button type="button"
+                                class="sidebar-btn sidebar-btn-add sidebar-btn-icon vor-relations-head-btn"
+                                x-show="editing && !relAdding"
+                                x-cloak
+                                title="Добавить связь"
+                                @click="startRelationAdd()">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                        <button type="button"
+                                class="sidebar-btn sidebar-btn-add sidebar-btn-icon vor-relations-head-btn"
+                                x-show="editing && relAdding"
+                                x-cloak
+                                title="Сохранить связь"
+                                @click="commitRelationAdd()">
+                            <i class="bi bi-floppy2"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="vor-relations-list" x-show="!relAdding">
+                    <template x-for="item in relations" :key="item.id || (item.type_key + '-' + item.work_id)">
+                        <div class="vor-relation-item"
+                             :class="{ 'is-static': editing }"
+                             @click="!editing && openRelated(item)">
+                            <template x-if="item.cover_url">
+                                <img class="vor-relation-cover" :src="item.cover_url" :alt="item.title">
+                            </template>
+                            <template x-if="!item.cover_url">
                                 <div class="vor-relation-cover vor-relation-cover-empty">
-                                    <i class="{{ item.icon }}"></i>
+                                    <i :class="item.icon"></i>
                                 </div>
-                            {% endif %}
+                            </template>
                             <div class="vor-relation-meta">
-                                <div class="vor-relation-title" title="{{ item.title }}">{{ item.title }}</div>
-                                <div class="vor-relation-type">{{ item.label }}</div>
+                                <div class="vor-relation-title" :title="item.title" x-text="item.title"></div>
+                                <div class="vor-relation-type" x-text="item.label"></div>
                             </div>
-                        </a>
-                    {% empty %}
-                        <div class="vor-relations-empty">Нет связей</div>
-                    {% endfor %}
+                            <div class="vor-relation-edit" x-show="editing" x-cloak @click.outside="relTypeEdit = null">
+                                <div class="vor-relation-actions">
+                                    <button type="button"
+                                            class="vor-relation-action"
+                                            title="Изменить тип связи"
+                                            @click.stop="toggleRelationType(item)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button type="button"
+                                            class="vor-relation-action vor-relation-action-delete"
+                                            title="Удалить связь"
+                                            @click.stop="removeRelation(item)">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                                <div class="vor-relation-type-menu"
+                                     x-show="relTypeEdit === relationKey(item)"
+                                     x-cloak>
+                                    <template x-for="opt in allowedRelationTypes(item.type_key)" :key="opt.value">
+                                        <button type="button"
+                                                class="vor-relation-type-option"
+                                                :class="{ 'is-current': item.relation_type === opt.value }"
+                                                @click.stop="setRelationType(item, opt.value)"
+                                                x-text="opt.label"></button>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <div class="vor-relations-empty" x-show="!relations.length">Нет связей</div>
+                </div>
+                <div class="vor-relation-add" x-show="relAdding" x-cloak>
+                    <input class="vor-chip-picker-search"
+                           type="text"
+                           placeholder="Поиск произведения"
+                           x-model="relQuery"
+                           @input.debounce.250ms="searchRelatedWorks()">
+                    <div class="vor-relation-add-list">
+                        <template x-for="hit in relResults" :key="hit.type_key + '-' + hit.work_id">
+                            <button type="button"
+                                    class="vor-relation-item vor-relation-pick"
+                                    :class="{ 'is-selected': relPick && relPick.work_id === hit.work_id && relPick.type_key === hit.type_key }"
+                                    @click="relPick = hit">
+                                <template x-if="hit.cover_url">
+                                    <img class="vor-relation-cover" :src="hit.cover_url" :alt="hit.title">
+                                </template>
+                                <template x-if="!hit.cover_url">
+                                    <div class="vor-relation-cover vor-relation-cover-empty">
+                                        <i :class="hit.icon"></i>
+                                    </div>
+                                </template>
+                                <div class="vor-relation-meta">
+                                    <div class="vor-relation-title" x-text="hit.title"></div>
+                                </div>
+                            </button>
+                        </template>
+                        <div class="vor-relations-empty" x-show="relQuery && !relResults.length">Ничего не найдено</div>
+                    </div>
+                    <div class="vor-relation-add-type" x-show="relPick">
+                        <div class="vor-relation-add-type-head">
+                            <span class="vor-field-label">Тип связи</span>
+                            <span class="vor-relation-add-hint">(текущее → выбранное)</span>
+                        </div>
+                        <div class="vor-relation-type-choices">
+                            <template x-for="opt in allowedRelationTypes(relPick && relPick.type_key)" :key="opt.value">
+                                <button type="button"
+                                        class="vor-relation-type-option"
+                                        :class="{ 'is-current': relPickType === opt.value }"
+                                        @click="relPickType = opt.value"
+                                        x-text="opt.label"></button>
+                            </template>
+                        </div>
+                    </div>
                 </div>
             </aside>
 
@@ -237,40 +538,30 @@
             </div>
             {% endif %}
 
-            <p class="vor-view-desc">{% if work.description %}{{ work.description }}{% else %}Описание произведения отсутствует{% endif %}</p>
-        </div>
-
-        <div class="vor-edit-fields" x-show="editing" x-cloak>
-            <fieldset>
-                <h3>Общая информация</h3>
-                {% include "vor_archives/partials/work_common_fields.html" with form=work_form show_title=True %}
-            </fieldset>
-            <fieldset>
-                <h3>О произведении</h3>
-                {% if work_type == 'book' %}
-                    {% include "vor_archives/partials/form_field.html" with field=work_form.pages %}
-                    {% include "vor_archives/partials/form_field.html" with field=work_form.genres %}
-                {% elif work_type == 'film' %}
-                    {% include "vor_archives/partials/form_field.html" with field=work_form.film_type %}
-                    {% include "vor_archives/partials/form_field.html" with field=work_form.duration_minutes %}
-                    <div x-show="filmType === 'tv_show'" x-cloak>
-                        {% include "vor_archives/partials/form_field.html" with field=work_form.episode_count %}
-                    </div>
-                    {% include "vor_archives/partials/form_field.html" with field=work_form.genres %}
-                {% elif work_type == 'game' %}
-                    {% include "vor_archives/partials/form_field.html" with field=work_form.platforms %}
-                    {% include "vor_archives/partials/form_field.html" with field=work_form.genres %}
-                {% endif %}
-            </fieldset>
-            {% if owned and work_type == 'game' %}
-                <fieldset>
-                    <h3>Ваша информация</h3>
-                    {% include "vor_archives/partials/form_field.html" with field=user_work_form.owned_platforms %}
-                </fieldset>
-            {% endif %}
-            <div class="vor-overlay-footer">
-                <button type="submit" class="sidebar-btn sidebar-btn-add">Сохранить</button>
-            </div>
+            <p class="vor-view-desc" x-show="!editing">{% if work.description %}{{ work.description }}{% else %}Описание произведения отсутствует{% endif %}</p>
+            <textarea class="vor-view-desc vor-inline-desc"
+                      name="description"
+                      x-show="editing"
+                      x-cloak
+                      x-model="description"
+                      rows="6"
+                      placeholder="Описание произведения"></textarea>
         </div>
     </form>
+
+    <div class="vor-modal-backdrop vor-leave-confirm" x-show="leaveConfirmOpen" x-cloak @click.self="leaveConfirmOpen = false">
+        <div class="vor-modal" @click.stop>
+            <h3 class="vor-modal-title">Несохранённые изменения</h3>
+            <p class="vor-modal-text">При переходе будут потеряны изменения в полях:</p>
+            <ul class="vor-leave-list">
+                <template x-for="field in leaveChanges" :key="field">
+                    <li x-text="field"></li>
+                </template>
+            </ul>
+            <div class="vor-modal-actions">
+                <button type="button" class="sidebar-btn" @click="leaveConfirmOpen = false">Остаться</button>
+                <button type="button" class="sidebar-btn sidebar-btn-delete" @click="confirmLeave()">Уйти</button>
+            </div>
+        </div>
+    </div>
 </div>

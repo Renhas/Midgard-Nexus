@@ -1,25 +1,44 @@
+import json
 from decimal import Decimal, InvalidOperation
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.db.models import prefetch_related_objects
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from .constants import AgeRatingChoices, FilmTypeChoices, UserWorkStatusChoices
+from .constants import (
+    AgeRatingChoices,
+    FilmTypeChoices,
+    UserWorkStatusChoices,
+    WorkRelationTypeChoices,
+)
 from .forms import WORK_FORMS, UserWorkEditForm, UserWorkForm
 from .templatetags.vor_archives_extras import get_progress_info
-from .models import BookGenre, Collection, FilmGenre, GameGenre, Platform, Tag, UserWork
+from .models import (
+    BookGenre,
+    Collection,
+    FilmGenre,
+    GameGenre,
+    Person,
+    Platform,
+    Tag,
+    UserWork,
+)
 from .services import (
     WORK_MODELS,
     attach_work,
+    clamp_progress_for_work,
     create_work_and_attach,
     delete_user_works,
     get_user_work,
     get_work,
     orphan_works,
+    search_works,
+    sync_work_relations,
     user_has_work,
     user_has_work_title,
     user_owned_work_ids,
@@ -171,6 +190,82 @@ def _prefetch_work(work, user_work=None):
     return type_key
 
 
+def _chip_payload(items, tip_field="description"):
+    payload = []
+    for item in items:
+        payload.append({
+            "id": item.pk,
+            "name": item.name,
+            "tip": getattr(item, tip_field, "") or "",
+        })
+    return payload
+
+
+def _attr_catalog(type_key):
+    genre_model = {"book": BookGenre, "film": FilmGenre, "game": GameGenre}[type_key]
+    return {
+        "authors": _chip_payload(Person.objects.order_by("name"), "bio"),
+        "genres": _chip_payload(genre_model.objects.order_by("name")),
+        "tags": _chip_payload(Tag.objects.order_by("name")),
+        "platforms": _chip_payload(Platform.objects.order_by("name"), "") if type_key == "game" else [],
+    }
+
+
+RELATION_TYPE_OPTIONS = [
+    {"value": WorkRelationTypeChoices.SEQUEL, "label": "Продолжение"},
+    {"value": WorkRelationTypeChoices.SPIN_OFF, "label": "Спин-офф"},
+    {"value": WorkRelationTypeChoices.ADAPTATION, "label": "Адаптация"},
+    {"value": WorkRelationTypeChoices.REMAKE, "label": "Ремейк"},
+    {"value": WorkRelationTypeChoices.OTHER, "label": "Связано"},
+]
+
+
+def _parse_id_list(request, name):
+    values = []
+    for raw in request.POST.getlist(name):
+        for part in str(raw).split(","):
+            part = part.strip()
+            if not part:
+                continue
+            try:
+                values.append(int(part))
+            except ValueError:
+                continue
+    return values
+
+
+def _parse_relations_payload(request):
+    raw = request.POST.get("relations_json") or "[]"
+    try:
+        items = json.loads(raw)
+    except json.JSONDecodeError:
+        return []
+    if not isinstance(items, list):
+        return []
+    parsed = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        entry = {
+            "id": item.get("id") or None,
+            "relation_type": item.get("relation_type") or WorkRelationTypeChoices.OTHER,
+            "type_key": item.get("type_key"),
+            "work_id": item.get("work_id"),
+        }
+        if entry["id"]:
+            try:
+                entry["id"] = int(entry["id"])
+            except (TypeError, ValueError):
+                entry["id"] = None
+        if entry["work_id"]:
+            try:
+                entry["work_id"] = int(entry["work_id"])
+            except (TypeError, ValueError):
+                entry["work_id"] = None
+        parsed.append(entry)
+    return parsed
+
+
 def _detail_context(request, work, user_work=None, work_form=None, user_work_form=None, editing=False, global_edit=False):
     type_key = work_type_key(work)
     owned = user_work is not None
@@ -178,6 +273,12 @@ def _detail_context(request, work, user_work=None, work_form=None, user_work_for
     owned_platform_ids = []
     if owned:
         owned_platform_ids = list(user_work.owned_platforms.values_list("pk", flat=True))
+    catalog = _attr_catalog(type_key)
+    save_url = (
+        reverse("vor_archives:artwork_detail", args=[user_work.pk])
+        if owned
+        else reverse("vor_archives:artwork_work", args=[type_key, work.pk])
+    )
     return {
         "user_work": user_work,
         "owned": owned,
@@ -193,11 +294,15 @@ def _detail_context(request, work, user_work=None, work_form=None, user_work_for
         "hide_platforms": type_key != "game" or not owned,
         "owned_platform_ids": owned_platform_ids,
         "status_choices": UserWorkStatusChoices.choices,
+        "age_rating_choices": AgeRatingChoices.choices,
         "work_relations": work_relation_items(work),
         "overlay_opts": {
             "editing": editing,
             "globalEdit": global_edit,
             "owned": owned,
+            "isStaff": request.user.is_staff,
+            "workType": type_key,
+            "workId": work.pk,
             "filmType": getattr(work, "film_type", None) or "movie",
             "status": user_work.status if owned else "planning",
             "statusChoices": [
@@ -222,6 +327,29 @@ def _detail_context(request, work, user_work=None, work_form=None, user_work_for
                 else ""
             ),
             "listUrl": reverse("vor_archives:artwork_list"),
+            "saveUrl": save_url,
+            "relationSearchUrl": reverse("vor_archives:artwork_relation_search"),
+            "title": work.title,
+            "description": work.description or "",
+            "releaseDate": work.release_date.isoformat() if work.release_date else "",
+            "ageRating": work.age_rating or "",
+            "externalLink": work.external_link or "",
+            "pages": getattr(work, "pages", None),
+            "durationMinutes": getattr(work, "duration_minutes", None),
+            "episodeCount": getattr(work, "episode_count", None),
+            "coverUrl": work.cover.url if work.cover else "",
+            "authors": _chip_payload(work.authors.all(), "bio"),
+            "genres": _chip_payload(work.genres.all()),
+            "tags": _chip_payload(work.tags.all()),
+            "platforms": _chip_payload(work.platforms.all(), "") if type_key == "game" else [],
+            "ownedPlatformIds": owned_platform_ids,
+            "catalog": catalog,
+            "relations": work_relation_items(work),
+            "relationTypes": RELATION_TYPE_OPTIONS,
+            "ageChoices": [
+                {"value": value, "label": label}
+                for value, label in AgeRatingChoices.choices
+            ],
         },
     }
 
@@ -251,33 +379,52 @@ def _artwork_overlay_response(request, work, user_work=None):
     work_form_class = _work_form_class(type_key)
 
     if request.method == "POST":
-        global_edit = request.POST.get("global_edit") == "1" and request.user.is_staff
-        user_work_form = (
-            UserWorkEditForm(request.POST, instance=user_work)
-            if user_work is not None
-            else None
-        )
-        if global_edit:
-            work_form = work_form_class(request.POST, request.FILES, instance=work)
-            user_ok = user_work_form is None or user_work_form.is_valid()
-            if user_ok and work_form.is_valid():
-                if user_work_form is not None:
-                    user_work_form.save()
-                work_form.save()
-                return _list_response(request, '{"vor:close-overlay": true}')
-        elif user_work_form is not None:
-            work_form = work_form_class(instance=work)
-            if user_work_form.is_valid():
-                user_work_form.save()
-                return _list_response(request, '{"vor:close-overlay": true}')
-        else:
+        if not request.user.is_staff:
             return HttpResponseBadRequest("Недостаточно прав")
+        post = request.POST.copy()
+        for name in ("authors", "tags", "genres", "platforms"):
+            ids = _parse_id_list(request, name)
+            post.setlist(name, [str(item) for item in ids])
+        work_form = work_form_class(post, request.FILES, instance=work)
+        if work_form.is_valid():
+            saved = work_form.save()
+            if post.get("cover_clear") == "1" and not request.FILES.get("cover"):
+                if saved.cover:
+                    saved.cover.delete(save=False)
+                saved.cover = None
+                saved.save(update_fields=["cover"])
+            try:
+                sync_work_relations(saved, _parse_relations_payload(request))
+            except ValidationError as error:
+                work_form.add_error(None, error)
+            else:
+                clamp_progress_for_work(saved)
+                if type_key == "game" and user_work is not None:
+                    valid_ids = set(saved.platforms.values_list("pk", flat=True))
+                    stale_ids = [
+                        pk
+                        for pk in user_work.owned_platforms.values_list("pk", flat=True)
+                        if pk not in valid_ids
+                    ]
+                    if stale_ids:
+                        user_work.owned_platforms.remove(*stale_ids)
+                _prefetch_work(saved, user_work)
+                return render(
+                    request,
+                    "vor_archives/partials/artwork_overlay.html",
+                    _detail_context(
+                        request, saved, user_work,
+                        work_form_class(instance=saved),
+                        UserWorkEditForm(instance=user_work) if user_work is not None else None,
+                    ),
+                )
         return render(
             request,
             "vor_archives/partials/artwork_overlay.html",
             _detail_context(
-                request, work, user_work, work_form, user_work_form,
-                editing=True, global_edit=global_edit,
+                request, work, user_work, work_form,
+                UserWorkEditForm(instance=user_work) if user_work is not None else None,
+                editing=True, global_edit=True,
             ),
         )
 
@@ -342,6 +489,21 @@ def artwork_quick(request, uw_id):
         except (TypeError, ValueError):
             return HttpResponseBadRequest("Некорректное число завершений")
         user_work.times_completed = max(times_completed, 0)
+    elif field == "owned_platform":
+        try:
+            platform_id = int(value)
+        except (TypeError, ValueError):
+            return HttpResponseBadRequest("Некорректная платформа")
+        work = user_work.work
+        if work is None or not work.platforms.filter(pk=platform_id).exists():
+            return HttpResponseBadRequest("Платформа не относится к произведению")
+        if user_work.owned_platforms.filter(pk=platform_id).exists():
+            user_work.owned_platforms.remove(platform_id)
+        else:
+            user_work.owned_platforms.add(platform_id)
+        return JsonResponse({
+            "owned_platform_ids": list(user_work.owned_platforms.values_list("pk", flat=True)),
+        })
     else:
         return HttpResponseBadRequest("Неизвестное поле")
 
@@ -407,6 +569,17 @@ def _add_work_forms(bound_type=None, data=None, files=None):
         else:
             forms[f"{key}_form"] = form_class()
     return forms
+
+
+@login_required(login_url=LOGIN_URL)
+@require_GET
+def artwork_relation_search(request):
+    results = search_works(
+        request.GET.get("q") or "",
+        exclude_type=request.GET.get("exclude_type"),
+        exclude_id=request.GET.get("exclude_id"),
+    )
+    return JsonResponse({"results": results})
 
 
 @login_required(login_url=LOGIN_URL)

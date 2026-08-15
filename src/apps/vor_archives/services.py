@@ -1,9 +1,11 @@
+from decimal import Decimal
+
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.db.models import Count, Q, prefetch_related_objects
 from django.shortcuts import get_object_or_404
 
-from .constants import WorkRelationTypeChoices
+from .constants import FilmTypeChoices, WorkRelationTypeChoices
 from .models import Book, FeedItem, Film, Game, UserWork, WorkRelation
 
 WORK_MODELS = {
@@ -165,14 +167,24 @@ def _relation_cover_url(work):
         return ""
 
 
-def _relation_item(work, label):
+def relation_label(relation_type, direction="out"):
+    outgoing_label, incoming_label = RELATION_LABELS.get(
+        relation_type, ("Связано", "Связано")
+    )
+    return outgoing_label if direction == "out" else incoming_label
+
+
+def _relation_item(work, label, relation, direction):
     return {
+        "id": relation.pk,
         "title": work.title,
         "cover_url": _relation_cover_url(work),
         "label": label,
         "icon": WORK_TYPE_ICONS.get(work._meta.model_name, "bi bi-collection"),
         "type_key": work._meta.model_name,
         "work_id": work.pk,
+        "relation_type": relation.relation_type,
+        "direction": direction,
     }
 
 
@@ -192,19 +204,103 @@ def work_relation_items(work):
         other = relation.target
         if other is None:
             continue
-        outgoing_label, _incoming_label = RELATION_LABELS.get(
-            relation.relation_type, ("Связано", "Связано")
+        items.append(
+            _relation_item(other, relation_label(relation.relation_type, "out"), relation, "out")
         )
-        items.append(_relation_item(other, outgoing_label))
     for relation in incoming:
         other = relation.source
         if other is None:
             continue
-        _outgoing_label, incoming_label = RELATION_LABELS.get(
-            relation.relation_type, ("Связано", "Связано")
+        items.append(
+            _relation_item(other, relation_label(relation.relation_type, "in"), relation, "in")
         )
-        items.append(_relation_item(other, incoming_label))
     return items
+
+
+def search_works(query, exclude_type=None, exclude_id=None, limit=20):
+    query = (query or "").strip()
+    if len(query) < 1:
+        return []
+    results = []
+    exclude_id = int(exclude_id) if exclude_id not in (None, "") else None
+    for type_key, model in WORK_MODELS.items():
+        qs = model.objects.filter(title__icontains=query)
+        if type_key == exclude_type and exclude_id is not None:
+            qs = qs.exclude(pk=exclude_id)
+        for work in qs.order_by("title")[:limit]:
+            results.append({
+                "type_key": type_key,
+                "work_id": work.pk,
+                "title": work.title,
+                "cover_url": _relation_cover_url(work),
+                "icon": WORK_TYPE_ICONS.get(type_key, "bi bi-collection"),
+            })
+    results.sort(key=lambda item: item["title"].casefold())
+    return results[:limit]
+
+
+def _work_progress_maximum(work):
+    model_name = work._meta.model_name
+    if model_name == "book":
+        return work.pages
+    if model_name == "film":
+        if work.film_type == FilmTypeChoices.TV_SHOW:
+            return work.episode_count
+        return work.duration_minutes
+    return None
+
+
+def clamp_progress_for_work(work):
+    maximum = _work_progress_maximum(work)
+    if maximum is None:
+        return
+    limit = Decimal(str(maximum))
+    user_works = list(work.user_works.all())
+    for user_work in user_works:
+        if user_work.progress > limit:
+            user_work.progress = limit
+            user_work.save()
+
+
+@transaction.atomic
+def sync_work_relations(work, items):
+    ct = ContentType.objects.get_for_model(work)
+    keep_ids = []
+    new_items = []
+    for item in items:
+        relation_id = item.get("id")
+        relation_type = item.get("relation_type") or WorkRelationTypeChoices.OTHER
+        if relation_id:
+            relation = WorkRelation.objects.filter(pk=relation_id).first()
+            if relation is None:
+                continue
+            if relation.relation_type != relation_type:
+                relation.relation_type = relation_type
+                relation.save()
+            keep_ids.append(relation.pk)
+            continue
+        new_items.append(item)
+    WorkRelation.objects.filter(
+        Q(source_content_type=ct, source_object_id=work.pk)
+        | Q(target_content_type=ct, target_object_id=work.pk)
+    ).exclude(pk__in=keep_ids).delete()
+    for item in new_items:
+        type_key = item.get("type_key")
+        work_id = item.get("work_id")
+        relation_type = item.get("relation_type") or WorkRelationTypeChoices.OTHER
+        if not type_key or not work_id:
+            continue
+        target = get_work(type_key, work_id)
+        if target.pk == work.pk and work_type_key(target) == work_type_key(work):
+            continue
+        relation = WorkRelation(
+            source_content_type=ct,
+            source_object_id=work.pk,
+            target_content_type=ContentType.objects.get_for_model(target),
+            target_object_id=target.pk,
+            relation_type=relation_type,
+        )
+        relation.save()
 
 
 def create_work_and_attach(user, work, user_work_form):
