@@ -281,6 +281,12 @@ class UserWork(models.Model):
     owned_platforms = models.ManyToManyField(Platform, blank=True)
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "work_content_type", "work_object_id"],
+                name="unique_user_work",
+            ),
+        ]
         indexes = [
             models.Index(fields=["work_content_type", "work_object_id"]),
             models.Index(fields=["user", "order_position"]),
@@ -292,7 +298,8 @@ class UserWork(models.Model):
 
     def clean(self):
         super().clean()
-        validate_gfk(self.work_content_type, self.work_object_id)
+        if self.work_content_type_id and self.work_object_id:
+            validate_gfk(self.work_content_type, self.work_object_id)
 
     def save(self, *args, **kwargs):
         self.full_clean()

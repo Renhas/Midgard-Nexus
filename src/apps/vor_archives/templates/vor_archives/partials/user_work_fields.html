@@ -1,0 +1,22 @@
+{% include "vor_archives/partials/form_field.html" with field=form.status %}
+{% include "vor_archives/partials/form_field.html" with field=form.rating %}
+<div class="vor-field{% if form.progress.errors %} has-error{% endif %}">
+    <label class="vor-field-label" for="{{ form.progress.id_for_label }}">
+        {{ form.progress.label }}{% if progress_unit %} ({{ progress_unit }}){% endif %}
+    </label>
+    {{ form.progress }}
+    {% if form.progress.errors %}
+        <div class="vor-field-errors">{{ form.progress.errors }}</div>
+    {% endif %}
+</div>
+<div class="vor-field vor-field-check">
+    <label class="vor-check-label">
+        {{ form.is_hidden }}
+        <span>{{ form.is_hidden.label }}</span>
+    </label>
+</div>
+<div class="vor-field" {% if hide_platforms %}style="display:none"{% endif %}
+     {% if alpine_platforms %}x-show="{{ alpine_platforms }}" x-cloak{% endif %}>
+    <label class="vor-field-label" for="{{ form.owned_platforms.id_for_label }}">{{ form.owned_platforms.label }}</label>
+    {{ form.owned_platforms }}
+</div>

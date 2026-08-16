@@ -1,0 +1,37 @@
+<div class="vor-modal-backdrop" @click.self="$store.vorArtworks.closeModal()">
+    <div class="vor-modal" @click.stop>
+        <h3 class="vor-modal-title">Подтверждение удаления</h3>
+        <p class="vor-modal-text">
+            {% if count == 1 %}
+                Произведение будет удалено из вашего списка.
+            {% else %}
+                Выбранные произведения ({{ count }}) будут удалены из вашего списка.
+            {% endif %}
+        </p>
+        {% if orphan_titles %}
+            <div class="vor-modal-warning">
+                <p>Эти произведения не привязаны к другим пользователям и будут удалены из базы навсегда:</p>
+                <ul class="vor-orphan-list">
+                    {% for title in orphan_titles %}
+                        <li>{{ title }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <form class="vor-modal-actions"
+              hx-post="{% url 'vor_archives:artwork_delete' %}"
+              hx-target="#artwork-list"
+              hx-swap="outerHTML">
+            {% csrf_token %}
+            {% for id in ids %}
+                <input type="hidden" name="ids" value="{{ id }}">
+            {% endfor %}
+            <button type="button" class="sidebar-btn" @click="$store.vorArtworks.closeModal()">
+                Отмена
+            </button>
+            <button type="submit" class="sidebar-btn sidebar-btn-delete">
+                Удалить
+            </button>
+        </form>
+    </div>
+</div>

@@ -5,38 +5,81 @@ from ..constants import FilmTypeChoices
 register = template.Library()
 
 
+WORK_TYPE_ICONS = {
+    'book': 'icon-book-text',
+    'film': 'icon-clapperboard',
+    'game': 'icon-gamepad-2',
+}
+
+WORK_TYPE_LABELS = {
+    'book': 'Книга',
+    'film': 'Фильм',
+    'game': 'Игра',
+}
+
+
+def _display_progress_value(value):
+    number = float(value or 0)
+    rounded = round(number, 1)
+    if rounded == int(rounded):
+        return str(int(rounded))
+    return str(rounded)
+
+
+def get_progress_info(user_work):
+    if not user_work or not getattr(user_work, "work", None):
+        return None
+    work = user_work.work
+    model_name = work._meta.model_name
+    info = {
+        "value": float(user_work.progress or 0),
+        "display_value": _display_progress_value(user_work.progress),
+        "maximum": None,
+        "unit": "",
+        "step": 1,
+    }
+    if model_name == "book":
+        info["maximum"] = work.pages
+        info["unit"] = "стр."
+    elif model_name == "game":
+        info["unit"] = "ч."
+        info["step"] = 0.5
+    elif model_name == "film":
+        if work.film_type == FilmTypeChoices.TV_SHOW:
+            info["maximum"] = work.episode_count
+            info["unit"] = "эп."
+        else:
+            info["maximum"] = work.duration_minutes
+            info["unit"] = "мин."
+    return info
+
+
+@register.filter
+def get_model_icon(obj):
+    if not obj:
+        return 'bi bi-collection'
+    return WORK_TYPE_ICONS.get(obj._meta.model_name, 'bi bi-collection')
+
+
 @register.filter
 def get_work_type_icon(user_work):
     if not user_work or not hasattr(user_work, 'work'):
         return ''
-    work = user_work.work
-    model_name = work._meta.model_name
-    icons = {
-        'book': 'icon-book-text',
-        'film': 'icon-clapperboard',
-        'game': 'icon-gamepad-2',
-    }
-    return icons.get(model_name, 'bi bi-collection')
+    return get_model_icon(user_work.work)
 
 
 @register.filter
 def format_progress(user_work):
-    if not user_work or not hasattr(user_work, 'work'):
-        return '—'
-    work = user_work.work
-    model_name = work._meta.model_name
-    progress = round(user_work.progress) or 0
+    info = get_progress_info(user_work)
+    if not info:
+        return "—"
+    if info["maximum"] is not None:
+        return f'{info["display_value"]}/{info["maximum"]} {info["unit"]}'
+    return f'{info["display_value"]} {info["unit"]}'
 
-    if model_name == 'book':
-        max_pages = work.pages
-        return f'{progress}/{max_pages} стр.'
-    elif model_name == 'game':
-        return f'{progress} ч.'
-    elif model_name == 'film':
-        f_type = work.film_type
-        if f_type == FilmTypeChoices.MOVIE:
-            duration = work.duration_minutes
-            return f'{progress}/{duration} мин.'
-        if f_type == FilmTypeChoices.TV_SHOW:
-            return f"{progress}/{work.episode_count} эп."
-    return '—'
+
+@register.filter
+def work_type_label(work):
+    if not work:
+        return ""
+    return WORK_TYPE_LABELS.get(work._meta.model_name, "")
