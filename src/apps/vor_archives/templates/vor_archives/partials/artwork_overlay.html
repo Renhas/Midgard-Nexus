@@ -120,7 +120,7 @@
                         <i class="{{ work|get_model_icon }}"></i>
                         <span>{{ work|work_type_label }}{% if work_type == 'film' %} ({{ work.get_film_type_display }}){% endif %}</span>
                     </span>
-                    <div class="vor-age-wrap" x-show="editing || ageRating" @click.outside="ageOpen = false">
+                    <div class="vor-age-wrap" x-show="editing || ageRating" @click.outside="ageOpen = false" @wheel.prevent="editing && onAgeWheel($event)">
                         <button type="button"
                                 class="vor-age-badge"
                                 :data-age="ageRating"
@@ -133,9 +133,8 @@
                             <button type="button"
                                     class="vor-age-option"
                                     data-age=""
-                                    @click="setAgeRating('')">
-                                Нет
-                            </button>
+                                    :class="{ 'is-current': !ageRating }"
+                                    @click="setAgeRating('')">—</button>
                             <template x-for="opt in ageChoices" :key="opt.value">
                                 <button type="button"
                                         class="vor-age-option"
@@ -152,37 +151,12 @@
                         <span class="vor-field-value" x-show="!editing && releaseDate" x-text="formatDate(releaseDate)">
                             {% if work.release_date %}{{ work.release_date|date:'d.m.Y' }}{% endif %}
                         </span>
-                        <div class="vor-date-wrap" x-show="editing" x-cloak @click.outside="dateOpen = false">
-                            <button type="button" class="vor-date-trigger" @click="dateOpen = !dateOpen">
+                        <div class="vor-date-wrap" x-show="editing" x-cloak @click.outside="closeDatePopup()">
+                            <button type="button" class="vor-date-trigger" @click="toggleDateOpen()">
                                 <span x-text="releaseDate ? formatDate(releaseDate) : 'Выбрать'"></span>
                                 <i class="bi bi-calendar3"></i>
                             </button>
-                            <div class="vor-date-popup" x-show="dateOpen" x-cloak>
-                                <div class="vor-date-nav">
-                                    <button type="button" class="sidebar-btn sidebar-btn-icon" @click="shiftMonth(-1)">
-                                        <i class="bi bi-chevron-left"></i>
-                                    </button>
-                                    <span x-text="dateMonthLabel()"></span>
-                                    <button type="button" class="sidebar-btn sidebar-btn-icon" @click="shiftMonth(1)">
-                                        <i class="bi bi-chevron-right"></i>
-                                    </button>
-                                </div>
-                                <div class="vor-date-week">
-                                    <template x-for="day in ['Пн','Вт','Ср','Чт','Пт','Сб','Вс']" :key="day">
-                                        <span x-text="day"></span>
-                                    </template>
-                                </div>
-                                <div class="vor-date-grid">
-                                    <template x-for="cell in dateCells()" :key="cell.key">
-                                        <button type="button"
-                                                class="vor-date-day"
-                                                :class="{ 'is-muted': !cell.current, 'is-selected': cell.iso === releaseDate }"
-                                                @click="setReleaseDate(cell.iso)"
-                                                x-text="cell.day"></button>
-                                    </template>
-                                </div>
-                                <button type="button" class="vor-date-clear" @click="setReleaseDate('')">Очистить</button>
-                            </div>
+                            {% include "vor_archives/partials/date_picker.html" %}
                         </div>
                         <input type="hidden" name="release_date" :value="releaseDate">
                         <div class="vor-link-wrap" x-show="editing || externalLink" @click.outside="linkOpen = false">
@@ -266,7 +240,8 @@
                                name="pages"
                                x-show="editing"
                                x-cloak
-                               x-model="pages">
+                               x-model="pages"
+                               @wheel.prevent="onNumberWheel($event, 'pages')">
                     </div>
                 {% elif work_type == 'film' %}
                     <div class="vor-view-row vor-view-labeled" x-show="editing || durationMinutes">
@@ -281,7 +256,8 @@
                                    type="number"
                                    min="1"
                                    name="duration_minutes"
-                                   x-model="durationMinutes">
+                                   x-model="durationMinutes"
+                                   @wheel.prevent="onNumberWheel($event, 'durationMinutes')">
                             <span class="vor-field-value">мин.</span>
                         </span>
                     </div>
@@ -295,7 +271,8 @@
                                    name="episode_count"
                                    x-show="editing"
                                    x-cloak
-                                   x-model="episodeCount">
+                                   x-model="episodeCount"
+                                   @wheel.prevent="onNumberWheel($event, 'episodeCount')">
                         </div>
                     {% endif %}
                     <input type="hidden" name="film_type" value="{{ work.film_type }}">
@@ -536,6 +513,14 @@
                     <span>Приватное</span>
                 </label>
             </div>
+            {% else %}
+            <div class="vor-view-cover-controls">
+                <button type="button"
+                        class="sidebar-btn sidebar-btn-add vor-add-to-list"
+                        @click="startAttach()">
+                    Добавить к себе
+                </button>
+            </div>
             {% endif %}
 
             <p class="vor-view-desc" x-show="!editing">{% if work.description %}{{ work.description }}{% else %}Описание произведения отсутствует{% endif %}</p>
@@ -548,6 +533,17 @@
                       placeholder="Описание произведения"></textarea>
         </div>
     </form>
+
+    <div class="vor-modal-backdrop vor-leave-confirm" x-show="attachOpen" x-cloak>
+        <div class="vor-modal" @click.stop>
+            <h3 class="vor-modal-title">Добавить в список</h3>
+            {% include "vor_archives/partials/attach_user_fields.html" %}
+            <div class="vor-modal-actions vor-modal-actions-center">
+                <button type="button" class="sidebar-btn" @click="attachOpen = false">Назад</button>
+                <button type="button" class="sidebar-btn sidebar-btn-add" :disabled="saving" @click="saveAttach()">Сохранить</button>
+            </div>
+        </div>
+    </div>
 
     <div class="vor-modal-backdrop vor-leave-confirm" x-show="leaveConfirmOpen" x-cloak @click.self="leaveConfirmOpen = false">
         <div class="vor-modal" @click.stop>

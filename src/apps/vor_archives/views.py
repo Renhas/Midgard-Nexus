@@ -4,6 +4,7 @@ from decimal import Decimal, InvalidOperation
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.db.models import prefetch_related_objects
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -16,7 +17,7 @@ from .constants import (
     UserWorkStatusChoices,
     WorkRelationTypeChoices,
 )
-from .forms import WORK_FORMS, UserWorkEditForm, UserWorkForm
+from .forms import WORK_FORMS, UserWorkEditForm
 from .templatetags.vor_archives_extras import get_progress_info
 from .models import (
     BookGenre,
@@ -32,7 +33,6 @@ from .services import (
     WORK_MODELS,
     attach_work,
     clamp_progress_for_work,
-    create_work_and_attach,
     delete_user_works,
     get_user_work,
     get_work,
@@ -211,6 +211,33 @@ def _attr_catalog(type_key):
     }
 
 
+def _all_attr_catalogs():
+    return {key: _attr_catalog(key) for key in WORK_FORMS}
+
+
+def _progress_meta_for_work(work):
+    type_key = work_type_key(work)
+    if type_key == "book":
+        return {"maximum": work.pages, "unit": "стр.", "step": 1}
+    if type_key == "game":
+        return {"maximum": None, "unit": "ч.", "step": 0.5}
+    if getattr(work, "film_type", None) == FilmTypeChoices.TV_SHOW:
+        return {"maximum": work.episode_count, "unit": "эп.", "step": 1}
+    return {"maximum": getattr(work, "duration_minutes", None), "unit": "мин.", "step": 1}
+
+
+def _wants_json(request):
+    return request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
+
+STATUS_LABELS_RU = {
+    UserWorkStatusChoices.PLANNING: "Запланировано",
+    UserWorkStatusChoices.IN_PROGRESS: "В процессе",
+    UserWorkStatusChoices.COMPLETED: "Завершено",
+    UserWorkStatusChoices.DROPPED: "Брошено",
+}
+
+
 RELATION_TYPE_OPTIONS = [
     {"value": WorkRelationTypeChoices.SEQUEL, "label": "Продолжение"},
     {"value": WorkRelationTypeChoices.SPIN_OFF, "label": "Спин-офф"},
@@ -269,7 +296,16 @@ def _parse_relations_payload(request):
 def _detail_context(request, work, user_work=None, work_form=None, user_work_form=None, editing=False, global_edit=False):
     type_key = work_type_key(work)
     owned = user_work is not None
-    progress_meta = (get_progress_info(user_work) or {}) if owned else {}
+    if owned:
+        progress_meta = get_progress_info(user_work) or {}
+    else:
+        work_meta = _progress_meta_for_work(work)
+        progress_meta = {
+            "value": 0,
+            "maximum": work_meta["maximum"],
+            "unit": work_meta["unit"],
+            "step": work_meta["step"],
+        }
     owned_platform_ids = []
     if owned:
         owned_platform_ids = list(user_work.owned_platforms.values_list("pk", flat=True))
@@ -293,7 +329,10 @@ def _detail_context(request, work, user_work=None, work_form=None, user_work_for
         "progress_meta": progress_meta,
         "hide_platforms": type_key != "game" or not owned,
         "owned_platform_ids": owned_platform_ids,
-        "status_choices": UserWorkStatusChoices.choices,
+        "status_choices": [
+            (value, STATUS_LABELS_RU.get(value, label))
+            for value, label in UserWorkStatusChoices.choices
+        ],
         "age_rating_choices": AgeRatingChoices.choices,
         "work_relations": work_relation_items(work),
         "overlay_opts": {
@@ -306,9 +345,10 @@ def _detail_context(request, work, user_work=None, work_form=None, user_work_for
             "filmType": getattr(work, "film_type", None) or "movie",
             "status": user_work.status if owned else "planning",
             "statusChoices": [
-                {"value": value, "label": label}
+                {"value": value, "label": STATUS_LABELS_RU.get(value, label)}
                 for value, label in UserWorkStatusChoices.choices
             ],
+            "attachUrl": reverse("vor_archives:artwork_attach"),
             "rating": (user_work.rating or 0) if owned else 0,
             "isHidden": user_work.is_hidden if owned else False,
             "progress": progress_meta.get("value", 0),
@@ -528,36 +568,57 @@ def artwork_add(request):
         work_form_class = _work_form_class(type_key)
         if work_form_class is None:
             return HttpResponseBadRequest("Неизвестный тип")
-        forms = _add_work_forms(type_key, request.POST, request.FILES)
-        work_form = forms[f"{type_key}_form"]
-        user_work_form = UserWorkForm(request.POST)
-        title_value = request.POST.get("title", "")
-        if user_has_work_title(request.user, type_key, title_value):
-            work_form.add_error(
-                "title",
-                "Произведение с таким названием уже есть в вашем списке",
-            )
-        if work_form.is_valid() and user_work_form.is_valid():
-            work = work_form.save()
-            create_work_and_attach(request.user, work, user_work_form)
-            return _list_response(request, '{"vor:close-overlay": true}')
-        return render(request, "vor_archives/partials/artwork_add.html", {
-            **forms,
-            "work_form": work_form,
-            "work_type": type_key,
-            "user_work_form": user_work_form,
-            "title_value": title_value,
-            "create_errors": True,
-            "progress_unit": _progress_unit(type_key=type_key),
-        })
+        post = request.POST.copy()
+        for name in ("authors", "tags", "genres", "platforms"):
+            ids = _parse_id_list(request, name)
+            post.setlist(name, [str(item) for item in ids])
+        work_form = work_form_class(post, request.FILES)
+        if work_form.is_valid():
+            try:
+                with transaction.atomic():
+                    work = work_form.save()
+                    sync_work_relations(work, _parse_relations_payload(request))
+            except ValidationError as error:
+                message = " ".join(error.messages) if getattr(error, "messages", None) else str(error)
+                return JsonResponse(
+                    {"ok": False, "errors": {"__all__": [{"message": message}]}},
+                    status=400,
+                )
+            meta = _progress_meta_for_work(work)
+            return JsonResponse({
+                "ok": True,
+                "work_id": work.pk,
+                "work_type": type_key,
+                "title": work.title,
+                "progressMax": meta["maximum"],
+                "progressUnit": meta["unit"],
+                "progressStep": meta["step"],
+            })
+        return JsonResponse(
+            {"ok": False, "errors": work_form.errors.get_json_data()},
+            status=400,
+        )
 
-    forms = _add_work_forms()
     return render(request, "vor_archives/partials/artwork_add.html", {
-        **forms,
-        "work_form": forms["book_form"],
-        "work_type": "book",
-        "user_work_form": UserWorkForm(),
-        "progress_unit": _progress_unit(type_key="book"),
+        "add_opts": {
+            "workType": "book",
+            "saveUrl": reverse("vor_archives:artwork_add"),
+            "searchUrl": reverse("vor_archives:artwork_search"),
+            "previewUrl": reverse("vor_archives:artwork_preview"),
+            "attachUrl": reverse("vor_archives:artwork_attach"),
+            "listUrl": reverse("vor_archives:artwork_list"),
+            "relationSearchUrl": reverse("vor_archives:artwork_relation_search"),
+            "relationTypes": RELATION_TYPE_OPTIONS,
+            "catalogs": _all_attr_catalogs(),
+            "ageChoices": [
+                {"value": value, "label": label}
+                for value, label in AgeRatingChoices.choices
+            ],
+            "statusChoices": [
+                {"value": value, "label": STATUS_LABELS_RU.get(value, label)}
+                for value, label in UserWorkStatusChoices.choices
+            ],
+        },
     })
 
 
@@ -616,12 +677,14 @@ def artwork_preview(request):
     if not work_id:
         return HttpResponseBadRequest("Не указано произведение")
     work = get_work(type_key, work_id)
+    meta = _progress_meta_for_work(work)
     return render(request, "vor_archives/partials/work_preview_card.html", {
         "work": work,
         "work_type": type_key,
         "already": user_has_work(request.user, work),
-        "user_work_form": UserWorkForm(),
-        "progress_unit": _progress_unit(work),
+        "progress_max": meta["maximum"],
+        "progress_unit": meta["unit"],
+        "progress_step": meta["step"],
     })
 
 
@@ -634,24 +697,38 @@ def artwork_attach(request):
         return HttpResponseBadRequest("Не указано произведение")
     work = get_work(type_key, work_id)
     if user_has_work(request.user, work):
+        if _wants_json(request):
+            return JsonResponse({"ok": False, "error": "already"}, status=400)
+        meta = _progress_meta_for_work(work)
         return render(request, "vor_archives/partials/work_preview_card.html", {
             "work": work,
             "work_type": type_key,
             "already": True,
-            "user_work_form": UserWorkForm(),
-            "progress_unit": _progress_unit(work),
+            "progress_max": meta["maximum"],
+            "progress_unit": meta["unit"],
+            "progress_step": meta["step"],
         })
-    user_work_form = UserWorkForm(request.POST)
-    if not user_work_form.is_valid():
-        return render(request, "vor_archives/partials/work_preview_card.html", {
-            "work": work,
-            "work_type": type_key,
-            "already": False,
-            "attaching": True,
-            "user_work_form": user_work_form,
-            "progress_unit": _progress_unit(work),
-        })
-    attach_work(request.user, type_key, work_id, user_work_form.cleaned_data)
+    status = request.POST.get("status") or UserWorkStatusChoices.PLANNING
+    if status not in {choice[0] for choice in UserWorkStatusChoices.choices}:
+        return HttpResponseBadRequest("Некорректный статус")
+    rating = request.POST.get("rating") or ""
+    progress = request.POST.get("progress") or "0"
+    try:
+        rating_value = int(rating) if rating not in ("", "0") else None
+        progress_value = Decimal(progress)
+    except (TypeError, ValueError, InvalidOperation):
+        return HttpResponseBadRequest("Некорректные данные")
+    if rating_value is not None and (rating_value < 1 or rating_value > 10):
+        return HttpResponseBadRequest("Некорректный рейтинг")
+    if progress_value < 0:
+        progress_value = Decimal("0")
+    attach_work(request.user, type_key, work_id, {
+        "status": status,
+        "rating": rating_value,
+        "progress": progress_value,
+    })
+    if _wants_json(request):
+        return JsonResponse({"ok": True})
     return _list_response(request, '{"vor:close-overlay": true}')
 
 

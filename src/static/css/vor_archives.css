@@ -226,6 +226,12 @@
     padding: 0.5rem 0 0.25rem 0;
 }
 
+.sidebar-accordion-search {
+    width: 100%;
+    margin: 0 0 0.35rem;
+    font-size: 0.8125rem;
+}
+
 .sidebar-filter-item {
     display: flex;
     align-items: center;
@@ -560,6 +566,10 @@
     z-index: 1020;
     background-color: var(--bg-primary);
     overflow: auto;
+}
+
+#vor-overlay:has(.is-add) {
+    overflow: hidden;
 }
 
 .vor-overlay {
@@ -1585,18 +1595,45 @@ a.vor-relation-item:hover {
 
 .vor-add-search {
     position: relative;
+    z-index: 8;
+    flex-shrink: 0;
     margin-bottom: 1rem;
 }
 
-.vor-suggestions {
+.vor-add-search .vor-view-title {
+    margin-bottom: 0;
+}
+
+.vor-add-title-wrap {
     position: relative;
 }
 
-.vor-suggestions-list {
+.vor-add-title-wrap .vor-req-star {
+    position: absolute;
+    right: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.35rem;
+    pointer-events: none;
+}
+
+.vor-inline-title.is-invalid,
+.vor-inline-title.is-invalid:focus,
+.vor-inline-number.is-invalid,
+.vor-inline-number.is-invalid:focus {
+    border-color: var(--error);
+    box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.25);
+}
+
+.vor-suggestions {
     position: absolute;
     left: 0;
     right: 0;
-    z-index: 2;
+    top: 100%;
+    z-index: 9;
+}
+
+.vor-suggestions-list {
     list-style: none;
     margin: 0.25rem 0 0;
     padding: 0.25rem;
@@ -1684,6 +1721,360 @@ a.vor-relation-item:hover {
 
 .vor-attach-form {
     margin-top: 0.85rem;
+}
+
+.vor-overlay.is-add .vor-overlay-bar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: start;
+    justify-content: initial;
+}
+
+.vor-overlay.is-add .vor-overlay-bar > .sidebar-btn:first-child {
+    justify-self: start;
+}
+
+.vor-add-bar-spacer {
+    min-width: 0;
+}
+
+.vor-add-types {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.vor-add-type-btn {
+    width: 4rem;
+    height: 4rem;
+    padding: 0;
+    font-size: 1.75rem;
+}
+
+.vor-add-type-btn i {
+    font-size: 1.75rem;
+    line-height: 1;
+}
+
+.vor-overlay.is-add {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    padding-bottom: 0.85rem;
+}
+
+.vor-overlay.is-add .vor-overlay-bar {
+    flex-shrink: 0;
+}
+
+.vor-overlay.is-add .vor-overlay-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.vor-create-form {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.vor-add-hero {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr) 330px;
+    grid-template-rows: minmax(0, 1fr);
+    column-gap: 1.5rem;
+    align-items: stretch;
+}
+
+.vor-add-hero .vor-cover-wrap {
+    align-self: start;
+}
+
+.vor-add-info {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+    overflow: visible;
+    position: relative;
+    z-index: 3;
+}
+
+.vor-add-info > h3 {
+    flex-shrink: 0;
+}
+
+.vor-add-info-fields {
+    flex: 0 0 auto;
+}
+
+.vor-add-desc {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.vor-add-desc .vor-inline-desc {
+    flex: 1 1 auto;
+    min-height: 3.5rem;
+    height: auto;
+    max-height: 100%;
+    resize: none;
+    overflow-y: auto;
+}
+
+.vor-add-info,
+.vor-add-attrs,
+.vor-add-relations,
+.vor-add-side {
+    margin-bottom: 0;
+    min-width: 0;
+}
+
+.vor-add-side {
+    grid-column: 3;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 0;
+    height: 100%;
+}
+
+.vor-add-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.85rem;
+}
+
+.vor-add-section-head h3 {
+    margin-bottom: 0;
+}
+
+.vor-add-section-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.vor-add-attrs {
+    flex: 0 0 auto;
+}
+
+.vor-add-relations {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 8rem;
+    max-height: none;
+    overflow: hidden;
+}
+
+.vor-add-relations .vor-relations-list,
+.vor-add-relations .vor-relation-add {
+    flex: 1;
+    min-height: 0;
+}
+
+.vor-add-attrs .sidebar-accordion + .sidebar-accordion {
+    margin-top: 0.45rem;
+}
+
+.vor-add-attrs .sidebar-accordion-body {
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.vor-add-field {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.7rem;
+}
+
+.vor-add-field-control {
+    position: relative;
+}
+
+.vor-req-star {
+    color: var(--error);
+    margin-left: 0.2rem;
+    font-weight: 700;
+}
+
+.vor-add-error {
+    position: absolute;
+    z-index: 12;
+    left: 0;
+    top: calc(100% + 6px);
+    padding: 0.45rem 0.8rem;
+    border-radius: 0.375rem;
+    background-color: rgba(239, 68, 68, 0.18);
+    border: 1px solid var(--error);
+    color: var(--error);
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.35;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 0.4rem 0.9rem rgba(0, 0, 0, 0.28);
+}
+
+.vor-add-title-wrap .vor-add-error {
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.vor-add-error.is-under-center {
+    top: calc(100% + 8px);
+    white-space: normal;
+    max-width: calc(100% - 2rem);
+}
+
+.vor-add-field .vor-field-label {
+    flex: 0 0 7.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.vor-add-field .vor-status-dropdown,
+.vor-add-field .vor-date-wrap,
+.vor-add-link,
+.vor-add-select {
+    flex: 1;
+    min-width: 0;
+}
+
+.vor-add-link {
+    width: 100%;
+}
+
+.vor-add-subtitle {
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.95rem;
+    margin-top: 0.35rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.vor-add-info .vor-view-desc {
+    grid-column: auto;
+    grid-row: auto;
+}
+
+.vor-add-footer {
+    display: flex;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 0.75rem;
+}
+
+.vor-add-save {
+    min-width: min(32rem, 90%);
+    min-height: 3.5rem;
+    padding: 0.7rem 3.2rem;
+    font-size: 1.25rem;
+}
+
+.vor-add-save i {
+    font-size: 1.4rem;
+}
+
+.vor-add-to-list {
+    width: 100%;
+}
+
+.vor-add-attach-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.vor-add-attach-fields .vor-add-field {
+    margin-bottom: 0;
+}
+
+.vor-add-attach-fields .vor-status-dropdown {
+    width: 100%;
+}
+
+.vor-modal-actions-center {
+    justify-content: center;
+}
+
+@media (max-width: 1100px) {
+    .vor-add-hero {
+        grid-template-columns: 260px minmax(0, 1fr);
+        grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .vor-add-side {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+}
+
+@media (max-width: 900px) {
+    #vor-overlay:has(.is-add) {
+        overflow: auto;
+    }
+
+    .vor-overlay.is-add {
+        height: auto;
+        min-height: 100%;
+        overflow: visible;
+    }
+
+    .vor-overlay.is-add .vor-overlay-bar {
+        grid-template-columns: 1fr;
+        justify-items: start;
+    }
+
+    .vor-add-types {
+        justify-self: center;
+    }
+
+    .vor-add-bar-spacer {
+        display: none;
+    }
+
+    .vor-add-hero {
+        flex: none;
+        height: auto;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+
+    .vor-add-info,
+    .vor-add-side {
+        grid-column: 1;
+        grid-row: auto;
+        height: auto;
+    }
+
+    .vor-add-hero .vor-cover-wrap,
+    .vor-add-hero .vor-view-cover {
+        width: 260px;
+        height: 390px;
+    }
+
+    .vor-add-desc .vor-inline-desc {
+        min-height: 8rem;
+    }
 }
 
 /* ============================================
@@ -1897,7 +2288,30 @@ a.vor-relation-item:hover {
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.35);
 }
 
-.vor-age-option,
+.vor-age-menu {
+    display: grid;
+    grid-template-columns: repeat(3, 32px);
+    gap: 0.4rem;
+    min-width: 0;
+    width: max-content;
+}
+
+.vor-age-option {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background-color: var(--bg-input);
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
 .vor-relation-type-option {
     display: flex;
     width: 100%;
@@ -1916,17 +2330,20 @@ a.vor-relation-item:hover {
 .vor-age-option[data-age="6+"] {
     color: var(--bg-primary);
     background-color: var(--success);
+    border-color: var(--success);
 }
 
 .vor-age-option[data-age="12+"],
 .vor-age-option[data-age="16+"] {
     color: var(--bg-primary);
     background-color: #fb923c;
+    border-color: #fb923c;
 }
 
 .vor-age-option[data-age="18+"] {
     color: var(--bg-primary);
     background-color: var(--error);
+    border-color: var(--error);
 }
 
 .vor-age-option.is-current,
@@ -1957,6 +2374,27 @@ a.vor-relation-item:hover {
     margin-bottom: 0.4rem;
     color: var(--text-primary);
     font-size: 0.85rem;
+}
+
+.vor-date-head {
+    border: 0;
+    background: none;
+    color: var(--text-primary);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.15rem 0.45rem;
+    border-radius: 0.3rem;
+}
+
+.vor-date-head:hover:not(:disabled) {
+    background-color: rgba(167, 145, 255, 0.12);
+}
+
+.vor-date-head.is-static,
+.vor-date-head:disabled {
+    cursor: default;
+    opacity: 1;
 }
 
 .vor-date-week,
@@ -1992,13 +2430,39 @@ a.vor-relation-item:hover {
     background-color: rgba(167, 145, 255, 0.18);
 }
 
-.vor-date-clear {
-    width: 100%;
+.vor-date-grid-pick {
+    grid-template-columns: repeat(3, 1fr);
+    min-height: 10.5rem;
+    align-content: start;
+}
+
+.vor-date-pick {
+    padding: 0.55rem 0.15rem;
+}
+
+.vor-date-actions {
+    display: flex;
+    gap: 0.4rem;
     margin-top: 0.4rem;
+}
+
+.vor-date-today,
+.vor-date-clear {
+    flex: 1;
+    width: auto;
+    margin-top: 0;
     border: 0;
     background: none;
     color: var(--text-secondary);
     cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 0.3rem;
+}
+
+.vor-date-today:hover,
+.vor-date-clear:hover {
+    color: var(--text-primary);
+    background-color: rgba(167, 145, 255, 0.1);
 }
 
 .vor-link-popup {

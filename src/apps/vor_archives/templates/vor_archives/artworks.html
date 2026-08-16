@@ -167,9 +167,9 @@
         </h6>
         {% include 'vor_archives/partials/filter_accordion.html' with title='Статус' options=status_options name='status' %}
         {% include 'vor_archives/partials/filter_accordion.html' with title='Возрастной рейтинг' options=age_rating_options name='age_rating' %}
-        {% include 'vor_archives/partials/filter_accordion.html' with title='Теги' options=tags_options name='tags' %}
+        {% include 'vor_archives/partials/filter_accordion.html' with title='Теги' options=tags_options name='tags' searchable=True %}
         {% include 'vor_archives/partials/filter_accordion.html' with title='Жанры' nested=genres_nested %}
-        {% include 'vor_archives/partials/filter_accordion.html' with title='Платформы' options=platform_options name='platform' show_condition="workTypes.includes('game')" %}
+        {% include 'vor_archives/partials/filter_accordion.html' with title='Платформы' options=platform_options name='platform' show_condition="workTypes.includes('game')" searchable=True %}
     </div>
 </div>
 {% endblock %}

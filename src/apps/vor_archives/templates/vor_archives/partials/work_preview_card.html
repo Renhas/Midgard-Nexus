@@ -1,5 +1,8 @@
 {% load vor_archives_extras %}
-<div class="vor-preview-card" x-data="{ attaching: {{ attaching|yesno:'true,false' }} }">
+<div class="vor-preview-card"
+     data-progress-max="{{ progress_max|default_if_none:'' }}"
+     data-progress-unit="{{ progress_unit }}"
+     data-progress-step="{{ progress_step }}">
     {% if work.cover %}
         <img class="vor-preview-cover" src="{{ work.cover.url }}" alt="{{ work.title }}">
     {% else %}
@@ -21,26 +24,9 @@
         {% else %}
             <button type="button"
                     class="sidebar-btn sidebar-btn-add"
-                    x-show="!attaching"
-                    @click="attaching = true">
-                Добавить в мой список
+                    data-attach-preview>
+                Добавить в список
             </button>
-            <form x-show="attaching"
-                  x-cloak
-                  class="vor-attach-form"
-                  hx-post="{% url 'vor_archives:artwork_attach' %}"
-                  hx-target="#add-preview"
-                  hx-swap="innerHTML"
-                  hx-encoding="multipart/form-data">
-                {% csrf_token %}
-                <input type="hidden" name="work_type" value="{{ work_type }}">
-                <input type="hidden" name="work_id" value="{{ work.pk }}">
-                <div class="vor-overlay-section">
-                    <h4>Ваша информация</h4>
-                    {% include "vor_archives/partials/user_work_fields.html" with form=user_work_form progress_unit=progress_unit alpine_platforms="workType === 'game'" %}
-                </div>
-                <button type="submit" class="sidebar-btn sidebar-btn-add">Сохранить</button>
-            </form>
         {% endif %}
     </div>
 </div>

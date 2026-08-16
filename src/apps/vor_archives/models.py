@@ -298,7 +298,8 @@ class UserWork(models.Model):
 
     def clean(self):
         super().clean()
-        validate_gfk(self.work_content_type, self.work_object_id)
+        if self.work_content_type_id and self.work_object_id:
+            validate_gfk(self.work_content_type, self.work_object_id)
 
     def save(self, *args, **kwargs):
         self.full_clean()
