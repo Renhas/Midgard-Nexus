@@ -75,8 +75,16 @@
 {% endblock %}
 
 {% block vor_content %}
-<div id="artwork-list" class="artwork-list">
-    <div class="text-center text-muted py-4">Загрузка…</div>
+<div id="artwork-list"
+     class="artwork-list"
+     :class="{
+        'is-grid': $store.vorArtworks.viewMode === 'grid',
+        'is-sortable': $store.vorArtworks.canDrag(),
+        'is-delete-mode': $store.vorArtworks.deleteMode
+     }">
+    <div id="artwork-list-body">
+        <div class="text-center text-muted py-4">Загрузка…</div>
+    </div>
 </div>
 {% endblock %}
 

@@ -1,14 +1,11 @@
 {% load vor_archives_extras %}
 <div class="artwork-item" data-uw-id="{{ user_work.pk }}">
     <div class="artwork-row"
-         x-show="$store.vorArtworks.viewMode === 'list'"
          hx-get="{% url 'vor_archives:artwork_detail' user_work.pk %}"
          hx-target="#vor-overlay"
-         hx-swap="innerHTML"
-         :class="{ 'is-selected': $store.vorArtworks.isSelected({{ user_work.pk }}) }">
-        <div class="artwork-row-check" x-show="$store.vorArtworks.deleteMode" x-cloak>
-            <span class="custom-checkbox"
-                  :class="{ 'is-checked': $store.vorArtworks.isSelected({{ user_work.pk }}) }"></span>
+         hx-swap="innerHTML">
+        <div class="artwork-row-check">
+            <span class="custom-checkbox"></span>
         </div>
         <div class="artwork-row-type">
             <i class="{{ user_work|get_work_type_icon }}"></i>
@@ -35,12 +32,11 @@
             {{ user_work|format_progress }}
         </div>
     </div>
-    <div class="artwork-row-delete-slot" x-show="$store.vorArtworks.viewMode === 'list'">
+    <div class="artwork-row-delete-slot">
         <button type="button"
                 class="sidebar-btn sidebar-btn-delete sidebar-btn-icon artwork-row-delete"
                 title="Удалить"
-                x-show="!$store.vorArtworks.deleteMode"
-                x-cloak
+                onclick="event.stopPropagation()"
                 hx-get="{% url 'vor_archives:artwork_delete_preview' %}?ids={{ user_work.pk }}"
                 hx-target="#vor-modal"
                 hx-swap="innerHTML">
@@ -48,12 +44,9 @@
         </button>
     </div>
     <div class="artwork-tile"
-         x-show="$store.vorArtworks.viewMode === 'grid'"
-         x-cloak
          hx-get="{% url 'vor_archives:artwork_detail' user_work.pk %}"
          hx-target="#vor-overlay"
-         hx-swap="innerHTML"
-         :class="{ 'is-selected': $store.vorArtworks.isSelected({{ user_work.pk }}) }">
+         hx-swap="innerHTML">
         <div class="artwork-tile-cover">
             {% if user_work.work.cover %}
                 <img class="artwork-tile-image" src="{{ user_work.work.cover.url }}" alt="{{ user_work.work.title }}">
@@ -71,16 +64,13 @@
             <div class="artwork-tile-rating">
                 {% if user_work.rating %}{{ user_work.rating }}{% endif %}
             </div>
-            <div class="artwork-tile-check" x-show="$store.vorArtworks.deleteMode" x-cloak>
-                <span class="custom-checkbox"
-                      :class="{ 'is-checked': $store.vorArtworks.isSelected({{ user_work.pk }}) }"></span>
+            <div class="artwork-tile-check">
+                <span class="custom-checkbox"></span>
             </div>
             <button type="button"
                     class="sidebar-btn sidebar-btn-delete sidebar-btn-icon artwork-tile-delete"
                     title="Удалить"
-                    x-show="!$store.vorArtworks.deleteMode"
-                    x-cloak
-                    @click.stop
+                    onclick="event.stopPropagation()"
                     hx-get="{% url 'vor_archives:artwork_delete_preview' %}?ids={{ user_work.pk }}"
                     hx-target="#vor-modal"
                     hx-swap="innerHTML">

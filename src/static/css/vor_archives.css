@@ -529,12 +529,15 @@
 }
 
 .artwork-row-check .custom-checkbox.is-checked,
-.artwork-row-check .custom-checkbox.is-checked:hover {
+.artwork-row-check .custom-checkbox.is-checked:hover,
+.artwork-tile-check .custom-checkbox.is-checked,
+.artwork-tile-check .custom-checkbox.is-checked:hover {
     background-color: var(--accent-hover);
     border-color: var(--accent-hover);
 }
 
-.artwork-row-check .custom-checkbox.is-checked::after {
+.artwork-row-check .custom-checkbox.is-checked::after,
+.artwork-tile-check .custom-checkbox.is-checked::after {
     content: "";
     display: block;
     position: absolute;
@@ -2997,8 +3000,34 @@ button.vor-relation-item,
     gap: 0.5rem;
 }
 
+.artwork-list.is-grid .artwork-list-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
 .artwork-list.is-grid .artwork-item {
     display: block;
+}
+
+.artwork-list.is-grid .artwork-list-header,
+.artwork-list.is-grid .artwork-row,
+.artwork-list.is-grid .artwork-row-delete-slot {
+    display: none !important;
+}
+
+.artwork-list:not(.is-grid) .artwork-tile {
+    display: none !important;
+}
+
+.artwork-list:not(.is-delete-mode) .artwork-row-check,
+.artwork-list:not(.is-delete-mode) .artwork-tile-check {
+    display: none !important;
+}
+
+.artwork-list.is-delete-mode .artwork-row-delete,
+.artwork-list.is-delete-mode .artwork-tile-delete {
+    display: none !important;
 }
 
 .artwork-grid {
@@ -3016,6 +3045,7 @@ button.vor-relation-item,
 
 .artwork-tile-cover {
     position: relative;
+    width: 100%;
     aspect-ratio: 2 / 3;
     border-radius: 0.375rem;
     overflow: hidden;

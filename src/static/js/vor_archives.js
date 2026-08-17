@@ -405,13 +405,28 @@
         if (el?.id === "vor-overlay") {
             pushOverlayHistory(event);
         }
-        if (el && (el.id === "artwork-list" || el.id === "vor-library-search-results")) {
+        if (el?.id === "vor-library-search-results") {
             window.Alpine?.initTree?.(el);
         }
-        if (el?.id === "artwork-list") {
-            window.Alpine?.store("vorArtworks")?.syncSortable();
+        if (el?.id === "artwork-list-body" || el?.id === "artwork-list") {
+            window.Alpine?.store("vorArtworks")?.applyListState();
         }
     });
+
+    document.addEventListener("keydown", (event) => {
+        if (!(event.ctrlKey || event.metaKey) || event.code !== "KeyF") {
+            return;
+        }
+        if (!document.getElementById("vor-artworks-opts")) {
+            return;
+        }
+        if (hasContent("vor-overlay")) {
+            return;
+        }
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        window.Alpine?.store("vorArtworks")?.openSearch();
+    }, true);
 
     document.addEventListener("alpine:init", () => {
         Alpine.store("vorArtworks", {
@@ -461,6 +476,8 @@
                 this.filterCatalog = { ...this.filterCatalog, ...(opts.filterCatalog || {}) };
                 this.resetFilters(false);
                 this.restoreSidebar();
+                this.persistSidebar();
+                this.applyListState();
                 this.reloadList();
             },
             restoreSidebar() {
@@ -513,8 +530,8 @@
                 FILTER_KEYS.forEach((key) => {
                     this.filters[key] = [...(this.filterCatalog[key] || [])];
                 });
-                this.persistSidebar();
                 if (reload) {
+                    this.persistSidebar();
                     this.reloadList();
                 }
             },
@@ -534,16 +551,18 @@
                 }
                 this.viewMode = mode;
                 this.persistSidebar();
-                this.syncSortable();
+                this.applyListState();
             },
             setSortField(field) {
                 this.sortField = field;
                 this.persistSidebar();
+                this.applyListState();
                 this.reloadList();
             },
             toggleSortDir() {
                 this.sortAsc = !this.sortAsc;
                 this.persistSidebar();
+                this.applyListState();
                 this.reloadList();
             },
             toggleFilter(name, value) {
@@ -580,8 +599,29 @@
                     return;
                 }
                 htmx.ajax("GET", `${this.listUrl}?${this.listQuery().toString()}`, {
-                    target: "#artwork-list",
-                    swap: "outerHTML",
+                    target: "#artwork-list-body",
+                    swap: "innerHTML",
+                });
+            },
+            applyListState() {
+                const list = document.getElementById("artwork-list");
+                if (list) {
+                    list.classList.toggle("is-grid", this.viewMode === "grid");
+                    list.classList.toggle("is-sortable", this.canDrag());
+                    list.classList.toggle("is-delete-mode", this.deleteMode);
+                }
+                this.syncSelectedDom();
+                this.syncSortable();
+            },
+            syncSelectedDom() {
+                document.querySelectorAll(".artwork-item").forEach((item) => {
+                    const selected = this.isSelected(item.dataset.uwId);
+                    item.querySelectorAll(".artwork-row, .artwork-tile").forEach((node) => {
+                        node.classList.toggle("is-selected", selected);
+                    });
+                    item.querySelectorAll(".custom-checkbox").forEach((node) => {
+                        node.classList.toggle("is-checked", selected);
+                    });
                 });
             },
             canDrag() {
@@ -698,10 +738,12 @@
             enterDeleteMode() {
                 this.deleteMode = true;
                 this.selectedIds = [];
+                this.applyListState();
             },
             exitDeleteMode() {
                 this.deleteMode = false;
                 this.selectedIds = [];
+                this.applyListState();
             },
             toggleSelected(id) {
                 id = Number(id);
@@ -711,6 +753,7 @@
                 } else {
                     this.selectedIds.push(id);
                 }
+                this.syncSelectedDom();
             },
             isSelected(id) {
                 return this.selectedIds.includes(Number(id));
@@ -2268,17 +2311,6 @@
     document.addEventListener("keydown", (event) => {
         const store = window.Alpine?.store("vorArtworks");
         if (!store) {
-            return;
-        }
-        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "f") {
-            if (!document.getElementById("artwork-list")) {
-                return;
-            }
-            if (hasContent("vor-overlay")) {
-                return;
-            }
-            event.preventDefault();
-            store.openSearch();
             return;
         }
         if (event.key === "Escape") {
