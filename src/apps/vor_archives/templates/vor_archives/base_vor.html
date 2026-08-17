@@ -37,7 +37,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="layout" x-data="{ leftOpen: true, rightOpen: true }">
+<div class="layout{% if hide_right %} layout-no-right{% endif %}"
+     x-data="{ leftOpen: true, rightOpen: {% if hide_right %}false{% else %}true{% endif %} }">
     <!-- Left sidebar (15 %) -->
     <aside class="sidebar sidebar-left" :class="{ collapsed: !leftOpen }">
         <div class="sidebar-body">
@@ -62,6 +63,7 @@
         {% block vor_content %}{% endblock %}
     </div>
 
+    {% if not hide_right %}
     <!-- Right sidebar (15 %) -->
     <aside class="sidebar sidebar-right" :class="{ collapsed: !rightOpen }">
         <div class="sidebar-body">
@@ -79,6 +81,7 @@
             @click="rightOpen = true" title="Показать панель">
         <i class="bi bi-chevron-left"></i>
     </button>
+    {% endif %}
 
     <!-- Page-level notifications -->
     {% block page_notifications %}{% endblock %}
