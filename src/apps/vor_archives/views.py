@@ -6,8 +6,13 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import prefetch_related_objects
-from django.http import HttpResponseBadRequest, JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.http import (
+    Http404,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    JsonResponse,
+)
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
@@ -17,7 +22,18 @@ from .constants import (
     UserWorkStatusChoices,
     WorkRelationTypeChoices,
 )
-from .forms import WORK_FORMS, UserWorkEditForm
+from .attr_catalog import (
+    ATTR_TABS,
+    DEFAULT_KIND,
+    genre_composite_id,
+    genre_type_meta,
+    genre_work_count,
+    get_attr_tab,
+    get_genre,
+    list_genre_groups,
+    parse_genre_ids,
+)
+from .forms import WORK_FORMS, GenreForm, UserWorkEditForm
 from .templatetags.vor_archives_extras import get_progress_info
 from .models import (
     BookGenre,
@@ -159,13 +175,28 @@ def dashboard(request):
 
 @login_required(login_url=LOGIN_URL)
 def attributes(request):
-    """Страница атрибутов модуля «Библиотека»."""
+    """Страница атрибутов — редирект на первую готовую вкладку."""
+    return redirect("vor_archives:attributes_kind", kind=DEFAULT_KIND)
+
+
+@login_required(login_url=LOGIN_URL)
+def attributes_kind(request, kind):
+    """Оболочка страницы атрибутов для выбранной вкладки."""
+    tab = get_attr_tab(kind)
+    if tab is None:
+        raise Http404("Неизвестный тип атрибута")
     module = _module_context()
     return render(request, "vor_archives/attributes.html", {
         "module_name": module["name"],
         "module_icon": module["icon"],
         "module_color": module["color"],
         "active_section": "attributes",
+        "hide_right": True,
+        "attr_kind": kind,
+        "attr_ready": tab["ready"],
+        "attr_label": tab["label"],
+        "attr_tabs": ATTR_TABS,
+        "is_staff": request.user.is_staff,
     })
 
 
@@ -767,3 +798,187 @@ def artwork_delete(request):
     ids = _parse_ids(request)
     delete_user_works(request.user, ids)
     return _list_response(request, '{"vor:close-overlay": true}')
+
+
+def _require_staff(request):
+    if not request.user.is_staff:
+        return HttpResponseForbidden("Недостаточно прав")
+    return None
+
+
+def _genre_list_context(request):
+    groups, total = list_genre_groups(request.GET.get("q") or request.POST.get("q") or "")
+    return {
+        "groups": groups,
+        "total_count": total,
+        "has_items": any(group["items"] for group in groups),
+        "is_staff": request.user.is_staff,
+    }
+
+
+def _genre_item_context(request, obj, type_key):
+    meta = genre_type_meta(type_key)
+    return {
+        "item": {
+            "key": genre_composite_id(type_key, obj.pk),
+            "pk": obj.pk,
+            "type_key": type_key,
+            "type_label": meta["label"],
+            "name": obj.name,
+            "description": obj.description,
+            "work_count": genre_work_count(obj, type_key),
+        },
+        "is_staff": request.user.is_staff,
+    }
+
+
+def _genre_mutation_response(request, detail_template, detail_context, extra_trigger=None):
+    response = render(request, detail_template, detail_context)
+    triggers = {"vor:attr-list-refresh": True}
+    if extra_trigger:
+        triggers.update(extra_trigger)
+    response["HX-Trigger"] = json.dumps(triggers)
+    return response
+
+
+@login_required(login_url=LOGIN_URL)
+@require_GET
+def genre_list(request):
+    return render(
+        request,
+        "vor_archives/partials/attr_list.html",
+        _genre_list_context(request),
+    )
+
+
+@login_required(login_url=LOGIN_URL)
+@require_GET
+def genre_empty(request):
+    return render(request, "vor_archives/partials/attr_empty.html")
+
+
+@login_required(login_url=LOGIN_URL)
+@require_GET
+def genre_detail(request, type_key, pk):
+    if genre_type_meta(type_key) is None:
+        return HttpResponseBadRequest("Неизвестный тип жанра")
+    obj = get_genre(type_key, pk)
+    if obj is None:
+        raise Http404("Жанр не найден")
+    return render(
+        request,
+        "vor_archives/partials/attr_detail.html",
+        _genre_item_context(request, obj, type_key),
+    )
+
+
+@login_required(login_url=LOGIN_URL)
+@require_http_methods(["GET", "POST"])
+def genre_new(request):
+    forbidden = _require_staff(request)
+    if forbidden:
+        return forbidden
+    initial_type = request.GET.get("type") or request.POST.get("type_key") or "book"
+    if genre_type_meta(initial_type) is None:
+        initial_type = "book"
+    if request.method == "POST":
+        form = GenreForm(request.POST, initial_type=initial_type)
+        if form.is_valid():
+            obj, type_key = form.save()
+            return _genre_mutation_response(
+                request,
+                "vor_archives/partials/attr_detail.html",
+                _genre_item_context(request, obj, type_key),
+            )
+    else:
+        form = GenreForm(initial_type=initial_type)
+    return render(request, "vor_archives/partials/attr_form.html", {
+        "form": form,
+        "lock_type": False,
+        "type_label": genre_type_meta(initial_type)["label"],
+        "is_create": True,
+    })
+
+
+@login_required(login_url=LOGIN_URL)
+@require_http_methods(["GET", "POST"])
+def genre_edit(request, type_key, pk):
+    forbidden = _require_staff(request)
+    if forbidden:
+        return forbidden
+    if genre_type_meta(type_key) is None:
+        return HttpResponseBadRequest("Неизвестный тип жанра")
+    obj = get_genre(type_key, pk)
+    if obj is None:
+        raise Http404("Жанр не найден")
+    if request.method == "POST":
+        form = GenreForm(request.POST, instance=obj, lock_type=True, initial_type=type_key)
+        if form.is_valid():
+            obj, saved_type = form.save()
+            return _genre_mutation_response(
+                request,
+                "vor_archives/partials/attr_detail.html",
+                _genre_item_context(request, obj, saved_type),
+            )
+    else:
+        form = GenreForm(instance=obj, lock_type=True, initial_type=type_key)
+    return render(request, "vor_archives/partials/attr_form.html", {
+        "form": form,
+        "lock_type": True,
+        "type_label": genre_type_meta(type_key)["label"],
+        "is_create": False,
+        "type_key": type_key,
+        "pk": obj.pk,
+    })
+
+
+def _genre_delete_items(pairs):
+    items = []
+    for type_key, pk in pairs:
+        obj = get_genre(type_key, pk)
+        if obj is None:
+            continue
+        items.append({
+            "key": genre_composite_id(type_key, pk),
+            "type_key": type_key,
+            "pk": pk,
+            "name": obj.name,
+            "type_label": genre_type_meta(type_key)["label"],
+            "work_count": genre_work_count(obj, type_key),
+            "obj": obj,
+        })
+    return items
+
+
+@login_required(login_url=LOGIN_URL)
+@require_GET
+def genre_delete_preview(request):
+    forbidden = _require_staff(request)
+    if forbidden:
+        return forbidden
+    pairs = parse_genre_ids(request.GET.getlist("ids"))
+    items = _genre_delete_items(pairs)
+    return render(request, "vor_archives/partials/attr_delete_confirm.html", {
+        "items": items,
+        "count": len(items),
+        "linked_count": sum(item["work_count"] for item in items),
+    })
+
+
+@login_required(login_url=LOGIN_URL)
+@require_POST
+def genre_delete(request):
+    forbidden = _require_staff(request)
+    if forbidden:
+        return forbidden
+    pairs = parse_genre_ids(request.POST.getlist("ids"))
+    items = _genre_delete_items(pairs)
+    with transaction.atomic():
+        for item in items:
+            item["obj"].delete()
+    return _genre_mutation_response(
+        request,
+        "vor_archives/partials/attr_empty.html",
+        {},
+        extra_trigger={"vor:close-attr-modal": True},
+    )

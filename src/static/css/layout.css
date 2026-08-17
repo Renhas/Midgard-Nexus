@@ -99,10 +99,11 @@
 
 /* === Center content (70 %) === */
 .center {
-    margin-left: 15vw;
-    margin-right: 15vw;
+    margin-left: clamp(180px, 15vw, 220px);
+    margin-right: clamp(180px, 15vw, 220px);
     padding: 1.5rem;
     transition: margin-left 0.3s ease, margin-right 0.3s ease;
 }
-.center.left-collapsed  { margin-left: 0; }
+.center.left-collapsed  { margin-left: 1.25rem; }
 .center.right-collapsed { margin-right: 0; }
+.layout-no-right .center { margin-right: 0; }

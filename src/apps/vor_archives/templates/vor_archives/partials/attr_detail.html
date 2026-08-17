@@ -1,0 +1,27 @@
+<div class="attr-card" x-init="$store.vorAttributes.select('{{ item.key }}')">
+    <div class="attr-card-header">
+        <h3 class="attr-card-title">{{ item.name }}</h3>
+        <span class="attr-card-type">{{ item.type_label }}</span>
+    </div>
+    <div class="attr-card-desc">{% if item.description %}{{ item.description|linebreaksbr }}{% else %}<span class="text-muted">Нет описания</span>{% endif %}</div>
+    {% if is_staff %}
+    <div class="attr-detail-actions">
+        <button type="button"
+                class="sidebar-btn"
+                hx-get="{% url 'vor_archives:genre_edit' item.type_key item.pk %}"
+                hx-target="#attr-detail"
+                hx-swap="innerHTML">
+            <i class="bi bi-pencil"></i>
+            <span>Редактировать</span>
+        </button>
+        <button type="button"
+                class="sidebar-btn sidebar-btn-delete"
+                hx-get="{% url 'vor_archives:genre_delete_preview' %}?ids={{ item.key }}"
+                hx-target="#vor-modal"
+                hx-swap="innerHTML">
+            <i class="bi bi-trash"></i>
+            <span>Удалить</span>
+        </button>
+    </div>
+    {% endif %}
+</div>

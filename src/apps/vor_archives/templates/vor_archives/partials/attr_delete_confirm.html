@@ -1,0 +1,42 @@
+<div class="vor-modal-backdrop" @click.self="$store.vorAttributes.closeModal()">
+    <div class="vor-modal" @click.stop>
+        <h3 class="vor-modal-title">Подтверждение удаления</h3>
+        <p class="vor-modal-text">
+            {% if count == 1 %}
+                Жанр «{{ items.0.name }}» будет удалён.
+            {% else %}
+                Выбранные жанры ({{ count }}) будут удалены.
+            {% endif %}
+        </p>
+        {% if linked_count %}
+            <div class="vor-modal-warning">
+                <p>
+                    Связи с произведениями будут сняты, сами произведения останутся.
+                    Затронуто произведений: {{ linked_count }}.
+                </p>
+                <ul class="vor-orphan-list">
+                    {% for item in items %}
+                        {% if item.work_count %}
+                            <li>{{ item.name }} ({{ item.type_label }}) — {{ item.work_count }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <form class="vor-modal-actions"
+              hx-post="{% url 'vor_archives:genre_delete' %}"
+              hx-target="#attr-detail"
+              hx-swap="innerHTML">
+            {% csrf_token %}
+            {% for item in items %}
+                <input type="hidden" name="ids" value="{{ item.key }}">
+            {% endfor %}
+            <button type="button" class="sidebar-btn" @click="$store.vorAttributes.closeModal()">
+                Отмена
+            </button>
+            <button type="submit" class="sidebar-btn sidebar-btn-delete">
+                Удалить
+            </button>
+        </form>
+    </div>
+</div>
