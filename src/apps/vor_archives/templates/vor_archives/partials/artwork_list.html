@@ -1,5 +1,9 @@
-<div id="artwork-list" class="artwork-list" x-data>
-    <div class="artwork-list-header">
+<div id="artwork-list"
+     class="artwork-list"
+     :class="{ 'is-grid': $store.vorArtworks.viewMode === 'grid', 'is-sortable': $store.vorArtworks.canDrag() }"
+     x-data
+     x-init="$store.vorArtworks.syncSortable()">
+    <div class="artwork-list-header" x-show="$store.vorArtworks.viewMode === 'list'">
         <div class="artwork-row-check" x-show="$store.vorArtworks.deleteMode" x-cloak></div>
         <div class="artwork-row-type"></div>
         <div class="artwork-row-title">Название</div>
@@ -9,11 +13,17 @@
         <div class="artwork-row-progress">Прогресс</div>
         <div class="artwork-row-delete-slot"></div>
     </div>
-    {% for user_work in user_works %}
-        {% include "vor_archives/partials/artwork_row.html" with user_work=user_work %}
-    {% empty %}
+    {% if user_works %}
+        <div id="artwork-list-items"
+             class="artwork-list-items"
+             :class="{ 'artwork-grid': $store.vorArtworks.viewMode === 'grid' }">
+            {% for user_work in user_works %}
+                {% include "vor_archives/partials/artwork_row.html" with user_work=user_work %}
+            {% endfor %}
+        </div>
+    {% else %}
         <div class="text-center text-muted py-4">
             Произведения не найдены
         </div>
-    {% endfor %}
+    {% endif %}
 </div>

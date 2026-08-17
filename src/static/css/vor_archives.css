@@ -209,9 +209,25 @@
     padding: 0.5rem 0.5rem 0 0.5rem;
 }
 
+.sidebar-filters-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    position: relative;
+}
+
 .sidebar-filters-title {
     letter-spacing: 0.05em;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0;
+    flex: 1;
+}
+
+.sidebar-filters-title-row .sidebar-btn-icon {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .sidebar-accordion {
@@ -2965,4 +2981,284 @@ button.vor-relation-item,
         width: 100%;
         min-height: 220px;
     }
+}
+
+/* ============================================
+    Artworks grid
+    ============================================ */
+
+.artwork-list.is-sortable .artwork-item {
+    cursor: grab;
+}
+
+.artwork-list-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.artwork-list.is-grid .artwork-item {
+    display: block;
+}
+
+.artwork-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
+.artwork-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    cursor: pointer;
+}
+
+.artwork-tile-cover {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background-color: var(--bg-input);
+}
+
+.artwork-tile.is-selected .artwork-tile-cover {
+    border-color: var(--action-delete);
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
+}
+
+.artwork-tile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.artwork-tile-image-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 1.75rem;
+}
+
+.artwork-tile-type {
+    position: absolute;
+    top: 0.4rem;
+    left: 0.4rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.25rem;
+    background-color: rgba(11, 17, 32, 0.72);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+}
+
+.artwork-tile-status {
+    position: absolute;
+    top: 0.45rem;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100% - 3.4rem);
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.25rem;
+    background-color: rgba(11, 17, 32, 0.72);
+    font-size: 0.7rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.artwork-tile-rating {
+    position: absolute;
+    right: 0.4rem;
+    bottom: 0.4rem;
+    min-width: 1.35rem;
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.25rem;
+    background-color: rgba(11, 17, 32, 0.72);
+    color: var(--text-primary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.artwork-tile-rating:empty {
+    display: none;
+}
+
+.artwork-tile-check {
+    position: absolute;
+    left: 0.4rem;
+    bottom: 0.4rem;
+}
+
+.artwork-tile-delete {
+    position: absolute;
+    top: 0.3rem;
+    right: 0.3rem;
+    opacity: 0;
+}
+
+.artwork-tile:hover .artwork-tile-delete {
+    opacity: 1;
+}
+
+.artwork-tile-title {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ============================================
+    Library search
+    ============================================ */
+
+.vor-search-backdrop {
+    position: fixed;
+    inset: 0;
+    top: 56px;
+    z-index: 1030;
+    background-color: rgba(11, 17, 32, 0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.vor-search-panel {
+    width: min(560px, 100%);
+    transition: transform 0.2s ease, margin 0.2s ease;
+}
+
+.vor-search-panel.has-query {
+    align-self: flex-start;
+    margin-top: 12vh;
+}
+
+.vor-search-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.vor-search-field i {
+    position: absolute;
+    left: 1rem;
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+.vor-search-field input {
+    width: 100%;
+    padding: 0.85rem 1rem 0.85rem 2.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border);
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    text-align: center;
+    font-size: 1rem;
+}
+
+.vor-search-field input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.55;
+}
+
+.vor-search-field input:focus {
+    outline: none;
+    border-color: var(--accent-hover);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.vor-search-segment {
+    margin-top: 0.85rem;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 0.65rem 0.75rem;
+}
+
+.vor-search-segment-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    margin: 0 0 0.45rem;
+}
+
+.vor-search-results {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    max-height: 42vh;
+    overflow-y: auto;
+}
+
+.vor-search-result {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.vor-search-result-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.4rem 0.5rem;
+    border: 0;
+    background: transparent;
+    color: var(--text-primary);
+    text-align: left;
+    border-radius: 0.375rem;
+    cursor: pointer;
+}
+
+.vor-search-result-main:hover {
+    background-color: rgba(167, 145, 255, 0.12);
+}
+
+.vor-search-cover {
+    width: 28px;
+    height: 42px;
+    object-fit: cover;
+    border-radius: 0.2rem;
+    flex-shrink: 0;
+}
+
+.vor-search-cover-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-input);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+}
+
+.vor-search-result-title {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vor-search-empty {
+    margin-top: 0.85rem;
+    text-align: center;
+    color: var(--text-secondary);
 }

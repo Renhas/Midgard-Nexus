@@ -381,9 +381,35 @@
         }
     });
 
+    const SIDEBAR_STORAGE_KEY = "vor.artworks.sidebar";
+    const ALL_WORK_TYPES = ["book", "film", "game"];
+    const FILTER_KEYS = [
+        "status", "age_rating", "tags", "genre_book", "genre_film", "genre_game", "platform",
+    ];
+
+    function mergeFilterSelection(allIds, savedSelected, savedKnown) {
+        const catalog = allIds || [];
+        if (!savedSelected && !savedKnown) {
+            return [...catalog];
+        }
+        const selected = new Set((savedSelected || []).map(String));
+        const known = new Set((savedKnown || []).map(String));
+        return catalog.filter((id) => {
+            const key = String(id);
+            return !known.has(key) || selected.has(key);
+        });
+    }
+
     document.body.addEventListener("htmx:afterSwap", (event) => {
-        if (event.detail.elt?.id === "vor-overlay") {
+        const el = event.detail.elt;
+        if (el?.id === "vor-overlay") {
             pushOverlayHistory(event);
+        }
+        if (el && (el.id === "artwork-list" || el.id === "vor-library-search-results")) {
+            window.Alpine?.initTree?.(el);
+        }
+        if (el?.id === "artwork-list") {
+            window.Alpine?.store("vorArtworks")?.syncSortable();
         }
     });
 
@@ -391,6 +417,283 @@
         Alpine.store("vorArtworks", {
             deleteMode: false,
             selectedIds: [],
+            workTypes: [...ALL_WORK_TYPES],
+            viewMode: "list",
+            sortField: "custom",
+            sortAsc: true,
+            filters: {
+                status: [],
+                age_rating: [],
+                tags: [],
+                genre_book: [],
+                genre_film: [],
+                genre_game: [],
+                platform: [],
+            },
+            filterCatalog: {
+                status: [],
+                age_rating: [],
+                tags: [],
+                genre_book: [],
+                genre_film: [],
+                genre_game: [],
+                platform: [],
+            },
+            listUrl: "",
+            reorderUrl: "",
+            searchUrl: "",
+            attachUrl: "",
+            searchOpen: false,
+            searchQuery: "",
+            searchTimer: null,
+            _sortable: null,
+            _booted: false,
+
+            initFromPage(opts) {
+                if (this._booted) {
+                    return;
+                }
+                this._booted = true;
+                this.listUrl = opts.listUrl || "";
+                this.reorderUrl = opts.reorderUrl || "";
+                this.searchUrl = opts.searchUrl || "";
+                this.attachUrl = opts.attachUrl || "";
+                this.filterCatalog = { ...this.filterCatalog, ...(opts.filterCatalog || {}) };
+                this.resetFilters(false);
+                this.restoreSidebar();
+                this.reloadList();
+            },
+            restoreSidebar() {
+                let saved = null;
+                try {
+                    saved = JSON.parse(localStorage.getItem(SIDEBAR_STORAGE_KEY) || "null");
+                } catch (error) {
+                    saved = null;
+                }
+                if (!saved) {
+                    return;
+                }
+                if (Array.isArray(saved.workTypes)) {
+                    this.workTypes = saved.workTypes.filter((type) => ALL_WORK_TYPES.includes(type));
+                }
+                if (saved.viewMode === "list" || saved.viewMode === "grid") {
+                    this.viewMode = saved.viewMode;
+                }
+                if (saved.sortField) {
+                    this.sortField = saved.sortField;
+                }
+                if (typeof saved.sortAsc === "boolean") {
+                    this.sortAsc = saved.sortAsc;
+                }
+                FILTER_KEYS.forEach((key) => {
+                    this.filters[key] = mergeFilterSelection(
+                        this.filterCatalog[key],
+                        saved.filters?.[key],
+                        saved.known?.[key]
+                    );
+                });
+            },
+            persistSidebar() {
+                const known = {};
+                const filters = {};
+                FILTER_KEYS.forEach((key) => {
+                    known[key] = [...(this.filterCatalog[key] || [])];
+                    filters[key] = [...(this.filters[key] || [])];
+                });
+                localStorage.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify({
+                    workTypes: [...this.workTypes],
+                    viewMode: this.viewMode,
+                    sortField: this.sortField,
+                    sortAsc: this.sortAsc,
+                    filters,
+                    known,
+                }));
+            },
+            resetFilters(reload = true) {
+                FILTER_KEYS.forEach((key) => {
+                    this.filters[key] = [...(this.filterCatalog[key] || [])];
+                });
+                this.persistSidebar();
+                if (reload) {
+                    this.reloadList();
+                }
+            },
+            toggleType(type) {
+                const index = this.workTypes.indexOf(type);
+                if (index > -1) {
+                    this.workTypes.splice(index, 1);
+                } else {
+                    this.workTypes.push(type);
+                }
+                this.persistSidebar();
+                this.reloadList();
+            },
+            setViewMode(mode) {
+                if (this.viewMode === mode) {
+                    return;
+                }
+                this.viewMode = mode;
+                this.persistSidebar();
+                this.syncSortable();
+            },
+            setSortField(field) {
+                this.sortField = field;
+                this.persistSidebar();
+                this.reloadList();
+            },
+            toggleSortDir() {
+                this.sortAsc = !this.sortAsc;
+                this.persistSidebar();
+                this.reloadList();
+            },
+            toggleFilter(name, value) {
+                const list = this.filters[name] || [];
+                const index = list.map(String).indexOf(String(value));
+                if (index > -1) {
+                    list.splice(index, 1);
+                } else {
+                    list.push(value);
+                }
+                this.filters[name] = list;
+                this.persistSidebar();
+                this.reloadList();
+            },
+            isFilterOn(name, value) {
+                return (this.filters[name] || []).map(String).includes(String(value));
+            },
+            listQuery() {
+                const params = new URLSearchParams();
+                if (this.workTypes.length) {
+                    this.workTypes.forEach((type) => params.append("types", type));
+                } else {
+                    params.append("types", "");
+                }
+                params.set("sort", this.sortField);
+                params.set("dir", this.sortAsc ? "asc" : "desc");
+                FILTER_KEYS.forEach((name) => {
+                    (this.filters[name] || []).forEach((value) => params.append(name, value));
+                });
+                return params;
+            },
+            reloadList() {
+                if (!this.listUrl) {
+                    return;
+                }
+                htmx.ajax("GET", `${this.listUrl}?${this.listQuery().toString()}`, {
+                    target: "#artwork-list",
+                    swap: "outerHTML",
+                });
+            },
+            canDrag() {
+                return this.viewMode === "list" && this.sortField === "custom" && this.sortAsc;
+            },
+            syncSortable() {
+                if (this._sortable) {
+                    this._sortable.destroy();
+                    this._sortable = null;
+                }
+                const container = document.getElementById("artwork-list-items");
+                if (!container || !this.canDrag() || typeof Sortable === "undefined") {
+                    return;
+                }
+                this._sortable = Sortable.create(container, {
+                    animation: 150,
+                    draggable: ".artwork-item",
+                    onEnd: () => this.saveOrder(),
+                });
+            },
+            saveOrder() {
+                const container = document.getElementById("artwork-list-items");
+                if (!container || !this.reorderUrl) {
+                    return;
+                }
+                const ids = [...container.querySelectorAll(".artwork-item")]
+                    .map((el) => el.dataset.uwId)
+                    .filter(Boolean);
+                const token = document.querySelector("[name=csrfmiddlewaretoken]")?.value
+                    || getCookie("csrftoken");
+                const body = new URLSearchParams();
+                ids.forEach((id) => body.append("ids", id));
+                fetch(this.reorderUrl, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": token || "",
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                    body,
+                });
+            },
+            openSearch() {
+                if (this.searchOpen) {
+                    document.getElementById("vor-library-search-input")?.focus();
+                    return;
+                }
+                this.searchOpen = true;
+                this.searchQuery = "";
+                const results = document.getElementById("vor-library-search-results");
+                if (results) {
+                    results.innerHTML = "";
+                }
+                queueMicrotask(() => document.getElementById("vor-library-search-input")?.focus());
+            },
+            closeSearch() {
+                this.searchOpen = false;
+                this.searchQuery = "";
+                const results = document.getElementById("vor-library-search-results");
+                if (results) {
+                    results.innerHTML = "";
+                }
+            },
+            onSearchInput() {
+                clearTimeout(this.searchTimer);
+                this.searchTimer = setTimeout(() => this.runSearch(), 280);
+            },
+            runSearch() {
+                const query = String(this.searchQuery || "").trim();
+                const results = document.getElementById("vor-library-search-results");
+                if (!query || !this.searchUrl) {
+                    if (results) {
+                        results.innerHTML = "";
+                    }
+                    return;
+                }
+                htmx.ajax("GET", `${this.searchUrl}?q=${encodeURIComponent(query)}`, {
+                    target: "#vor-library-search-results",
+                    swap: "innerHTML",
+                });
+            },
+            attachFromSearch(typeKey, workId) {
+                const token = document.querySelector("[name=csrfmiddlewaretoken]")?.value
+                    || getCookie("csrftoken");
+                const body = new URLSearchParams({
+                    work_type: typeKey,
+                    work_id: String(workId),
+                    status: "planning",
+                });
+                fetch(this.attachUrl, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": token || "",
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                    body,
+                })
+                    .then((response) => (response.ok ? response.json() : null))
+                    .then((data) => {
+                        if (!data?.ok) {
+                            return;
+                        }
+                        this.reloadList();
+                        this.runSearch();
+                    });
+            },
+            openWork(url) {
+                this.closeSearch();
+                htmx.ajax("GET", url, {
+                    target: "#vor-overlay",
+                    swap: "innerHTML",
+                });
+            },
 
             enterDeleteMode() {
                 this.deleteMode = true;
@@ -1111,13 +1414,7 @@
                     });
             },
             refreshList() {
-                if (!this.listUrl) {
-                    return;
-                }
-                htmx.ajax("GET", this.listUrl, {
-                    target: "#artwork-list",
-                    swap: "outerHTML",
-                });
+                window.Alpine?.store("vorArtworks")?.reloadList();
             },
             startAttach() {
                 this.status = "planning";
@@ -1769,13 +2066,7 @@
                 this.phase = "form";
             },
             refreshList() {
-                if (!this.listUrl) {
-                    return;
-                }
-                htmx.ajax("GET", this.listUrl, {
-                    target: "#artwork-list",
-                    swap: "outerHTML",
-                });
+                window.Alpine?.store("vorArtworks")?.reloadList();
             },
             statusLabel() {
                 const found = this.statusChoices.find((item) => item.value === this.status);
@@ -1979,7 +2270,22 @@
         if (!store) {
             return;
         }
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "f") {
+            if (!document.getElementById("artwork-list")) {
+                return;
+            }
+            if (hasContent("vor-overlay")) {
+                return;
+            }
+            event.preventDefault();
+            store.openSearch();
+            return;
+        }
         if (event.key === "Escape") {
+            if (store.searchOpen) {
+                store.closeSearch();
+                return;
+            }
             if (hasContent("vor-modal")) {
                 store.closeModal();
                 return;
@@ -2022,7 +2328,7 @@
                 return;
             }
             const item = event.target.closest(".artwork-item");
-            if (!item || event.target.closest(".artwork-row-delete")) {
+            if (!item || event.target.closest(".artwork-row-delete, .artwork-tile-delete")) {
                 return;
             }
             event.preventDefault();
@@ -2043,6 +2349,10 @@
         store.closeOverlay();
         store.closeModal();
         store.exitDeleteMode();
+    });
+
+    document.body.addEventListener("vor:reload-list", () => {
+        window.Alpine?.store("vorArtworks")?.reloadList();
     });
 
     document.body.addEventListener("vor:close-attr-modal", () => {

@@ -8,6 +8,7 @@ from django.db import transaction
 from django.db.models import prefetch_related_objects
 from django.http import (
     Http404,
+    HttpResponse,
     HttpResponseBadRequest,
     HttpResponseForbidden,
     JsonResponse,
@@ -57,7 +58,10 @@ from .services import (
     delete_user_works,
     get_user_work,
     get_work,
+    list_user_works,
     orphan_works,
+    reorder_user_works,
+    search_library_works,
     search_works,
     sync_work_relations,
     user_has_work,
@@ -69,30 +73,61 @@ from .services import (
 
 LOGIN_URL = "users:login"
 
+STATUS_LABELS_RU = {
+    UserWorkStatusChoices.PLANNING: "Запланировано",
+    UserWorkStatusChoices.IN_PROGRESS: "В процессе",
+    UserWorkStatusChoices.COMPLETED: "Завершено",
+    UserWorkStatusChoices.DROPPED: "Брошено",
+}
+
 
 def _module_context():
     """Возвращает общие переменные шаблона для модуля vor_archives."""
     return next(m for m in settings.MODULES if m["url_name"] == "vor_archives")
 
 
-def _user_works_qs(user):
-    user_works = UserWork.objects.filter(user=user).select_related(
-        "work_content_type"
-    ).order_by("order_position", "-date_added")
-    prefetch_related_objects(user_works, "work")
-    return user_works
+def _id_list(request, name):
+    values = []
+    for raw in request.GET.getlist(name):
+        try:
+            values.append(int(raw))
+        except (TypeError, ValueError):
+            continue
+    return values
+
+
+def _artwork_list_params(request):
+    types = [key for key in request.GET.getlist("types") if key in WORK_MODELS]
+    if "types" not in request.GET:
+        types = list(WORK_MODELS.keys())
+    return {
+        "types": types,
+        "statuses": [value for value in request.GET.getlist("status") if value],
+        "age_ratings": [value for value in request.GET.getlist("age_rating") if value],
+        "tags": _id_list(request, "tags"),
+        "genre_book": _id_list(request, "genre_book"),
+        "genre_film": _id_list(request, "genre_film"),
+        "genre_game": _id_list(request, "genre_game"),
+        "platforms": _id_list(request, "platform"),
+        "all_statuses": list(UserWorkStatusChoices.values),
+        "all_age_ratings": list(AgeRatingChoices.values),
+        "all_tags": list(Tag.objects.values_list("pk", flat=True)),
+        "all_genre_book": list(BookGenre.objects.values_list("pk", flat=True)),
+        "all_genre_film": list(FilmGenre.objects.values_list("pk", flat=True)),
+        "all_genre_game": list(GameGenre.objects.values_list("pk", flat=True)),
+        "all_platforms": list(Platform.objects.values_list("pk", flat=True)),
+        "sort": request.GET.get("sort") or "custom",
+        "sort_asc": request.GET.get("dir", "asc") != "desc",
+    }
 
 
 def _list_response(request, trigger=None):
-    response = render(
-        request,
-        "vor_archives/partials/artwork_list.html",
-        {"user_works": _user_works_qs(request.user)},
-    )
+    payload = {"vor:reload-list": True}
     if trigger:
-        response["HX-Trigger"] = trigger
-        response["HX-Retarget"] = "#artwork-list"
-        response["HX-Reswap"] = "outerHTML"
+        extra = json.loads(trigger) if isinstance(trigger, str) else dict(trigger)
+        payload.update(extra)
+    response = HttpResponse()
+    response["HX-Trigger"] = json.dumps(payload)
     return response
 
 
@@ -122,24 +157,31 @@ def index(request):
     """Главная страница модуля «Библиотека» — страница произведений."""
     module = _module_context()
     collections = Collection.objects.filter(user=request.user, parent=None)
-    status_options = [{"value": v, "label": l} for v, l in UserWorkStatusChoices.choices]
+    status_options = [
+        {"value": value, "label": STATUS_LABELS_RU.get(value, label)}
+        for value, label in UserWorkStatusChoices.choices
+    ]
     age_rating_options = [{"value": v, "label": l} for v, l in AgeRatingChoices.choices]
-    platform_options = [{"value": p.id, "label": p.name} for p in Platform.objects.all()]
-    tags_options = [{"value": p.id, "label": p.name} for p in Tag.objects.all()]
+    platforms = list(Platform.objects.all())
+    tags = list(Tag.objects.all())
+    platform_options = [{"value": p.id, "label": p.name} for p in platforms]
+    tags_options = [{"value": p.id, "label": p.name} for p in tags]
     genre_models = [
         ("book", BookGenre, "Книги"),
         ("film", FilmGenre, "Фильмы"),
         ("game", GameGenre, "Игры"),
     ]
     genres_nested = []
+    genre_catalog = {}
     for type_key, model, label in genre_models:
         options = [{"value": g.id, "label": g.name} for g in model.objects.all()]
+        genre_catalog[f"genre_{type_key}"] = [item["value"] for item in options]
         if options:
             genres_nested.append({
                 "title": label,
                 "options": options,
                 "name": f"genre_{type_key}",
-                "show_condition": f"workTypes.includes('{type_key}')",
+                "show_condition": f"$store.vorArtworks.workTypes.includes('{type_key}')",
             })
 
     return render(request, "vor_archives/artworks.html", {
@@ -160,9 +202,21 @@ def index(request):
             {"value": "status", "label": "Статус"},
             {"value": "date_added", "label": "Дата добавления"},
         ],
-        "sort_field_default": "custom",
-        "sort_order_asc": True,
-        "work_types": ["book", "film", "game"],
+        "page_opts": {
+            "listUrl": reverse("vor_archives:artwork_list"),
+            "reorderUrl": reverse("vor_archives:artwork_reorder"),
+            "searchUrl": reverse("vor_archives:artwork_library_search"),
+            "attachUrl": reverse("vor_archives:artwork_attach"),
+            "filterCatalog": {
+                "status": [item["value"] for item in status_options],
+                "age_rating": [item["value"] for item in age_rating_options],
+                "tags": [item["value"] for item in tags_options],
+                "genre_book": genre_catalog.get("genre_book", []),
+                "genre_film": genre_catalog.get("genre_film", []),
+                "genre_game": genre_catalog.get("genre_game", []),
+                "platform": [item["value"] for item in platform_options],
+            },
+        },
     })
 
 
@@ -214,7 +268,7 @@ def artwork_list(request):
     return render(
         request,
         "vor_archives/partials/artwork_list.html",
-        {"user_works": _user_works_qs(request.user)},
+        {"user_works": list_user_works(request.user, _artwork_list_params(request))},
     )
 
 
@@ -267,14 +321,6 @@ def _progress_meta_for_work(work):
 
 def _wants_json(request):
     return request.headers.get("X-Requested-With") == "XMLHttpRequest"
-
-
-STATUS_LABELS_RU = {
-    UserWorkStatusChoices.PLANNING: "Запланировано",
-    UserWorkStatusChoices.IN_PROGRESS: "В процессе",
-    UserWorkStatusChoices.COMPLETED: "Завершено",
-    UserWorkStatusChoices.DROPPED: "Брошено",
-}
 
 
 RELATION_TYPE_OPTIONS = [
@@ -669,6 +715,29 @@ def _add_work_forms(bound_type=None, data=None, files=None):
         else:
             forms[f"{key}_form"] = form_class()
     return forms
+
+
+@login_required(login_url=LOGIN_URL)
+@require_GET
+def artwork_library_search(request):
+    result = search_library_works(request.user, request.GET.get("q") or "")
+    for item in result["owned"]:
+        item["detail_url"] = reverse("vor_archives:artwork_detail", args=[item["uw_id"]])
+    for item in result["other"]:
+        item["detail_url"] = reverse(
+            "vor_archives:artwork_work", args=[item["type_key"], item["work_id"]]
+        )
+    return render(request, "vor_archives/partials/library_search_results.html", {
+        **result,
+        "query": (request.GET.get("q") or "").strip(),
+    })
+
+
+@login_required(login_url=LOGIN_URL)
+@require_POST
+def artwork_reorder(request):
+    reorder_user_works(request.user, _parse_ids(request))
+    return JsonResponse({"ok": True})
 
 
 @login_required(login_url=LOGIN_URL)

@@ -36,7 +36,12 @@
             {% for option in options %}
                 <label class="sidebar-filter-item"
                        {% if searchable %}data-label="{{ option.label }}" x-show="match($el.dataset.label)"{% endif %}>
-                    <input type="checkbox" name="{{ name }}" value="{{ option.value }}" class="hidden-checkbox">
+                    <input type="checkbox"
+                           name="{{ name }}"
+                           value="{{ option.value }}"
+                           class="hidden-checkbox"
+                           :checked="$store.vorArtworks.isFilterOn('{{ name }}', '{{ option.value }}')"
+                           @change="$store.vorArtworks.toggleFilter('{{ name }}', '{{ option.value }}')">
                     <span class="custom-checkbox"></span>
                     {{ option.label }}
                 </label>
