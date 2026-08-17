@@ -1,13 +1,7 @@
 <div class="vor-modal-backdrop" @click.self="$store.vorAttributes.closeModal()">
     <div class="vor-modal" @click.stop>
         <h3 class="vor-modal-title">Подтверждение удаления</h3>
-        <p class="vor-modal-text">
-            {% if count == 1 %}
-                Жанр «{{ items.0.name }}» будет удалён.
-            {% else %}
-                Выбранные жанры ({{ count }}) будут удалены.
-            {% endif %}
-        </p>
+        <p class="vor-modal-text">{{ delete_text }}</p>
         {% if linked_count %}
             <div class="vor-modal-warning">
                 <p>
@@ -17,14 +11,14 @@
                 <ul class="vor-orphan-list">
                     {% for item in items %}
                         {% if item.work_count %}
-                            <li>{{ item.name }} ({{ item.type_label }}) — {{ item.work_count }}</li>
+                            <li>{{ item.name }}{% if item.type_label %} ({{ item.type_label }}){% endif %} — {{ item.work_count }}</li>
                         {% endif %}
                     {% endfor %}
                 </ul>
             </div>
         {% endif %}
         <form class="vor-modal-actions"
-              hx-post="{% url 'vor_archives:genre_delete' %}"
+              hx-post="{{ delete_url }}"
               hx-target="#attr-detail"
               hx-swap="innerHTML">
             {% csrf_token %}

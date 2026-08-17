@@ -1,30 +1,36 @@
 <div id="attr-list"
      class="attr-list"
-     hx-get="{% url 'vor_archives:genre_list' %}"
+     hx-get="{% url 'vor_archives:attr_list' kind %}"
      hx-trigger="vor:attr-list-refresh from:body"
      hx-include="#attr-search"
      hx-swap="outerHTML">
-    <div class="attr-list-header">Жанров: {{ total_count }}</div>
-    {% for group in groups %}
-        {% if group.items %}
-        <div class="attr-group" x-data="{ expanded: true }">
-            <button type="button"
-                    class="attr-group-toggle"
-                    @click="expanded = !expanded">
-                <span>{{ group.label }} ({{ group.items|length }})</span>
-                <i class="bi" :class="expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
-            </button>
-            <div class="attr-group-body" x-show="expanded">
-                {% for item in group.items %}
-                    {% include "vor_archives/partials/attr_list_item.html" with item=item %}
-                {% endfor %}
+    <div class="attr-list-header">{{ tab.count_label }}: {{ total_count }}</div>
+    {% if groups %}
+        {% for group in groups %}
+            {% if group.items %}
+            <div class="attr-group" x-data="{ expanded: true }">
+                <button type="button"
+                        class="attr-group-toggle"
+                        @click="expanded = !expanded">
+                    <span>{{ group.label }} ({{ group.items|length }})</span>
+                    <i class="bi" :class="expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+                </button>
+                <div class="attr-group-body" x-show="expanded">
+                    {% for item in group.items %}
+                        {% include "vor_archives/partials/attr_list_item.html" with item=item %}
+                    {% endfor %}
+                </div>
             </div>
-        </div>
-        {% endif %}
-    {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        {% for item in items %}
+            {% include "vor_archives/partials/attr_list_item.html" with item=item %}
+        {% endfor %}
+    {% endif %}
     {% if not has_items %}
         <div class="attr-list-empty">
-            {% if total_count %}Ничего не найдено{% else %}Жанров пока нет{% endif %}
+            {% if total_count %}Ничего не найдено{% else %}{{ tab.none_yet }}{% endif %}
         </div>
     {% endif %}
 </div>

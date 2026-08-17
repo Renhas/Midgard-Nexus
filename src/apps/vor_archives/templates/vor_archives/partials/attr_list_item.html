@@ -4,7 +4,7 @@
          'is-active': $store.vorAttributes.selectedKey === '{{ item.key }}',
          'is-selected': $store.vorAttributes.isSelected('{{ item.key }}')
      }"
-     hx-get="{% url 'vor_archives:genre_detail' item.type_key item.pk %}"
+     hx-get="{{ item.detail_url }}"
      hx-target="#attr-detail"
      hx-swap="innerHTML"
      hx-disinherit="hx-include"

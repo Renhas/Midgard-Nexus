@@ -1,34 +1,38 @@
 <form class="attr-card attr-form"
       x-init="{% if is_create %}$store.vorAttributes.select(''){% endif %}"
-      hx-post="{% if is_create %}{% url 'vor_archives:genre_new' %}{% else %}{% url 'vor_archives:genre_edit' type_key pk %}{% endif %}"
+      hx-post="{{ save_url }}"
       hx-target="#attr-detail"
       hx-swap="innerHTML">
     {% csrf_token %}
     <div class="attr-card-header">
         <h3 class="attr-card-title">
-            {% if is_create %}Новый жанр{% else %}Редактирование{% endif %}
+            {% if is_create %}{{ tab.create_title }}{% else %}Редактирование{% endif %}
         </h3>
     </div>
     <div class="attr-card-body">
-        {% if lock_type %}
-            <div class="vor-field">
-                <span class="vor-field-label">Тип</span>
-                <div class="attr-readonly">{{ type_label }}</div>
-            </div>
-        {% else %}
-            {% include "vor_archives/partials/form_field.html" with field=form.type_key %}
+        {% if show_type %}
+            {% if lock_type %}
+                <div class="vor-field">
+                    <span class="vor-field-label">Тип</span>
+                    <div class="attr-readonly">{{ type_label }}</div>
+                </div>
+            {% else %}
+                {% include "vor_archives/partials/form_field.html" with field=form.type_key %}
+            {% endif %}
         {% endif %}
         {% include "vor_archives/partials/form_field.html" with field=form.name %}
-        {% include "vor_archives/partials/form_field.html" with field=form.description %}
+        {% if has_text %}
+            {% if show_type %}
+                {% include "vor_archives/partials/form_field.html" with field=form.description %}
+            {% else %}
+                {% include "vor_archives/partials/form_field.html" with field=form.text %}
+            {% endif %}
+        {% endif %}
     </div>
     <div class="attr-detail-actions">
         <button type="button"
                 class="sidebar-btn"
-                {% if is_create %}
-                hx-get="{% url 'vor_archives:genre_empty' %}"
-                {% else %}
-                hx-get="{% url 'vor_archives:genre_detail' type_key pk %}"
-                {% endif %}
+                hx-get="{{ cancel_url }}"
                 hx-target="#attr-detail"
                 hx-swap="innerHTML">
             Отмена

@@ -1,20 +1,104 @@
+from functools import reduce
+from operator import add
+
 from django.db.models import Count
 
-from .models import BookGenre, FilmGenre, GameGenre
+from .models import BookGenre, FilmGenre, GameGenre, Person, Platform, Tag
 
 ATTR_TABS = [
-    {"kind": "tags", "label": "Теги", "icon": "bi bi-tag", "ready": False},
-    {"kind": "persons", "label": "Авторы", "icon": "bi bi-person", "ready": False},
-    {"kind": "genres", "label": "Жанры", "icon": "bi bi-bookmark", "ready": True},
-    {"kind": "platforms", "label": "Платформы", "icon": "bi bi-controller", "ready": False},
+    {
+        "kind": "tags",
+        "label": "Теги",
+        "icon": "bi bi-tag",
+        "search_placeholder": "Поиск тега",
+        "count_label": "Тегов",
+        "empty_prompt": "Выберите тег из списка",
+        "none_yet": "Тегов пока нет",
+        "create_title": "Новый тег",
+        "noun_one": "тег",
+        "noun_many": "теги",
+        "delete_one": "Тег «{name}» будет удалён.",
+        "delete_many": "Выбранные теги ({count}) будут удалены.",
+    },
+    {
+        "kind": "persons",
+        "label": "Авторы",
+        "icon": "bi bi-person",
+        "search_placeholder": "Поиск автора",
+        "count_label": "Авторов",
+        "empty_prompt": "Выберите автора из списка",
+        "none_yet": "Авторов пока нет",
+        "create_title": "Новый автор",
+        "noun_one": "автор",
+        "noun_many": "авторы",
+        "delete_one": "Автор «{name}» будет удалён.",
+        "delete_many": "Выбранные авторы ({count}) будут удалены.",
+    },
+    {
+        "kind": "genres",
+        "label": "Жанры",
+        "icon": "icon-drama",
+        "search_placeholder": "Поиск жанра",
+        "count_label": "Жанров",
+        "empty_prompt": "Выберите жанр из списка",
+        "none_yet": "Жанров пока нет",
+        "create_title": "Новый жанр",
+        "noun_one": "жанр",
+        "noun_many": "жанры",
+        "delete_one": "Жанр «{name}» будет удалён.",
+        "delete_many": "Выбранные жанры ({count}) будут удалены.",
+    },
+    {
+        "kind": "platforms",
+        "label": "Платформы",
+        "icon": "bi bi-controller",
+        "search_placeholder": "Поиск платформы",
+        "count_label": "Платформ",
+        "empty_prompt": "Выберите платформу из списка",
+        "none_yet": "Платформ пока нет",
+        "create_title": "Новая платформа",
+        "noun_one": "платформа",
+        "noun_many": "платформы",
+        "delete_one": "Платформа «{name}» будет удалена.",
+        "delete_many": "Выбранные платформы ({count}) будут удалены.",
+    },
 ]
 
-DEFAULT_KIND = "genres"
+DEFAULT_KIND = "tags"
 
 GENRE_TYPES = {
     "book": {"model": BookGenre, "label": "Книги", "count_field": "book"},
     "film": {"model": FilmGenre, "label": "Фильмы", "count_field": "film"},
     "game": {"model": GameGenre, "label": "Игры", "count_field": "game"},
+}
+
+SIMPLE_KINDS = {
+    "tags": {
+        "model": Tag,
+        "name_label": "Название",
+        "text_field": "description",
+        "text_label": "Описание",
+        "count_fields": ("book", "film", "game"),
+        "unique_error": "Тег с таким названием уже существует",
+        "empty_text": "Нет описания",
+    },
+    "persons": {
+        "model": Person,
+        "name_label": "Имя",
+        "text_field": "bio",
+        "text_label": "Биография",
+        "count_fields": ("book", "film", "game"),
+        "unique_error": "Автор с таким именем уже существует",
+        "empty_text": "Нет биографии",
+    },
+    "platforms": {
+        "model": Platform,
+        "name_label": "Название",
+        "text_field": None,
+        "text_label": None,
+        "count_fields": ("game",),
+        "unique_error": "Платформа с таким названием уже существует",
+    },
 }
 
 ATTR_KIND_MAP = {tab["kind"]: tab for tab in ATTR_TABS}
@@ -65,8 +149,32 @@ def parse_genre_ids(raw_values):
     return parsed
 
 
+def parse_simple_ids(raw_values):
+    parsed = []
+    seen = set()
+    for raw in raw_values:
+        for part in str(raw).split(","):
+            part = part.strip()
+            try:
+                pk = int(part)
+            except (TypeError, ValueError):
+                continue
+            if pk in seen:
+                continue
+            seen.add(pk)
+            parsed.append(pk)
+    return parsed
+
+
 def get_genre(type_key, pk):
     meta = genre_type_meta(type_key)
+    if meta is None:
+        return None
+    return meta["model"].objects.filter(pk=pk).first()
+
+
+def get_simple_attr(kind, pk):
+    meta = SIMPLE_KINDS.get(kind)
     if meta is None:
         return None
     return meta["model"].objects.filter(pk=pk).first()
@@ -76,6 +184,11 @@ def genre_work_count(obj, type_key=None):
     type_key = type_key or genre_type_key(obj)
     accessor = f"{GENRE_TYPES[type_key]['count_field']}_set"
     return getattr(obj, accessor).count()
+
+
+def simple_work_count(obj, kind):
+    meta = SIMPLE_KINDS[kind]
+    return sum(getattr(obj, f"{field}_set").count() for field in meta["count_fields"])
 
 
 def list_genre_groups(query=""):
@@ -105,3 +218,23 @@ def list_genre_groups(query=""):
             "items": items,
         })
     return groups, total
+
+
+def list_simple_attrs(kind, query=""):
+    meta = SIMPLE_KINDS[kind]
+    query = (query or "").strip()
+    total = meta["model"].objects.count()
+    counts = [Count(field, distinct=True) for field in meta["count_fields"]]
+    qs = meta["model"].objects.annotate(work_count=reduce(add, counts))
+    if query:
+        qs = qs.filter(name__icontains=query)
+    items = [
+        {
+            "key": str(obj.pk),
+            "pk": obj.pk,
+            "name": obj.name,
+            "work_count": obj.work_count,
+        }
+        for obj in qs.order_by("name")
+    ]
+    return items, total
