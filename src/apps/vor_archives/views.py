@@ -118,6 +118,7 @@ def _artwork_list_params(request):
         "all_platforms": list(Platform.objects.values_list("pk", flat=True)),
         "sort": request.GET.get("sort") or "custom",
         "sort_asc": request.GET.get("dir", "asc") != "desc",
+        "show_hidden": request.GET.get("hidden", "1") != "0",
     }
 
 
@@ -534,7 +535,7 @@ def _artwork_overlay_response(request, work, user_work=None):
                     if stale_ids:
                         user_work.owned_platforms.remove(*stale_ids)
                 _prefetch_work(saved, user_work)
-                return render(
+                response = render(
                     request,
                     "vor_archives/partials/artwork_overlay.html",
                     _detail_context(
@@ -543,6 +544,8 @@ def _artwork_overlay_response(request, work, user_work=None):
                         UserWorkEditForm(instance=user_work) if user_work is not None else None,
                     ),
                 )
+                response["HX-Trigger"] = json.dumps({"vor:reload-list": True})
+                return response
         return render(
             request,
             "vor_archives/partials/artwork_overlay.html",

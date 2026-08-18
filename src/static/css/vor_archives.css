@@ -2,6 +2,12 @@
     VOR Archives — Styles
     ============================================ */
 
+html.vor-scroll-lock,
+html.vor-scroll-lock body {
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+
 /* ============================================
     Buttons
     ============================================ */
@@ -27,6 +33,12 @@
 .sidebar-nav-row .sidebar-btn-type,
 .sidebar-nav-row .sidebar-btn-display {
     flex: 1;
+}
+
+.sidebar-hidden-switch {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 0.1rem 0.15rem;
 }
 
 .sidebar-btn {
@@ -215,6 +227,7 @@
     justify-content: center;
     gap: 0.35rem;
     position: relative;
+    min-height: 2rem;
 }
 
 .sidebar-filters-title {
@@ -581,8 +594,99 @@
 }
 
 .artwork-row.is-selected {
-    border-color: var(--action-delete);
+    border: 1.33px solid var(--action-delete);
     background-color: rgba(239, 68, 68, 0.08);
+}
+
+.artwork-row-preview {
+    display: none;
+    position: fixed;
+    z-index: 50;
+    width: 320px;
+    padding: 0.45rem;
+    gap: 0.65rem;
+    box-sizing: border-box;
+    border-radius: 0.5rem;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.artwork-row-preview.is-visible {
+    display: flex;
+    align-items: stretch;
+}
+
+.artwork-row-preview-cover {
+    width: 64px;
+    height: 96px;
+    flex-shrink: 0;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    background-color: var(--bg-input);
+}
+
+.artwork-row-preview-cover img,
+.artwork-row-preview-cover-empty {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.artwork-row-preview-cover-empty {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 1.35rem;
+}
+
+.artwork-row-preview.is-empty .artwork-row-preview-cover img {
+    display: none;
+}
+
+.artwork-row-preview.is-empty .artwork-row-preview-cover-empty {
+    display: flex;
+}
+
+.artwork-row-preview-body {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.artwork-row-preview-title {
+    flex-shrink: 0;
+    color: var(--text-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.artwork-row-preview-desc {
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: calc(0.75rem * 1.35 * 4);
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    line-height: 1.35;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .sidebar-btn:disabled {
@@ -3009,8 +3113,51 @@ button.vor-relation-item,
     Artworks grid
     ============================================ */
 
+.artwork-list.is-sortable,
+.artwork-list.is-sortable * {
+    user-select: none;
+}
+
 .artwork-list.is-sortable .artwork-item {
     cursor: grab;
+}
+
+.artwork-item.is-sortable-ghost,
+.artwork-item.is-sortable-chosen {
+    opacity: 1 !important;
+}
+
+.artwork-item.is-sortable-ghost .artwork-row,
+.artwork-item.is-sortable-chosen .artwork-row,
+.artwork-item.is-sortable-ghost .artwork-tile-cover,
+.artwork-item.is-sortable-chosen .artwork-tile-cover {
+    box-shadow: 0 0 0 2px var(--accent-vor);
+}
+
+.artwork-item.is-sortable-drag,
+.sortable-fallback {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+body.vor-artworks-dragging {
+    user-select: none;
+    cursor: grabbing;
+}
+
+body.vor-artworks-dragging .artwork-row-delete,
+body.vor-artworks-dragging .artwork-tile-delete {
+    display: none !important;
+}
+
+body.vor-artworks-grid-drag .artwork-row,
+body.vor-artworks-grid-drag .artwork-row-delete-slot {
+    display: none !important;
+}
+
+body.vor-artworks-list-drag .artwork-tile {
+    display: none !important;
 }
 
 .artwork-list-items {
@@ -3073,7 +3220,7 @@ button.vor-relation-item,
 }
 
 .artwork-tile.is-selected .artwork-tile-cover {
-    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
+    box-shadow: 0 0 0 2.67px var(--action-delete);
 }
 
 .artwork-tile-image {
@@ -3152,8 +3299,8 @@ button.vor-relation-item,
 
 .artwork-tile-check {
     position: absolute;
-    left: 0.4rem;
-    bottom: 0.4rem;
+    top: 0.4rem;
+    right: 0.4rem;
     z-index: 2;
 }
 

@@ -403,6 +403,9 @@ def list_user_works(user, params):
     if _is_partial(statuses, params.get("all_statuses") or list(UserWorkStatusChoices.values)):
         qs = qs.filter(status__in=statuses or [])
 
+    if not params.get("show_hidden", True):
+        qs = qs.filter(is_hidden=False)
+
     items = list(qs)
     _prefetch_work_filters(items)
     items = [user_work for user_work in items if _work_matches_filters(user_work, params)]

@@ -13,6 +13,12 @@
         return Boolean(el && el.innerHTML.trim());
     }
 
+    function syncPageScrollLock() {
+        const locked = hasContent("vor-overlay")
+            || Boolean(window.Alpine?.store("vorArtworks")?.searchOpen);
+        document.documentElement.classList.toggle("vor-scroll-lock", locked);
+    }
+
     function overlayAlpine() {
         const el = document.querySelector("#vor-overlay .vor-overlay");
         return el && window.Alpine ? Alpine.$data(el) : null;
@@ -411,7 +417,13 @@
         if (el?.id === "artwork-list-body" || el?.id === "artwork-list") {
             window.Alpine?.store("vorArtworks")?.applyListState();
         }
+        syncPageScrollLock();
     });
+
+    const overlayEl = document.getElementById("vor-overlay");
+    if (overlayEl) {
+        new MutationObserver(syncPageScrollLock).observe(overlayEl, { childList: true });
+    }
 
     document.addEventListener("keydown", (event) => {
         if (!(event.ctrlKey || event.metaKey) || event.code !== "KeyF") {
@@ -433,6 +445,7 @@
             deleteMode: false,
             selectedIds: [],
             workTypes: [...ALL_WORK_TYPES],
+            showHidden: true,
             viewMode: "list",
             sortField: "custom",
             sortAsc: true,
@@ -493,6 +506,9 @@
                 if (Array.isArray(saved.workTypes)) {
                     this.workTypes = saved.workTypes.filter((type) => ALL_WORK_TYPES.includes(type));
                 }
+                if (typeof saved.showHidden === "boolean") {
+                    this.showHidden = saved.showHidden;
+                }
                 if (saved.viewMode === "list" || saved.viewMode === "grid") {
                     this.viewMode = saved.viewMode;
                 }
@@ -519,6 +535,7 @@
                 });
                 localStorage.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify({
                     workTypes: [...this.workTypes],
+                    showHidden: this.showHidden,
                     viewMode: this.viewMode,
                     sortField: this.sortField,
                     sortAsc: this.sortAsc,
@@ -534,6 +551,11 @@
                     this.persistSidebar();
                     this.reloadList();
                 }
+            },
+            setShowHidden(value) {
+                this.showHidden = Boolean(value);
+                this.persistSidebar();
+                this.reloadList();
             },
             toggleType(type) {
                 const index = this.workTypes.indexOf(type);
@@ -594,6 +616,7 @@
                 }
                 params.set("sort", this.sortField);
                 params.set("dir", this.sortAsc ? "asc" : "desc");
+                params.set("hidden", this.showHidden ? "1" : "0");
                 FILTER_KEYS.forEach((name) => {
                     (this.filters[name] || []).forEach((value) => params.append(name, value));
                 });
@@ -630,7 +653,7 @@
                 });
             },
             canDrag() {
-                return this.viewMode === "list" && this.sortField === "custom" && this.sortAsc;
+                return this.sortField === "custom" && !this.deleteMode;
             },
             syncSortable() {
                 if (this._sortable) {
@@ -641,10 +664,32 @@
                 if (!container || !this.canDrag() || typeof Sortable === "undefined") {
                     return;
                 }
+                const dragViewClass = this.viewMode === "grid"
+                    ? "vor-artworks-grid-drag"
+                    : "vor-artworks-list-drag";
                 this._sortable = Sortable.create(container, {
                     animation: 150,
                     draggable: ".artwork-item",
-                    onEnd: () => this.saveOrder(),
+                    forceFallback: true,
+                    fallbackOnBody: true,
+                    fallbackTolerance: 4,
+                    ghostClass: "is-sortable-ghost",
+                    chosenClass: "is-sortable-chosen",
+                    dragClass: "is-sortable-drag",
+                    filter: ".artwork-row-delete, .artwork-tile-delete, .artwork-row-check, .artwork-tile-check",
+                    preventOnFilter: true,
+                    onStart: () => {
+                        window.getSelection?.().removeAllRanges();
+                        document.body.classList.add(dragViewClass, "vor-artworks-dragging");
+                    },
+                    onEnd: () => {
+                        document.body.classList.remove(
+                            "vor-artworks-grid-drag",
+                            "vor-artworks-list-drag",
+                            "vor-artworks-dragging",
+                        );
+                        this.saveOrder();
+                    },
                 });
             },
             saveOrder() {
@@ -655,6 +700,9 @@
                 const ids = [...container.querySelectorAll(".artwork-item")]
                     .map((el) => el.dataset.uwId)
                     .filter(Boolean);
+                if (!this.sortAsc) {
+                    ids.reverse();
+                }
                 const token = document.querySelector("[name=csrfmiddlewaretoken]")?.value
                     || getCookie("csrftoken");
                 const body = new URLSearchParams();
@@ -674,6 +722,7 @@
                     return;
                 }
                 this.searchOpen = true;
+                syncPageScrollLock();
                 this.searchQuery = "";
                 const results = document.getElementById("vor-library-search-results");
                 if (results) {
@@ -683,6 +732,7 @@
             },
             closeSearch() {
                 this.searchOpen = false;
+                syncPageScrollLock();
                 this.searchQuery = "";
                 const results = document.getElementById("vor-library-search-results");
                 if (results) {
@@ -2391,6 +2441,134 @@
     document.body.addEventListener("vor:reload-list", () => {
         window.Alpine?.store("vorArtworks")?.reloadList();
     });
+
+    (function initArtworkRowPreview() {
+        const OFFSET = 14;
+        const PAD = 12;
+        const SHOW_DELAY = 180;
+        let preview = null;
+        let currentItem = null;
+        let showTimer = 0;
+
+        function ensurePreview() {
+            if (preview) {
+                return preview;
+            }
+            preview = document.createElement("div");
+            preview.id = "artwork-row-preview";
+            preview.className = "artwork-row-preview";
+            preview.innerHTML = `
+                <div class="artwork-row-preview-cover">
+                    <img alt="">
+                    <div class="artwork-row-preview-cover-empty"><i></i></div>
+                </div>
+                <div class="artwork-row-preview-body">
+                    <div class="artwork-row-preview-title"></div>
+                    <div class="artwork-row-preview-desc"></div>
+                </div>
+            `;
+            document.body.appendChild(preview);
+            return preview;
+        }
+
+        function hidePreview() {
+            window.clearTimeout(showTimer);
+            showTimer = 0;
+            currentItem = null;
+            if (preview) {
+                preview.classList.remove("is-visible");
+            }
+        }
+
+        function canShow(row) {
+            if (!row) {
+                return false;
+            }
+            if (document.body.classList.contains("vor-artworks-dragging")) {
+                return false;
+            }
+            const list = row.closest(".artwork-list");
+            if (!list || list.classList.contains("is-grid")) {
+                return false;
+            }
+            if (window.Alpine?.store("vorArtworks")?.searchOpen) {
+                return false;
+            }
+            return true;
+        }
+
+        function fillPreview(item) {
+            const el = ensurePreview();
+            const title = item.dataset.previewTitle || "";
+            const cover = item.dataset.previewCover || "";
+            el.querySelector(".artwork-row-preview-title").textContent = title;
+            el.querySelector(".artwork-row-preview-desc").textContent =
+                (item.dataset.previewDesc || "").replace(/\s+/g, " ").trim();
+            const img = el.querySelector("img");
+            img.alt = title;
+            if (cover) {
+                img.src = cover;
+                el.classList.remove("is-empty");
+            } else {
+                img.removeAttribute("src");
+                el.classList.add("is-empty");
+                const icon = el.querySelector(".artwork-row-preview-cover-empty i");
+                if (icon) {
+                    icon.className = item.dataset.previewIcon || "";
+                }
+            }
+        }
+
+        function placePreview(clientX, clientY) {
+            const el = ensurePreview();
+            el.classList.add("is-visible");
+            const width = el.offsetWidth;
+            const height = el.offsetHeight;
+            let x = clientX + OFFSET;
+            let y = clientY + OFFSET;
+            if (x + width > window.innerWidth - PAD) {
+                x = clientX - width - OFFSET;
+            }
+            if (y + height > window.innerHeight - PAD) {
+                y = clientY - height - OFFSET;
+            }
+            x = Math.max(PAD, x);
+            y = Math.max(PAD, y);
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+        }
+
+        document.addEventListener("pointermove", (event) => {
+            const row = event.target.closest(".artwork-row");
+            const item = row?.closest(".artwork-item");
+            if (!canShow(row) || !item) {
+                hidePreview();
+                return;
+            }
+            if (currentItem !== item) {
+                currentItem = item;
+                fillPreview(item);
+                window.clearTimeout(showTimer);
+                if (preview?.classList.contains("is-visible")) {
+                    placePreview(event.clientX, event.clientY);
+                    return;
+                }
+                showTimer = window.setTimeout(() => {
+                    if (currentItem === item) {
+                        placePreview(event.clientX, event.clientY);
+                    }
+                }, SHOW_DELAY);
+                return;
+            }
+            if (preview?.classList.contains("is-visible")) {
+                placePreview(event.clientX, event.clientY);
+            }
+        });
+
+        document.addEventListener("pointerdown", hidePreview);
+        window.addEventListener("blur", hidePreview);
+        window.addEventListener("scroll", hidePreview, true);
+    })();
 
     document.body.addEventListener("vor:close-attr-modal", () => {
         const store = window.Alpine?.store("vorAttributes");

@@ -1,5 +1,10 @@
 {% load vor_archives_extras %}
-<div class="artwork-item" data-uw-id="{{ user_work.pk }}">
+<div class="artwork-item"
+     data-uw-id="{{ user_work.pk }}"
+     data-preview-title="{{ user_work.work.title }}"
+     data-preview-desc="{{ user_work.work.description|default:'' }}"
+     data-preview-cover="{% if user_work.work.cover %}{{ user_work.work.cover.url }}{% endif %}"
+     data-preview-icon="{{ user_work|get_work_type_icon }}">
     <div class="artwork-row"
          hx-get="{% url 'vor_archives:artwork_detail' user_work.pk %}"
          hx-target="#vor-overlay"
@@ -10,7 +15,7 @@
         <div class="artwork-row-type">
             <i class="{{ user_work|get_work_type_icon }}"></i>
         </div>
-        <div class="artwork-row-title" title="{{ user_work.work.title }}">
+        <div class="artwork-row-title">
             {{ user_work.work.title }}
         </div>
         <div class="artwork-row-year">
