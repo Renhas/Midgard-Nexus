@@ -8,6 +8,10 @@ html.vor-scroll-lock body {
     overscroll-behavior: none;
 }
 
+html.vor-scroll-lock .center {
+    overflow: hidden;
+}
+
 /* ============================================
     Buttons
     ============================================ */
@@ -701,7 +705,7 @@ html.vor-scroll-lock body {
 
 #vor-overlay:not(:empty) {
     position: fixed;
-    top: 56px;
+    top: var(--header-height);
     left: 0;
     right: 0;
     bottom: 0;
@@ -2226,7 +2230,7 @@ a.vor-relation-item:hover {
 .vor-modal-backdrop {
     position: fixed;
     inset: 0;
-    top: 56px;
+    top: var(--header-height);
     z-index: 1025;
     background-color: rgba(11, 17, 32, 0.72);
     display: flex;
@@ -2833,7 +2837,7 @@ button.vor-relation-item,
     display: flex;
     flex-direction: column;
     gap: 0.85rem;
-    height: calc(100vh - 56px - 3rem);
+    height: 100%;
     min-height: 0;
 }
 
@@ -3334,7 +3338,7 @@ body.vor-artworks-list-drag .artwork-tile {
 .vor-search-backdrop {
     position: fixed;
     inset: 0;
-    top: 56px;
+    top: var(--header-height);
     z-index: 1030;
     background-color: rgba(11, 17, 32, 0.72);
     display: flex;

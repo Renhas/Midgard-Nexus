@@ -24,6 +24,7 @@
     --action-delete: #EF4444;
 
     --header-icon-size: 1.5rem;
+    --header-height: 57px;
 }
 
 /* === Global Body === */
@@ -104,12 +105,15 @@ body {
    Navbar overrides
    ============================================ */
 .navbar-spacer {
-    height: 56px;
+    height: var(--header-height);
 }
 
 .navbar {
+    height: var(--header-height);
+    box-sizing: border-box;
     background-color: var(--bg-card) !important;
     border-bottom: 1px solid var(--border);
+    z-index: 1100;
 }
 
 .navbar .container-fluid {
