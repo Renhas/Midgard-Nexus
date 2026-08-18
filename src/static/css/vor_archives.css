@@ -242,10 +242,29 @@
     padding: 0.5rem 0 0.25rem 0;
 }
 
-.sidebar-accordion-search {
-    width: 100%;
+.sidebar-accordion-search-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0.25rem;
     margin: 0 0 0.35rem;
+}
+
+.sidebar-accordion-search-row .sidebar-accordion-search {
+    flex: 1;
+    min-width: 0;
+    width: auto;
+    margin: 0;
     font-size: 0.8125rem;
+    box-sizing: border-box;
+}
+
+.sidebar-accordion-search-row .sidebar-btn-icon {
+    flex-shrink: 0;
+    align-self: stretch;
+    height: auto;
+    aspect-ratio: auto;
+    padding: 0 0.45rem;
+    box-sizing: border-box;
 }
 
 .sidebar-filter-item {
@@ -492,7 +511,7 @@
     color: var(--text-secondary);
 }
 .status-in_progress {
-    color: var(--accent-hover);
+    color: var(--status-in-progress);
 }
 .status-completed {
     color: var(--success);
@@ -1189,7 +1208,7 @@
 
 .vor-status-select.status-in_progress,
 .vor-status-option.status-in_progress {
-    color: var(--accent-hover);
+    color: var(--status-in-progress);
 }
 
 .vor-status-select.status-completed,
@@ -3002,7 +3021,7 @@ button.vor-relation-item,
 
 .artwork-list.is-grid .artwork-list-items {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
     gap: 1rem;
 }
 
@@ -3032,7 +3051,7 @@ button.vor-relation-item,
 
 .artwork-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
     gap: 1rem;
 }
 
@@ -3049,12 +3068,11 @@ button.vor-relation-item,
     aspect-ratio: 2 / 3;
     border-radius: 0.375rem;
     overflow: hidden;
-    border: 1px solid var(--border);
+    border: 0;
     background-color: var(--bg-input);
 }
 
 .artwork-tile.is-selected .artwork-tile-cover {
-    border-color: var(--action-delete);
     box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
 }
 
@@ -3075,47 +3093,57 @@ button.vor-relation-item,
 
 .artwork-tile-type {
     position: absolute;
-    top: 0.4rem;
+    bottom: 0.4rem;
     left: 0.4rem;
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 32px;
+    height: 32px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: 0.25rem;
-    background-color: rgba(11, 17, 32, 0.72);
+    background-color: var(--bg-primary);
     color: var(--text-primary);
-    font-size: 0.85rem;
+    font-size: 1.15rem;
 }
 
 .artwork-tile-status {
     position: absolute;
-    top: 0.45rem;
-    left: 50%;
-    transform: translateX(-50%);
-    max-width: calc(100% - 3.4rem);
-    padding: 0.1rem 0.4rem;
+    top: 0.4rem;
+    left: 0.4rem;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 0.25rem;
-    background-color: rgba(11, 17, 32, 0.72);
-    font-size: 0.7rem;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    border: 1px solid currentColor;
+    box-sizing: border-box;
+    background-color: var(--bg-primary);
+    font-size: 1.2rem;
 }
 
 .artwork-tile-rating {
     position: absolute;
     right: 0.4rem;
     bottom: 0.4rem;
-    min-width: 1.35rem;
-    padding: 0.1rem 0.35rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    height: 32px;
+    min-width: 32px;
+    padding: 0 0.4rem;
+    box-sizing: border-box;
     border-radius: 0.25rem;
-    background-color: rgba(11, 17, 32, 0.72);
+    background-color: var(--bg-primary);
     color: var(--text-primary);
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    text-align: center;
+}
+
+.artwork-tile-rating i {
+    font-size: 0.85rem;
+    color: #f5c518;
 }
 
 .artwork-tile-rating:empty {
@@ -3126,6 +3154,7 @@ button.vor-relation-item,
     position: absolute;
     left: 0.4rem;
     bottom: 0.4rem;
+    z-index: 2;
 }
 
 .artwork-tile-delete {
@@ -3133,6 +3162,8 @@ button.vor-relation-item,
     top: 0.3rem;
     right: 0.3rem;
     opacity: 0;
+    background-color: var(--bg-primary);
+    border-color: var(--action-delete);
 }
 
 .artwork-tile:hover .artwork-tile-delete {

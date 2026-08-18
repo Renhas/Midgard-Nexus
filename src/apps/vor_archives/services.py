@@ -371,19 +371,19 @@ def _work_matches_filters(user_work, params):
 
     if _is_partial(params.get("tags"), params.get("all_tags")):
         work_tags = _item_ids(work.tags.all())
-        if work_tags and not work_tags.intersection(params.get("tags") or []):
+        if not work_tags.intersection(params.get("tags") or []):
             return False
 
     genre_selected = params.get(f"genre_{type_key}")
     genre_all = params.get(f"all_genre_{type_key}")
     if _is_partial(genre_selected, genre_all):
         work_genres = _item_ids(work.genres.all())
-        if work_genres and not work_genres.intersection(genre_selected or []):
+        if not work_genres.intersection(genre_selected or []):
             return False
 
     if type_key == "game" and _is_partial(params.get("platforms"), params.get("all_platforms")):
         work_platforms = _item_ids(work.platforms.all())
-        if work_platforms and not work_platforms.intersection(params.get("platforms") or []):
+        if not work_platforms.intersection(params.get("platforms") or []):
             return False
     return True
 

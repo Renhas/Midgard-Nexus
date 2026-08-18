@@ -27,11 +27,19 @@
             {% endfor %}
         {% else %}
             {% if searchable %}
-                <input class="vor-chip-picker-search sidebar-accordion-search"
-                       type="text"
-                       placeholder="Поиск"
-                       x-model="query"
-                       @click.stop>
+                <div class="sidebar-accordion-search-row">
+                    <input class="vor-chip-picker-search sidebar-accordion-search"
+                           type="text"
+                           placeholder="Поиск"
+                           x-model="query"
+                           @click.stop>
+                    <button type="button"
+                            class="sidebar-btn sidebar-btn-icon"
+                            title="Снять все"
+                            @click.stop="$store.vorArtworks.clearFilter('{{ name }}')">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
             {% endif %}
             {% for option in options %}
                 <label class="sidebar-filter-item"

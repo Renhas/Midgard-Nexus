@@ -580,6 +580,11 @@
             isFilterOn(name, value) {
                 return (this.filters[name] || []).map(String).includes(String(value));
             },
+            clearFilter(name) {
+                this.filters[name] = [];
+                this.persistSidebar();
+                this.reloadList();
+            },
             listQuery() {
                 const params = new URLSearchParams();
                 if (this.workTypes.length) {

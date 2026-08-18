@@ -24,6 +24,13 @@ STATUS_LABELS_RU = {
     'dropped': 'Брошено',
 }
 
+STATUS_ICONS = {
+    'planning': 'bi bi-clock-fill',
+    'in_progress': 'bi bi-play-circle-fill',
+    'completed': 'bi bi-check-circle-fill',
+    'dropped': 'bi bi-x-circle-fill',
+}
+
 
 def _display_progress_value(value):
     number = float(value or 0)
@@ -97,3 +104,10 @@ def status_label_ru(user_work):
     if not user_work:
         return ""
     return STATUS_LABELS_RU.get(user_work.status, user_work.get_status_display())
+
+
+@register.filter
+def status_icon(user_work):
+    if not user_work:
+        return "bi bi-circle"
+    return STATUS_ICONS.get(user_work.status, "bi bi-circle")

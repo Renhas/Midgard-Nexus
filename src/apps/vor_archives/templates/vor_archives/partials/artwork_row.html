@@ -55,15 +55,18 @@
                     <i class="{{ user_work|get_work_type_icon }}"></i>
                 </div>
             {% endif %}
+            <div class="artwork-tile-status status-{{ user_work.status }}" title="{{ user_work|status_label_ru }}">
+                <i class="{{ user_work|status_icon }}"></i>
+            </div>
             <div class="artwork-tile-type">
                 <i class="{{ user_work|get_work_type_icon }}"></i>
             </div>
-            <div class="artwork-tile-status status-{{ user_work.status }}">
-                {{ user_work|status_label_ru }}
-            </div>
-            <div class="artwork-tile-rating">
-                {% if user_work.rating %}{{ user_work.rating }}{% endif %}
-            </div>
+            {% if user_work.rating %}
+                <div class="artwork-tile-rating">
+                    <i class="bi bi-star-fill"></i>
+                    <span>{{ user_work.rating }}</span>
+                </div>
+            {% endif %}
             <div class="artwork-tile-check">
                 <span class="custom-checkbox"></span>
             </div>
@@ -74,7 +77,7 @@
                     hx-get="{% url 'vor_archives:artwork_delete_preview' %}?ids={{ user_work.pk }}"
                     hx-target="#vor-modal"
                     hx-swap="innerHTML">
-                <i class="bi bi-trash"></i>
+                <i class="bi bi-trash-fill"></i>
             </button>
         </div>
         <div class="artwork-tile-title" title="{{ user_work.work.title }}">
