@@ -17,6 +17,20 @@ WORK_TYPE_LABELS = {
     'game': 'Игра',
 }
 
+STATUS_LABELS_RU = {
+    'planning': 'Запланировано',
+    'in_progress': 'В процессе',
+    'completed': 'Завершено',
+    'dropped': 'Брошено',
+}
+
+STATUS_ICONS = {
+    'planning': 'bi bi-clock-fill',
+    'in_progress': 'bi bi-play-circle-fill',
+    'completed': 'bi bi-check-circle-fill',
+    'dropped': 'bi bi-x-circle-fill',
+}
+
 
 def _display_progress_value(value):
     number = float(value or 0)
@@ -83,3 +97,17 @@ def work_type_label(work):
     if not work:
         return ""
     return WORK_TYPE_LABELS.get(work._meta.model_name, "")
+
+
+@register.filter
+def status_label_ru(user_work):
+    if not user_work:
+        return ""
+    return STATUS_LABELS_RU.get(user_work.status, user_work.get_status_display())
+
+
+@register.filter
+def status_icon(user_work):
+    if not user_work:
+        return "bi bi-circle"
+    return STATUS_ICONS.get(user_work.status, "bi bi-circle")
