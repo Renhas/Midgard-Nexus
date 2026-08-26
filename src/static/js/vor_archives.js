@@ -415,7 +415,15 @@
             window.Alpine?.initTree?.(el);
         }
         if (el?.id === "artwork-list-body" || el?.id === "artwork-list") {
+            window.Alpine?.initTree?.(el);
             window.Alpine?.store("vorArtworks")?.applyListState();
+        }
+        if (el?.id === "sidebar-collections-list") {
+            window.Alpine?.initTree?.(el);
+            window.Alpine?.store("vorArtworks")?.syncCollectionSortable();
+        }
+        if (el?.id === "vor-modal") {
+            window.Alpine?.initTree?.(el);
         }
         syncPageScrollLock();
     });
@@ -471,11 +479,40 @@
             reorderUrl: "",
             searchUrl: "",
             attachUrl: "",
+            collectionTreeUrl: "",
+            collectionReorderUrl: "",
+            collectionId: null,
+            collectionName: "",
+            collectionDragging: false,
+            expandedCollectionIds: [],
             searchOpen: false,
             searchQuery: "",
             searchTimer: null,
             _sortable: null,
+            _sortables: [],
+            _collectionSortables: [],
+            _artworkDragging: false,
+            _collectionJustDragged: false,
+            _flyoutTimer: null,
             _booted: false,
+            menu: {
+                open: false,
+                kind: "",
+                x: 0,
+                y: 0,
+                collectionId: null,
+                collectionName: "",
+                uwId: null,
+                detailUrl: "",
+                flyout: false,
+                flyoutSide: "right",
+                membership: [],
+                membershipLoading: false,
+            },
+
+            get listTitle() {
+                return this.collectionId ? (this.collectionName || "Коллекция") : "Медиатека";
+            },
 
             initFromPage(opts) {
                 if (this._booted) {
@@ -486,12 +523,15 @@
                 this.reorderUrl = opts.reorderUrl || "";
                 this.searchUrl = opts.searchUrl || "";
                 this.attachUrl = opts.attachUrl || "";
+                this.collectionTreeUrl = opts.collectionTreeUrl || "";
+                this.collectionReorderUrl = opts.collectionReorderUrl || "";
                 this.filterCatalog = { ...this.filterCatalog, ...(opts.filterCatalog || {}) };
                 this.resetFilters(false);
                 this.restoreSidebar();
                 this.persistSidebar();
                 this.applyListState();
                 this.reloadList();
+                this.syncCollectionSortable();
             },
             restoreSidebar() {
                 let saved = null;
@@ -617,6 +657,9 @@
                 params.set("sort", this.sortField);
                 params.set("dir", this.sortAsc ? "asc" : "desc");
                 params.set("hidden", this.showHidden ? "1" : "0");
+                if (this.collectionId) {
+                    params.set("collection", String(this.collectionId));
+                }
                 FILTER_KEYS.forEach((name) => {
                     (this.filters[name] || []).forEach((value) => params.append(name, value));
                 });
@@ -653,68 +696,449 @@
                 });
             },
             canDrag() {
+                return !this.deleteMode;
+            },
+            canReorder() {
                 return this.sortField === "custom" && !this.deleteMode;
             },
+            collectionPath(id, rest = "") {
+                const base = String(this.collectionTreeUrl || "").replace(/tree\/?$/, "");
+                return `${base}${id}/${rest}`;
+            },
+            csrfHeaders() {
+                const token = document.querySelector("[name=csrfmiddlewaretoken]")?.value
+                    || getCookie("csrftoken");
+                return {
+                    "X-CSRFToken": token || "",
+                    "X-Requested-With": "XMLHttpRequest",
+                };
+            },
+            destroySortables(list) {
+                (list || []).forEach((sortable) => {
+                    try {
+                        sortable.destroy();
+                    } catch (error) {
+                        // already destroyed
+                    }
+                });
+            },
             syncSortable() {
+                this.destroySortables(this._sortables);
+                this._sortables = [];
                 if (this._sortable) {
                     this._sortable.destroy();
                     this._sortable = null;
                 }
-                const container = document.getElementById("artwork-list-items");
-                if (!container || !this.canDrag() || typeof Sortable === "undefined") {
+                if (!this.canDrag() || typeof Sortable === "undefined") {
                     return;
                 }
                 const dragViewClass = this.viewMode === "grid"
                     ? "vor-artworks-grid-drag"
                     : "vor-artworks-list-drag";
-                this._sortable = Sortable.create(container, {
-                    animation: 150,
-                    draggable: ".artwork-item",
-                    forceFallback: true,
-                    fallbackOnBody: true,
-                    fallbackTolerance: 4,
-                    ghostClass: "is-sortable-ghost",
-                    chosenClass: "is-sortable-chosen",
-                    dragClass: "is-sortable-drag",
-                    filter: ".artwork-row-delete, .artwork-tile-delete, .artwork-row-check, .artwork-tile-check",
-                    preventOnFilter: true,
-                    onStart: () => {
-                        window.getSelection?.().removeAllRanges();
-                        document.body.classList.add(dragViewClass, "vor-artworks-dragging");
-                    },
-                    onEnd: () => {
-                        document.body.classList.remove(
-                            "vor-artworks-grid-drag",
-                            "vor-artworks-list-drag",
-                            "vor-artworks-dragging",
-                        );
-                        this.saveOrder();
-                    },
+                document.querySelectorAll(".artwork-list-items").forEach((container) => {
+                    this._sortables.push(Sortable.create(container, {
+                        group: "vor-artworks",
+                        animation: 150,
+                        draggable: ".artwork-item",
+                        forceFallback: true,
+                        fallbackOnBody: true,
+                        fallbackTolerance: 4,
+                        ghostClass: "is-sortable-ghost",
+                        chosenClass: "is-sortable-chosen",
+                        dragClass: "is-sortable-drag",
+                        filter: ".artwork-row-delete, .artwork-tile-delete, .artwork-row-check, .artwork-tile-check",
+                        preventOnFilter: true,
+                        onStart: () => {
+                            this._artworkDragging = true;
+                            this.closeMenu();
+                            window.getSelection?.().removeAllRanges();
+                            document.body.classList.add(dragViewClass, "vor-artworks-dragging");
+                        },
+                        onEnd: (evt) => {
+                            this._artworkDragging = false;
+                            this.clearCollectionDropTargets();
+                            document.body.classList.remove(
+                                "vor-artworks-grid-drag",
+                                "vor-artworks-list-drag",
+                                "vor-artworks-dragging",
+                            );
+                            const point = evt.originalEvent;
+                            const collectionId = this.collectionIdAtPoint(
+                                point?.clientX,
+                                point?.clientY,
+                            );
+                            if (collectionId) {
+                                this.revertSortable(evt);
+                                this.addWorkToCollection(collectionId, evt.item?.dataset?.uwId);
+                                return;
+                            }
+                            const direct = document.getElementById("artwork-list-items");
+                            if (
+                                this.canReorder()
+                                && evt.from === direct
+                                && evt.to === direct
+                            ) {
+                                this.saveOrder();
+                                return;
+                            }
+                            if (evt.from !== evt.to || evt.oldIndex !== evt.newIndex) {
+                                this.revertSortable(evt);
+                            }
+                        },
+                    }));
                 });
+            },
+            revertSortable(evt) {
+                if (!evt?.from || !evt.item) {
+                    return;
+                }
+                const siblings = [...evt.from.children].filter((node) => node !== evt.item);
+                if (evt.oldIndex >= siblings.length) {
+                    evt.from.appendChild(evt.item);
+                    return;
+                }
+                evt.from.insertBefore(evt.item, siblings[evt.oldIndex]);
             },
             saveOrder() {
                 const container = document.getElementById("artwork-list-items");
-                if (!container || !this.reorderUrl) {
+                if (!container) {
                     return;
                 }
-                const ids = [...container.querySelectorAll(".artwork-item")]
+                const ids = [...container.querySelectorAll(":scope > .artwork-item")]
                     .map((el) => el.dataset.uwId)
                     .filter(Boolean);
                 if (!this.sortAsc) {
                     ids.reverse();
                 }
-                const token = document.querySelector("[name=csrfmiddlewaretoken]")?.value
-                    || getCookie("csrftoken");
                 const body = new URLSearchParams();
                 ids.forEach((id) => body.append("ids", id));
-                fetch(this.reorderUrl, {
+                const url = this.collectionId
+                    ? this.collectionPath(this.collectionId, "items/reorder/")
+                    : this.reorderUrl;
+                if (!url) {
+                    return;
+                }
+                fetch(url, {
                     method: "POST",
-                    headers: {
-                        "X-CSRFToken": token || "",
-                        "X-Requested-With": "XMLHttpRequest",
-                    },
+                    headers: this.csrfHeaders(),
                     body,
                 });
+            },
+            selectLibrary() {
+                this.collectionId = null;
+                this.collectionName = "";
+                this.reloadList();
+            },
+            selectCollection(id, name) {
+                this.collectionId = Number(id) || null;
+                this.collectionName = name || "";
+                this.reloadList();
+            },
+            selectCollectionFromEl(el) {
+                if (!el || this._collectionJustDragged) {
+                    return;
+                }
+                this.selectCollection(el.dataset.collectionId, el.dataset.collectionName);
+            },
+            isCollectionExpanded(id) {
+                return this.expandedCollectionIds.includes(Number(id));
+            },
+            setCollectionExpanded(id, value) {
+                id = Number(id);
+                const index = this.expandedCollectionIds.indexOf(id);
+                if (value && index < 0) {
+                    this.expandedCollectionIds.push(id);
+                } else if (!value && index > -1) {
+                    this.expandedCollectionIds.splice(index, 1);
+                }
+            },
+            toggleCollectionExpanded(id) {
+                this.setCollectionExpanded(id, !this.isCollectionExpanded(id));
+            },
+            reloadCollectionTree() {
+                if (!this.collectionTreeUrl) {
+                    return;
+                }
+                htmx.ajax("GET", this.collectionTreeUrl, {
+                    target: "#sidebar-collections-list",
+                    swap: "innerHTML",
+                });
+            },
+            syncCollectionSortable() {
+                this.destroySortables(this._collectionSortables);
+                this._collectionSortables = [];
+                if (typeof Sortable === "undefined") {
+                    return;
+                }
+                const root = document.getElementById("collection-tree-root");
+                if (!root) {
+                    return;
+                }
+                const containers = [root, ...root.querySelectorAll(".collection-children")];
+                containers.forEach((container) => {
+                    this._collectionSortables.push(Sortable.create(container, {
+                        group: "vor-collections",
+                        animation: 150,
+                        draggable: ".collection-tree-node",
+                        handle: ".collection-item",
+                        fallbackOnBody: true,
+                        swapThreshold: 0.65,
+                        emptyInsertThreshold: 12,
+                        ghostClass: "is-sortable-ghost",
+                        chosenClass: "is-sortable-chosen",
+                        dragClass: "is-sortable-drag",
+                        filter: ".collection-toggle",
+                        preventOnFilter: true,
+                        onStart: () => {
+                            this.collectionDragging = true;
+                            this.closeMenu();
+                            document.body.classList.add("vor-collections-dragging");
+                        },
+                        onEnd: (evt) => {
+                            this.collectionDragging = false;
+                            this._collectionJustDragged = true;
+                            window.setTimeout(() => {
+                                this._collectionJustDragged = false;
+                            }, 80);
+                            document.body.classList.remove("vor-collections-dragging");
+                            this.saveCollectionTree(evt);
+                        },
+                    }));
+                });
+            },
+            saveCollectionTree(evt) {
+                const item = evt?.item;
+                const parentEl = item?.parentElement;
+                if (!item || !parentEl || !this.collectionReorderUrl) {
+                    return;
+                }
+                const body = new URLSearchParams();
+                body.set("id", item.dataset.collectionId || "");
+                body.set("parent_id", parentEl.dataset.parentId || "");
+                [...parentEl.querySelectorAll(":scope > .collection-tree-node")].forEach((node) => {
+                    if (node.dataset.collectionId) {
+                        body.append("sibling_ids", node.dataset.collectionId);
+                    }
+                });
+                fetch(this.collectionReorderUrl, {
+                    method: "POST",
+                    headers: this.csrfHeaders(),
+                    body,
+                }).finally(() => this.reloadCollectionTree());
+            },
+            collectionIdAtPoint(x, y) {
+                if (x == null || y == null) {
+                    return null;
+                }
+                const el = document.elementFromPoint(x, y);
+                return el?.closest(".collection-item")?.dataset?.collectionId || null;
+            },
+            clearCollectionDropTargets() {
+                document.querySelectorAll(".collection-item.is-drop-target").forEach((node) => {
+                    node.classList.remove("is-drop-target");
+                });
+            },
+            highlightCollectionAtPoint(x, y) {
+                this.clearCollectionDropTargets();
+                const id = this.collectionIdAtPoint(x, y);
+                if (!id) {
+                    return;
+                }
+                document.querySelector(
+                    `.collection-item[data-collection-id="${id}"]`,
+                )?.classList.add("is-drop-target");
+            },
+            addWorkToCollection(collectionId, uwId) {
+                if (!collectionId || !uwId) {
+                    return;
+                }
+                const body = new URLSearchParams();
+                body.set("uw_id", uwId);
+                body.set("action", "add");
+                fetch(this.collectionPath(collectionId, "items/"), {
+                    method: "POST",
+                    headers: this.csrfHeaders(),
+                    body,
+                }).then((response) => response.json()).then((data) => {
+                    if (!data?.ok) {
+                        return;
+                    }
+                    if (data.changed) {
+                        window.dispatchEvent(new Event("collection-update"));
+                    }
+                    if (String(this.collectionId) === String(collectionId)) {
+                        this.reloadList();
+                    }
+                });
+            },
+            placeMenu(x, y) {
+                this.menu.x = x;
+                this.menu.y = y;
+                this.menu.open = true;
+                queueMicrotask(() => {
+                    const el = document.getElementById("vor-context-menu");
+                    if (!el) {
+                        return;
+                    }
+                    const rect = el.getBoundingClientRect();
+                    const pad = 8;
+                    let nextX = x;
+                    let nextY = y;
+                    if (nextX + rect.width > window.innerWidth - pad) {
+                        nextX = window.innerWidth - rect.width - pad;
+                    }
+                    if (nextY + rect.height > window.innerHeight - pad) {
+                        nextY = window.innerHeight - rect.height - pad;
+                    }
+                    this.menu.x = Math.max(pad, nextX);
+                    this.menu.y = Math.max(pad, nextY);
+                });
+            },
+            closeMenu() {
+                this.menu.open = false;
+                this.menu.flyout = false;
+                this.menu.membership = [];
+                this.cancelCloseFlyout();
+            },
+            openCollectionMenu(event, el) {
+                this.closeMenu();
+                this.menu.kind = "collection";
+                this.menu.collectionId = Number(el.dataset.collectionId);
+                this.menu.collectionName = el.dataset.collectionName || "";
+                this.placeMenu(event.clientX, event.clientY);
+            },
+            openArtworkMenu(event, item) {
+                if (!item || this.deleteMode) {
+                    return;
+                }
+                this.closeMenu();
+                this.menu.kind = "artwork";
+                this.menu.uwId = Number(item.dataset.uwId);
+                this.menu.detailUrl = item.dataset.detailUrl || "";
+                this.placeMenu(event.clientX, event.clientY);
+                this.loadArtworkCollections();
+            },
+            flattenCollectionTree(nodes, level = 0) {
+                const out = [];
+                (nodes || []).forEach((node) => {
+                    out.push({
+                        id: node.id,
+                        name: node.name,
+                        in_collection: Boolean(node.in_collection),
+                        level,
+                    });
+                    if (node.children?.length) {
+                        out.push(...this.flattenCollectionTree(node.children, level + 1));
+                    }
+                });
+                return out;
+            },
+            loadArtworkCollections() {
+                if (!this.menu.uwId || !this.listUrl) {
+                    return;
+                }
+                this.menu.membershipLoading = true;
+                fetch(`${this.listUrl}${this.menu.uwId}/collections/`, {
+                    headers: { "X-Requested-With": "XMLHttpRequest" },
+                }).then((response) => response.json()).then((data) => {
+                    this.menu.membership = this.flattenCollectionTree(data.tree || []);
+                    this.menu.membershipLoading = false;
+                }).catch(() => {
+                    this.menu.membershipLoading = false;
+                });
+            },
+            openCollectionFlyout() {
+                this.cancelCloseFlyout();
+                this.menu.flyout = true;
+                const menu = document.getElementById("vor-context-menu");
+                const rect = menu?.getBoundingClientRect();
+                const spaceRight = rect ? window.innerWidth - rect.right : 0;
+                this.menu.flyoutSide = spaceRight > 220 ? "right" : "left";
+            },
+            scheduleCloseFlyout() {
+                this.cancelCloseFlyout();
+                this._flyoutTimer = window.setTimeout(() => {
+                    this.menu.flyout = false;
+                }, 180);
+            },
+            cancelCloseFlyout() {
+                if (this._flyoutTimer) {
+                    window.clearTimeout(this._flyoutTimer);
+                    this._flyoutTimer = null;
+                }
+            },
+            toggleWorkCollection(item) {
+                if (!item || !this.menu.uwId) {
+                    return;
+                }
+                const adding = !item.in_collection;
+                const body = new URLSearchParams();
+                body.set("uw_id", String(this.menu.uwId));
+                body.set("action", adding ? "add" : "remove");
+                fetch(this.collectionPath(item.id, "items/"), {
+                    method: "POST",
+                    headers: this.csrfHeaders(),
+                    body,
+                }).then((response) => response.json()).then((data) => {
+                    if (!data?.ok) {
+                        return;
+                    }
+                    item.in_collection = adding;
+                    window.dispatchEvent(new Event("collection-update"));
+                    if (String(this.collectionId) === String(item.id)) {
+                        this.reloadList();
+                    }
+                });
+            },
+            menuRenameCollection() {
+                const id = this.menu.collectionId;
+                this.closeMenu();
+                if (!id) {
+                    return;
+                }
+                htmx.ajax("GET", this.collectionPath(id, "edit/"), {
+                    target: "#vor-modal",
+                    swap: "innerHTML",
+                });
+            },
+            menuDeleteCollection() {
+                const id = this.menu.collectionId;
+                this.closeMenu();
+                if (!id) {
+                    return;
+                }
+                htmx.ajax("GET", this.collectionPath(id, "delete/preview/"), {
+                    target: "#vor-modal",
+                    swap: "innerHTML",
+                });
+            },
+            menuEditArtwork() {
+                const url = this.menu.detailUrl;
+                this.closeMenu();
+                if (!url) {
+                    return;
+                }
+                htmx.ajax("GET", url, {
+                    target: "#vor-overlay",
+                    swap: "innerHTML",
+                });
+            },
+            menuDeleteArtwork() {
+                const id = this.menu.uwId;
+                const base = document.getElementById("vor-modal")?.dataset.vorDeletePreview;
+                this.closeMenu();
+                if (!id || !base) {
+                    return;
+                }
+                htmx.ajax("GET", `${base}?ids=${id}`, {
+                    target: "#vor-modal",
+                    swap: "innerHTML",
+                });
+            },
+            onCollectionDeleted(id) {
+                if (String(this.collectionId) === String(id)) {
+                    this.selectLibrary();
+                }
             },
             openSearch() {
                 if (this.searchOpen) {
@@ -2369,6 +2793,10 @@
             return;
         }
         if (event.key === "Escape") {
+            if (store.menu?.open) {
+                store.closeMenu();
+                return;
+            }
             if (store.searchOpen) {
                 store.closeSearch();
                 return;
@@ -2442,6 +2870,60 @@
         window.Alpine?.store("vorArtworks")?.reloadList();
     });
 
+    document.body.addEventListener("vor:reload-tree", () => {
+        window.Alpine?.store("vorArtworks")?.reloadCollectionTree();
+    });
+
+    document.body.addEventListener("vor:close-modal", () => {
+        window.Alpine?.store("vorArtworks")?.closeModal();
+    });
+
+    document.body.addEventListener("vor:collection-deleted", (event) => {
+        const id = event.detail?.value ?? event.detail;
+        window.Alpine?.store("vorArtworks")?.onCollectionDeleted(id);
+    });
+
+    document.body.addEventListener("vor:collection-renamed", (event) => {
+        const payload = event.detail?.value ?? event.detail;
+        const store = window.Alpine?.store("vorArtworks");
+        if (!store || !payload) {
+            return;
+        }
+        if (String(store.collectionId) === String(payload.id)) {
+            store.collectionName = payload.name || store.collectionName;
+        }
+    });
+
+    document.addEventListener("contextmenu", (event) => {
+        const store = window.Alpine?.store("vorArtworks");
+        if (!store || !document.getElementById("vor-artworks-opts")) {
+            return;
+        }
+        const collectionItem = event.target.closest(".collection-item");
+        if (collectionItem) {
+            event.preventDefault();
+            store.openCollectionMenu(event, collectionItem);
+            return;
+        }
+        const artwork = event.target.closest(".artwork-row, .artwork-tile");
+        if (artwork) {
+            event.preventDefault();
+            store.openArtworkMenu(event, artwork.closest(".artwork-item"));
+        }
+    });
+
+    document.addEventListener("pointermove", (event) => {
+        const store = window.Alpine?.store("vorArtworks");
+        if (!store?._artworkDragging) {
+            return;
+        }
+        store.highlightCollectionAtPoint(event.clientX, event.clientY);
+    });
+
+    window.addEventListener("scroll", () => {
+        window.Alpine?.store("vorArtworks")?.closeMenu();
+    }, true);
+
     (function initArtworkRowPreview() {
         const OFFSET = 14;
         const PAD = 12;
@@ -2492,6 +2974,9 @@
                 return false;
             }
             if (window.Alpine?.store("vorArtworks")?.searchOpen) {
+                return false;
+            }
+            if (window.Alpine?.store("vorArtworks")?.menu?.open) {
                 return false;
             }
             return true;

@@ -346,12 +346,13 @@ class Collection(MPTTModel):
         on_delete=models.CASCADE,
         related_name="children",
     )
+    order = models.IntegerField(default=0)
 
     class Meta(MPTTModel.Meta):
         abstract = False
 
     class MPTTMeta:
-        order_insertion_by = ["name"]
+        order_insertion_by = ["order"]
 
     def __str__(self):
         return f"Collection: {self.name} ({self.user})"
@@ -380,6 +381,12 @@ class CollectionItem(models.Model):
     class Meta:
         indexes = [
             models.Index(fields=["collection", "order"]),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["collection", "work_content_type", "work_object_id"],
+                name="vor_archives_collectionitem_unique_work",
+            ),
         ]
 
     def __str__(self):

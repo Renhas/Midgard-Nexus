@@ -43,7 +43,6 @@ from .forms import WORK_FORMS, AttrForm, GenreForm, UserWorkEditForm
 from .templatetags.vor_archives_extras import get_progress_info
 from .models import (
     BookGenre,
-    Collection,
     FilmGenre,
     GameGenre,
     Person,
@@ -53,13 +52,24 @@ from .models import (
 )
 from .services import (
     WORK_MODELS,
+    add_user_work_to_collection,
     attach_work,
     clamp_progress_for_work,
+    collection_tree_payload,
+    create_collection,
+    delete_collection,
     delete_user_works,
+    get_user_collection,
+    get_user_collection_trees,
     get_user_work,
     get_work,
+    list_collection_segments,
     list_user_works,
+    move_collection,
     orphan_works,
+    remove_user_work_from_collection,
+    rename_collection,
+    reorder_collection_items,
     reorder_user_works,
     search_library_works,
     search_works,
@@ -67,6 +77,7 @@ from .services import (
     user_has_work,
     user_has_work_title,
     user_owned_work_ids,
+    user_work_collection_ids,
     work_relation_items,
     work_type_key,
 )
@@ -96,6 +107,13 @@ def _id_list(request, name):
     return values
 
 
+def _optional_int(value):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def _artwork_list_params(request):
     types = [key for key in request.GET.getlist("types") if key in WORK_MODELS]
     if "types" not in request.GET:
@@ -119,6 +137,7 @@ def _artwork_list_params(request):
         "sort": request.GET.get("sort") or "custom",
         "sort_asc": request.GET.get("dir", "asc") != "desc",
         "show_hidden": request.GET.get("hidden", "1") != "0",
+        "collection_id": _optional_int(request.GET.get("collection")),
     }
 
 
@@ -157,7 +176,7 @@ def _work_form_class(type_key):
 def index(request):
     """Главная страница модуля «Библиотека» — страница произведений."""
     module = _module_context()
-    collections = Collection.objects.filter(user=request.user, parent=None)
+    collections = get_user_collection_trees(request.user)
     status_options = [
         {"value": value, "label": STATUS_LABELS_RU.get(value, label)}
         for value, label in UserWorkStatusChoices.choices
@@ -208,6 +227,9 @@ def index(request):
             "reorderUrl": reverse("vor_archives:artwork_reorder"),
             "searchUrl": reverse("vor_archives:artwork_library_search"),
             "attachUrl": reverse("vor_archives:artwork_attach"),
+            "collectionTreeUrl": reverse("vor_archives:collection_tree"),
+            "collectionReorderUrl": reverse("vor_archives:collection_reorder"),
+            "collectionNewUrl": reverse("vor_archives:collection_new"),
             "filterCatalog": {
                 "status": [item["value"] for item in status_options],
                 "age_rating": [item["value"] for item in age_rating_options],
@@ -266,10 +288,28 @@ def attributes_kind(request, kind):
 @login_required(login_url=LOGIN_URL)
 @require_GET
 def artwork_list(request):
+    params = _artwork_list_params(request)
+    collection = None
+    direct = []
+    nested = []
+    if params.get("collection_id"):
+        collection = get_user_collection(request.user, params["collection_id"])
+        segments = list_collection_segments(request.user, collection, params)
+        direct = segments["direct"]
+        nested = segments["nested"]
+        user_works = []
+    else:
+        user_works = list_user_works(request.user, params)
     return render(
         request,
         "vor_archives/partials/artwork_list.html",
-        {"user_works": list_user_works(request.user, _artwork_list_params(request))},
+        {
+            "collection": collection,
+            "user_works": user_works,
+            "direct": direct,
+            "nested": nested,
+            "has_collection_items": bool(direct or nested),
+        },
     )
 
 
@@ -878,6 +918,175 @@ def artwork_delete(request):
     ids = _parse_ids(request)
     delete_user_works(request.user, ids)
     return _list_response(request, '{"vor:close-overlay": true}')
+
+
+def _collection_mutation_response():
+    response = HttpResponse()
+    response["HX-Trigger"] = json.dumps({
+        "vor:reload-tree": True,
+        "vor:close-modal": True,
+        "collection-update": True,
+    })
+    return response
+
+
+def _collection_form_response(request, template, context, status=200):
+    return render(request, template, context, status=status)
+
+
+@login_required(login_url=LOGIN_URL)
+@require_GET
+def collection_tree(request):
+    return render(request, "vor_archives/partials/collection_tree.html", {
+        "collections": get_user_collection_trees(request.user),
+    })
+
+
+@login_required(login_url=LOGIN_URL)
+@require_http_methods(["GET", "POST"])
+def collection_new(request):
+    error = ""
+    name = ""
+    if request.method == "POST":
+        name = (request.POST.get("name") or "").strip()
+        try:
+            create_collection(request.user, name)
+            return _collection_mutation_response()
+        except ValidationError as exc:
+            error = " ".join(exc.messages) if getattr(exc, "messages", None) else str(exc)
+    return _collection_form_response(request, "vor_archives/partials/collection_form.html", {
+        "title": "Новая коллекция",
+        "submit_label": "Создать",
+        "action_url": reverse("vor_archives:collection_new"),
+        "name": name,
+        "error": error,
+    })
+
+
+@login_required(login_url=LOGIN_URL)
+@require_GET
+def collection_edit(request, pk):
+    collection = get_user_collection(request.user, pk)
+    return render(request, "vor_archives/partials/collection_form.html", {
+        "title": "Переименовать коллекцию",
+        "submit_label": "Сохранить",
+        "action_url": reverse("vor_archives:collection_update", args=[collection.pk]),
+        "name": collection.name,
+        "error": "",
+    })
+
+
+@login_required(login_url=LOGIN_URL)
+@require_POST
+def collection_update(request, pk):
+    name = (request.POST.get("name") or "").strip()
+    try:
+        rename_collection(request.user, pk, name)
+        response = _collection_mutation_response()
+        extra = json.loads(response["HX-Trigger"])
+        extra["vor:collection-renamed"] = {"id": pk, "name": name}
+        response["HX-Trigger"] = json.dumps(extra)
+        return response
+    except ValidationError as exc:
+        error = " ".join(exc.messages) if getattr(exc, "messages", None) else str(exc)
+        collection = get_user_collection(request.user, pk)
+        return render(
+            request,
+            "vor_archives/partials/collection_form.html",
+            {
+                "title": "Переименовать коллекцию",
+                "submit_label": "Сохранить",
+                "action_url": reverse("vor_archives:collection_update", args=[collection.pk]),
+                "name": name,
+                "error": error,
+            },
+        )
+
+
+@login_required(login_url=LOGIN_URL)
+@require_GET
+def collection_delete_preview(request, pk):
+    collection = get_user_collection(request.user, pk)
+    child_count = collection.get_descendant_count()
+    return render(request, "vor_archives/partials/collection_delete_confirm.html", {
+        "collection": collection,
+        "child_count": child_count,
+    })
+
+
+@login_required(login_url=LOGIN_URL)
+@require_POST
+def collection_delete(request, pk):
+    delete_collection(request.user, pk)
+    response = _collection_mutation_response()
+    extra = json.loads(response["HX-Trigger"])
+    extra["vor:collection-deleted"] = pk
+    response["HX-Trigger"] = json.dumps(extra)
+    return response
+
+
+@login_required(login_url=LOGIN_URL)
+@require_POST
+def collection_reorder(request):
+    collection_id = _optional_int(request.POST.get("id"))
+    parent_id = _optional_int(request.POST.get("parent_id"))
+    if not collection_id:
+        return HttpResponseBadRequest("Не указана коллекция")
+    try:
+        move_collection(
+            request.user,
+            collection_id,
+            parent_id,
+            request.POST.getlist("sibling_ids"),
+        )
+    except ValidationError as exc:
+        message = " ".join(exc.messages) if getattr(exc, "messages", None) else str(exc)
+        return JsonResponse({"ok": False, "error": message}, status=400)
+    return JsonResponse({"ok": True})
+
+
+@login_required(login_url=LOGIN_URL)
+@require_POST
+def collection_items(request, pk):
+    collection = get_user_collection(request.user, pk)
+    user_work_id = _optional_int(request.POST.get("uw_id"))
+    action = request.POST.get("action") or "add"
+    if not user_work_id:
+        return HttpResponseBadRequest("Не указано произведение")
+    user_work = get_object_or_404(UserWork, user=request.user, pk=user_work_id)
+    try:
+        if action == "remove":
+            changed = remove_user_work_from_collection(request.user, collection, user_work)
+        else:
+            _item, created = add_user_work_to_collection(request.user, collection, user_work)
+            changed = created
+    except ValidationError as exc:
+        message = " ".join(exc.messages) if getattr(exc, "messages", None) else str(exc)
+        return JsonResponse({"ok": False, "error": message}, status=400)
+    return JsonResponse({
+        "ok": True,
+        "changed": changed,
+        "in_collection": action != "remove",
+        "collection_id": collection.pk,
+    })
+
+
+@login_required(login_url=LOGIN_URL)
+@require_POST
+def collection_items_reorder(request, pk):
+    collection = get_user_collection(request.user, pk)
+    reorder_collection_items(request.user, collection, _parse_ids(request))
+    return JsonResponse({"ok": True})
+
+
+@login_required(login_url=LOGIN_URL)
+@require_GET
+def artwork_collections(request, uw_id):
+    user_work = get_object_or_404(UserWork, user=request.user, pk=uw_id)
+    member_ids = user_work_collection_ids(request.user, user_work)
+    return JsonResponse({
+        "tree": collection_tree_payload(request.user, member_ids),
+    })
 
 
 def _require_staff(request):

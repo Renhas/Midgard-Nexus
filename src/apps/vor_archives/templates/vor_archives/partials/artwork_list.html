@@ -8,7 +8,27 @@
     <div class="artwork-row-progress">Прогресс</div>
     <div class="artwork-row-delete-slot"></div>
 </div>
-{% if user_works %}
+{% if collection %}
+    {% if has_collection_items %}
+        <div id="artwork-list-items" class="artwork-list-items">
+            {% for user_work in direct %}
+                {% include "vor_archives/partials/artwork_row.html" with user_work=user_work %}
+            {% endfor %}
+        </div>
+        {% for segment in nested %}
+            <div class="artwork-list-segment">
+                <div class="artwork-list-segment-title">{{ segment.collection.name }}</div>
+                <div class="artwork-list-items artwork-list-items-nested">
+                    {% for user_work in segment.user_works %}
+                        {% include "vor_archives/partials/artwork_row.html" with user_work=user_work %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-center text-muted py-4">Произведения не найдены</div>
+    {% endif %}
+{% elif user_works %}
     <div id="artwork-list-items" class="artwork-list-items">
         {% for user_work in user_works %}
             {% include "vor_archives/partials/artwork_row.html" with user_work=user_work %}

@@ -7,10 +7,11 @@
     <div class="sidebar-nav-row">
         <button type="button"
                 class="sidebar-btn sidebar-btn-primary"
-                title="Все произведения"
-                @click="$store.vorArtworks.reloadList()">
+                title="Медиатека"
+                :class="{ 'active': !$store.vorArtworks.collectionId }"
+                @click="$store.vorArtworks.selectLibrary()">
             <i class="bi bi-collection"></i>
-            <span>Все произведения</span>
+            <span>Медиатека</span>
         </button>
         <button type="button"
                 class="sidebar-btn sidebar-btn-icon"
@@ -59,14 +60,15 @@
         <div class="sidebar-collections-header">
             <span>Коллекции</span>
         </div>
-        <div class="sidebar-collections-list">
-            {% for collection in collections %}
-                {% include "vor_archives/partials/collection_tree_item.html" with collection=collection %}
-            {% endfor %}
+        <div id="sidebar-collections-list" class="sidebar-collections-list">
+            {% include "vor_archives/partials/collection_tree.html" %}
         </div>
         <button type="button"
                 class="sidebar-btn sidebar-btn-add sidebar-btn-full"
-                title="Добавить коллекцию">
+                title="Добавить коллекцию"
+                hx-get="{% url 'vor_archives:collection_new' %}"
+                hx-target="#vor-modal"
+                hx-swap="innerHTML">
             <i class="bi bi-plus-circle"></i>
             <span>Добавить коллекцию</span>
         </button>
@@ -75,6 +77,8 @@
 {% endblock %}
 
 {% block vor_content %}
+<div class="artwork-library-title"
+     x-text="$store.vorArtworks.collectionId ? ($store.vorArtworks.collectionName || 'Коллекция') : 'Медиатека'"></div>
 <div id="artwork-list"
      class="artwork-list"
      :class="{
@@ -214,5 +218,70 @@
     class="custom-toast">
     <i class="bi bi-arrow-clockwise"></i>
     <span>Коллекция обновлена</span>
+</div>
+<div id="vor-context-menu"
+     class="vor-context-menu"
+     x-data
+     x-show="$store.vorArtworks.menu.open"
+     x-cloak
+     :class="{ 'has-flyout': $store.vorArtworks.menu.flyout }"
+     :style="`left: ${$store.vorArtworks.menu.x}px; top: ${$store.vorArtworks.menu.y}px`"
+     @click.outside="$store.vorArtworks.closeMenu()"
+     @contextmenu.prevent>
+    <template x-if="$store.vorArtworks.menu.kind === 'collection'">
+        <div>
+            <button type="button" class="vor-context-item" @click="$store.vorArtworks.menuRenameCollection()">
+                <i class="bi bi-pencil"></i>
+                <span>Переименовать</span>
+            </button>
+            <button type="button" class="vor-context-item is-danger" @click="$store.vorArtworks.menuDeleteCollection()">
+                <i class="bi bi-trash"></i>
+                <span>Удалить</span>
+            </button>
+        </div>
+    </template>
+    <template x-if="$store.vorArtworks.menu.kind === 'artwork'">
+        <div>
+            <button type="button" class="vor-context-item" @click="$store.vorArtworks.menuEditArtwork()">
+                <i class="bi bi-pencil"></i>
+                <span>Редактировать</span>
+            </button>
+            <button type="button" class="vor-context-item is-danger" @click="$store.vorArtworks.menuDeleteArtwork()">
+                <i class="bi bi-trash"></i>
+                <span>Удалить</span>
+            </button>
+            <div class="vor-context-item has-submenu"
+                 @mouseenter="$store.vorArtworks.openCollectionFlyout()"
+                 @mouseleave="$store.vorArtworks.scheduleCloseFlyout()">
+                <span>
+                    <i class="bi bi-folder"></i>
+                    <span>Коллекции</span>
+                </span>
+                <i class="bi bi-chevron-right"></i>
+                <div class="vor-context-flyout"
+                     :class="$store.vorArtworks.menu.flyoutSide"
+                     x-show="$store.vorArtworks.menu.flyout"
+                     @mouseenter="$store.vorArtworks.cancelCloseFlyout()">
+                    <div class="vor-context-flyout-empty" x-show="$store.vorArtworks.menu.membershipLoading">
+                        Загрузка…
+                    </div>
+                    <div class="vor-context-flyout-empty"
+                         x-show="!$store.vorArtworks.menu.membershipLoading && !$store.vorArtworks.menu.membership.length">
+                        Нет коллекций
+                    </div>
+                    <template x-for="item in $store.vorArtworks.menu.membership" :key="item.id">
+                        <button type="button"
+                                class="vor-context-item"
+                                :class="{ 'is-checked': item.in_collection }"
+                                :style="`padding-left: ${0.65 + item.level * 0.85}rem`"
+                                @click="$store.vorArtworks.toggleWorkCollection(item)">
+                            <i class="bi" :class="item.in_collection ? 'bi-check-square' : 'bi-square'"></i>
+                            <span x-text="item.name"></span>
+                        </button>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </template>
 </div>
 {% endblock %}
