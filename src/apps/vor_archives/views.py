@@ -230,6 +230,7 @@ def index(request):
             "collectionTreeUrl": reverse("vor_archives:collection_tree"),
             "collectionReorderUrl": reverse("vor_archives:collection_reorder"),
             "collectionNewUrl": reverse("vor_archives:collection_new"),
+            "isStaff": request.user.is_staff,
             "filterCatalog": {
                 "status": [item["value"] for item in status_options],
                 "age_rating": [item["value"] for item in age_rating_options],
@@ -596,6 +597,11 @@ def _artwork_overlay_response(request, work, user_work=None):
             ),
         )
 
+    start_editing = (
+        request.method == "GET"
+        and request.GET.get("edit") == "1"
+        and request.user.is_staff
+    )
     return render(
         request,
         "vor_archives/partials/artwork_overlay.html",
@@ -603,6 +609,8 @@ def _artwork_overlay_response(request, work, user_work=None):
             request, work, user_work,
             work_form_class(instance=work),
             UserWorkEditForm(instance=user_work) if user_work is not None else None,
+            editing=start_editing,
+            global_edit=start_editing,
         ),
     )
 
@@ -1042,6 +1050,8 @@ def collection_reorder(request):
     except ValidationError as exc:
         message = " ".join(exc.messages) if getattr(exc, "messages", None) else str(exc)
         return JsonResponse({"ok": False, "error": message}, status=400)
+    except Exception as exc:
+        return JsonResponse({"ok": False, "error": str(exc)}, status=400)
     return JsonResponse({"ok": True})
 
 

@@ -158,6 +158,9 @@ html.vor-scroll-lock .center {
     display: flex;
     align-items: center;
     gap: 0.25rem;
+    width: max-content;
+    min-width: 100%;
+    white-space: nowrap;
 }
 
 .collection-item:hover {
@@ -167,6 +170,8 @@ html.vor-scroll-lock .center {
 
 .collection-tree-node {
     user-select: none;
+    width: max-content;
+    min-width: 100%;
 }
 
 .collection-toggle {
@@ -196,16 +201,9 @@ html.vor-scroll-lock .center {
 
 .sidebar-collections-list {
     flex: 1;
-    overflow-x: auto;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
+    overflow: auto;
+    overscroll-behavior: contain;
     min-width: 0;
-}
-
-.collection-item {
-    white-space: nowrap;
 }
 
 .collection-item.is-active {
@@ -220,9 +218,8 @@ html.vor-scroll-lock .center {
 }
 
 .collection-item-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 0;
+    flex: 0 0 auto;
+    white-space: nowrap;
 }
 
 .collection-tree-root,
@@ -230,7 +227,16 @@ html.vor-scroll-lock .center {
     display: flex;
     flex-direction: column;
     gap: 0.125rem;
-    min-width: 0;
+    width: max-content;
+    min-width: 100%;
+}
+
+.collection-tree-node > .collection-children {
+    display: none;
+}
+
+.collection-tree-node.is-expanded > .collection-children {
+    display: flex;
 }
 
 .collection-children {
@@ -249,17 +255,69 @@ body.vor-collections-dragging .collection-children {
     padding: 0.35rem 0.25rem 0.75rem;
 }
 
+.artwork-library-path {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.15rem 0;
+}
+
+.artwork-library-path-item {
+    display: inline-flex;
+    align-items: center;
+}
+
+.artwork-library-path-sep {
+    margin: 0 0.4rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.artwork-library-path-link {
+    border: none;
+    padding: 0;
+    background: transparent;
+    color: var(--accent-vor);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.artwork-library-path-link:hover:not(:disabled) {
+    text-decoration: underline;
+}
+
+.artwork-library-path-link.is-current,
+.artwork-library-path-link:disabled {
+    color: var(--text-primary);
+    cursor: default;
+}
+
+.artwork-library-path-current {
+    color: var(--text-primary);
+}
+
 .artwork-list-segment {
     margin-top: 1rem;
 }
 
 .artwork-list-segment-title {
+    display: inline-flex;
+    align-items: center;
+    border: none;
+    background: transparent;
+    font: inherit;
     font-size: 0.78rem;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--text-secondary);
     padding: 0.35rem 0.5rem 0.55rem;
+    cursor: pointer;
+}
+
+.artwork-list-segment-title:hover {
+    color: var(--accent-vor);
 }
 
 .vor-modal-input {
@@ -318,30 +376,31 @@ body.vor-collections-dragging .collection-children {
     color: var(--action-delete);
 }
 
+.vor-context-item.is-disabled,
+.vor-context-item:disabled {
+    opacity: 0.4;
+    cursor: default;
+    pointer-events: none;
+}
+
 .vor-context-item.has-submenu {
     position: relative;
     justify-content: space-between;
 }
 
 .vor-context-flyout {
-    position: absolute;
-    top: -0.3rem;
-    min-width: 200px;
+    position: fixed;
+    z-index: 1101;
+    min-width: 220px;
+    max-width: 280px;
     max-height: 260px;
     overflow: auto;
+    overscroll-behavior: contain;
     padding: 0.3rem;
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 0.4rem;
     box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.35);
-}
-
-.vor-context-flyout.right {
-    left: calc(100% + 0.25rem);
-}
-
-.vor-context-flyout.left {
-    right: calc(100% + 0.25rem);
 }
 
 .vor-context-flyout-empty {
@@ -3265,6 +3324,10 @@ button.vor-relation-item,
 }
 
 .artwork-list.is-sortable .artwork-item {
+    cursor: grab;
+}
+
+.artwork-list.is-sortable .artwork-list-items-nested .artwork-item {
     cursor: grab;
 }
 

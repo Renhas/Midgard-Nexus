@@ -1,27 +1,19 @@
-<div class="collection-tree-node"
-     data-collection-id="{{ collection.pk }}"
-     x-data="{ expanded: $store.vorArtworks.isCollectionExpanded({{ collection.pk }}) }">
+<div class="collection-tree-node" data-collection-id="{{ collection.pk }}">
     <div class="collection-item"
          data-collection-id="{{ collection.pk }}"
-         data-collection-name="{{ collection.name }}"
-         :class="{ 'is-active': $store.vorArtworks.collectionId === {{ collection.pk }} }"
-         @click="$store.vorArtworks.selectCollectionFromEl($el)"
-         @contextmenu.prevent="$store.vorArtworks.openCollectionMenu($event, $el)">
+         data-collection-name="{{ collection.name }}">
         <button type="button"
                 class="collection-toggle"
-                @click.stop="$store.vorArtworks.toggleCollectionExpanded({{ collection.pk }}); expanded = $store.vorArtworks.isCollectionExpanded({{ collection.pk }})"
                 title="Свернуть/Развернуть">
             {% if collection.get_children %}
-                <i class="bi bi-chevron-right" :class="{ 'bi-rotate-90': expanded }"></i>
+                <i class="bi bi-chevron-right"></i>
             {% else %}
                 <span class="collection-toggle-placeholder"></span>
             {% endif %}
         </button>
         <span class="collection-item-name">{{ collection.name }}</span>
     </div>
-    <div class="collection-children"
-         data-parent-id="{{ collection.pk }}"
-         x-show="expanded || $store.vorArtworks.collectionDragging">
+    <div class="collection-children" data-parent-id="{{ collection.pk }}">
         {% for child in collection.get_children %}
             {% include "vor_archives/partials/collection_tree_item.html" with collection=child %}
         {% endfor %}

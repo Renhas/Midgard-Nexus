@@ -530,8 +530,16 @@ def move_collection(user, collection_id, parent_id, sibling_ids):
         if parent is not None and collection.parent_id != parent.pk:
             collection.move_to(parent, "last-child")
         elif parent is None and collection.parent_id is not None:
-            collection.parent = None
-            collection.save()
+            other_root = (
+                Collection.objects.filter(user=user, parent=None)
+                .exclude(pk=collection.pk)
+                .first()
+            )
+            if other_root is not None:
+                collection.move_to(other_root, "right")
+            else:
+                collection.parent = None
+                collection.save()
 
         ordered_ids = []
         for raw in sibling_ids or []:
@@ -545,9 +553,10 @@ def move_collection(user, collection_id, parent_id, sibling_ids):
         leftover = [node for node in siblings if node.pk not in {pk for pk in ordered_ids}]
         ordered.extend(leftover)
         for index, node in enumerate(ordered):
-            if node.order != index:
-                node.order = index
-                node.save()
+            node.order = index
+        if ordered:
+            Collection.objects.bulk_update(ordered, ["order"])
+        Collection.objects.rebuild()
     return collection
 
 
