@@ -1,23 +1,21 @@
-{% if collection.get_children.all %}
-<div class="collection-tree-node" x-data="{ expanded: false }">
-    <div class="collection-item" style="padding-left: {{ collection.level|default:0 }}px">
+<div class="collection-tree-node" data-collection-id="{{ collection.pk }}">
+    <div class="collection-item"
+         data-collection-id="{{ collection.pk }}"
+         data-collection-name="{{ collection.name }}">
         <button type="button"
                 class="collection-toggle"
-                @click="expanded = !expanded"
                 title="Свернуть/Развернуть">
-            <i class="bi bi-chevron-right" x-bind:class="{ 'bi-rotate-90': expanded }"></i>
+            {% if collection.get_children %}
+                <i class="bi bi-chevron-right"></i>
+            {% else %}
+                <span class="collection-toggle-placeholder"></span>
+            {% endif %}
         </button>
-        <span>{{ collection.name }}</span>
+        <span class="collection-item-name">{{ collection.name }}</span>
     </div>
-    <div x-show="expanded" style="padding-left: 16px;">
-        {% for child in collection.get_children.all %}
+    <div class="collection-children" data-parent-id="{{ collection.pk }}">
+        {% for child in collection.get_children %}
             {% include "vor_archives/partials/collection_tree_item.html" with collection=child %}
         {% endfor %}
     </div>
 </div>
-{% else %}
-<div class="collection-item" style="padding-left: {{ collection.level|default:0 }}px">
-    <span class="collection-toggle-placeholder"></span>
-    <span>{{ collection.name }}</span>
-</div>
-{% endif %}

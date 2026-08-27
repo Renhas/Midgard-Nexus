@@ -158,6 +158,9 @@ html.vor-scroll-lock .center {
     display: flex;
     align-items: center;
     gap: 0.25rem;
+    width: max-content;
+    min-width: 100%;
+    white-space: nowrap;
 }
 
 .collection-item:hover {
@@ -167,6 +170,8 @@ html.vor-scroll-lock .center {
 
 .collection-tree-node {
     user-select: none;
+    width: max-content;
+    min-width: 100%;
 }
 
 .collection-toggle {
@@ -196,16 +201,212 @@ html.vor-scroll-lock .center {
 
 .sidebar-collections-list {
     flex: 1;
-    overflow-x: auto;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
+    overflow: auto;
+    overscroll-behavior: contain;
     min-width: 0;
 }
 
-.collection-item {
+.collection-item.is-active {
+    color: var(--text-primary);
+    background-color: rgba(167, 145, 255, 0.16);
+}
+
+.collection-item.is-drop-target {
+    color: var(--text-primary);
+    background-color: rgba(167, 145, 255, 0.28);
+    outline: 1px dashed var(--accent-vor);
+}
+
+.collection-item-name {
+    flex: 0 0 auto;
     white-space: nowrap;
+}
+
+.collection-tree-root,
+.collection-children {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    width: max-content;
+    min-width: 100%;
+}
+
+.collection-tree-node > .collection-children {
+    display: none;
+}
+
+.collection-tree-node.is-expanded > .collection-children {
+    display: flex;
+}
+
+.collection-children {
+    padding-left: 0.85rem;
+    min-height: 0.4rem;
+}
+
+body.vor-collections-dragging .collection-children {
+    outline: 1px dashed rgba(167, 145, 255, 0.25);
+}
+
+.artwork-library-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    padding: 0.35rem 0.25rem 0.75rem;
+}
+
+.artwork-library-path {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.15rem 0;
+}
+
+.artwork-library-path-item {
+    display: inline-flex;
+    align-items: center;
+}
+
+.artwork-library-path-sep {
+    margin: 0 0.4rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.artwork-library-path-link {
+    border: none;
+    padding: 0;
+    background: transparent;
+    color: var(--accent-vor);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.artwork-library-path-link:hover:not(:disabled) {
+    text-decoration: underline;
+}
+
+.artwork-library-path-link.is-current,
+.artwork-library-path-link:disabled {
+    color: var(--text-primary);
+    cursor: default;
+}
+
+.artwork-library-path-current {
+    color: var(--text-primary);
+}
+
+.artwork-list-segment {
+    margin-top: 1rem;
+}
+
+.artwork-list-segment-title {
+    display: inline-flex;
+    align-items: center;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    padding: 0.35rem 0.5rem 0.55rem;
+    cursor: pointer;
+}
+
+.artwork-list-segment-title:hover {
+    color: var(--accent-vor);
+}
+
+.vor-modal-input {
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 0.375rem;
+    background: var(--bg-input, transparent);
+    color: var(--text-primary);
+}
+
+.vor-modal-input:focus {
+    outline: none;
+    border-color: var(--accent-vor);
+}
+
+.vor-modal-error {
+    color: var(--action-delete);
+    font-size: 0.875rem;
+    margin-bottom: 0.65rem;
+}
+
+.vor-context-menu {
+    position: fixed;
+    z-index: 1100;
+    min-width: 188px;
+    padding: 0.3rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.4rem;
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.35);
+}
+
+.vor-context-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.4rem 0.65rem;
+    border: none;
+    border-radius: 0.3rem;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 0.8125rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.vor-context-item:hover,
+.vor-context-item.is-checked {
+    background-color: rgba(167, 145, 255, 0.12);
+}
+
+.vor-context-item.is-danger {
+    color: var(--action-delete);
+}
+
+.vor-context-item.is-disabled,
+.vor-context-item:disabled {
+    opacity: 0.4;
+    cursor: default;
+    pointer-events: none;
+}
+
+.vor-context-item.has-submenu {
+    position: relative;
+    justify-content: space-between;
+}
+
+.vor-context-flyout {
+    position: fixed;
+    z-index: 1101;
+    min-width: 220px;
+    max-width: 280px;
+    max-height: 260px;
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding: 0.3rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.4rem;
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.35);
+}
+
+.vor-context-flyout-empty {
+    padding: 0.45rem 0.65rem;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
 }
 
 
@@ -3126,6 +3327,10 @@ button.vor-relation-item,
     cursor: grab;
 }
 
+.artwork-list.is-sortable .artwork-list-items-nested .artwork-item {
+    cursor: grab;
+}
+
 .artwork-item.is-sortable-ghost,
 .artwork-item.is-sortable-chosen {
     opacity: 1 !important;
@@ -3174,6 +3379,10 @@ body.vor-artworks-list-drag .artwork-tile {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
     gap: 1rem;
+}
+
+.artwork-list.is-grid .artwork-list-segment-title {
+    padding-left: 0;
 }
 
 .artwork-list.is-grid .artwork-item {

@@ -1,6 +1,9 @@
 {% load vor_archives_extras %}
 <div class="artwork-item"
      data-uw-id="{{ user_work.pk }}"
+     data-work-type="{{ user_work.work_content_type.model }}"
+     data-work-id="{{ user_work.work_object_id }}"
+     data-detail-url="{% url 'vor_archives:artwork_detail' user_work.pk %}"
      data-preview-title="{{ user_work.work.title }}"
      data-preview-desc="{{ user_work.work.description|default:'' }}"
      data-preview-cover="{% if user_work.work.cover %}{{ user_work.work.cover.url }}{% endif %}"
@@ -8,7 +11,8 @@
     <div class="artwork-row"
          hx-get="{% url 'vor_archives:artwork_detail' user_work.pk %}"
          hx-target="#vor-overlay"
-         hx-swap="innerHTML">
+         hx-swap="innerHTML"
+         @contextmenu.prevent="$store.vorArtworks.openArtworkMenu($event, $el.closest('.artwork-item'))">
         <div class="artwork-row-check">
             <span class="custom-checkbox"></span>
         </div>
@@ -51,7 +55,8 @@
     <div class="artwork-tile"
          hx-get="{% url 'vor_archives:artwork_detail' user_work.pk %}"
          hx-target="#vor-overlay"
-         hx-swap="innerHTML">
+         hx-swap="innerHTML"
+         @contextmenu.prevent="$store.vorArtworks.openArtworkMenu($event, $el.closest('.artwork-item'))">
         <div class="artwork-tile-cover">
             {% if user_work.work.cover %}
                 <img class="artwork-tile-image" src="{{ user_work.work.cover.url }}" alt="{{ user_work.work.title }}">
