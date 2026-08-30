@@ -8,7 +8,16 @@ from django.shortcuts import get_object_or_404
 from mptt.utils import get_cached_trees
 
 from .constants import FilmTypeChoices, UserWorkStatusChoices, WorkRelationTypeChoices
-from .models import Book, Collection, CollectionItem, FeedItem, Film, Game, UserWork, WorkRelation
+from .models import (
+    Book,
+    Collection,
+    CollectionItem,
+    FeedItem,
+    Film,
+    Game,
+    UserWork,
+    WorkRelation,
+)
 
 WORK_MODELS = {
     "book": Book,
@@ -95,7 +104,9 @@ def orphan_works(user_works):
 
 @transaction.atomic
 def delete_user_works(user, ids):
-    qs = UserWork.objects.filter(user=user, pk__in=ids).select_related("work_content_type")
+    qs = UserWork.objects.filter(user=user, pk__in=ids).select_related(
+        "work_content_type"
+    )
     user_works = list(qs)
     if not user_works:
         return 0
@@ -214,14 +225,18 @@ def work_relation_items(work):
         if other is None:
             continue
         items.append(
-            _relation_item(other, relation_label(relation.relation_type, "out"), relation, "out")
+            _relation_item(
+                other, relation_label(relation.relation_type, "out"), relation, "out"
+            )
         )
     for relation in incoming:
         other = relation.source
         if other is None:
             continue
         items.append(
-            _relation_item(other, relation_label(relation.relation_type, "in"), relation, "in")
+            _relation_item(
+                other, relation_label(relation.relation_type, "in"), relation, "in"
+            )
         )
     return items
 
@@ -237,13 +252,15 @@ def search_works(query, exclude_type=None, exclude_id=None, limit=20):
         if type_key == exclude_type and exclude_id is not None:
             qs = qs.exclude(pk=exclude_id)
         for work in qs.order_by("title")[:limit]:
-            results.append({
-                "type_key": type_key,
-                "work_id": work.pk,
-                "title": work.title,
-                "cover_url": _relation_cover_url(work),
-                "icon": WORK_TYPE_ICONS.get(type_key, "bi bi-collection"),
-            })
+            results.append(
+                {
+                    "type_key": type_key,
+                    "work_id": work.pk,
+                    "title": work.title,
+                    "cover_url": _relation_cover_url(work),
+                    "icon": WORK_TYPE_ICONS.get(type_key, "bi bi-collection"),
+                }
+            )
     results.sort(key=lambda item: item["title"].casefold())
     return results[:limit]
 
@@ -383,7 +400,9 @@ def _work_matches_filters(user_work, params):
         if not work_genres.intersection(genre_selected or []):
             return False
 
-    if type_key == "game" and _is_partial(params.get("platforms"), params.get("all_platforms")):
+    if type_key == "game" and _is_partial(
+        params.get("platforms"), params.get("all_platforms")
+    ):
         work_platforms = _item_ids(work.platforms.all())
         if not work_platforms.intersection(params.get("platforms") or []):
             return False
@@ -402,7 +421,9 @@ def _load_filtered_user_works(user, params):
     qs = qs.filter(work_content_type__in=content_types)
 
     statuses = params.get("statuses")
-    if _is_partial(statuses, params.get("all_statuses") or list(UserWorkStatusChoices.values)):
+    if _is_partial(
+        statuses, params.get("all_statuses") or list(UserWorkStatusChoices.values)
+    ):
         qs = qs.filter(status__in=statuses or [])
 
     if not params.get("show_hidden", True):
@@ -410,7 +431,9 @@ def _load_filtered_user_works(user, params):
 
     items = list(qs)
     _prefetch_work_filters(items)
-    return [user_work for user_work in items if _work_matches_filters(user_work, params)]
+    return [
+        user_work for user_work in items if _work_matches_filters(user_work, params)
+    ]
 
 
 def _sort_user_works(items, params, order_key=None):
@@ -454,7 +477,9 @@ def _collection_scope_keys(collection, include_descendants=True):
     qs = CollectionItem.objects.filter(collection=collection)
     if include_descendants:
         descendant_ids = collection.get_descendants().values_list("pk", flat=True)
-        qs = CollectionItem.objects.filter(collection_id__in=[collection.pk, *descendant_ids])
+        qs = CollectionItem.objects.filter(
+            collection_id__in=[collection.pk, *descendant_ids]
+        )
     return {_work_key(item) for item in qs}
 
 
@@ -479,7 +504,9 @@ def get_user_collection_trees(user):
 
 
 def next_collection_order(user, parent=None):
-    current = Collection.objects.filter(user=user, parent=parent).aggregate(Max("order"))
+    current = Collection.objects.filter(user=user, parent=parent).aggregate(
+        Max("order")
+    )
     return (current["order__max"] or 0) + 1
 
 
@@ -550,7 +577,9 @@ def move_collection(user, collection_id, parent_id, sibling_ids):
         siblings = list(Collection.objects.filter(user=user, parent=parent))
         by_id = {node.pk: node for node in siblings}
         ordered = [by_id[pk] for pk in ordered_ids if pk in by_id]
-        leftover = [node for node in siblings if node.pk not in {pk for pk in ordered_ids}]
+        leftover = [
+            node for node in siblings if node.pk not in {pk for pk in ordered_ids}
+        ]
         ordered.extend(leftover)
         for index, node in enumerate(ordered):
             node.order = index
@@ -715,13 +744,19 @@ def search_library_works(user, query, limit=15):
         return {"owned": [], "other": []}
 
     owned_map = {}
-    for user_work in UserWork.objects.filter(user=user).select_related("work_content_type"):
-        owned_map[(user_work.work_content_type.model, user_work.work_object_id)] = user_work.pk
+    for user_work in UserWork.objects.filter(user=user).select_related(
+        "work_content_type"
+    ):
+        owned_map[(user_work.work_content_type.model, user_work.work_object_id)] = (
+            user_work.pk
+        )
 
     owned = []
     other = []
     for type_key, model in WORK_MODELS.items():
-        for work in model.objects.filter(title__icontains=query).order_by("title")[: limit * 2]:
+        for work in model.objects.filter(title__icontains=query).order_by("title")[
+            : limit * 2
+        ]:
             item = {
                 "type_key": type_key,
                 "work_id": work.pk,

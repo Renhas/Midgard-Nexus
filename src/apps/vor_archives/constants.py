@@ -3,12 +3,14 @@ from django.db import models
 # TODO: Remove duplicates in UserWork & FeedItemAction Types
 # TODO: Localization (RU) for types
 
+
 class AgeRatingChoices(models.TextChoices):
     RATING_0 = ("0+", "0+")
     RATING_6 = ("6+", "6+")
     RATING_12 = ("12+", "12+")
     RATING_16 = ("16+", "16+")
     RATING_18 = ("18+", "18+")
+
 
 class FilmTypeChoices(models.TextChoices):
     MOVIE = ("movie", "Movie")

@@ -3,9 +3,10 @@ from itertools import chain
 from collections import deque
 
 NodeKeyPair: TypeAlias = tuple[int, int]
+
+
 class RelationStrategy(Protocol):
-    def __call__(self, key: NodeKeyPair) -> Iterable[NodeKeyPair]: 
-        ...
+    def __call__(self, key: NodeKeyPair) -> Iterable[NodeKeyPair]: ...
 
 
 class CycleChecker:

@@ -6,7 +6,7 @@ from .forms import SignUpForm
 
 def profile(request):
     """Страница профиля пользователя."""
-    return render(request, 'users/profile.html')
+    return render(request, "users/profile.html")
 
 
 def signup(request):

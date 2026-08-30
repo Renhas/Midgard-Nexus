@@ -212,11 +212,13 @@ def list_genre_groups(query=""):
             }
             for obj in qs.order_by("name")
         ]
-        groups.append({
-            "type_key": type_key,
-            "label": meta["label"],
-            "items": items,
-        })
+        groups.append(
+            {
+                "type_key": type_key,
+                "label": meta["label"],
+                "items": items,
+            }
+        )
     return groups, total
 
 
