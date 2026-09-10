@@ -7,7 +7,7 @@ from django.db import IntegrityError, transaction
 
 from apps.users.tests.factories import UserFactory
 from apps.vor_archives.constants import FilmTypeChoices, WorkRelationTypeChoices
-from apps.vor_archives.models import Film, UserWork, WorkRelation
+from apps.vor_archives.models import CollectionItem, Film, UserWork, WorkRelation
 from apps.vor_archives.tests.factories import (
     BookFactory,
     BookGenreFactory,
@@ -213,20 +213,36 @@ def test_work_relation_reverse_pair_raises(book):
         WorkRelationFactory(source=other, target=book)
 
 
-@pytest.mark.django_db(transaction=True)
-def test_work_relation_same_direction_duplicate_hits_unique(book):
+@pytest.mark.django_db
+def test_work_relation_same_direction_duplicate_raises_on_save(book):
     other = BookFactory()
     WorkRelationFactory(source=book, target=other)
-    duplicate = WorkRelation(
-        source_content_type=_ct(book),
-        source_object_id=book.pk,
-        target_content_type=_ct(other),
-        target_object_id=other.pk,
-        relation_type=WorkRelationTypeChoices.REMAKE,
-    )
-    with transaction.atomic():
-        with pytest.raises(IntegrityError):
-            duplicate.save()
+    with pytest.raises(ValidationError):
+        WorkRelation(
+            source_content_type=_ct(book),
+            source_object_id=book.pk,
+            target_content_type=_ct(other),
+            target_object_id=other.pk,
+            relation_type=WorkRelationTypeChoices.REMAKE,
+        ).save()
+
+
+@pytest.mark.django_db(transaction=True)
+def test_work_relation_same_direction_duplicate_hits_db_unique(book):
+    other = BookFactory()
+    existing = WorkRelationFactory(source=book, target=other)
+    with pytest.raises(IntegrityError):
+        WorkRelation.objects.bulk_create(
+            [
+                WorkRelation(
+                    source_content_type=existing.source_content_type,
+                    source_object_id=existing.source_object_id,
+                    target_content_type=existing.target_content_type,
+                    target_object_id=existing.target_object_id,
+                    relation_type=WorkRelationTypeChoices.REMAKE,
+                )
+            ]
+        )
 
 
 @pytest.mark.django_db
@@ -303,14 +319,28 @@ def test_user_work_rejects_missing_work(user, book):
         uw.save()
 
 
-@pytest.mark.django_db(transaction=True)
-def test_user_work_unique_per_user_and_work(book, user):
+@pytest.mark.django_db
+def test_user_work_duplicate_raises_on_save(book, user):
     UserWorkFactory(user=user, work=book)
-    with transaction.atomic():
-        with pytest.raises(IntegrityError):
-            UserWorkFactory(user=user, work=book)
+    with pytest.raises(ValidationError):
+        UserWorkFactory(user=user, work=book)
     UserWorkFactory(user=UserFactory(), work=book)
     UserWorkFactory(user=user, work=BookFactory())
+
+
+@pytest.mark.django_db(transaction=True)
+def test_user_work_duplicate_hits_db_unique(book, user):
+    existing = UserWorkFactory(user=user, work=book)
+    with pytest.raises(IntegrityError):
+        UserWork.objects.bulk_create(
+            [
+                UserWork(
+                    user=user,
+                    work_content_type=existing.work_content_type,
+                    work_object_id=existing.work_object_id,
+                )
+            ]
+        )
 
 
 # ─── CollectionItem ──────────────────────────────────────────────────────────
@@ -330,15 +360,30 @@ def test_collection_item_rejects_missing_work():
         item.save()
 
 
-@pytest.mark.django_db(transaction=True)
-def test_collection_item_unique_work_per_collection(book):
+@pytest.mark.django_db
+def test_collection_item_duplicate_raises_on_save(book):
     collection = CollectionFactory()
     CollectionItemFactory(collection=collection, work=book)
-    with transaction.atomic():
-        with pytest.raises(IntegrityError):
-            CollectionItemFactory(collection=collection, work=book)
+    with pytest.raises(ValidationError):
+        CollectionItemFactory(collection=collection, work=book)
     CollectionItemFactory(collection=CollectionFactory(), work=book)
     CollectionItemFactory(collection=collection, work=BookFactory())
+
+
+@pytest.mark.django_db(transaction=True)
+def test_collection_item_duplicate_hits_db_unique(book):
+    collection = CollectionFactory()
+    existing = CollectionItemFactory(collection=collection, work=book)
+    with pytest.raises(IntegrityError):
+        CollectionItem.objects.bulk_create(
+            [
+                CollectionItem(
+                    collection=collection,
+                    work_content_type=existing.work_content_type,
+                    work_object_id=existing.work_object_id,
+                )
+            ]
+        )
 
 
 # ─── Collection ──────────────────────────────────────────────────────────────
@@ -389,9 +434,13 @@ def test_collection_sibling_and_move_up_save(user):
     sibling_b = CollectionFactory(user=user, parent=root)
     grandchild = CollectionFactory(user=user, parent=sibling_a)
 
+    sibling_a.refresh_from_db()
+    sibling_b.refresh_from_db()
     sibling_a.parent = sibling_b
     sibling_a.save()
 
+    grandchild.refresh_from_db()
+    root.refresh_from_db()
     grandchild.parent = root
     grandchild.save()
 
