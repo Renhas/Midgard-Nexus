@@ -75,7 +75,6 @@ from .services import (
     search_works,
     sync_work_relations,
     user_has_work,
-    user_has_work_title,
     user_owned_work_ids,
     user_work_collection_ids,
     work_relation_items,
@@ -181,7 +180,9 @@ def index(request):
         {"value": value, "label": STATUS_LABELS_RU.get(value, label)}
         for value, label in UserWorkStatusChoices.choices
     ]
-    age_rating_options = [{"value": v, "label": l} for v, l in AgeRatingChoices.choices]
+    age_rating_options = [
+        {"value": value, "label": label} for value, label in AgeRatingChoices.choices
+    ]
     platforms = list(Platform.objects.all())
     tags = list(Tag.objects.all())
     platform_options = [{"value": p.id, "label": p.name} for p in platforms]
@@ -197,63 +198,73 @@ def index(request):
         options = [{"value": g.id, "label": g.name} for g in model.objects.all()]
         genre_catalog[f"genre_{type_key}"] = [item["value"] for item in options]
         if options:
-            genres_nested.append({
-                "title": label,
-                "options": options,
-                "name": f"genre_{type_key}",
-                "show_condition": f"$store.vorArtworks.workTypes.includes('{type_key}')",
-            })
+            genres_nested.append(
+                {
+                    "title": label,
+                    "options": options,
+                    "name": f"genre_{type_key}",
+                    "show_condition": f"$store.vorArtworks.workTypes.includes('{type_key}')",
+                }
+            )
 
-    return render(request, "vor_archives/artworks.html", {
-        "module_name": module["name"],
-        "module_icon": module["icon"],
-        "module_color": module["color"],
-        "active_section": "artworks",
-        "collections": collections,
-        "status_options": status_options,
-        "age_rating_options": age_rating_options,
-        "tags_options": tags_options,
-        "platform_options": platform_options,
-        "genres_nested": genres_nested,
-        "sort_fields": [
-            {"value": "custom", "label": "Свой порядок"},
-            {"value": "title", "label": "Название"},
-            {"value": "rating", "label": "Рейтинг"},
-            {"value": "status", "label": "Статус"},
-            {"value": "date_added", "label": "Дата добавления"},
-        ],
-        "page_opts": {
-            "listUrl": reverse("vor_archives:artwork_list"),
-            "reorderUrl": reverse("vor_archives:artwork_reorder"),
-            "searchUrl": reverse("vor_archives:artwork_library_search"),
-            "attachUrl": reverse("vor_archives:artwork_attach"),
-            "collectionTreeUrl": reverse("vor_archives:collection_tree"),
-            "collectionReorderUrl": reverse("vor_archives:collection_reorder"),
-            "collectionNewUrl": reverse("vor_archives:collection_new"),
-            "isStaff": request.user.is_staff,
-            "filterCatalog": {
-                "status": [item["value"] for item in status_options],
-                "age_rating": [item["value"] for item in age_rating_options],
-                "tags": [item["value"] for item in tags_options],
-                "genre_book": genre_catalog.get("genre_book", []),
-                "genre_film": genre_catalog.get("genre_film", []),
-                "genre_game": genre_catalog.get("genre_game", []),
-                "platform": [item["value"] for item in platform_options],
+    return render(
+        request,
+        "vor_archives/artworks.html",
+        {
+            "module_name": module["name"],
+            "module_icon": module["icon"],
+            "module_color": module["color"],
+            "active_section": "artworks",
+            "collections": collections,
+            "status_options": status_options,
+            "age_rating_options": age_rating_options,
+            "tags_options": tags_options,
+            "platform_options": platform_options,
+            "genres_nested": genres_nested,
+            "sort_fields": [
+                {"value": "custom", "label": "Свой порядок"},
+                {"value": "title", "label": "Название"},
+                {"value": "rating", "label": "Рейтинг"},
+                {"value": "status", "label": "Статус"},
+                {"value": "date_added", "label": "Дата добавления"},
+            ],
+            "page_opts": {
+                "listUrl": reverse("vor_archives:artwork_list"),
+                "reorderUrl": reverse("vor_archives:artwork_reorder"),
+                "searchUrl": reverse("vor_archives:artwork_library_search"),
+                "attachUrl": reverse("vor_archives:artwork_attach"),
+                "collectionTreeUrl": reverse("vor_archives:collection_tree"),
+                "collectionReorderUrl": reverse("vor_archives:collection_reorder"),
+                "collectionNewUrl": reverse("vor_archives:collection_new"),
+                "isStaff": request.user.is_staff,
+                "filterCatalog": {
+                    "status": [item["value"] for item in status_options],
+                    "age_rating": [item["value"] for item in age_rating_options],
+                    "tags": [item["value"] for item in tags_options],
+                    "genre_book": genre_catalog.get("genre_book", []),
+                    "genre_film": genre_catalog.get("genre_film", []),
+                    "genre_game": genre_catalog.get("genre_game", []),
+                    "platform": [item["value"] for item in platform_options],
+                },
             },
         },
-    })
+    )
 
 
 @login_required(login_url=LOGIN_URL)
 def dashboard(request):
     """Страница дашборда модуля «Библиотека»."""
     module = _module_context()
-    return render(request, "vor_archives/dashboard.html", {
-        "module_name": module["name"],
-        "module_icon": module["icon"],
-        "module_color": module["color"],
-        "active_section": "dashboard",
-    })
+    return render(
+        request,
+        "vor_archives/dashboard.html",
+        {
+            "module_name": module["name"],
+            "module_icon": module["icon"],
+            "module_color": module["color"],
+            "active_section": "dashboard",
+        },
+    )
 
 
 @login_required(login_url=LOGIN_URL)
@@ -269,21 +280,25 @@ def attributes_kind(request, kind):
     if tab is None:
         raise Http404("Неизвестный тип атрибута")
     module = _module_context()
-    return render(request, "vor_archives/attributes.html", {
-        "module_name": module["name"],
-        "module_icon": module["icon"],
-        "module_color": module["color"],
-        "active_section": "attributes",
-        "hide_right": True,
-        "attr_kind": kind,
-        "attr_label": tab["label"],
-        "attr_icon": tab["icon"],
-        "attr_tabs": ATTR_TABS,
-        "tab": tab,
-        "search_placeholder": tab["search_placeholder"],
-        "empty_prompt": tab["empty_prompt"],
-        "is_staff": request.user.is_staff,
-    })
+    return render(
+        request,
+        "vor_archives/attributes.html",
+        {
+            "module_name": module["name"],
+            "module_icon": module["icon"],
+            "module_color": module["color"],
+            "active_section": "attributes",
+            "hide_right": True,
+            "attr_kind": kind,
+            "attr_label": tab["label"],
+            "attr_icon": tab["icon"],
+            "attr_tabs": ATTR_TABS,
+            "tab": tab,
+            "search_placeholder": tab["search_placeholder"],
+            "empty_prompt": tab["empty_prompt"],
+            "is_staff": request.user.is_staff,
+        },
+    )
 
 
 @login_required(login_url=LOGIN_URL)
@@ -328,11 +343,13 @@ def _prefetch_work(work, user_work=None):
 def _chip_payload(items, tip_field="description"):
     payload = []
     for item in items:
-        payload.append({
-            "id": item.pk,
-            "name": item.name,
-            "tip": getattr(item, tip_field, "") or "",
-        })
+        payload.append(
+            {
+                "id": item.pk,
+                "name": item.name,
+                "tip": getattr(item, tip_field, "") or "",
+            }
+        )
     return payload
 
 
@@ -342,7 +359,9 @@ def _attr_catalog(type_key):
         "authors": _chip_payload(Person.objects.order_by("name"), "bio"),
         "genres": _chip_payload(genre_model.objects.order_by("name")),
         "tags": _chip_payload(Tag.objects.order_by("name")),
-        "platforms": _chip_payload(Platform.objects.order_by("name"), "") if type_key == "game" else [],
+        "platforms": _chip_payload(Platform.objects.order_by("name"), "")
+        if type_key == "game"
+        else [],
     }
 
 
@@ -358,7 +377,11 @@ def _progress_meta_for_work(work):
         return {"maximum": None, "unit": "ч.", "step": 0.5}
     if getattr(work, "film_type", None) == FilmTypeChoices.TV_SHOW:
         return {"maximum": work.episode_count, "unit": "эп.", "step": 1}
-    return {"maximum": getattr(work, "duration_minutes", None), "unit": "мин.", "step": 1}
+    return {
+        "maximum": getattr(work, "duration_minutes", None),
+        "unit": "мин.",
+        "step": 1,
+    }
 
 
 def _wants_json(request):
@@ -420,7 +443,15 @@ def _parse_relations_payload(request):
     return parsed
 
 
-def _detail_context(request, work, user_work=None, work_form=None, user_work_form=None, editing=False, global_edit=False):
+def _detail_context(
+    request,
+    work,
+    user_work=None,
+    work_form=None,
+    user_work_form=None,
+    editing=False,
+    global_edit=False,
+):
     type_key = work_type_key(work)
     owned = user_work is not None
     if owned:
@@ -435,7 +466,9 @@ def _detail_context(request, work, user_work=None, work_form=None, user_work_for
         }
     owned_platform_ids = []
     if owned:
-        owned_platform_ids = list(user_work.owned_platforms.values_list("pk", flat=True))
+        owned_platform_ids = list(
+            user_work.owned_platforms.values_list("pk", flat=True)
+        )
     catalog = _attr_catalog(type_key)
     save_url = (
         reverse("vor_archives:artwork_detail", args=[user_work.pk])
@@ -508,7 +541,9 @@ def _detail_context(request, work, user_work=None, work_form=None, user_work_for
             "authors": _chip_payload(work.authors.all(), "bio"),
             "genres": _chip_payload(work.genres.all()),
             "tags": _chip_payload(work.tags.all()),
-            "platforms": _chip_payload(work.platforms.all(), "") if type_key == "game" else [],
+            "platforms": _chip_payload(work.platforms.all(), "")
+            if type_key == "game"
+            else [],
             "ownedPlatformIds": owned_platform_ids,
             "catalog": catalog,
             "relations": work_relation_items(work),
@@ -580,9 +615,13 @@ def _artwork_overlay_response(request, work, user_work=None):
                     request,
                     "vor_archives/partials/artwork_overlay.html",
                     _detail_context(
-                        request, saved, user_work,
+                        request,
+                        saved,
+                        user_work,
                         work_form_class(instance=saved),
-                        UserWorkEditForm(instance=user_work) if user_work is not None else None,
+                        UserWorkEditForm(instance=user_work)
+                        if user_work is not None
+                        else None,
                     ),
                 )
                 response["HX-Trigger"] = json.dumps({"vor:reload-list": True})
@@ -591,9 +630,13 @@ def _artwork_overlay_response(request, work, user_work=None):
             request,
             "vor_archives/partials/artwork_overlay.html",
             _detail_context(
-                request, work, user_work, work_form,
+                request,
+                work,
+                user_work,
+                work_form,
                 UserWorkEditForm(instance=user_work) if user_work is not None else None,
-                editing=True, global_edit=True,
+                editing=True,
+                global_edit=True,
             ),
         )
 
@@ -606,7 +649,9 @@ def _artwork_overlay_response(request, work, user_work=None):
         request,
         "vor_archives/partials/artwork_overlay.html",
         _detail_context(
-            request, work, user_work,
+            request,
+            work,
+            user_work,
             work_form_class(instance=work),
             UserWorkEditForm(instance=user_work) if user_work is not None else None,
             editing=start_editing,
@@ -677,23 +722,29 @@ def artwork_quick(request, uw_id):
             user_work.owned_platforms.remove(platform_id)
         else:
             user_work.owned_platforms.add(platform_id)
-        return JsonResponse({
-            "owned_platform_ids": list(user_work.owned_platforms.values_list("pk", flat=True)),
-        })
+        return JsonResponse(
+            {
+                "owned_platform_ids": list(
+                    user_work.owned_platforms.values_list("pk", flat=True)
+                ),
+            }
+        )
     else:
         return HttpResponseBadRequest("Неизвестное поле")
 
     user_work.save()
-    return JsonResponse({
-        "status": user_work.status,
-        "progress": float(user_work.progress or 0),
-        "times_completed": user_work.times_completed,
-        "last_completed_date": (
-            user_work.last_completed_date.strftime("%d.%m.%Y")
-            if user_work.last_completed_date
-            else ""
-        ),
-    })
+    return JsonResponse(
+        {
+            "status": user_work.status,
+            "progress": float(user_work.progress or 0),
+            "times_completed": user_work.times_completed,
+            "last_completed_date": (
+                user_work.last_completed_date.strftime("%d.%m.%Y")
+                if user_work.last_completed_date
+                else ""
+            ),
+        }
+    )
 
 
 @login_required(login_url=LOGIN_URL)
@@ -715,47 +766,57 @@ def artwork_add(request):
                     work = work_form.save()
                     sync_work_relations(work, _parse_relations_payload(request))
             except ValidationError as error:
-                message = " ".join(error.messages) if getattr(error, "messages", None) else str(error)
+                message = (
+                    " ".join(error.messages)
+                    if getattr(error, "messages", None)
+                    else str(error)
+                )
                 return JsonResponse(
                     {"ok": False, "errors": {"__all__": [{"message": message}]}},
                     status=400,
                 )
             meta = _progress_meta_for_work(work)
-            return JsonResponse({
-                "ok": True,
-                "work_id": work.pk,
-                "work_type": type_key,
-                "title": work.title,
-                "progressMax": meta["maximum"],
-                "progressUnit": meta["unit"],
-                "progressStep": meta["step"],
-            })
+            return JsonResponse(
+                {
+                    "ok": True,
+                    "work_id": work.pk,
+                    "work_type": type_key,
+                    "title": work.title,
+                    "progressMax": meta["maximum"],
+                    "progressUnit": meta["unit"],
+                    "progressStep": meta["step"],
+                }
+            )
         return JsonResponse(
             {"ok": False, "errors": work_form.errors.get_json_data()},
             status=400,
         )
 
-    return render(request, "vor_archives/partials/artwork_add.html", {
-        "add_opts": {
-            "workType": "book",
-            "saveUrl": reverse("vor_archives:artwork_add"),
-            "searchUrl": reverse("vor_archives:artwork_search"),
-            "previewUrl": reverse("vor_archives:artwork_preview"),
-            "attachUrl": reverse("vor_archives:artwork_attach"),
-            "listUrl": reverse("vor_archives:artwork_list"),
-            "relationSearchUrl": reverse("vor_archives:artwork_relation_search"),
-            "relationTypes": RELATION_TYPE_OPTIONS,
-            "catalogs": _all_attr_catalogs(),
-            "ageChoices": [
-                {"value": value, "label": label}
-                for value, label in AgeRatingChoices.choices
-            ],
-            "statusChoices": [
-                {"value": value, "label": STATUS_LABELS_RU.get(value, label)}
-                for value, label in UserWorkStatusChoices.choices
-            ],
+    return render(
+        request,
+        "vor_archives/partials/artwork_add.html",
+        {
+            "add_opts": {
+                "workType": "book",
+                "saveUrl": reverse("vor_archives:artwork_add"),
+                "searchUrl": reverse("vor_archives:artwork_search"),
+                "previewUrl": reverse("vor_archives:artwork_preview"),
+                "attachUrl": reverse("vor_archives:artwork_attach"),
+                "listUrl": reverse("vor_archives:artwork_list"),
+                "relationSearchUrl": reverse("vor_archives:artwork_relation_search"),
+                "relationTypes": RELATION_TYPE_OPTIONS,
+                "catalogs": _all_attr_catalogs(),
+                "ageChoices": [
+                    {"value": value, "label": label}
+                    for value, label in AgeRatingChoices.choices
+                ],
+                "statusChoices": [
+                    {"value": value, "label": STATUS_LABELS_RU.get(value, label)}
+                    for value, label in UserWorkStatusChoices.choices
+                ],
+            },
         },
-    })
+    )
 
 
 def _add_work_forms(bound_type=None, data=None, files=None):
@@ -773,15 +834,21 @@ def _add_work_forms(bound_type=None, data=None, files=None):
 def artwork_library_search(request):
     result = search_library_works(request.user, request.GET.get("q") or "")
     for item in result["owned"]:
-        item["detail_url"] = reverse("vor_archives:artwork_detail", args=[item["uw_id"]])
+        item["detail_url"] = reverse(
+            "vor_archives:artwork_detail", args=[item["uw_id"]]
+        )
     for item in result["other"]:
         item["detail_url"] = reverse(
             "vor_archives:artwork_work", args=[item["type_key"], item["work_id"]]
         )
-    return render(request, "vor_archives/partials/library_search_results.html", {
-        **result,
-        "query": (request.GET.get("q") or "").strip(),
-    })
+    return render(
+        request,
+        "vor_archives/partials/library_search_results.html",
+        {
+            **result,
+            "query": (request.GET.get("q") or "").strip(),
+        },
+    )
 
 
 @login_required(login_url=LOGIN_URL)
@@ -820,12 +887,16 @@ def artwork_search(request):
             .exclude(pk__in=owned_ids)
             .order_by("title")[:10]
         )
-    return render(request, "vor_archives/partials/work_suggestions.html", {
-        "works": works,
-        "work_type": type_key,
-        "query": query,
-        "already_owned": already_owned,
-    })
+    return render(
+        request,
+        "vor_archives/partials/work_suggestions.html",
+        {
+            "works": works,
+            "work_type": type_key,
+            "query": query,
+            "already_owned": already_owned,
+        },
+    )
 
 
 @login_required(login_url=LOGIN_URL)
@@ -837,14 +908,18 @@ def artwork_preview(request):
         return HttpResponseBadRequest("Не указано произведение")
     work = get_work(type_key, work_id)
     meta = _progress_meta_for_work(work)
-    return render(request, "vor_archives/partials/work_preview_card.html", {
-        "work": work,
-        "work_type": type_key,
-        "already": user_has_work(request.user, work),
-        "progress_max": meta["maximum"],
-        "progress_unit": meta["unit"],
-        "progress_step": meta["step"],
-    })
+    return render(
+        request,
+        "vor_archives/partials/work_preview_card.html",
+        {
+            "work": work,
+            "work_type": type_key,
+            "already": user_has_work(request.user, work),
+            "progress_max": meta["maximum"],
+            "progress_unit": meta["unit"],
+            "progress_step": meta["step"],
+        },
+    )
 
 
 @login_required(login_url=LOGIN_URL)
@@ -859,14 +934,18 @@ def artwork_attach(request):
         if _wants_json(request):
             return JsonResponse({"ok": False, "error": "already"}, status=400)
         meta = _progress_meta_for_work(work)
-        return render(request, "vor_archives/partials/work_preview_card.html", {
-            "work": work,
-            "work_type": type_key,
-            "already": True,
-            "progress_max": meta["maximum"],
-            "progress_unit": meta["unit"],
-            "progress_step": meta["step"],
-        })
+        return render(
+            request,
+            "vor_archives/partials/work_preview_card.html",
+            {
+                "work": work,
+                "work_type": type_key,
+                "already": True,
+                "progress_max": meta["maximum"],
+                "progress_unit": meta["unit"],
+                "progress_step": meta["step"],
+            },
+        )
     status = request.POST.get("status") or UserWorkStatusChoices.PLANNING
     if status not in {choice[0] for choice in UserWorkStatusChoices.choices}:
         return HttpResponseBadRequest("Некорректный статус")
@@ -881,11 +960,16 @@ def artwork_attach(request):
         return HttpResponseBadRequest("Некорректный рейтинг")
     if progress_value < 0:
         progress_value = Decimal("0")
-    attach_work(request.user, type_key, work_id, {
-        "status": status,
-        "rating": rating_value,
-        "progress": progress_value,
-    })
+    attach_work(
+        request.user,
+        type_key,
+        work_id,
+        {
+            "status": status,
+            "rating": rating_value,
+            "progress": progress_value,
+        },
+    )
     if _wants_json(request):
         return JsonResponse({"ok": True})
     return _list_response(request, '{"vor:close-overlay": true}')
@@ -913,11 +997,15 @@ def artwork_delete_preview(request):
     )
     prefetch_related_objects(user_works, "work")
     orphans = orphan_works(user_works)
-    return render(request, "vor_archives/partials/delete_confirm.html", {
-        "ids": [uw.pk for uw in user_works],
-        "count": len(user_works),
-        "orphan_titles": [work.title for work in orphans],
-    })
+    return render(
+        request,
+        "vor_archives/partials/delete_confirm.html",
+        {
+            "ids": [uw.pk for uw in user_works],
+            "count": len(user_works),
+            "orphan_titles": [work.title for work in orphans],
+        },
+    )
 
 
 @login_required(login_url=LOGIN_URL)
@@ -930,11 +1018,13 @@ def artwork_delete(request):
 
 def _collection_mutation_response():
     response = HttpResponse()
-    response["HX-Trigger"] = json.dumps({
-        "vor:reload-tree": True,
-        "vor:close-modal": True,
-        "collection-update": True,
-    })
+    response["HX-Trigger"] = json.dumps(
+        {
+            "vor:reload-tree": True,
+            "vor:close-modal": True,
+            "collection-update": True,
+        }
+    )
     return response
 
 
@@ -945,9 +1035,13 @@ def _collection_form_response(request, template, context, status=200):
 @login_required(login_url=LOGIN_URL)
 @require_GET
 def collection_tree(request):
-    return render(request, "vor_archives/partials/collection_tree.html", {
-        "collections": get_user_collection_trees(request.user),
-    })
+    return render(
+        request,
+        "vor_archives/partials/collection_tree.html",
+        {
+            "collections": get_user_collection_trees(request.user),
+        },
+    )
 
 
 @login_required(login_url=LOGIN_URL)
@@ -961,27 +1055,39 @@ def collection_new(request):
             create_collection(request.user, name)
             return _collection_mutation_response()
         except ValidationError as exc:
-            error = " ".join(exc.messages) if getattr(exc, "messages", None) else str(exc)
-    return _collection_form_response(request, "vor_archives/partials/collection_form.html", {
-        "title": "Новая коллекция",
-        "submit_label": "Создать",
-        "action_url": reverse("vor_archives:collection_new"),
-        "name": name,
-        "error": error,
-    })
+            error = (
+                " ".join(exc.messages) if getattr(exc, "messages", None) else str(exc)
+            )
+    return _collection_form_response(
+        request,
+        "vor_archives/partials/collection_form.html",
+        {
+            "title": "Новая коллекция",
+            "submit_label": "Создать",
+            "action_url": reverse("vor_archives:collection_new"),
+            "name": name,
+            "error": error,
+        },
+    )
 
 
 @login_required(login_url=LOGIN_URL)
 @require_GET
 def collection_edit(request, pk):
     collection = get_user_collection(request.user, pk)
-    return render(request, "vor_archives/partials/collection_form.html", {
-        "title": "Переименовать коллекцию",
-        "submit_label": "Сохранить",
-        "action_url": reverse("vor_archives:collection_update", args=[collection.pk]),
-        "name": collection.name,
-        "error": "",
-    })
+    return render(
+        request,
+        "vor_archives/partials/collection_form.html",
+        {
+            "title": "Переименовать коллекцию",
+            "submit_label": "Сохранить",
+            "action_url": reverse(
+                "vor_archives:collection_update", args=[collection.pk]
+            ),
+            "name": collection.name,
+            "error": "",
+        },
+    )
 
 
 @login_required(login_url=LOGIN_URL)
@@ -1004,7 +1110,9 @@ def collection_update(request, pk):
             {
                 "title": "Переименовать коллекцию",
                 "submit_label": "Сохранить",
-                "action_url": reverse("vor_archives:collection_update", args=[collection.pk]),
+                "action_url": reverse(
+                    "vor_archives:collection_update", args=[collection.pk]
+                ),
                 "name": name,
                 "error": error,
             },
@@ -1016,10 +1124,14 @@ def collection_update(request, pk):
 def collection_delete_preview(request, pk):
     collection = get_user_collection(request.user, pk)
     child_count = collection.get_descendant_count()
-    return render(request, "vor_archives/partials/collection_delete_confirm.html", {
-        "collection": collection,
-        "child_count": child_count,
-    })
+    return render(
+        request,
+        "vor_archives/partials/collection_delete_confirm.html",
+        {
+            "collection": collection,
+            "child_count": child_count,
+        },
+    )
 
 
 @login_required(login_url=LOGIN_URL)
@@ -1066,19 +1178,25 @@ def collection_items(request, pk):
     user_work = get_object_or_404(UserWork, user=request.user, pk=user_work_id)
     try:
         if action == "remove":
-            changed = remove_user_work_from_collection(request.user, collection, user_work)
+            changed = remove_user_work_from_collection(
+                request.user, collection, user_work
+            )
         else:
-            _item, created = add_user_work_to_collection(request.user, collection, user_work)
+            _item, created = add_user_work_to_collection(
+                request.user, collection, user_work
+            )
             changed = created
     except ValidationError as exc:
         message = " ".join(exc.messages) if getattr(exc, "messages", None) else str(exc)
         return JsonResponse({"ok": False, "error": message}, status=400)
-    return JsonResponse({
-        "ok": True,
-        "changed": changed,
-        "in_collection": action != "remove",
-        "collection_id": collection.pk,
-    })
+    return JsonResponse(
+        {
+            "ok": True,
+            "changed": changed,
+            "in_collection": action != "remove",
+            "collection_id": collection.pk,
+        }
+    )
 
 
 @login_required(login_url=LOGIN_URL)
@@ -1094,9 +1212,11 @@ def collection_items_reorder(request, pk):
 def artwork_collections(request, uw_id):
     user_work = get_object_or_404(UserWork, user=request.user, pk=uw_id)
     member_ids = user_work_collection_ids(request.user, user_work)
-    return JsonResponse({
-        "tree": collection_tree_payload(request.user, member_ids),
-    })
+    return JsonResponse(
+        {
+            "tree": collection_tree_payload(request.user, member_ids),
+        }
+    )
 
 
 def _require_staff(request):
@@ -1125,7 +1245,9 @@ def _attach_item_urls(kind, item):
             "vor_archives:genre_edit", args=[item["type_key"], item["pk"]]
         )
     else:
-        item["detail_url"] = reverse("vor_archives:attr_detail", args=[kind, item["pk"]])
+        item["detail_url"] = reverse(
+            "vor_archives:attr_detail", args=[kind, item["pk"]]
+        )
         item["edit_url"] = reverse("vor_archives:attr_edit", args=[kind, item["pk"]])
     return item
 
@@ -1158,17 +1280,20 @@ def _attr_list_context(request, kind):
 
 def _genre_item_context(request, obj, type_key):
     meta = genre_type_meta(type_key)
-    item = _attach_item_urls("genres", {
-        "key": genre_composite_id(type_key, obj.pk),
-        "pk": obj.pk,
-        "type_key": type_key,
-        "type_label": meta["label"],
-        "name": obj.name,
-        "description": obj.description,
-        "work_count": genre_work_count(obj, type_key),
-        "has_text": True,
-        "empty_text": "Нет описания",
-    })
+    item = _attach_item_urls(
+        "genres",
+        {
+            "key": genre_composite_id(type_key, obj.pk),
+            "pk": obj.pk,
+            "type_key": type_key,
+            "type_label": meta["label"],
+            "name": obj.name,
+            "description": obj.description,
+            "work_count": genre_work_count(obj, type_key),
+            "has_text": True,
+            "empty_text": "Нет описания",
+        },
+    )
     return {
         "kind": "genres",
         "tab": get_attr_tab("genres"),
@@ -1180,15 +1305,18 @@ def _genre_item_context(request, obj, type_key):
 def _simple_item_context(request, kind, obj):
     meta = SIMPLE_KINDS[kind]
     text_field = meta["text_field"]
-    item = _attach_item_urls(kind, {
-        "key": str(obj.pk),
-        "pk": obj.pk,
-        "name": obj.name,
-        "description": getattr(obj, text_field) if text_field else "",
-        "work_count": simple_work_count(obj, kind),
-        "has_text": bool(text_field),
-        "empty_text": meta.get("empty_text") or "Нет описания",
-    })
+    item = _attach_item_urls(
+        kind,
+        {
+            "key": str(obj.pk),
+            "pk": obj.pk,
+            "name": obj.name,
+            "description": getattr(obj, text_field) if text_field else "",
+            "work_count": simple_work_count(obj, kind),
+            "has_text": bool(text_field),
+            "empty_text": meta.get("empty_text") or "Нет описания",
+        },
+    )
     return {
         "kind": kind,
         "tab": get_attr_tab(kind),
@@ -1206,7 +1334,9 @@ def _empty_context(kind):
     }
 
 
-def _form_context(kind, form, *, is_create, type_key=None, pk=None, type_label=None, lock_type=False):
+def _form_context(
+    kind, form, *, is_create, type_key=None, pk=None, type_label=None, lock_type=False
+):
     tab = get_attr_tab(kind)
     has_text = kind == "genres" or bool(SIMPLE_KINDS.get(kind, {}).get("text_field"))
     cancel_url = reverse("vor_archives:attr_empty", args=[kind])
@@ -1235,7 +1365,9 @@ def _form_context(kind, form, *, is_create, type_key=None, pk=None, type_label=N
     }
 
 
-def _attr_mutation_response(request, detail_template, detail_context, extra_trigger=None):
+def _attr_mutation_response(
+    request, detail_template, detail_context, extra_trigger=None
+):
     response = render(request, detail_template, detail_context)
     triggers = {"vor:attr-list-refresh": True}
     if extra_trigger:
@@ -1257,7 +1389,9 @@ def attr_list(request, kind):
 @login_required(login_url=LOGIN_URL)
 @require_GET
 def attr_empty(request, kind):
-    return render(request, "vor_archives/partials/attr_empty.html", _empty_context(kind))
+    return render(
+        request, "vor_archives/partials/attr_empty.html", _empty_context(kind)
+    )
 
 
 @login_required(login_url=LOGIN_URL)
@@ -1298,7 +1432,7 @@ def attr_new(request, kind):
     forbidden = _require_staff(request)
     if forbidden:
         return forbidden
-    tab = _attr_tab_or_404(kind)
+    _attr_tab_or_404(kind)
     if kind == "genres":
         initial_type = request.GET.get("type") or request.POST.get("type_key") or "book"
         if genre_type_meta(initial_type) is None:
@@ -1314,9 +1448,16 @@ def attr_new(request, kind):
                 )
         else:
             form = GenreForm(initial_type=initial_type)
-        return render(request, "vor_archives/partials/attr_form.html", _form_context(
-            kind, form, is_create=True, type_label=genre_type_meta(initial_type)["label"],
-        ))
+        return render(
+            request,
+            "vor_archives/partials/attr_form.html",
+            _form_context(
+                kind,
+                form,
+                is_create=True,
+                type_label=genre_type_meta(initial_type)["label"],
+            ),
+        )
 
     if kind not in SIMPLE_KINDS:
         raise Http404("Неизвестный тип атрибута")
@@ -1331,9 +1472,15 @@ def attr_new(request, kind):
             )
     else:
         form = AttrForm(kind=kind)
-    return render(request, "vor_archives/partials/attr_form.html", _form_context(
-        kind, form, is_create=True,
-    ))
+    return render(
+        request,
+        "vor_archives/partials/attr_form.html",
+        _form_context(
+            kind,
+            form,
+            is_create=True,
+        ),
+    )
 
 
 @login_required(login_url=LOGIN_URL)
@@ -1358,9 +1505,16 @@ def attr_edit(request, kind, pk):
             )
     else:
         form = AttrForm(kind=kind, instance=obj)
-    return render(request, "vor_archives/partials/attr_form.html", _form_context(
-        kind, form, is_create=False, pk=obj.pk,
-    ))
+    return render(
+        request,
+        "vor_archives/partials/attr_form.html",
+        _form_context(
+            kind,
+            form,
+            is_create=False,
+            pk=obj.pk,
+        ),
+    )
 
 
 @login_required(login_url=LOGIN_URL)
@@ -1375,7 +1529,9 @@ def genre_edit(request, type_key, pk):
     if obj is None:
         raise Http404("Жанр не найден")
     if request.method == "POST":
-        form = GenreForm(request.POST, instance=obj, lock_type=True, initial_type=type_key)
+        form = GenreForm(
+            request.POST, instance=obj, lock_type=True, initial_type=type_key
+        )
         if form.is_valid():
             obj, saved_type = form.save()
             return _attr_mutation_response(
@@ -1385,10 +1541,19 @@ def genre_edit(request, type_key, pk):
             )
     else:
         form = GenreForm(instance=obj, lock_type=True, initial_type=type_key)
-    return render(request, "vor_archives/partials/attr_form.html", _form_context(
-        "genres", form, is_create=False, type_key=type_key, pk=obj.pk,
-        type_label=genre_type_meta(type_key)["label"], lock_type=True,
-    ))
+    return render(
+        request,
+        "vor_archives/partials/attr_form.html",
+        _form_context(
+            "genres",
+            form,
+            is_create=False,
+            type_key=type_key,
+            pk=obj.pk,
+            type_label=genre_type_meta(type_key)["label"],
+            lock_type=True,
+        ),
+    )
 
 
 def _genre_delete_items(pairs):
@@ -1397,15 +1562,17 @@ def _genre_delete_items(pairs):
         obj = get_genre(type_key, pk)
         if obj is None:
             continue
-        items.append({
-            "key": genre_composite_id(type_key, pk),
-            "type_key": type_key,
-            "pk": pk,
-            "name": obj.name,
-            "type_label": genre_type_meta(type_key)["label"],
-            "work_count": genre_work_count(obj, type_key),
-            "obj": obj,
-        })
+        items.append(
+            {
+                "key": genre_composite_id(type_key, pk),
+                "type_key": type_key,
+                "pk": pk,
+                "name": obj.name,
+                "type_label": genre_type_meta(type_key)["label"],
+                "work_count": genre_work_count(obj, type_key),
+                "obj": obj,
+            }
+        )
     return items
 
 
@@ -1415,13 +1582,15 @@ def _simple_delete_items(kind, pks):
         obj = get_simple_attr(kind, pk)
         if obj is None:
             continue
-        items.append({
-            "key": str(pk),
-            "pk": pk,
-            "name": obj.name,
-            "work_count": simple_work_count(obj, kind),
-            "obj": obj,
-        })
+        items.append(
+            {
+                "key": str(pk),
+                "pk": pk,
+                "name": obj.name,
+                "work_count": simple_work_count(obj, kind),
+                "obj": obj,
+            }
+        )
     return items
 
 
@@ -1442,15 +1611,19 @@ def attr_delete_preview(request, kind):
         delete_text = tab["delete_one"].format(name=items[0]["name"])
     else:
         delete_text = tab["delete_many"].format(count=len(items))
-    return render(request, "vor_archives/partials/attr_delete_confirm.html", {
-        "kind": kind,
-        "tab": tab,
-        "items": items,
-        "count": len(items),
-        "delete_text": delete_text,
-        "linked_count": sum(item["work_count"] for item in items),
-        "delete_url": reverse("vor_archives:attr_delete", args=[kind]),
-    })
+    return render(
+        request,
+        "vor_archives/partials/attr_delete_confirm.html",
+        {
+            "kind": kind,
+            "tab": tab,
+            "items": items,
+            "count": len(items),
+            "delete_text": delete_text,
+            "linked_count": sum(item["work_count"] for item in items),
+            "delete_url": reverse("vor_archives:attr_delete", args=[kind]),
+        },
+    )
 
 
 @login_required(login_url=LOGIN_URL)
@@ -1459,11 +1632,13 @@ def attr_delete(request, kind):
     forbidden = _require_staff(request)
     if forbidden:
         return forbidden
-    tab = _attr_tab_or_404(kind)
+    _attr_tab_or_404(kind)
     if kind == "genres":
         items = _genre_delete_items(parse_genre_ids(request.POST.getlist("ids")))
     elif kind in SIMPLE_KINDS:
-        items = _simple_delete_items(kind, parse_simple_ids(request.POST.getlist("ids")))
+        items = _simple_delete_items(
+            kind, parse_simple_ids(request.POST.getlist("ids"))
+        )
     else:
         raise Http404("Неизвестный тип атрибута")
     with transaction.atomic():

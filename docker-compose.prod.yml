@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/web/Dockerfile
+      target: production
     command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120
     volumes:
       - static_volume:/app/staticfiles
@@ -15,7 +16,8 @@ services:
     environment:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
-      - DJANGO_DEBUG=False
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+      - COLLECTSTATIC=1
 
   db:
     image: postgres:16-alpine

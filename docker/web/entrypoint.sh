@@ -3,13 +3,21 @@
 mkdir -p /app/staticfiles /app/media
 chown -R django:django /app/staticfiles /app/media
 
+DB_HOST="${DB_HOST:-db}"
+DB_PORT="${DB_PORT:-5432}"
+
 echo "⏳ Waiting for database..."
 
-while ! pg_isready -h db -p 5432 -U ${DB_USER} -d ${DB_NAME}; do
+while ! pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME"; do
     sleep 1
 done
 
 echo "✅ Database is ready"
+
+if [ ! -f /app/src/static/vendor/htmx/htmx.min.js ]; then
+    echo "📦 Vendor static missing, downloading..."
+    /app/download_static.sh
+fi
 
 python src/manage.py migrate
 
@@ -30,7 +38,9 @@ else:
     "
 fi
 
-python src/manage.py collectstatic --noinput
+if [ "${COLLECTSTATIC:-0}" = "1" ]; then
+    python src/manage.py collectstatic --noinput
+fi
 
 echo "🚀 Server starting..."
 

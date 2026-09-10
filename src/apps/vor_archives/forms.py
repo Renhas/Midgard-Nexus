@@ -155,9 +155,7 @@ WORK_FORMS = {
 
 
 class GenreForm(forms.Form):
-    TYPE_CHOICES = tuple(
-        (key, meta["label"]) for key, meta in GENRE_TYPES.items()
-    )
+    TYPE_CHOICES = tuple((key, meta["label"]) for key, meta in GENRE_TYPES.items())
 
     type_key = forms.ChoiceField(choices=TYPE_CHOICES, label="Тип")
     name = forms.CharField(max_length=255, label="Название")
@@ -167,7 +165,9 @@ class GenreForm(forms.Form):
         widget=forms.Textarea(attrs={"rows": 5}),
     )
 
-    def __init__(self, *args, instance=None, lock_type=False, initial_type=None, **kwargs):
+    def __init__(
+        self, *args, instance=None, lock_type=False, initial_type=None, **kwargs
+    ):
         self.instance = instance
         self.lock_type = lock_type
         self.fixed_type = initial_type

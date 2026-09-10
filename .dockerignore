@@ -7,6 +7,10 @@
 # Кэш линтеров и тестов
 .mypy_cache/
 .pytest_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+.coverage.*
 *.log
 
 # Окружение и IDE
@@ -28,5 +32,6 @@ media/
 # Локальные тяжелые папки проекта
 .koda/
 .venv/
+venv/
 
 *.sqlite3

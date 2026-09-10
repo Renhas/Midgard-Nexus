@@ -6,29 +6,29 @@ register = template.Library()
 
 
 WORK_TYPE_ICONS = {
-    'book': 'icon-book-text',
-    'film': 'icon-clapperboard',
-    'game': 'icon-gamepad-2',
+    "book": "icon-book-text",
+    "film": "icon-clapperboard",
+    "game": "icon-gamepad-2",
 }
 
 WORK_TYPE_LABELS = {
-    'book': 'Книга',
-    'film': 'Фильм',
-    'game': 'Игра',
+    "book": "Книга",
+    "film": "Фильм",
+    "game": "Игра",
 }
 
 STATUS_LABELS_RU = {
-    'planning': 'Запланировано',
-    'in_progress': 'В процессе',
-    'completed': 'Завершено',
-    'dropped': 'Брошено',
+    "planning": "Запланировано",
+    "in_progress": "В процессе",
+    "completed": "Завершено",
+    "dropped": "Брошено",
 }
 
 STATUS_ICONS = {
-    'planning': 'bi bi-clock-fill',
-    'in_progress': 'bi bi-play-circle-fill',
-    'completed': 'bi bi-check-circle-fill',
-    'dropped': 'bi bi-x-circle-fill',
+    "planning": "bi bi-clock-fill",
+    "in_progress": "bi bi-play-circle-fill",
+    "completed": "bi bi-check-circle-fill",
+    "dropped": "bi bi-x-circle-fill",
 }
 
 
@@ -71,14 +71,14 @@ def get_progress_info(user_work):
 @register.filter
 def get_model_icon(obj):
     if not obj:
-        return 'bi bi-collection'
-    return WORK_TYPE_ICONS.get(obj._meta.model_name, 'bi bi-collection')
+        return "bi bi-collection"
+    return WORK_TYPE_ICONS.get(obj._meta.model_name, "bi bi-collection")
 
 
 @register.filter
 def get_work_type_icon(user_work):
-    if not user_work or not hasattr(user_work, 'work'):
-        return ''
+    if not user_work or not hasattr(user_work, "work"):
+        return ""
     return get_model_icon(user_work.work)
 
 
@@ -88,8 +88,8 @@ def format_progress(user_work):
     if not info:
         return "—"
     if info["maximum"] is not None:
-        return f'{info["display_value"]}/{info["maximum"]} {info["unit"]}'
-    return f'{info["display_value"]} {info["unit"]}'
+        return f"{info['display_value']}/{info['maximum']} {info['unit']}"
+    return f"{info['display_value']} {info['unit']}"
 
 
 @register.filter

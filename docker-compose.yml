@@ -1,8 +1,9 @@
 services:
   web:
-    build: 
+    build:
       context: .
       dockerfile: ./docker/web/Dockerfile
+      target: development
     command: python src/manage.py runserver 0.0.0.0:8000
     volumes:
       - ./src:/app/src
@@ -18,6 +19,7 @@ services:
     environment:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
+      - DJANGO_SETTINGS_MODULE=config.settings.development
 
   db:
     image: postgres:16-alpine

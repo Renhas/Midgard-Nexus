@@ -1,0 +1,29 @@
+[tool.codespell]
+skip = "*.min.js,*.min.css,src/static/vendor,*/migrations/*,.venv,htmlcov,.git"
+ignore-words-list = "vor"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+pythonpath = ["src"]
+testpaths = ["src"]
+python_files = ["test_*.py"]
+addopts = "-q --strict-markers"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+src = ["src"]
+exclude = [
+    ".venv",
+    "**/migrations/**",
+]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["F401"]
+"**/tests/**" = ["F401"]
+
+[tool.ruff.format]
+quote-style = "double"

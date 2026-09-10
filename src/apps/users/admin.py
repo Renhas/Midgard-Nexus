@@ -1,4 +1,3 @@
-from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
@@ -7,7 +6,7 @@ from .models import User
 
 
 class UserAdminForm(UserChangeForm):
-    class Meta: # type: ignore
+    class Meta:  # type: ignore
         model = User
         fields = "__all__"
 
@@ -20,15 +19,32 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ("username", "email", "first_name", "last_name")
     fieldsets = (
         (None, {"fields": ("username", "password")}),
-        ("Personal info", {"fields": ("first_name", "last_name", "email", "avatar", "bio")}),
-        ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
+        (
+            "Personal info",
+            {"fields": ("first_name", "last_name", "email", "avatar", "bio")},
+        ),
+        (
+            "Permissions",
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                )
+            },
+        ),
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
     add_fieldsets = (
-        (None, {
-            "classes": ("wide",),
-            "fields": ("username", "password1", "password2"),
-        }),
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("username", "password1", "password2"),
+            },
+        ),
     )
 
 

@@ -14,22 +14,24 @@ def validate_gfk(ct: ContentType | None, obj_id: int | None) -> None:
     try:
         ct.get_object_for_this_type(pk=obj_id)
     except ObjectDoesNotExist:
-        raise ValidationError(
-            f"Объект с типом {ct} и ID {obj_id} не существует."
-        )
+        raise ValidationError(f"Объект с типом {ct} и ID {obj_id} не существует.")
 
 
-def validate_relation_type(source_ct: ContentType, target_ct: ContentType, relation_type: WorkRelationTypeChoices | str) -> None:
+def validate_relation_type(
+    source_ct: ContentType,
+    target_ct: ContentType,
+    relation_type: WorkRelationTypeChoices | str,
+) -> None:
     """
     Проверяет, допустима ли связь между типами произведений для данного relation_type.
-    
+
     - 'other' — допустима для любых типов
     - 'adaptation' — только между разными типами
     - остальное — только между одинаковыми типами
     """
     if relation_type == WorkRelationTypeChoices.OTHER:
         return
-    same_type = (source_ct == target_ct)
+    same_type = source_ct == target_ct
     if relation_type == WorkRelationTypeChoices.ADAPTATION and same_type:
         raise ValidationError(
             f"Связь '{relation_type}' допустима только между произведениями разных типов."
@@ -38,4 +40,3 @@ def validate_relation_type(source_ct: ContentType, target_ct: ContentType, relat
         raise ValidationError(
             f"Связь '{relation_type}' допустима только между произведениями одного типа."
         )
-

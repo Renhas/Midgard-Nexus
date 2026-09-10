@@ -59,12 +59,14 @@ class GameGenre(models.Model):
     def __str__(self):
         return self.name
 
+
 class Tag(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True)
 
     def __str__(self):
         return self.name
+
 
 # ─── Abstract base ───────────────────────────────────────────────────────────
 
@@ -84,13 +86,13 @@ class AWork(models.Model):
 
     relations_source = GenericRelation(
         "WorkRelation",
-        related_query_name='%(app_label)s_%(class)s_source',
+        related_query_name="%(app_label)s_%(class)s_source",
         content_type_field="source_content_type",
         object_id_field="source_object_id",
     )
     relations_target = GenericRelation(
         "WorkRelation",
-        related_query_name='%(app_label)s_%(class)s_target',
+        related_query_name="%(app_label)s_%(class)s_target",
         content_type_field="target_content_type",
         object_id_field="target_object_id",
     )
@@ -135,22 +137,18 @@ class Film(AWork):
             models.CheckConstraint(
                 name="check_episode_count_by_type",
                 condition=(
-                    Q(film_type=FilmTypeChoices.MOVIE, episode_count__isnull=True) |
-                    Q(film_type=FilmTypeChoices.TV_SHOW, episode_count__isnull=False)
-                )
+                    Q(film_type=FilmTypeChoices.MOVIE, episode_count__isnull=True)
+                    | Q(film_type=FilmTypeChoices.TV_SHOW, episode_count__isnull=False)
+                ),
             )
         ]
 
     def clean(self):
         super().clean()
         if self.episode_count and self.film_type != FilmTypeChoices.TV_SHOW:
-            raise ValidationError({
-                'episode_count': 'Only for TV Shows'
-            })
+            raise ValidationError({"episode_count": "Only for TV Shows"})
         if not self.episode_count and self.film_type == FilmTypeChoices.TV_SHOW:
-            raise ValidationError({
-                'episode_count': 'Must be not null for TV Shows'
-            })
+            raise ValidationError({"episode_count": "Must be not null for TV Shows"})
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -158,7 +156,7 @@ class Film(AWork):
 
     def __str__(self):
         return f"Film: {self.title}"
-    
+
 
 class Game(AWork):
     platforms = models.ManyToManyField(Platform, blank=True)
@@ -196,13 +194,21 @@ class WorkRelation(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["source_content_type", "source_object_id", "target_content_type", "target_object_id",],
+                fields=[
+                    "source_content_type",
+                    "source_object_id",
+                    "target_content_type",
+                    "target_object_id",
+                ],
                 name="unique_relation_direction",
             ),
         ]
         indexes = [
             models.Index(
-                fields=["target_content_type", "target_object_id",],
+                fields=[
+                    "target_content_type",
+                    "target_object_id",
+                ],
                 name="idx_workrelation_target",
             ),
         ]
@@ -214,12 +220,16 @@ class WorkRelation(models.Model):
         super().clean()
         validate_gfk(self.source_content_type, self.source_object_id)
         validate_gfk(self.target_content_type, self.target_object_id)
-        checker = CycleChecker(items_out=self.__get_outgoing, items_in=self.__get_incoming)
-        validate_relation_type(self.source_content_type, self.target_content_type, self.relation_type)
+        checker = CycleChecker(
+            items_out=self.__get_outgoing, items_in=self.__get_incoming
+        )
+        validate_relation_type(
+            self.source_content_type, self.target_content_type, self.relation_type
+        )
         if self.__other_relation_exists():
             raise ValidationError("Между данными объектами уже есть связь")
-        target_key = (self.target_content_type_id, self.target_object_id) # type: ignore
-        source_key = (self.source_content_type_id, self.source_object_id) # type: ignore
+        target_key = (self.target_content_type_id, self.target_object_id)  # type: ignore
+        source_key = (self.source_content_type_id, self.source_object_id)  # type: ignore
         if checker.check(target_key, source_key):
             raise ValidationError("Цикличное создание недопустимо")
 
@@ -228,32 +238,46 @@ class WorkRelation(models.Model):
         super().save(*args, **kwargs)
 
     def __get_outgoing(self, key):
-        return WorkRelation.objects.filter(
-            source_content_type_id=key[0],
-            source_object_id=key[1],
-        ).exclude(pk=self.pk).values_list('target_content_type_id', 'target_object_id')
+        return (
+            WorkRelation.objects.filter(
+                source_content_type_id=key[0],
+                source_object_id=key[1],
+            )
+            .exclude(pk=self.pk)
+            .values_list("target_content_type_id", "target_object_id")
+        )
 
     def __get_incoming(self, key):
-        return WorkRelation.objects.filter(
-            target_content_type_id=key[0],
-            target_object_id=key[1],
-            relation_type='other',
-        ).exclude(pk=self.pk).values_list('source_content_type_id', 'source_object_id')
+        return (
+            WorkRelation.objects.filter(
+                target_content_type_id=key[0],
+                target_object_id=key[1],
+                relation_type="other",
+            )
+            .exclude(pk=self.pk)
+            .values_list("source_content_type_id", "source_object_id")
+        )
 
     def __other_relation_exists(self):
-        return WorkRelation.objects.filter(
-            source_content_type=self.target_content_type,
-            source_object_id=self.target_object_id,
-            target_content_type=self.source_content_type,
-            target_object_id=self.source_object_id,
-        ).exclude(pk=self.pk).exists()
+        return (
+            WorkRelation.objects.filter(
+                source_content_type=self.target_content_type,
+                source_object_id=self.target_object_id,
+                target_content_type=self.source_content_type,
+                target_object_id=self.source_object_id,
+            )
+            .exclude(pk=self.pk)
+            .exists()
+        )
 
 
 # ─── UserWork ────────────────────────────────────────────────────────────────
 
 
 class UserWork(models.Model):
-    user = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="user_works")
+    user = models.ForeignKey(
+        "users.User", on_delete=models.CASCADE, related_name="user_works"
+    )
     work_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     work_object_id = models.PositiveIntegerField()
     work = GenericForeignKey("work_content_type", "work_object_id")
@@ -337,7 +361,9 @@ class CompletionRecord(models.Model):
 
 
 class Collection(MPTTModel):
-    user = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="collections")
+    user = models.ForeignKey(
+        "users.User", on_delete=models.CASCADE, related_name="collections"
+    )
     name = models.CharField(max_length=255)
     parent = TreeForeignKey(
         "self",
@@ -361,18 +387,20 @@ class Collection(MPTTModel):
         if not self.parent:
             return
         if self.parent.pk == self.pk:
-            raise ValidationError('Объект не может быть своим родителем.')
+            raise ValidationError("Объект не может быть своим родителем.")
         if not self.pk:
             return
-        if self.parent.pk in self.get_descendants().values_list('pk', flat=True):
-            raise ValidationError('Нельзя установить потомка в качестве родителя.')
+        if self.parent.pk in self.get_descendants().values_list("pk", flat=True):
+            raise ValidationError("Нельзя установить потомка в качестве родителя.")
 
 
 # ─── CollectionItem ──────────────────────────────────────────────────────────
 
 
 class CollectionItem(models.Model):
-    collection = models.ForeignKey(Collection, on_delete=models.CASCADE, related_name="items")
+    collection = models.ForeignKey(
+        Collection, on_delete=models.CASCADE, related_name="items"
+    )
     work_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     work_object_id = models.PositiveIntegerField()
     work = GenericForeignKey("work_content_type", "work_object_id")
@@ -405,7 +433,9 @@ class CollectionItem(models.Model):
 
 
 class FeedItem(models.Model):
-    user = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="feed_items")
+    user = models.ForeignKey(
+        "users.User", on_delete=models.CASCADE, related_name="feed_items"
+    )
     user_work = models.ForeignKey(
         UserWork,
         on_delete=models.SET_NULL,
