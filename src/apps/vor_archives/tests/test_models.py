@@ -7,7 +7,13 @@ from django.db import IntegrityError, transaction
 
 from apps.users.tests.factories import UserFactory
 from apps.vor_archives.constants import FilmTypeChoices, WorkRelationTypeChoices
-from apps.vor_archives.models import CollectionItem, Film, UserWork, WorkRelation
+from apps.vor_archives.models import (
+    Collection,
+    CollectionItem,
+    Film,
+    UserWork,
+    WorkRelation,
+)
 from apps.vor_archives.tests.factories import (
     BookFactory,
     BookGenreFactory,
@@ -49,9 +55,13 @@ def test_film_movie_without_episodes_saves(movie):
 
 
 @pytest.mark.django_db
-def test_film_tv_show_with_min_and_typical_episode_count_saves():
-    FilmFactory(tv=True, episode_count=1)
-    FilmFactory(tv=True, episode_count=10)
+@pytest.mark.parametrize("episode_count", [1, 10])
+def test_film_tv_show_with_min_and_typical_episode_count_saves(episode_count):
+    film = FilmFactory(tv=True, episode_count=episode_count)
+    film.refresh_from_db()
+    assert Film.objects.filter(pk=film.pk).exists()
+    assert film.film_type == FilmTypeChoices.TV_SHOW
+    assert film.episode_count == episode_count
 
 
 @pytest.mark.django_db
@@ -111,6 +121,12 @@ def test_film_db_allows_valid_episode_rules():
             ),
         ]
     )
+    movie = Film.objects.get(title="Movie")
+    show = Film.objects.get(title="Show")
+    assert movie.film_type == FilmTypeChoices.MOVIE
+    assert movie.episode_count is None
+    assert show.film_type == FilmTypeChoices.TV_SHOW
+    assert show.episode_count == 1
 
 
 @pytest.mark.django_db(transaction=True)
@@ -146,23 +162,38 @@ def test_film_db_rejects_tv_show_without_episode_count():
 # ─── WorkRelation ────────────────────────────────────────────────────────────
 
 
+def _assert_relation(rel, source, target, relation_type):
+    rel.refresh_from_db()
+    assert WorkRelation.objects.filter(pk=rel.pk).exists()
+    assert rel.relation_type == relation_type
+    assert rel.source_object_id == source.pk
+    assert rel.target_object_id == target.pk
+    assert rel.source_content_type_id == _ct(source).id
+    assert rel.target_content_type_id == _ct(target).id
+
+
 @pytest.mark.django_db
 def test_work_relation_valid_pairs_save(book, movie):
-    WorkRelationFactory(
+    sequel_target = BookFactory()
+    other_target = FilmFactory()
+    sequel = WorkRelationFactory(
         source=book,
-        target=BookFactory(),
+        target=sequel_target,
         relation_type=WorkRelationTypeChoices.SEQUEL,
     )
-    WorkRelationFactory(
+    adaptation = WorkRelationFactory(
         source=book,
         target=movie,
         relation_type=WorkRelationTypeChoices.ADAPTATION,
     )
-    WorkRelationFactory(
+    other = WorkRelationFactory(
         source=book,
-        target=FilmFactory(),
+        target=other_target,
         relation_type=WorkRelationTypeChoices.OTHER,
     )
+    _assert_relation(sequel, book, sequel_target, WorkRelationTypeChoices.SEQUEL)
+    _assert_relation(adaptation, book, movie, WorkRelationTypeChoices.ADAPTATION)
+    _assert_relation(other, book, other_target, WorkRelationTypeChoices.OTHER)
 
 
 @pytest.mark.django_db
@@ -247,11 +278,22 @@ def test_work_relation_same_direction_duplicate_hits_db_unique(book):
 
 @pytest.mark.django_db
 def test_work_relation_shared_source_or_target_allowed(book):
-    WorkRelationFactory(source=book, target=BookFactory())
-    WorkRelationFactory(source=book, target=BookFactory())
+    out_a = BookFactory()
+    out_b = BookFactory()
+    from_book_a = WorkRelationFactory(source=book, target=out_a)
+    from_book_b = WorkRelationFactory(source=book, target=out_b)
     shared_target = BookFactory()
-    WorkRelationFactory(source=BookFactory(), target=shared_target)
-    WorkRelationFactory(source=BookFactory(), target=shared_target)
+    in_a = BookFactory()
+    in_b = BookFactory()
+    to_shared_a = WorkRelationFactory(source=in_a, target=shared_target)
+    to_shared_b = WorkRelationFactory(source=in_b, target=shared_target)
+
+    _assert_relation(from_book_a, book, out_a, WorkRelationTypeChoices.SEQUEL)
+    _assert_relation(from_book_b, book, out_b, WorkRelationTypeChoices.SEQUEL)
+    _assert_relation(to_shared_a, in_a, shared_target, WorkRelationTypeChoices.SEQUEL)
+    _assert_relation(to_shared_b, in_b, shared_target, WorkRelationTypeChoices.SEQUEL)
+    assert WorkRelation.objects.filter(source_object_id=book.pk).count() == 2
+    assert WorkRelation.objects.filter(target_object_id=shared_target.pk).count() == 2
 
 
 @pytest.mark.django_db
@@ -281,9 +323,13 @@ def test_work_relation_other_incoming_creates_cycle():
 @pytest.mark.django_db
 def test_work_relation_separate_chains_can_be_joined():
     a, b, c, d = BookFactory(), BookFactory(), BookFactory(), BookFactory()
-    WorkRelationFactory(source=a, target=b)
-    WorkRelationFactory(source=c, target=d)
-    WorkRelationFactory(source=b, target=c)
+    ab = WorkRelationFactory(source=a, target=b)
+    cd = WorkRelationFactory(source=c, target=d)
+    bc = WorkRelationFactory(source=b, target=c)
+    _assert_relation(ab, a, b, WorkRelationTypeChoices.SEQUEL)
+    _assert_relation(cd, c, d, WorkRelationTypeChoices.SEQUEL)
+    _assert_relation(bc, b, c, WorkRelationTypeChoices.SEQUEL)
+    assert WorkRelation.objects.count() == 3
 
 
 # ─── UserWork ────────────────────────────────────────────────────────────────
@@ -292,7 +338,12 @@ def test_work_relation_separate_chains_can_be_joined():
 @pytest.mark.django_db
 @pytest.mark.parametrize("rating", [None, 1, 10])
 def test_user_work_rating_bounds_save(book, user, rating):
-    UserWorkFactory(user=user, work=book, rating=rating)
+    uw = UserWorkFactory(user=user, work=book, rating=rating)
+    uw.refresh_from_db()
+    assert UserWork.objects.filter(pk=uw.pk).exists()
+    assert uw.user_id == user.pk
+    assert uw.work == book
+    assert uw.rating == rating
 
 
 @pytest.mark.django_db
@@ -305,7 +356,14 @@ def test_user_work_rating_outside_bounds_raises(book, user, rating):
 @pytest.mark.django_db
 @pytest.mark.parametrize("work_factory", [BookFactory, FilmFactory, GameFactory])
 def test_user_work_accepts_each_work_type(user, work_factory):
-    UserWorkFactory(user=user, work=work_factory())
+    work = work_factory()
+    uw = UserWorkFactory(user=user, work=work)
+    uw.refresh_from_db()
+    assert UserWork.objects.filter(pk=uw.pk).exists()
+    assert uw.user_id == user.pk
+    assert uw.work == work
+    assert uw.work_content_type_id == _ct(work).id
+    assert uw.work_object_id == work.pk
 
 
 @pytest.mark.django_db
@@ -324,8 +382,16 @@ def test_user_work_duplicate_raises_on_save(book, user):
     UserWorkFactory(user=user, work=book)
     with pytest.raises(ValidationError):
         UserWorkFactory(user=user, work=book)
-    UserWorkFactory(user=UserFactory(), work=book)
-    UserWorkFactory(user=user, work=BookFactory())
+    other_user = UserFactory()
+    other_work = BookFactory()
+    other_user_uw = UserWorkFactory(user=other_user, work=book)
+    other_work_uw = UserWorkFactory(user=user, work=other_work)
+    other_user_uw.refresh_from_db()
+    other_work_uw.refresh_from_db()
+    assert other_user_uw.user_id == other_user.pk
+    assert other_user_uw.work == book
+    assert other_work_uw.user_id == user.pk
+    assert other_work_uw.work == other_work
 
 
 @pytest.mark.django_db(transaction=True)
@@ -348,7 +414,11 @@ def test_user_work_duplicate_hits_db_unique(book, user):
 
 @pytest.mark.django_db
 def test_collection_item_saves_valid_work(book):
-    CollectionItemFactory(work=book)
+    item = CollectionItemFactory(work=book)
+    item.refresh_from_db()
+    assert CollectionItem.objects.filter(pk=item.pk).exists()
+    assert item.work == book
+    assert item.collection_id is not None
 
 
 @pytest.mark.django_db
@@ -366,8 +436,18 @@ def test_collection_item_duplicate_raises_on_save(book):
     CollectionItemFactory(collection=collection, work=book)
     with pytest.raises(ValidationError):
         CollectionItemFactory(collection=collection, work=book)
-    CollectionItemFactory(collection=CollectionFactory(), work=book)
-    CollectionItemFactory(collection=collection, work=BookFactory())
+    other_collection = CollectionFactory()
+    other_work = BookFactory()
+    other_collection_item = CollectionItemFactory(
+        collection=other_collection, work=book
+    )
+    other_work_item = CollectionItemFactory(collection=collection, work=other_work)
+    other_collection_item.refresh_from_db()
+    other_work_item.refresh_from_db()
+    assert other_collection_item.collection_id == other_collection.pk
+    assert other_collection_item.work == book
+    assert other_work_item.collection_id == collection.pk
+    assert other_work_item.work == other_work
 
 
 @pytest.mark.django_db(transaction=True)
@@ -391,16 +471,28 @@ def test_collection_item_duplicate_hits_db_unique(book):
 
 @pytest.mark.django_db
 def test_collection_root_saves(user):
-    CollectionFactory(user=user, parent=None)
+    created = CollectionFactory(user=user, parent=None)
+    created.refresh_from_db()
+    assert Collection.objects.filter(pk=created.pk).exists()
+    assert created.parent is None
+    assert created.user_id == user.pk
+
     existing = CollectionFactory(user=user)
     existing.parent = None
     existing.save()
+    existing.refresh_from_db()
+    assert existing.parent is None
+    assert existing.user_id == user.pk
 
 
 @pytest.mark.django_db
 def test_collection_new_child_of_root_saves(user):
     root = CollectionFactory(user=user)
-    CollectionFactory(user=user, parent=root)
+    child = CollectionFactory(user=user, parent=root)
+    child.refresh_from_db()
+    assert Collection.objects.filter(pk=child.pk).exists()
+    assert child.parent_id == root.pk
+    assert child.user_id == user.pk
 
 
 @pytest.mark.django_db
@@ -428,21 +520,31 @@ def test_collection_descendant_as_parent_raises_on_save(user):
 
 
 @pytest.mark.django_db
-def test_collection_sibling_and_move_up_save(user):
+def test_collection_sibling_reparent_saves(user):
     root = CollectionFactory(user=user)
     sibling_a = CollectionFactory(user=user, parent=root)
     sibling_b = CollectionFactory(user=user, parent=root)
-    grandchild = CollectionFactory(user=user, parent=sibling_a)
 
     sibling_a.refresh_from_db()
     sibling_b.refresh_from_db()
     sibling_a.parent = sibling_b
     sibling_a.save()
+    sibling_a.refresh_from_db()
+    assert sibling_a.parent_id == sibling_b.pk
+
+
+@pytest.mark.django_db
+def test_collection_move_up_to_root_saves(user):
+    root = CollectionFactory(user=user)
+    child = CollectionFactory(user=user, parent=root)
+    grandchild = CollectionFactory(user=user, parent=child)
 
     grandchild.refresh_from_db()
     root.refresh_from_db()
     grandchild.parent = root
     grandchild.save()
+    grandchild.refresh_from_db()
+    assert grandchild.parent_id == root.pk
 
 
 # ─── Lookup unique ───────────────────────────────────────────────────────────
@@ -455,6 +557,11 @@ def test_lookup_name_unique_is_case_sensitive(factory):
     with transaction.atomic():
         with pytest.raises(IntegrityError):
             factory._meta.model.objects.create(name="Fantasy")
-    factory._meta.model.objects.create(name="fantasy")
+    model = factory._meta.model
+    model.objects.create(name="fantasy")
     factory(name="Sci-Fi")
+    obj.refresh_from_db()
     assert obj.name == "Fantasy"
+    assert model.objects.filter(name="Fantasy").exists()
+    assert model.objects.filter(name="fantasy").exists()
+    assert model.objects.filter(name="Sci-Fi").exists()
