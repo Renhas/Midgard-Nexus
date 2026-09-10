@@ -1,1 +1,1 @@
-"""Shared pytest fixtures. Add factory-boy factories here when tests appear."""
+"""Shared pytest fixtures. Add factory-boy factories in app test packages when tests appear."""
