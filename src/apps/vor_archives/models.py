@@ -393,6 +393,10 @@ class Collection(MPTTModel):
         if self.parent.pk in self.get_descendants().values_list("pk", flat=True):
             raise ValidationError("Нельзя установить потомка в качестве родителя.")
 
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
 
 # ─── CollectionItem ──────────────────────────────────────────────────────────
 
