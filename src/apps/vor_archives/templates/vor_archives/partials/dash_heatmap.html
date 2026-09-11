@@ -1,0 +1,25 @@
+<div class="dash-heatmap">
+    <div class="dash-heatmap-months">
+        <span class="dash-heatmap-wd-spacer"></span>
+        {% for label in heatmap.month_labels %}
+            <span class="dash-heatmap-month">{{ label }}</span>
+        {% endfor %}
+    </div>
+    <div class="dash-heatmap-body">
+        <div class="dash-heatmap-wdays">
+            {% for label in heatmap.weekday_labels %}
+                <span>{{ label }}</span>
+            {% endfor %}
+        </div>
+        <div class="dash-heatmap-weeks">
+            {% for week in heatmap.weeks %}
+            <div class="dash-heatmap-week">
+                {% for day in week %}
+                <div class="dash-heat-cell level-{{ day.level }}{% if not day.in_range %} is-out{% endif %}"
+                     title="{{ day.title }}"></div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

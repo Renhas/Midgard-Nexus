@@ -430,6 +430,9 @@
         if (el?.id === "vor-modal") {
             window.Alpine?.initTree?.(el);
         }
+        if (el?.id === "dash-heatmap" || el?.id === "dash-feed-more") {
+            window.Alpine?.initTree?.(el);
+        }
         syncPageScrollLock();
     });
 
@@ -1686,6 +1689,227 @@
                 }
             },
         });
+
+        const DASH_CHART_COLORS = [
+            "#A78BFA", "#60A5FA", "#34D399", "#F87171", "#FB923C",
+            "#818CF8", "#FBBF24", "#22D3EE", "#F472B6", "#94A3B8",
+            "#C084FC", "#38BDF8",
+        ];
+
+        function readJsonScript(id) {
+            const el = document.getElementById(id);
+            if (!el) {
+                return {};
+            }
+            try {
+                return JSON.parse(el.textContent);
+            } catch (error) {
+                return {};
+            }
+        }
+
+        function formatDashPercent(value) {
+            const number = Number(value || 0);
+            if (!number) {
+                return "0%";
+            }
+            if (Number.isInteger(number)) {
+                return `${number}%`;
+            }
+            return `${number}%`;
+        }
+
+        Alpine.data("vorDashStats", () => ({
+            workTypes: ["book", "film", "game"],
+            matrix: {},
+            statuses: [],
+            init() {
+                const data = readJsonScript("dash-stats-opts");
+                this.matrix = data.status_matrix || {};
+                this.statuses = data.statuses || [];
+            },
+            toggleType(type) {
+                const index = this.workTypes.indexOf(type);
+                if (index > -1) {
+                    this.workTypes.splice(index, 1);
+                } else {
+                    this.workTypes.push(type);
+                }
+            },
+            statusCount(status) {
+                const row = this.matrix[status] || {};
+                return this.workTypes.reduce((sum, type) => sum + (row[type] || 0), 0);
+            },
+            statusTotal() {
+                return this.statuses.reduce(
+                    (sum, status) => sum + this.statusCount(status.key),
+                    0
+                );
+            },
+            statusPercent(status) {
+                return formatDashPercent(
+                    this.statusTotal()
+                        ? Math.round((this.statusCount(status) * 1000) / this.statusTotal()) / 10
+                        : 0
+                );
+            },
+        }));
+
+        Alpine.data("vorDashCharts", () => ({
+            pieField: "status",
+            attrKind: "tags",
+            attrView: "cloud",
+            pies: {},
+            attrs: {},
+            histTopN: 12,
+            pieChart: null,
+            barChart: null,
+            init() {
+                const data = readJsonScript("dash-charts-opts");
+                this.pies = data.pies || {};
+                this.attrs = data.attrs || {};
+                this.histTopN = data.histTopN || 12;
+                this.$nextTick(() => {
+                    this.renderPie();
+                    this.renderBar();
+                });
+            },
+            get pieItems() {
+                return this.pies[this.pieField] || [];
+            },
+            get attrItems() {
+                return this.attrs[this.attrKind] || [];
+            },
+            get cloudItems() {
+                const items = this.attrItems;
+                if (!items.length) {
+                    return [];
+                }
+                const counts = items.map((item) => item.count);
+                const min = Math.min(...counts);
+                const max = Math.max(...counts);
+                return items.map((item) => ({
+                    ...item,
+                    fontSize: max === min
+                        ? 1.15
+                        : 0.75 + ((item.count - min) / (max - min)) * 1.55,
+                }));
+            },
+            formatPercent: formatDashPercent,
+            setPieField(field) {
+                this.pieField = field;
+                this.$nextTick(() => this.renderPie());
+            },
+            setAttrKind(kind) {
+                this.attrKind = kind;
+                this.$nextTick(() => this.renderBar());
+            },
+            setAttrView(view) {
+                this.attrView = view;
+                this.$nextTick(() => this.renderBar());
+            },
+            renderPie() {
+                const canvas = document.getElementById("dash-pie-chart");
+                if (!canvas || !window.Chart) {
+                    return;
+                }
+                if (this.pieChart) {
+                    this.pieChart.destroy();
+                    this.pieChart = null;
+                }
+                if (!this.pieItems.length) {
+                    return;
+                }
+                this.pieChart = new Chart(canvas, {
+                    type: "doughnut",
+                    data: {
+                        labels: this.pieItems.map((item) => item.label),
+                        datasets: [{
+                            data: this.pieItems.map((item) => item.value),
+                            backgroundColor: this.pieItems.map(
+                                (_, index) => DASH_CHART_COLORS[index % DASH_CHART_COLORS.length]
+                            ),
+                            borderColor: "#1A233A",
+                            borderWidth: 2,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: "right",
+                                labels: {
+                                    boxWidth: 12,
+                                    color: "#E2E8F0",
+                                },
+                            },
+                        },
+                    },
+                });
+            },
+            histogramItems() {
+                const items = [...this.attrItems];
+                if (items.length <= this.histTopN) {
+                    return items;
+                }
+                const head = items.slice(0, this.histTopN);
+                const rest = items.slice(this.histTopN);
+                const otherCount = rest.reduce((sum, item) => sum + item.count, 0);
+                const otherPercent = rest.reduce((sum, item) => sum + item.percent, 0);
+                head.push({
+                    name: "Другие",
+                    count: otherCount,
+                    percent: Math.round(otherPercent * 10) / 10,
+                });
+                return head;
+            },
+            renderBar() {
+                const canvas = document.getElementById("dash-bar-chart");
+                if (!canvas || !window.Chart) {
+                    return;
+                }
+                if (this.barChart) {
+                    this.barChart.destroy();
+                    this.barChart = null;
+                }
+                if (this.attrView !== "bar" || !this.attrItems.length) {
+                    return;
+                }
+                const items = this.histogramItems();
+                this.barChart = new Chart(canvas, {
+                    type: "bar",
+                    data: {
+                        labels: items.map((item) => item.name),
+                        datasets: [{
+                            data: items.map((item) => item.count),
+                            backgroundColor: items.map(
+                                (_, index) => DASH_CHART_COLORS[index % DASH_CHART_COLORS.length]
+                            ),
+                            borderWidth: 0,
+                        }],
+                    },
+                    options: {
+                        indexAxis: "y",
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                        },
+                        scales: {
+                            x: {
+                                ticks: { color: "#94A3B8", precision: 0 },
+                                grid: { color: "#334155" },
+                            },
+                            y: {
+                                ticks: { color: "#E2E8F0" },
+                                grid: { display: false },
+                            },
+                        },
+                    },
+                });
+            },
+        }));
 
         Alpine.data("vorDetailOverlay", (opts = {}) => ({
             editing: Boolean(opts.editing),

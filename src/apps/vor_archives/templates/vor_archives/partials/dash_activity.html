@@ -1,0 +1,37 @@
+<div class="dash-page dash-activity">
+    <section class="dash-pane">
+        <div class="dash-pane-head">
+            <h2 class="dash-segment-title">История</h2>
+        </div>
+        <div class="dash-pane-body" id="dash-feed-scroll">
+            <div id="dash-feed-list">
+                {% include "vor_archives/partials/dash_feed_items.html" %}
+            </div>
+        </div>
+    </section>
+
+    <section class="dash-pane">
+        <div class="dash-pane-head">
+            <h2 class="dash-segment-title">Активность</h2>
+            <select class="form-select form-select-sm dash-year-select"
+                    name="year"
+                    hx-get="{% url 'vor_archives:dashboard_heatmap' %}"
+                    hx-target="#dash-heatmap"
+                    hx-swap="innerHTML">
+                <option value="" {% if not heatmap.year %}selected{% endif %}>
+                    Последние 12 месяцев
+                </option>
+                {% for year in heatmap.years %}
+                <option value="{{ year }}" {% if heatmap.year == year %}selected{% endif %}>
+                    {{ year }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="dash-pane-body dash-heatmap-wrap">
+            <div id="dash-heatmap">
+                {% include "vor_archives/partials/dash_heatmap.html" %}
+            </div>
+        </div>
+    </section>
+</div>

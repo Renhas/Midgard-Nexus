@@ -1,0 +1,91 @@
+{{ stats_opts|json_script:"dash-stats-opts" }}
+<div class="dash-page dash-stats" x-data="vorDashStats()">
+    <section class="dash-segment">
+        <div class="dash-segment-head">
+            <h2 class="dash-segment-title">Обзор</h2>
+        </div>
+        <div class="dash-cards dash-cards-4">
+            <article class="dash-card dash-card-kpi">
+                <div class="dash-card-label">Всего</div>
+                <div class="dash-card-value">{{ total }}</div>
+            </article>
+            {% for card in type_cards %}
+            <article class="dash-card dash-card-ratio">
+                <div class="dash-card-label">
+                    <i class="{{ card.icon }}"></i>
+                    <span>{{ card.label }}</span>
+                </div>
+                <div class="dash-card-value">{{ card.count }}</div>
+                <div class="dash-card-ratio-value">{{ card.percent }}</div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="dash-segment">
+        <div class="dash-segment-head">
+            <h2 class="dash-segment-title">Статусы</h2>
+            <div class="dash-type-filters">
+                <button type="button"
+                        class="sidebar-btn sidebar-btn-type"
+                        :class="{ 'active': workTypes.includes('book') }"
+                        @click="toggleType('book')"
+                        title="Книги">
+                    <i class="icon-book-text"></i>
+                </button>
+                <button type="button"
+                        class="sidebar-btn sidebar-btn-type"
+                        :class="{ 'active': workTypes.includes('film') }"
+                        @click="toggleType('film')"
+                        title="Фильмы">
+                    <i class="icon-clapperboard"></i>
+                </button>
+                <button type="button"
+                        class="sidebar-btn sidebar-btn-type"
+                        :class="{ 'active': workTypes.includes('game') }"
+                        @click="toggleType('game')"
+                        title="Игры">
+                    <i class="icon-gamepad-2"></i>
+                </button>
+            </div>
+        </div>
+        <div class="dash-cards dash-cards-4">
+            <template x-for="status in statuses" :key="status.key">
+                <article class="dash-card dash-card-ratio">
+                    <div class="dash-card-label">
+                        <i :class="status.icon"></i>
+                        <span x-text="status.label"></span>
+                    </div>
+                    <div class="dash-card-value" x-text="statusCount(status.key)"></div>
+                    <div class="dash-card-ratio-value" x-text="statusPercent(status.key)"></div>
+                </article>
+            </template>
+        </div>
+    </section>
+
+    <section class="dash-segment">
+        <div class="dash-segment-head">
+            <h2 class="dash-segment-title">Прогресс</h2>
+        </div>
+        <div class="dash-cards dash-cards-3">
+            {% for card in progress_cards %}
+            <article class="dash-card dash-card-progress">
+                <div class="dash-card-label">
+                    <i class="{{ card.icon }}"></i>
+                    <span>{{ card.label }}</span>
+                </div>
+                <div class="dash-progress-metrics">
+                    <div class="dash-progress-metric">
+                        <div class="dash-card-value">{{ card.avg_rating_display }}</div>
+                        <div class="dash-card-ratio-value">средний рейтинг</div>
+                    </div>
+                    <div class="dash-progress-metric">
+                        <div class="dash-card-value">{{ card.spent_display }}</div>
+                        <div class="dash-card-ratio-value">по прогрессу</div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+</div>
