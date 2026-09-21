@@ -1689,12 +1689,34 @@
                 }
             },
         });
-
         const DASH_CHART_COLORS = [
             "#A78BFA", "#60A5FA", "#34D399", "#F87171", "#FB923C",
             "#818CF8", "#FBBF24", "#22D3EE", "#F472B6", "#94A3B8",
             "#C084FC", "#38BDF8",
         ];
+
+        const centerTextPlugin = {
+            id: "centerText",
+            afterDraw(chart, args, opts) {
+                if (!opts?.text) return;
+                const { ctx, chartArea } = chart;
+                if (!chartArea) return;
+                const cx = (chartArea.left + chartArea.right) / 2;
+                const cy = (chartArea.top + chartArea.bottom) / 2;
+                ctx.save();
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.font = "bold 28px sans-serif";
+                ctx.fillStyle = "#E2E8F0";
+                ctx.fillText(opts.text, cx, cy - 8);
+                if (opts.label) {
+                    ctx.font = "12px sans-serif";
+                    ctx.fillStyle = "#94A3B8";
+                    ctx.fillText(opts.label, cx, cy + 16);
+                }
+                ctx.restore();
+            },
+        };
 
         function readJsonScript(id) {
             const el = document.getElementById(id);
@@ -1721,12 +1743,103 @@
 
         Alpine.data("vorDashStats", () => ({
             workTypes: ["book", "film", "game"],
-            matrix: {},
-            statuses: [],
+            pieCharts: { types: null, statuses: null , age: null, rating: null},
+            barCharts: { rating: null},
+            statusMatrix: {},
+            ageMatrix: {},
+            ratingMatrix: {},
+            spent: {},
+            typeMeta: {},
+            statusChoices: {},
+            ageChoices: {},
+            ratingChoices: {},
+
             init() {
                 const data = readJsonScript("dash-stats-opts");
-                this.matrix = data.status_matrix || {};
-                this.statuses = data.statuses || [];
+                this.statusMatrix = data.status_matrix || {};
+                this.ageMatrix = data.age_matrix || {};
+                this.ratingMatrix = data.rating_matrix || {};
+                this.spent = data.spent || {};
+                this.typeMeta = data.type_meta || {};
+                this.statusChoices = data.status_choices || {}
+                this.ageChoices = data.age_choices || {};
+                this.ratingChoices = data.rating_choices || {};
+                
+                console.log("[charts] init, raw data:", data);
+                console.log("[charts] typeMeta:", this.typeMeta);
+                this.$nextTick(() => {
+                    this.renderPieTypes();
+                    this.renderPieStatus();
+                    this.renderPieAge();
+                    this.renderPieRating();
+                    this.renderBarRating();
+                });
+                
+                this.$watch("pieStatusItems", () => {
+                    this.$nextTick(() => this.renderPieStatus());
+                });
+                this.$watch("pieAgeItems", () => {
+                    this.$nextTick(() => this.renderPieAge());
+                });
+                this.$watch("pieRatingItems", () => {
+                    this.$nextTick(() => this.renderPieRating());
+                });
+            },
+            get worksTotalCount() {
+                return Object.keys(this.typeMeta).reduce((sum, type) => sum + this.sumByRow(type, this.statusMatrix), 0);
+            },
+            get averageRating() {
+                if (!this.workTypes.length) return "0.0";
+                const total_res = this.workTypes.reduce((res, type) => {
+                    const row_res = this.sumByRowWithCount(type, this.ratingMatrix);
+                    res.sum += row_res.sum;
+                    res.count += row_res.count;
+                    return res;
+                }, {"sum": 0, "count": 0});
+                return total_res.count ? (total_res.sum / total_res.count).toFixed(1) : "0.0";
+            },
+            get spentProgressItems() {
+                return Object.entries(this.spent).map(([key, value]) => ({
+                    key: key,
+                    count: value,
+                    unit: this.typeMeta[key].unit,
+                    icon: this.typeMeta[key].icon,
+                }));
+            },
+            get pieTypesItems() {
+                return Object.keys(this.typeMeta).map(type => ({
+                    label: this.typeMeta[type].label,
+                    count: this.sumByRow(type, this.statusMatrix),
+                }));
+            },
+            get pieStatusItems() {
+                if (!this.workTypes.length) return {};
+                return Object.keys(this.statusChoices).map(status => ({
+                    label: this.statusChoices[status].label,
+                    count: this.sumByCol(status, this.statusMatrix),
+                }));
+            },
+            get pieAgeItems() {
+                if (!this.workTypes.length) return {};
+                return Object.keys(this.ageChoices).map(age => ({
+                    label: this.ageChoices[age].label,
+                    count: this.sumByCol(age, this.ageMatrix),
+                }));
+            },
+            get pieRatingItems() {
+                if (!this.workTypes.length) return {};
+                return Object.keys(this.ratingChoices).map(age => ({
+                    label: this.ratingChoices[age].label,
+                    count: this.sumByCol(age, this.ratingMatrix),
+                }));
+            },
+            get barRatingItems() {
+                return Object.keys(this.typeMeta).map(type => {
+                    const { sum, count } = this.sumByRowWithCount(type, this.ratingMatrix);
+                    return {
+                    label: this.typeMeta[type].label,
+                    count: this.avgStr(sum, count)};
+                });
             },
             toggleType(type) {
                 const index = this.workTypes.indexOf(type);
@@ -1736,21 +1849,173 @@
                     this.workTypes.push(type);
                 }
             },
-            statusCount(status) {
-                const row = this.matrix[status] || {};
-                return this.workTypes.reduce((sum, type) => sum + (row[type] || 0), 0);
+            sumByCol(col, matrix) {
+                return this.workTypes.reduce((sum, type) => 
+                    sum + (matrix[type]?.[col] || 0), 0);
             },
-            statusTotal() {
-                return this.statuses.reduce(
-                    (sum, status) => sum + this.statusCount(status.key),
-                    0
+            sumByRow(row, matrix) {
+                const row_data = matrix[row] || {};
+                return Object.values(row_data).reduce((sum, val) => sum + val, 0)
+            },
+            sumByRowWithCount(row, matrix) {
+                const row_data = matrix[row] || {};
+                return Object.entries(row_data).reduce((res, [rating, count]) => {
+                        if (rating === "") return res;
+                        res.sum += Number(rating) * count;
+                        res.count += count;
+                        return res;
+                }, {"sum": 0, "count": 0});
+            },
+            avgStr(sum, count) {
+                return count ? (sum / count).toFixed(1) : "0.0";
+            },
+            formatNumber(number) {
+                console.log("[charts] number:", Number(number));
+                return Number(number).toFixed(1).toLocaleString("ru-RU");
+            },
+            _renderPie(key, canvas, items, { centerText = null } = {}) {
+                console.log(`[charts] _renderPie key=${key}`, {
+                    canvas: !!canvas,
+                    existing: canvas ? !!Chart.getChart(canvas) : null,
+                    stored: !!this.pieCharts[key],
+                });
+                if (!canvas || !window.Chart) return;
+                Chart.getChart(canvas)?.destroy();
+                this.pieCharts[key] = null;
+                if (!items.length) return;
+
+                this.pieCharts[key] = new Chart(canvas, {
+                    type: "doughnut",
+                    data: {
+                        labels: items.map(i => i.label),
+                        datasets: [{
+                            data: items.map(i => i.count),
+                            backgroundColor: items.map(
+                                (_, index) => DASH_CHART_COLORS[index % DASH_CHART_COLORS.length]
+                            ),
+                            borderColor: "#1A233A",
+                            borderWidth: 2,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: "bottom",
+                                labels: {
+                                    boxWidth: 12,
+                                    color: "#E2E8F0",
+                                },
+                            },
+                            centerText: centerText
+                                ? {"text": centerText.value, "label": centerText.label, }
+                                : undefined,
+                        },
+                    },
+                    plugins: [centerTextPlugin]
+                });
+            },
+            _renderBar(key, canvas, items) {
+                console.log(`[charts] _renderBar key=${key}`, {
+                    canvas: !!canvas,
+                    existing: canvas ? !!Chart.getChart(canvas) : null,
+                    stored: !!this.barCharts[key],
+                });
+                if (!canvas || !window.Chart) return;
+                Chart.getChart(canvas)?.destroy();
+                this.barCharts[key] = null;
+                if (!items.length) return;
+
+                this.barCharts[key] = new Chart(canvas, {
+                    type: "bar",
+                    data: {
+                        labels: items.map(i => i.label),
+                        datasets: [{
+                            data: items.map(i => i.count),
+                            backgroundColor: items.map(
+                                (_, index) => DASH_CHART_COLORS[index % DASH_CHART_COLORS.length]
+                            ),
+                            borderRadius: 4,
+                            borderSkipped: false,
+                            barThickness: "flex",
+                            maxBarThickness: 96,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                suggestedMax: 10,
+                                ticks: {
+                                    color: "#94A3B8",
+                                    font: { size: 11 },
+                                    precision: 0,     // целые числа на оси
+                                },
+                                grid: { color: "rgba(255,255,255,0.06)" },
+                                border: { display: false },
+                            },
+                            x: {
+                                ticks: {
+                                    color: "#94A3B8",
+                                    font: { size: 11 },
+                                },
+                                grid: { display: false },
+                                border: { display: false },
+                            },
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: "#1A233A",
+                                titleColor: "#E2E8F0",
+                                bodyColor: "#E2E8F0",
+                                borderColor: "rgba(167,139,250,0.3)",
+                                borderWidth: 1,
+                            },
+                        },
+                    }
+                });
+            },
+            renderPieTypes() {
+                this._renderPie(
+                    "types",
+                    this.$refs.pieTypes,
+                    this.pieTypesItems,
+                    { centerText: { value: this.worksTotalCount, label: "всего" } }
                 );
             },
-            statusPercent(status) {
-                return formatDashPercent(
-                    this.statusTotal()
-                        ? Math.round((this.statusCount(status) * 1000) / this.statusTotal()) / 10
-                        : 0
+            renderPieStatus() {
+                this._renderPie(
+                    "statuses",
+                    this.$refs.pieStatus,
+                    this.pieStatusItems,
+                    { centerText: null }
+                );
+            },
+            renderPieAge() {
+                this._renderPie(
+                    "age",
+                    this.$refs.pieAge,
+                    this.pieAgeItems,
+                    { centerText: null }
+                );
+            },
+            renderPieRating() {
+                this._renderPie(
+                    "rating",
+                    this.$refs.pieRating,
+                    this.pieRatingItems,
+                    { centerText: { value: this.averageRating, label: "среднее"} }
+                );
+            },
+            renderBarRating() {
+                this._renderBar(
+                    "rating",
+                    this.$refs.barRating,
+                    this.barRatingItems,
                 );
             },
         }));

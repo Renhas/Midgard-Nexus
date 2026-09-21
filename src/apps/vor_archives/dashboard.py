@@ -12,11 +12,14 @@ from .models import FeedItem, UserWork
 from .templatetags.vor_archives_extras import (
     FEED_ACTION_ICONS,
     FEED_ACTION_LABELS_RU,
-    STATUS_ICONS,
     STATUS_LABELS_RU,
 )
 
 WORK_TYPES = ("book", "film", "game")
+AGE_CHOICES_EXT = [("", "Не указан")] + list(AgeRatingChoices.choices)
+RATING_CHOICES_EXT = [("", "Без оценки")] + [
+    (str(value), str(value)) for value in range(1, 11)
+]
 
 TYPE_META = {
     "book": {"label": "Книги", "icon": "icon-book-text", "unit": "стр."},
@@ -113,16 +116,26 @@ def _prefetch_work_attrs(user_works):
 
 def _empty_status_matrix():
     return {
-        status: {type_key: 0 for type_key in WORK_TYPES}
-        for status in UserWorkStatusChoices.values
+        type_key: {status: 0 for status in UserWorkStatusChoices.values}
+        for type_key in WORK_TYPES
+    }
+
+
+def _empty_age_matrix():
+    return {type_key: {age[0]: 0 for age in AGE_CHOICES_EXT} for type_key in WORK_TYPES}
+
+
+def _empty_rating_matrix():
+    return {
+        type_key: {rat[0]: 0 for rat in RATING_CHOICES_EXT} for type_key in WORK_TYPES
     }
 
 
 def stats_payload(user):
     user_works = load_user_works(user)
-    by_type = {key: 0 for key in WORK_TYPES}
-    matrix = _empty_status_matrix()
-    ratings = {key: [] for key in WORK_TYPES}
+    status_matrix = _empty_status_matrix()
+    age_matrix = _empty_age_matrix()
+    rating_matrix = _empty_rating_matrix()
     spent = {key: 0.0 for key in WORK_TYPES}
 
     for user_work in user_works:
@@ -130,67 +143,31 @@ def stats_payload(user):
         if work is None:
             continue
         type_key = work._meta.model_name
-        if type_key not in by_type:
+        age_key = work.age_rating or ""
+        rating_key = str(user_work.rating or "")
+        if type_key not in WORK_TYPES:
             continue
-        by_type[type_key] += 1
-        if user_work.status in matrix:
-            matrix[user_work.status][type_key] += 1
-        if user_work.rating is not None:
-            ratings[type_key].append(user_work.rating)
+        age_matrix[type_key][age_key] += 1
+        rating_matrix[type_key][rating_key] += 1
+        status_matrix[type_key][user_work.status] += 1
         spent_row = progress_spent(user_work)
         if spent_row:
             spent[spent_row[0]] += spent_row[1]
-
-    total = sum(by_type.values())
-    type_cards = []
-    progress_cards = []
-    for type_key in WORK_TYPES:
-        meta = TYPE_META[type_key]
-        type_ratings = ratings[type_key]
-        avg_rating = None
-        if type_ratings:
-            avg_rating = round(sum(type_ratings) / len(type_ratings), 1)
-        type_cards.append(
-            {
-                "key": type_key,
-                "label": meta["label"],
-                "icon": meta["icon"],
-                "count": by_type[type_key],
-                "percent": format_percent(by_type[type_key], total),
-            }
-        )
-        progress_cards.append(
-            {
-                "key": type_key,
-                "label": meta["label"],
-                "icon": meta["icon"],
-                "unit": meta["unit"],
-                "avg_rating": avg_rating,
-                "avg_rating_display": (
-                    format_number(avg_rating) if avg_rating is not None else "—"
-                ),
-                "spent": round(spent[type_key], 1),
-                "spent_display": f"{format_number(spent[type_key])} {meta['unit']}",
-            }
-        )
-
-    statuses = [
-        {
-            "key": value,
-            "label": STATUS_LABELS_RU.get(value, label),
-            "icon": STATUS_ICONS.get(value, "bi bi-circle"),
-        }
-        for value, label in UserWorkStatusChoices.choices
-    ]
     return {
-        "total": total,
-        "type_cards": type_cards,
-        "progress_cards": progress_cards,
-        "status_matrix": matrix,
-        "statuses": statuses,
         "stats_opts": {
-            "status_matrix": matrix,
-            "statuses": statuses,
+            "status_matrix": status_matrix,
+            "age_matrix": age_matrix,
+            "rating_matrix": rating_matrix,
+            "spent": spent,
+            "type_meta": TYPE_META,
+            "status_choices": {
+                key: {"label": STATUS_LABELS_RU[key]}
+                for key in UserWorkStatusChoices.values
+            },
+            "age_choices": {key: {"label": name} for key, name in AGE_CHOICES_EXT},
+            "rating_choices": {
+                key: {"label": name} for key, name in RATING_CHOICES_EXT
+            },
         },
     }
 

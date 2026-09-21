@@ -3692,28 +3692,49 @@ body.vor-artworks-list-drag .artwork-tile {
     display: flex;
     flex-direction: column;
     height: 100%;
+    
+    max-width: 1500px;
+    width: 100%;
+    margin-inline: auto; 
     min-height: 0;
     overflow-y: auto;
     gap: 0.75rem;
+    padding-inline: 0.75rem;
 }
 
 .dash-stats {
     justify-content: stretch;
 }
 
+.dash-segments {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+    align-items: start;
+    flex: 1;
+    min-height: 0;
+}
+
 .dash-segment {
     display: flex;
     flex-direction: column;
     gap: 0.45rem;
-    flex: 1 1 0;
-    min-height: 9.5rem;
+    min-width: 0;
+}
+
+.dash-toolbar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
 .dash-segment-head,
 .dash-pane-head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 0.6rem;
     flex-shrink: 0;
 }
@@ -3728,26 +3749,17 @@ body.vor-artworks-list-drag .artwork-tile {
 }
 
 .dash-cards {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 0.65rem;
-    flex: 1;
-    min-height: 0;
-}
-
-.dash-cards-4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.dash-cards-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    flex: 0 0 auto;
 }
 
 .dash-card {
+    position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     gap: 0.2rem;
-    min-height: 0;
     padding: 0.7rem 0.85rem;
     border: 1px solid var(--border);
     border-radius: 0.75rem;
@@ -3757,44 +3769,33 @@ body.vor-artworks-list-drag .artwork-tile {
 }
 
 .dash-card:hover {
-    transform: scale(1.03);
+    transform: translateY(-5px);
     border-color: var(--accent-vor);
     background-color: rgba(167, 139, 250, 0.08);
-    box-shadow: 0 0 0 1px rgba(167, 139, 250, 0.2);
+    box-shadow:
+        0 0 0 1px rgba(167, 139, 250, 0.2),
+        0 6px 16px rgba(0, 0, 0, 0.18);
     z-index: 1;
 }
 
-.dash-card-label {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
+.dash-card--chart {
+    aspect-ratio: 4 / 3;
+}
+
+.dash-card-title {
+    align-self: stretch;
+    text-align: center;
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
     color: var(--text-secondary);
-    font-size: 0.8rem;
-}
-
-.dash-card-label i {
-    font-size: 1rem;
-}
-
-.dash-card-value {
-    color: var(--text-primary);
-    font-size: 1.65rem;
-    font-weight: 700;
-    line-height: 1.15;
-}
-
-.dash-card-kpi .dash-card-value {
-    font-size: 1.9rem;
-}
-
-.dash-card-ratio-value {
-    color: var(--text-secondary);
-    font-size: 0.78rem;
-    line-height: 1.2;
 }
 
 .dash-type-filters {
     display: flex;
+    align-self: flex-start;
+    flex-direction: row;
     align-items: center;
     gap: 0.3rem;
 }
@@ -3805,18 +3806,96 @@ body.vor-artworks-list-drag .artwork-tile {
     padding: 0;
 }
 
+.dash-chart-canvas-wrap {
+    position: relative;
+    flex: 1 1 0;
+    min-height: 0;
+    min-width: 0;
+}
+
+.dash-chart-canvas-wrap canvas {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.dash-card-label {
+    gap: 0.35rem;
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.dash-card-value {
+    color: var(--text-primary);
+    font-size: 1.65rem;
+    font-weight: 700;
+}
+
+.dash-card-ratio-value {
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    line-height: 1.2;
+}
+
+.dash-progress-star {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    height: 32px;
+    min-width: 32px;
+    padding: 0 0.4rem;
+    box-sizing: border-box;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.dash-progress-star i {
+    font-size: 1.2rem;
+    color: #f5c518;
+}
+
 .dash-progress-metrics {
-    display: flex;
-    gap: 1rem;
-    margin-top: 0.2rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 0.5rem;
+    padding-inline: 0.25rem;
+    align-content: center;
+    flex: 1;
 }
 
 .dash-progress-metric {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     min-width: 0;
+}
+
+.dash-progress-metric + .dash-progress-metric::before {
+    content: "";
+    position: absolute;
+    left: calc(-0.25rem - 0.5px);
+    top: 50%;
+    transform: translateY(-50%);
+    height: 60%;
+    width: 1px;
+    background: var(--border);
 }
 
 .dash-progress-metric .dash-card-value {
     font-size: 1.35rem;
+}
+
+.dash-progress-metric i {
+    font-size: 1.5rem;
+}
+
+.dash-progress-metric .dash-card-label {
+    font-size: 0.8rem;
 }
 
 .dash-charts {
@@ -3848,17 +3927,6 @@ body.vor-artworks-list-drag .artwork-tile {
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: 0.45rem;
-}
-
-.dash-chart-canvas-wrap {
-    position: relative;
-    flex: 1;
-    min-height: 14rem;
-}
-
-.dash-chart-canvas-wrap canvas {
-    width: 100% !important;
-    height: 100% !important;
 }
 
 .dash-attr-body {
@@ -4080,11 +4148,6 @@ body.vor-artworks-list-drag .artwork-tile {
 }
 
 @media (max-width: 1200px) {
-    .dash-cards-4,
-    .dash-cards-3 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
     .dash-charts,
     .dash-activity {
         grid-template-columns: 1fr;
