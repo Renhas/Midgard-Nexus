@@ -1695,6 +1695,9 @@
             "#C084FC", "#38BDF8",
         ];
 
+        const MIN_SIZE_PX = 12;
+        const MAX_SIZE_PX = 48;
+
         const centerTextPlugin = {
             id: "centerText",
             afterDraw(chart, args, opts) {
@@ -2021,7 +2024,8 @@
         }));
 
         Alpine.data("vorDashAttrs", () => {
-            const charts = Object.create(null);
+            const barCharts = Object.create(null);
+            const cloudCharts = Object.create(null);
             return {
                 attrView: "cloud",
                 attrs: {},
@@ -2034,9 +2038,6 @@
                     this.totalWorks = data.total;
                     this.histTopN = data.histTopN || 12;
                     this.calcAttrTotal();
-                    this.barCharts = Object.fromEntries(
-                        Object.keys(this.attrs).map(key => [key, null])
-                    );
                     console.log("[attrs] raw input data", data);
                     console.log("[attrs] attrView", this.attrView);
                     console.log("[attrs] attrs", this.attrs);
@@ -2044,24 +2045,6 @@
                     this.$nextTick(() => this._updateData());
                     this.$watch("attrView", () => this._updateData());
                     this.$watch("attrs", () => this._updateData());
-                },
-                get attrItems() {
-                    return this.attrs[this.attrKind] || [];
-                },
-                get cloudItems() {
-                    const items = this.attrItems;
-                    if (!items.length) {
-                        return [];
-                    }
-                    const counts = items.map((item) => item.count);
-                    const min = Math.min(...counts);
-                    const max = Math.max(...counts);
-                    return items.map((item) => ({
-                        ...item,
-                        fontSize: max === min
-                            ? 1.15
-                            : 0.75 + ((item.count - min) / (max - min)) * 1.55,
-                    }));
                 },
                 calcAttrTotal() {
                     this.attrTotals = Object.fromEntries(
@@ -2080,6 +2063,25 @@
                         count: item.count,
                     }));
                 },
+                getCloudItems(attrKey) {
+                    const items = this.attrs[attrKey];
+                    if (!items.length) return [];
+                    
+                    const counts = items.map(i => i.count);
+                    const min = Math.min(...counts);
+                    const max = Math.max(...counts);
+
+                    return items.map(item => {
+                        const size = min === max ? (MIN_SIZE_PX + MAX_SIZE_PX) / 2 
+                            : MIN_SIZE_PX + ((item.count - min) / (max - min)) * (MAX_SIZE_PX - MIN_SIZE_PX);
+                        
+                        return {
+                            label: item.name,
+                            count: item.count,
+                            size,
+                        };
+                    });
+                },
                 calcAttrShare(count, attrKey) {
                     const total = this.attrTotals[attrKey];
                     return total ? (count / total).toFixed(1) : 0;
@@ -2092,24 +2094,43 @@
                 _updateData() {
                     console.log("[attrs | _updateData] view", this.attrView);
                     if (this.attrView === "bar") {
-                        this.$nextTick(() => this._renderAllCharts());
+                        this.$nextTick(() => this._renderAllBars());
+                    }
+                    if (this.attrView === "cloud") {
+                        this.$nextTick(() => this._renderAllClouds());
                     }
                 },
-                _deleteAllCharts() {
-                    for (const key of Object.keys(charts)) {
+                _deleteAllBars() {
+                    for (const key of Object.keys(barCharts)) {
                         try {
-                            charts[key]?.stop();
-                            charts[key]?.destroy();
+                            barCharts[key]?.stop();
+                            barCharts[key]?.destroy();
                         } catch (e) {
-                            console.error('[charts] destroy failed for', key, e);
+                            console.error('[attrs] destroy failed for', key, e);
                         }
-                        delete charts[key];
+                        delete barCharts[key];
                     }
                 },
-                _renderAllCharts() {
-                    console.log("[attrs | _renderAllCharts] Start render");
+                _deleteAllClouds() {
+                    for (const key of Object.keys(cloudCharts)) {
+                        try {
+                            cloudCharts[key]?.stop();
+                            cloudCharts[key]?.destroy();
+                        } catch (e) {
+                            console.error('[attrs] destroy failed for', key, e);
+                        }
+                        delete cloudCharts[key];
+                    }
+                },
+                _renderAllBars() {
+                    console.log("[attrs | _renderAllBars] Start render");
                     Object.keys(this.attrs).forEach((key) => this.renderSingleBar(key));
-                    console.log("[attrs | _renderAllCharts] End render");
+                    console.log("[attrs | _renderAllBars] End render");
+                },
+                _renderAllClouds() {
+                    console.log("[attrs | _renderAllClouds] Start render");
+                    Object.keys(this.attrs).forEach((key) => this.renderSingleCloud(key));
+                    console.log("[attrs | _renderAllClouds] End render");
                 },
                 _formBarData(items) {
                     return {
@@ -2120,17 +2141,25 @@
                         ),
                     }
                 },
+                _formCloudData(items) {
+                    return {
+                        labels: items.map(i => i.label),
+                        data: items.map(i => i.size),
+                        counts: items.map(i => i.count),
+                        color: DASH_CHART_COLORS[0],
+                    }
+                },
                 _renderBar(key, canvas, items) {
                     console.log(`[attrs | _renderBar] _renderBar key=${key}`, {
                         canvas: !!canvas,
                         existing: canvas ? !!Chart.getChart(canvas) : null,
-                        stored: !!charts[key],
+                        stored: !!barCharts[key],
                         items: items,
                     });
                     if (!canvas || !window.Chart) return;
                     const { labels, data, bgColor } = this._formBarData(items);
-                    if (charts[key]) {
-                        const chart = charts[key];
+                    if (barCharts[key]) {
+                        const chart = barCharts[key];
                         console.log(`[attrs | _renderBar] _renderBar key=${key}`, `Work with chart=${chart}`);
                         chart.data.labels = labels;
                         chart.data.datasets[0].data = data;
@@ -2145,7 +2174,7 @@
                         return;
                     }
 
-                    charts[key] = new Chart(canvas, {
+                    barCharts[key] = new Chart(canvas, {
                         type: "bar",
                         data: {
                             labels: labels,
@@ -2195,6 +2224,69 @@
                         }
                     });
                 },
+                _renderCloud(key, canvas, items) {
+                    console.log(`[attrs | _renderCloud] _renderCloud key=${key}`, {
+                        canvas: !!canvas,
+                        existing: canvas ? !!Chart.getChart(canvas) : null,
+                        stored: !!cloudCharts[key],
+                        items: items,
+                    });
+                    if (!canvas || !window.Chart) return;
+                    const { labels, data, counts, color } = this._formCloudData(items);
+                    if (cloudCharts[key]) {
+                        const chart = cloudCharts[key];
+                        console.log(`[attrs | _renderCloud] _renderCloud key=${key}`, `Work with chart=${chart}`);
+                        chart.data.labels = labels;
+                        chart.data.datasets[0].data = data;
+                        chart.data.datasets[0].color = color;
+                        chart.data.datasets[0].counts = counts;
+                        console.log(`[attrs | _renderCloud] _renderCloud key=${key}`, "Data Updated with", {
+                            labels: labels,
+                            data: data,
+                            color: color,
+                        });
+                        chart.update();
+                        console.log(`[attrs | _renderCloud] _renderCloud key=${key}`, "Updated!");
+                        return;
+                    }
+
+                    cloudCharts[key] = new Chart(canvas, {
+                        type: "wordCloud",
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: "",
+                                data: data,
+                                color: color,
+                                counts: counts,
+                                minRotation: 0,
+                                maxRotation: 0,
+                                padding: 8,
+                            }],
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                title: { display: false },
+                                tooltip: {
+                                    backgroundColor: "#1A233A",
+                                    titleColor: "#E2E8F0",
+                                    bodyColor: "#E2E8F0",
+                                    borderColor: "rgba(167,139,250,0.3)",
+                                    borderWidth: 1,
+                                    callbacks: {
+                                        label: (ctx) => {
+                                            const counts = ctx.dataset.counts ?? [];
+                                            return `${counts[ctx.dataIndex] ?? ''}`;
+                                        },
+                                    },
+                                },
+                            },
+                        }
+                    });
+                },
                 renderSingleBar(attrKey) {
                     console.log(`[attrs | renderSingleBar] Render start, key=${attrKey}`);
                     this._renderBar(
@@ -2204,8 +2296,17 @@
                     );
                     console.log(`[attrs | renderSingleBar] Render end, key=${attrKey}`);
                 },
+                renderSingleCloud(attrKey) {
+                    console.log(`[attrs | renderSingleCloud] Render start, key=${attrKey}`);
+                    this._renderCloud(
+                        attrKey,
+                        this.$refs[`cloud-${attrKey}`],
+                        this.getCloudItems(attrKey),
+                    );
+                    console.log(`[attrs | renderSingleCloud] Render end, key=${attrKey}`);
+                },
                 destroy() {
-                    this._deleteAllCharts();
+                    this._deleteAllBars();
                 }
             }
         });

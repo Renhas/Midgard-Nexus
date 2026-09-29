@@ -21,10 +21,9 @@
                     <i class="{{ kind.icon }} dash-card-title__icon"></i>
                     <h2 class="dash-card-title">{{ kind.label }}</h2>
                 </div>
-                <template x-if="attrView === 'cloud'">
-                    <div class="dash-attr-cloud">
-                    </div>
-                </template>
+                <div class="dash-chart-canvas-wrap" x-show="attrView === 'cloud'" x-cloak>
+                    <canvas x-ref="cloud-{{kind.key}}"></canvas>
+                </div>
                 <div class="dash-chart-canvas-wrap" x-show="attrView === 'bar'" x-cloak>
                     <canvas x-ref="bar-{{kind.key}}"></canvas>
                 </div>
@@ -46,19 +45,5 @@
                 </div>
             </section>
         {% endfor %}
-        <!--
-            <div class="dash-attr-body">
-                <p class="dash-empty" x-show="!attrItems.length" x-cloak>Атрибутов пока нет</p>
-    
-                <div class="dash-attr-cloud" x-show="attrView === 'cloud' && attrItems.length" x-cloak>
-                    <template x-for="item in cloudItems" :key="item.name">
-                        <span class="dash-cloud-tag"
-                                :style="`font-size: ${item.fontSize}rem`"
-                                x-text="item.name"
-                                :title="`${item.count} · ${formatPercent(item.percent)}`"></span>
-                    </template>
-                </div>
-            </div>
-            -->
     </section>
 </div>

@@ -209,7 +209,6 @@ def _attrs_to_items(user_works):
                 {
                     "name": f"{name} ({TYPE_META[type_key]['label']})",
                     "count": count,
-                    "type_key": type_key,
                 }
             )
     genre_items.sort(key=lambda item: (-item["count"], item["name"]))
