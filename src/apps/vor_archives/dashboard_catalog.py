@@ -1,6 +1,6 @@
 DASHBOARD_TABS = [
-    {"kind": "stats", "label": "Статистика", "icon": "bi bi-123"},
-    {"kind": "charts", "label": "Графики", "icon": "bi bi-pie-chart"},
+    {"kind": "stats", "label": "Статистика", "icon": "bi bi-pie-chart"},
+    {"kind": "attrs", "label": "Аттрибуты", "icon": "bi bi-cloud"},
     {"kind": "activity", "label": "Активность", "icon": "bi bi-calendar-date"},
 ]
 

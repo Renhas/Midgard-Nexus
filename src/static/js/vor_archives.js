@@ -2020,161 +2020,195 @@
             },
         }));
 
-        Alpine.data("vorDashCharts", () => ({
-            pieField: "status",
-            attrKind: "tags",
-            attrView: "cloud",
-            pies: {},
-            attrs: {},
-            histTopN: 12,
-            pieChart: null,
-            barChart: null,
-            init() {
-                const data = readJsonScript("dash-charts-opts");
-                this.pies = data.pies || {};
-                this.attrs = data.attrs || {};
-                this.histTopN = data.histTopN || 12;
-                this.$nextTick(() => {
-                    this.renderPie();
-                    this.renderBar();
-                });
-            },
-            get pieItems() {
-                return this.pies[this.pieField] || [];
-            },
-            get attrItems() {
-                return this.attrs[this.attrKind] || [];
-            },
-            get cloudItems() {
-                const items = this.attrItems;
-                if (!items.length) {
-                    return [];
-                }
-                const counts = items.map((item) => item.count);
-                const min = Math.min(...counts);
-                const max = Math.max(...counts);
-                return items.map((item) => ({
-                    ...item,
-                    fontSize: max === min
-                        ? 1.15
-                        : 0.75 + ((item.count - min) / (max - min)) * 1.55,
-                }));
-            },
-            formatPercent: formatDashPercent,
-            setPieField(field) {
-                this.pieField = field;
-                this.$nextTick(() => this.renderPie());
-            },
-            setAttrKind(kind) {
-                this.attrKind = kind;
-                this.$nextTick(() => this.renderBar());
-            },
-            setAttrView(view) {
-                this.attrView = view;
-                this.$nextTick(() => this.renderBar());
-            },
-            renderPie() {
-                const canvas = document.getElementById("dash-pie-chart");
-                if (!canvas || !window.Chart) {
-                    return;
-                }
-                if (this.pieChart) {
-                    this.pieChart.destroy();
-                    this.pieChart = null;
-                }
-                if (!this.pieItems.length) {
-                    return;
-                }
-                this.pieChart = new Chart(canvas, {
-                    type: "doughnut",
-                    data: {
-                        labels: this.pieItems.map((item) => item.label),
-                        datasets: [{
-                            data: this.pieItems.map((item) => item.value),
-                            backgroundColor: this.pieItems.map(
-                                (_, index) => DASH_CHART_COLORS[index % DASH_CHART_COLORS.length]
-                            ),
-                            borderColor: "#1A233A",
-                            borderWidth: 2,
-                        }],
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: "right",
-                                labels: {
-                                    boxWidth: 12,
-                                    color: "#E2E8F0",
+        Alpine.data("vorDashAttrs", () => {
+            const charts = Object.create(null);
+            return {
+                attrView: "cloud",
+                attrs: {},
+                attrTotals: {},
+                totalWorks: 0,
+                histTopN: 12,
+                init() {
+                    const data = readJsonScript("dash-attrs-opts");
+                    this.attrs = data.attrs || {};
+                    this.totalWorks = data.total;
+                    this.histTopN = data.histTopN || 12;
+                    this.calcAttrTotal();
+                    this.barCharts = Object.fromEntries(
+                        Object.keys(this.attrs).map(key => [key, null])
+                    );
+                    console.log("[attrs] raw input data", data);
+                    console.log("[attrs] attrView", this.attrView);
+                    console.log("[attrs] attrs", this.attrs);
+                    console.log("[attrs] attrTotals", this.attrTotals);
+                    this.$nextTick(() => this._updateData());
+                    this.$watch("attrView", () => this._updateData());
+                    this.$watch("attrs", () => this._updateData());
+                },
+                get attrItems() {
+                    return this.attrs[this.attrKind] || [];
+                },
+                get cloudItems() {
+                    const items = this.attrItems;
+                    if (!items.length) {
+                        return [];
+                    }
+                    const counts = items.map((item) => item.count);
+                    const min = Math.min(...counts);
+                    const max = Math.max(...counts);
+                    return items.map((item) => ({
+                        ...item,
+                        fontSize: max === min
+                            ? 1.15
+                            : 0.75 + ((item.count - min) / (max - min)) * 1.55,
+                    }));
+                },
+                calcAttrTotal() {
+                    this.attrTotals = Object.fromEntries(
+                        Object.entries(this.attrs).map(([key, items]) => [
+                            key,
+                            items.reduce((sum, item) => sum + (item.count || 0), 0),
+                        ])
+                    );
+                },
+                getItems(attrKey) {
+                    return this.attrs[attrKey];
+                },
+                getHistItems(attrKey) {
+                    return this.attrs[attrKey].slice(0, this.histTopN).map((item) => ({
+                        label: item.name,
+                        count: item.count,
+                    }));
+                },
+                calcAttrShare(count, attrKey) {
+                    const total = this.attrTotals[attrKey];
+                    return total ? (count / total).toFixed(1) : 0;
+                },
+                formatPercent: formatDashPercent,
+                setAttrView(view) {
+                    if (view === this.attrView) return;
+                    this.attrView = view;
+                },
+                _updateData() {
+                    console.log("[attrs | _updateData] view", this.attrView);
+                    if (this.attrView === "bar") {
+                        this.$nextTick(() => this._renderAllCharts());
+                    }
+                },
+                _deleteAllCharts() {
+                    for (const key of Object.keys(charts)) {
+                        try {
+                            charts[key]?.stop();
+                            charts[key]?.destroy();
+                        } catch (e) {
+                            console.error('[charts] destroy failed for', key, e);
+                        }
+                        delete charts[key];
+                    }
+                },
+                _renderAllCharts() {
+                    console.log("[attrs | _renderAllCharts] Start render");
+                    Object.keys(this.attrs).forEach((key) => this.renderSingleBar(key));
+                    console.log("[attrs | _renderAllCharts] End render");
+                },
+                _formBarData(items) {
+                    return {
+                        labels: items.map(i => i.label),
+                        data: items.map(i => i.count),
+                        bgColor: items.map(
+                            (_, index) => DASH_CHART_COLORS[index % DASH_CHART_COLORS.length]
+                        ),
+                    }
+                },
+                _renderBar(key, canvas, items) {
+                    console.log(`[attrs | _renderBar] _renderBar key=${key}`, {
+                        canvas: !!canvas,
+                        existing: canvas ? !!Chart.getChart(canvas) : null,
+                        stored: !!charts[key],
+                        items: items,
+                    });
+                    if (!canvas || !window.Chart) return;
+                    const { labels, data, bgColor } = this._formBarData(items);
+                    if (charts[key]) {
+                        const chart = charts[key];
+                        console.log(`[attrs | _renderBar] _renderBar key=${key}`, `Work with chart=${chart}`);
+                        chart.data.labels = labels;
+                        chart.data.datasets[0].data = data;
+                        chart.data.datasets[0].backgroundColor = bgColor;
+                        console.log(`[attrs | _renderBar] _renderBar key=${key}`, "Data Updated with", {
+                            labels: labels,
+                            data: data,
+                            bgColor: bgColor,
+                        });
+                        chart.update();
+                        console.log(`[attrs | _renderBar] _renderBar key=${key}`, "Updated!");
+                        return;
+                    }
+
+                    charts[key] = new Chart(canvas, {
+                        type: "bar",
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: data,
+                                backgroundColor: bgColor,
+                                borderRadius: 4,
+                                borderSkipped: false,
+                                barThickness: "flex",
+                                maxBarThickness: 96,
+                            }],
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        color: "#94A3B8",
+                                        font: { size: 11 },
+                                    },
+                                    grid: { display: false },
+                                    border: { display: false },
+                                },
+                                x: {
+                                    ticks: {
+                                        color: "#94A3B8",
+                                        font: { size: 11 },
+                                        precision: 0,
+                                    },
+                                    grid: { color: "rgba(255,255,255,0.06)" },
+                                    border: { display: false },
                                 },
                             },
-                        },
-                    },
-                });
-            },
-            histogramItems() {
-                const items = [...this.attrItems];
-                if (items.length <= this.histTopN) {
-                    return items;
-                }
-                const head = items.slice(0, this.histTopN);
-                const rest = items.slice(this.histTopN);
-                const otherCount = rest.reduce((sum, item) => sum + item.count, 0);
-                const otherPercent = rest.reduce((sum, item) => sum + item.percent, 0);
-                head.push({
-                    name: "Другие",
-                    count: otherCount,
-                    percent: Math.round(otherPercent * 10) / 10,
-                });
-                return head;
-            },
-            renderBar() {
-                const canvas = document.getElementById("dash-bar-chart");
-                if (!canvas || !window.Chart) {
-                    return;
-                }
-                if (this.barChart) {
-                    this.barChart.destroy();
-                    this.barChart = null;
-                }
-                if (this.attrView !== "bar" || !this.attrItems.length) {
-                    return;
-                }
-                const items = this.histogramItems();
-                this.barChart = new Chart(canvas, {
-                    type: "bar",
-                    data: {
-                        labels: items.map((item) => item.name),
-                        datasets: [{
-                            data: items.map((item) => item.count),
-                            backgroundColor: items.map(
-                                (_, index) => DASH_CHART_COLORS[index % DASH_CHART_COLORS.length]
-                            ),
-                            borderWidth: 0,
-                        }],
-                    },
-                    options: {
-                        indexAxis: "y",
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                        },
-                        scales: {
-                            x: {
-                                ticks: { color: "#94A3B8", precision: 0 },
-                                grid: { color: "#334155" },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: "#1A233A",
+                                    titleColor: "#E2E8F0",
+                                    bodyColor: "#E2E8F0",
+                                    borderColor: "rgba(167,139,250,0.3)",
+                                    borderWidth: 1,
+                                },
                             },
-                            y: {
-                                ticks: { color: "#E2E8F0" },
-                                grid: { display: false },
-                            },
-                        },
-                    },
-                });
-            },
-        }));
+                        }
+                    });
+                },
+                renderSingleBar(attrKey) {
+                    console.log(`[attrs | renderSingleBar] Render start, key=${attrKey}`);
+                    this._renderBar(
+                        attrKey,
+                        this.$refs[`bar-${attrKey}`],
+                        this.getHistItems(attrKey),
+                    );
+                    console.log(`[attrs | renderSingleBar] Render end, key=${attrKey}`);
+                },
+                destroy() {
+                    this._deleteAllCharts();
+                }
+            }
+        });
 
         Alpine.data("vorDetailOverlay", (opts = {}) => ({
             editing: Boolean(opts.editing),

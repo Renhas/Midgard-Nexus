@@ -9,7 +9,7 @@ from django.utils import timezone
 from apps.users.tests.factories import UserFactory
 from apps.vor_archives.constants import UserWorkStatusChoices
 from apps.vor_archives.dashboard import (
-    charts_payload,
+    attrs_payload,
     feed_page,
     heatmap_payload,
     heatmap_range,
@@ -116,7 +116,7 @@ def test_stats_payload_counts_percents_and_hidden_works(user, book, movie, game)
 
 
 @pytest.mark.django_db
-def test_charts_payload_pie_and_genre_name_collision(user):
+def test_attrs_payload_pie_and_genre_name_collision(user):
     shared = "Fantasy"
     book = BookFactory(age_rating="12+")
     film = FilmFactory(age_rating="")
@@ -134,7 +134,7 @@ def test_charts_payload_pie_and_genre_name_collision(user):
     UserWorkFactory(user=user, work=film, rating=None)
     UserWorkFactory(user=user, work=game, rating=7)
 
-    payload = charts_payload(user)
+    payload = attrs_payload(user)
     status_keys = {item["key"] for item in payload["pies"]["status"]}
     rating_keys = {item["key"] for item in payload["pies"]["rating"]}
     age_keys = {item["key"] for item in payload["pies"]["age_rating"]}

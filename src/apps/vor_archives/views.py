@@ -24,7 +24,7 @@ from .constants import (
     WorkRelationTypeChoices,
 )
 from .dashboard import (
-    charts_payload,
+    attrs_payload,
     feed_page,
     heatmap_payload,
     parse_heatmap_year,
@@ -293,8 +293,8 @@ def dashboard_tab(request, tab):
     extra = {}
     if tab == "stats":
         extra.update(stats_payload(request.user))
-    elif tab == "charts":
-        extra.update(charts_payload(request.user))
+    elif tab == "attrs":
+        extra.update(attrs_payload(request.user))
     elif tab == "activity":
         items, has_more = feed_page(request.user)
         extra.update(

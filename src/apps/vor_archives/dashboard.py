@@ -1,5 +1,5 @@
 from calendar import monthrange
-from collections import Counter, defaultdict
+from collections import Counter
 from datetime import date, timedelta
 
 from django.db.models import Count, prefetch_related_objects
@@ -181,7 +181,7 @@ def _pie_items(counter, labels):
     return items
 
 
-def _attribute_weights(user_works, total):
+def _attrs_to_items(user_works):
     tags = Counter()
     persons = Counter()
     platforms = Counter()
@@ -191,48 +191,31 @@ def _attribute_weights(user_works, total):
         work = user_work.work
         if work is None:
             continue
-        type_key = work._meta.model_name
         for tag in work.tags.all():
             tags[tag.name] += 1
         for person in work.authors.all():
             persons[person.name] += 1
+        type_key = work._meta.model_name
         if type_key == "game":
             for platform in work.platforms.all():
                 platforms[platform.name] += 1
         if type_key in genres and hasattr(work, "genres"):
             for genre in work.genres.all():
                 genres[type_key][genre.name] += 1
-
-    name_types = defaultdict(set)
-    for type_key, counter in genres.items():
-        for name in counter:
-            name_types[name].add(type_key)
-
     genre_items = []
     for type_key, counter in genres.items():
         for name, count in counter.items():
-            label = name
-            if len(name_types[name]) > 1:
-                label = f"{name} ({TYPE_META[type_key]['label']})"
             genre_items.append(
                 {
-                    "name": label,
+                    "name": f"{name} ({TYPE_META[type_key]['label']})",
                     "count": count,
-                    "percent": percent_value(count, total),
                     "type_key": type_key,
                 }
             )
     genre_items.sort(key=lambda item: (-item["count"], item["name"]))
 
     def as_items(counter):
-        items = [
-            {
-                "name": name,
-                "count": count,
-                "percent": percent_value(count, total),
-            }
-            for name, count in counter.items()
-        ]
+        items = [{"name": name, "count": count} for name, count in counter.items()]
         items.sort(key=lambda item: (-item["count"], item["name"]))
         return items
 
@@ -244,69 +227,26 @@ def _attribute_weights(user_works, total):
     }
 
 
-def charts_payload(user):
+def attrs_payload(user):
     user_works = load_user_works(user, with_attrs=True)
-    status_counts = Counter()
-    age_counts = Counter()
-    rating_counts = Counter()
-    type_counts = Counter()
-    total = 0
 
-    for user_work in user_works:
-        work = user_work.work
-        if work is None:
-            continue
-        type_key = work._meta.model_name
-        if type_key not in TYPE_META:
-            continue
-        total += 1
-        type_counts[type_key] += 1
-        status_counts[user_work.status] += 1
-        age_key = work.age_rating or ""
-        age_counts[age_key] += 1
-        if user_work.rating is None:
-            rating_counts[""] += 1
-        else:
-            rating_counts[str(user_work.rating)] += 1
-
-    age_labels = [("", "Не указан")] + list(AgeRatingChoices.choices)
-    rating_labels = [("", "Без оценки")] + [
-        (str(value), str(value)) for value in range(1, 11)
+    view_types = [
+        {"key": "cloud", "label": "Облако", "icon": "bi bi-cloud"},
+        {"key": "bar", "label": "Гистограмма", "icon": "bi bi-bar-chart"},
+        {"key": "list", "label": "Список", "icon": "bi bi-list-ul"},
     ]
-    pies = {
-        "status": _pie_items(
-            status_counts,
-            [
-                (value, STATUS_LABELS_RU.get(value, label))
-                for value, label in UserWorkStatusChoices.choices
-            ],
-        ),
-        "age_rating": _pie_items(age_counts, age_labels),
-        "rating": _pie_items(rating_counts, rating_labels),
-        "type": _pie_items(
-            type_counts,
-            [(key, TYPE_META[key]["label"]) for key in WORK_TYPES],
-        ),
-    }
-    attrs = _attribute_weights(user_works, total)
+    attr_kinds = [
+        {"key": "tags", "label": "Теги", "icon": "bi bi-tag"},
+        {"key": "persons", "label": "Авторы", "icon": "bi bi-person"},
+        {"key": "genres", "label": "Жанры", "icon": "icon-drama"},
+        {"key": "platforms", "label": "Платформы", "icon": "bi bi-controller"},
+    ]
     return {
-        "pies": pies,
-        "attrs": attrs,
-        "pie_fields": [
-            {"key": "status", "label": "Статус"},
-            {"key": "age_rating", "label": "Возрастной рейтинг"},
-            {"key": "rating", "label": "Личный рейтинг"},
-            {"key": "type", "label": "Типы произведений"},
-        ],
-        "attr_kinds": [
-            {"key": "tags", "label": "Теги", "icon": "bi bi-tag"},
-            {"key": "persons", "label": "Авторы", "icon": "bi bi-person"},
-            {"key": "genres", "label": "Жанры", "icon": "icon-drama"},
-            {"key": "platforms", "label": "Платформы", "icon": "bi bi-controller"},
-        ],
-        "charts_opts": {
-            "pies": pies,
-            "attrs": attrs,
+        "attr_kinds": attr_kinds,
+        "view_types": view_types,
+        "attrs_opts": {
+            "attrs": _attrs_to_items(user_works),
+            "total": len(user_works),
             "histTopN": HIST_TOP_N,
         },
     }

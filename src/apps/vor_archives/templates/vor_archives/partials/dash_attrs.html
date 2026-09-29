@@ -1,0 +1,64 @@
+{{ attrs_opts|json_script:"dash-attrs-opts" }}
+<div class="dash-page" x-data="vorDashAttrs()">
+    <section class="dash-toolbar">
+        <h2 class="dash-segment-title">Вид</h2>
+        <div class="dash-type-filters">
+            {% for type in view_types %}
+                <button type="button"
+                        class="sidebar-btn"
+                        :class="{ 'active': attrView === '{{ type.key }}' }"
+                        @click="setAttrView('{{ type.key }}')"
+                        title="{{ type.label }}">
+                    <i class="{{ type.icon }}"></i>
+                </button>
+            {% endfor %}
+        </div>
+    </section>
+    <section class="dash-attr-grid">
+        {% for kind in attr_kinds %}
+            <section class="dash-card">
+                <div class="dash-segment-head">
+                    <i class="{{ kind.icon }} dash-card-title__icon"></i>
+                    <h2 class="dash-card-title">{{ kind.label }}</h2>
+                </div>
+                <template x-if="attrView === 'cloud'">
+                    <div class="dash-attr-cloud">
+                    </div>
+                </template>
+                <div class="dash-chart-canvas-wrap" x-show="attrView === 'bar'" x-cloak>
+                    <canvas x-ref="bar-{{kind.key}}"></canvas>
+                </div>
+                <div class="dash-attr-list" x-show="attrView === 'list'" x-cloak>
+                    <div class="dash-attr-row dash-attr-row--header">
+                        <span>Название</span>
+                        <span>Кол-во</span>
+                        <span>Доля</span>
+                    </div>
+                    <div class="dash-attr-body">
+                        <template x-for="item in getItems('{{ kind.key }}')" :key="item.name">
+                            <div class="dash-attr-row">
+                                <span class="dash-attr-name" x-text="item.name"></span>
+                                <span class="dash-attr-count" x-text="item.count"></span>
+                                <span class="dash-attr-pct" x-text="formatPercent(calcAttrShare(item.count, '{{ kind.key }}'))"></span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </section>
+        {% endfor %}
+        <!--
+            <div class="dash-attr-body">
+                <p class="dash-empty" x-show="!attrItems.length" x-cloak>Атрибутов пока нет</p>
+    
+                <div class="dash-attr-cloud" x-show="attrView === 'cloud' && attrItems.length" x-cloak>
+                    <template x-for="item in cloudItems" :key="item.name">
+                        <span class="dash-cloud-tag"
+                                :style="`font-size: ${item.fontSize}rem`"
+                                x-text="item.name"
+                                :title="`${item.count} · ${formatPercent(item.percent)}`"></span>
+                    </template>
+                </div>
+            </div>
+            -->
+    </section>
+</div>
