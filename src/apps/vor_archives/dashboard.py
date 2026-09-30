@@ -42,7 +42,7 @@ MONTHS_RU = {
     12: "Дек",
 }
 
-WEEKDAY_LABELS = ["Пн", "", "Ср", "", "Пт", "", ""]
+WEEKDAY_LABELS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
 
 FEED_PAGE_SIZE = 30
 HIST_TOP_N = 12
@@ -385,16 +385,17 @@ def heatmap_payload(user, year=None, today=None):
         weeks.append(week)
 
     month_labels = []
-    prev_month = None
-    for week in weeks:
+    for i, week in enumerate(weeks):
         in_days = [date.fromisoformat(day["date"]) for day in week if day["in_range"]]
         if not in_days:
             month_labels.append("")
             continue
-        month = in_days[0].month
-        if month != prev_month:
-            month_labels.append(MONTHS_RU[month])
-            prev_month = month
+
+        first_of_month = next((d for d in in_days if d.day == 1), None)
+        if first_of_month:
+            month_labels.append(MONTHS_RU[first_of_month.month])
+        elif i == 0:
+            month_labels.append(MONTHS_RU[in_days[0].month])
         else:
             month_labels.append("")
 

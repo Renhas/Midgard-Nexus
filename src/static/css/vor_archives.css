@@ -4015,10 +4015,10 @@ body.vor-artworks-list-drag .artwork-tile {
 
 .dash-activity {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
     gap: 0.85rem;
     height: 100%;
-    min-height: 0;
+    min-width: 0;
 }
 
 .dash-pane-body {
@@ -4086,9 +4086,23 @@ body.vor-artworks-list-drag .artwork-tile {
     margin: 0.65rem 0 0.25rem;
 }
 
+.dash-heatmap-inner {
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.dash-heatmap-year-select {
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 10;
+}
+
 .dash-heatmap-wrap {
     display: flex;
     align-items: flex-start;
+    justify-content: center;
+    position: relative;
 }
 
 .dash-heatmap {
@@ -4116,10 +4130,11 @@ body.vor-artworks-list-drag .artwork-tile {
 .dash-heatmap-month {
     width: 11px;
     flex-shrink: 0;
-    overflow: visible;
+    text-overflow: ellipsis;
     white-space: nowrap;
     font-size: 0.65rem;
     color: var(--text-secondary);
+    padding-left: 2px;
 }
 
 .dash-heatmap-body {
