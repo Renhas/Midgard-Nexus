@@ -259,8 +259,6 @@ def _feed_item_payload(item):
     if work is not None:
         work_title = work.title
         detail_url = reverse("vor_archives:artwork_detail", args=[user_work.pk])
-    elif user_work is not None:
-        work_title = "Удалённое произведение"
     return {
         "id": item.pk,
         "action_type": item.action_type,
