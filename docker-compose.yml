@@ -37,6 +37,20 @@ services:
       timeout: 5s
       retries: 5
 
+  cov:
+    extends:
+      service: web
+    profiles: ["tools"]
+    volumes:
+      - ./src:/app/src
+      - ./htmlcov:/app/htmlcov
+    command: >
+      pytest
+      --cov=apps.vor_archives
+      --cov-report=term-missing:skip-covered
+      --cov-report=html:htmlcov
+      src/apps/vor_archives/
+
 volumes:
   postgres_data:
   static_volume:
