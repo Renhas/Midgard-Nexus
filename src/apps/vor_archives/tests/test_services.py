@@ -81,6 +81,30 @@ def test_book_and_game_progress_passthrough(user, book, game):
 
 
 @pytest.mark.django_db
+def test_stats_payload_opts_shape(user, book):
+    UserWorkFactory(user=user, work=book)
+    opts = stats_payload(user)["stats_opts"]
+
+    for key in (
+        "status_matrix",
+        "age_matrix",
+        "rating_matrix",
+        "spent",
+        "type_meta",
+        "status_choices",
+        "age_choices",
+        "rating_choices",
+    ):
+        assert key in opts, f"stats_opts missing {key!r}"
+
+    for type_key in ("book", "film", "game"):
+        assert set(opts["status_matrix"][type_key]) == set(UserWorkStatusChoices.values)
+        assert type_key in opts["spent"]
+        assert opts["type_meta"][type_key]["label"]
+        assert opts["type_meta"][type_key]["unit"]
+
+
+@pytest.mark.django_db
 def test_stats_payload_spent(user, book, movie, tv_show, game):
     tv_show.duration_minutes = 45
     tv_show.save()
@@ -406,6 +430,16 @@ def test_feed_item_payload_with_deleted_user_work(user, book):
 
 
 @pytest.mark.django_db
+def test_heatmap_payload_grid_structure(user):
+    """7 дней в неделе, month_labels совпадает по длине с weeks."""
+    payload = heatmap_payload(user, year=2024)
+
+    assert payload["weekday_labels"] == ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+    assert all(len(week) == 7 for week in payload["weeks"])
+    assert len(payload["month_labels"]) == len(payload["weeks"])
+
+
+@pytest.mark.django_db
 def test_heatmap_counts_days_in_selected_year(user, book):
     user_work = UserWorkFactory(user=user, work=book)
     item = FeedItem.objects.filter(user_work=user_work).get()
@@ -445,6 +479,33 @@ def test_heatmap_payload_excludes_other_years(user, book):
 
     assert counted == []
     assert payload["max_count"] == 0
+
+
+@pytest.mark.django_db
+def test_heatmap_payload_years_deduped_and_sorted(user):
+    for _ in range(2):
+        uw = UserWorkFactory(user=user, work=BookFactory())
+        item = FeedItem.objects.get(user_work=uw, action_type="added")
+        _set_timestamp(item, timezone.make_aware(datetime(2020, 5, 1, 12, 0)))
+
+    for _ in range(2):
+        UserWorkFactory(user=user, work=BookFactory())
+
+    payload = heatmap_payload(user)
+
+    assert payload["years"] == [2020, timezone.localdate().year]
+
+
+@pytest.mark.django_db
+def test_heatmap_payload_is_user_scoped(user, book):
+    other = UserFactory()
+    UserWorkFactory(user=other, work=book)
+
+    payload = heatmap_payload(user)
+
+    assert payload["max_count"] == 0
+    counted = [day for week in payload["weeks"] for day in week if day["count"]]
+    assert counted == []
 
 
 def test_heatmap_range_for_year():
