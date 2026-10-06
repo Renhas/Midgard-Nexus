@@ -9,6 +9,13 @@ testpaths = ["src"]
 python_files = ["test_*.py"]
 addopts = "-q --strict-markers --ds=config.settings.test"
 
+[tool.coverage.run]
+omit = [
+    "*/tests/*",
+    "*/migrations/*",
+    "*/__init__.py",
+]
+
 [tool.ruff]
 target-version = "py312"
 line-length = 88

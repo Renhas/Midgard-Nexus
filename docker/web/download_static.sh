@@ -19,7 +19,8 @@ mkdir -p "$VENDOR_DIR/bootstrap/css" "$VENDOR_DIR/bootstrap/js" \
          "$VENDOR_DIR/bootstrap/css/fonts" \
          "$VENDOR_DIR/lucide/css" "$VENDOR_DIR/lucide/fonts" \
          "$VENDOR_DIR/htmx" "$VENDOR_DIR/alpine" \
-         "$VENDOR_DIR/chart" "$VENDOR_DIR/sortable"
+         "$VENDOR_DIR/chart" "$VENDOR_DIR/wordcloud" \
+         "$VENDOR_DIR/sortable"
 
 echo "Скачивание библиотек..."
 echo "Bootstrap"
@@ -55,6 +56,9 @@ curl -L -o "$VENDOR_DIR/alpine/alpine.min.js" \
 echo "Chart"
 curl -L -o "$VENDOR_DIR/chart/chart.min.js" \
     https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js
+echo "Chart WordCloud"
+curl -L -o "$VENDOR_DIR/wordcloud/chartjs-chart-wordcloud.min.js" \
+    https://cdn.jsdelivr.net/npm/chartjs-chart-wordcloud@4.4.5/build/index.umd.min.js
 echo "Sortable"
 curl -L -o "$VENDOR_DIR/sortable/Sortable.min.js" \
     https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js

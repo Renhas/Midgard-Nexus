@@ -23,6 +23,14 @@ from .constants import (
     UserWorkStatusChoices,
     WorkRelationTypeChoices,
 )
+from .dashboard import (
+    attrs_payload,
+    feed_page,
+    heatmap_payload,
+    parse_heatmap_year,
+    stats_payload,
+)
+from .dashboard_catalog import DASHBOARD_TABS, DEFAULT_DASH_TAB, get_dash_tab
 from .attr_catalog import (
     ATTR_TABS,
     DEFAULT_KIND,
@@ -253,17 +261,83 @@ def index(request):
 
 @login_required(login_url=LOGIN_URL)
 def dashboard(request):
-    """Страница дашборда модуля «Библиотека»."""
+    """Страница дашборда — редирект на вкладку статистики."""
+    return redirect("vor_archives:dashboard_tab", tab=DEFAULT_DASH_TAB)
+
+
+def _dashboard_shell(request, tab_kind, extra=None):
+    tab = get_dash_tab(tab_kind)
+    if tab is None:
+        raise Http404("Неизвестная вкладка дашборда")
     module = _module_context()
+    context = {
+        "module_name": module["name"],
+        "module_icon": module["icon"],
+        "module_color": module["color"],
+        "active_section": "dashboard",
+        "hide_right": True,
+        "dash_kind": tab_kind,
+        "dash_tabs": DASHBOARD_TABS,
+        "dash_tab": tab,
+    }
+    if extra:
+        context.update(extra)
+    return render(request, "vor_archives/dashboard.html", context)
+
+
+@login_required(login_url=LOGIN_URL)
+def dashboard_tab(request, tab):
+    """Оболочка дашборда для выбранной вкладки."""
+    if get_dash_tab(tab) is None:
+        raise Http404("Неизвестная вкладка дашборда")
+    extra = {}
+    if tab == "stats":
+        extra.update(stats_payload(request.user))
+    elif tab == "attrs":
+        extra.update(attrs_payload(request.user))
+    elif tab == "activity":
+        items, has_more = feed_page(request.user)
+        extra.update(
+            {
+                "feed_items": items,
+                "feed_has_more": has_more,
+                "feed_next_offset": len(items),
+                "heatmap": heatmap_payload(
+                    request.user,
+                    year=parse_heatmap_year(request.GET.get("year")),
+                ),
+            }
+        )
+    return _dashboard_shell(request, tab, extra)
+
+
+@login_required(login_url=LOGIN_URL)
+@require_GET
+def dashboard_feed(request):
+    try:
+        offset = max(int(request.GET.get("offset") or 0), 0)
+    except (TypeError, ValueError):
+        offset = 0
+    items, has_more = feed_page(request.user, offset=offset)
     return render(
         request,
-        "vor_archives/dashboard.html",
+        "vor_archives/partials/dash_feed_items.html",
         {
-            "module_name": module["name"],
-            "module_icon": module["icon"],
-            "module_color": module["color"],
-            "active_section": "dashboard",
+            "feed_items": items,
+            "feed_has_more": has_more,
+            "feed_next_offset": offset + len(items),
         },
+    )
+
+
+@login_required(login_url=LOGIN_URL)
+@require_GET
+def dashboard_heatmap(request):
+    year = parse_heatmap_year(request.GET.get("year"))
+    return render(
+        request,
+        "vor_archives/partials/dash_heatmap.html",
+        {"heatmap": heatmap_payload(request.user, year=year)},
     )
 
 

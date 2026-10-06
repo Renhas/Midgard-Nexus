@@ -7,6 +7,13 @@ app_name = "vor_archives"
 urlpatterns = [
     path("", views.index, name="index"),
     path("dashboard/", views.dashboard, name="dashboard"),
+    path("dashboard/activity/feed/", views.dashboard_feed, name="dashboard_feed"),
+    path(
+        "dashboard/activity/heatmap/",
+        views.dashboard_heatmap,
+        name="dashboard_heatmap",
+    ),
+    path("dashboard/<str:tab>/", views.dashboard_tab, name="dashboard_tab"),
     path("attributes/", views.attributes, name="attributes"),
     path("attributes/<str:kind>/list/", views.attr_list, name="attr_list"),
     path("attributes/<str:kind>/empty/", views.attr_empty, name="attr_empty"),

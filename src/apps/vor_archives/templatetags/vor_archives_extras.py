@@ -31,6 +31,24 @@ STATUS_ICONS = {
     "dropped": "bi bi-x-circle-fill",
 }
 
+FEED_ACTION_LABELS_RU = {
+    "added": "Добавлено",
+    "planning": "Запланировано",
+    "in_progress": "В процессе",
+    "completed": "Завершено",
+    "dropped": "Брошено",
+    "rated": "Оценка",
+}
+
+FEED_ACTION_ICONS = {
+    "added": "bi bi-plus-circle",
+    "planning": "bi bi-clock",
+    "in_progress": "bi bi-play-circle",
+    "completed": "bi bi-check-circle",
+    "dropped": "bi bi-x-circle",
+    "rated": "bi bi-star",
+}
+
 
 def _display_progress_value(value):
     number = float(value or 0)
@@ -111,3 +129,17 @@ def status_icon(user_work):
     if not user_work:
         return "bi bi-circle"
     return STATUS_ICONS.get(user_work.status, "bi bi-circle")
+
+
+@register.filter
+def feed_action_label(item):
+    if not item:
+        return ""
+    return FEED_ACTION_LABELS_RU.get(item.action_type, item.get_action_type_display())
+
+
+@register.filter
+def feed_action_icon(item):
+    if not item:
+        return "bi bi-circle"
+    return FEED_ACTION_ICONS.get(item.action_type, "bi bi-circle")
