@@ -1,0 +1,36 @@
+name: Move issue to In review on PR to dev
+
+on:
+  pull_request:
+    types: [opened, reopened, edited]
+    branches: [dev]
+
+jobs:
+  move-to-in-review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract issue numbers from PR body
+        id: extract
+        shell: bash
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          ISSUES=$(printf '%s' "$PR_BODY" \
+            | grep -oiE '(close[sd]?|fix(es|ed)?|resolve[sd]?)[[:space:]]+#[0-9]+' \
+            | grep -oE '[0-9]+' \
+            | sort -un \
+            | paste -sd, - || true)
+          echo "issues=$ISSUES" >> "$GITHUB_OUTPUT"
+          echo "Extracted: $ISSUES"
+
+      - name: Update project status
+        if: steps.extract.outputs.issues != ''
+        continue-on-error: true
+        uses: ./.github/actions/update-project-status
+        with:
+          github-token: ${{ secrets.GH_PROJECT_TOKEN }}
+          issue-numbers: ${{ steps.extract.outputs.issues }}
+          target-status: 'In review'

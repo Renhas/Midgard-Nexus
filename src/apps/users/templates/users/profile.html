@@ -1,0 +1,19 @@
+{% extends "base_app.html" %}
+
+{% block title %}Профиль — Midgard Nexus{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-5">Профиль пользователя</h1>
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Имя пользователя: {{ user.get_full_name|default:user.username }}</h5>
+                    <p class="card-text">Эта страница будет содержать информацию о пользователе.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

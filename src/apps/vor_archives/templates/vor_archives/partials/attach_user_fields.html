@@ -1,0 +1,59 @@
+<div class="vor-add-attach-fields">
+    <div class="vor-add-field">
+        <span class="vor-field-label">Статус</span>
+        <div class="vor-status-dropdown" @click.outside="statusOpen = false">
+            <button type="button" class="sidebar-select vor-status-select" :class="'status-' + status" @click="statusOpen = !statusOpen">
+                <span x-text="statusLabel()"></span>
+            </button>
+            <div class="vor-status-menu" x-show="statusOpen" x-cloak>
+                <template x-for="opt in statusChoices" :key="opt.value">
+                    <button type="button"
+                            class="vor-status-option"
+                            :class="'status-' + opt.value"
+                            @click="setStatus(opt.value)"
+                            x-text="opt.label"></button>
+                </template>
+            </div>
+        </div>
+    </div>
+    <div class="vor-add-field">
+        <span class="vor-field-label">Рейтинг</span>
+        <div class="vor-stars" @mouseleave="hoverRating = 0">
+            <template x-for="star in [1,2,3,4,5]" :key="star">
+                <span class="vor-star" :class="starState(star)">
+                    <i class="bi bi-star vor-star-empty"></i>
+                    <i class="bi bi-star-fill vor-star-fill"></i>
+                    <button type="button" class="vor-star-hit left" @mouseenter="hoverRating = star * 2 - 1" @click="setRating(star * 2 - 1)"></button>
+                    <button type="button" class="vor-star-hit right" @mouseenter="hoverRating = star * 2" @click="setRating(star * 2)"></button>
+                </span>
+            </template>
+            <span class="vor-rating-number" x-text="ratingLabel()"></span>
+        </div>
+    </div>
+    <div class="vor-progress-row">
+        <span class="vor-field-label">Прогресс:</span>
+        <div class="vor-progress"
+             :class="{ 'is-editing': progressEditing }"
+             :style="{ '--progress-ch': progressCh() + 'ch' }">
+            <span class="vor-progress-text">
+                <span class="vor-progress-value"
+                      x-show="!progressEditing"
+                      :class="{ 'is-hot': progressHover || progressEditing }"
+                      @mouseenter="progressHover = true"
+                      @mouseleave="progressHover = false"
+                      @click="startProgressEdit()"
+                      x-text="progressValueLabel()"></span>
+                <input class="vor-progress-input"
+                       x-show="progressEditing"
+                       x-ref="progressInput"
+                       x-model="progressDraft"
+                       @keydown.enter.prevent="commitProgress()"
+                       @keydown.escape.prevent="cancelProgressEdit()"
+                       @blur="commitProgress()">
+                <span class="vor-progress-suffix" x-text="progressSuffix()"></span>
+            </span>
+            <button type="button" class="vor-progress-btn vor-progress-btn-plus" @click="nudgeProgress(1)">+</button>
+            <button type="button" class="vor-progress-btn" @click="nudgeProgress(-1)">−</button>
+        </div>
+    </div>
+</div>

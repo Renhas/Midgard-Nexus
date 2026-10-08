@@ -1,0 +1,7 @@
+<div class="vor-field{% if field.errors %} has-error{% endif %}">
+    <label class="vor-field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+    {% if field.errors %}
+        <div class="vor-field-errors">{{ field.errors }}</div>
+    {% endif %}
+</div>

@@ -1,0 +1,99 @@
+{{ stats_opts|json_script:"dash-stats-opts" }}
+<div class="dash-page dash-stats" x-data="vorDashStats()">
+    <section class="dash-toolbar">
+        <h2 class="dash-segment-title">Фильтры</h2>
+        <div class="dash-type-filters">
+            <button type="button"
+                    class="sidebar-btn sidebar-btn-type"
+                    :class="{ 'active': workTypes.includes('book') }"
+                    @click="toggleType('book')"
+                    title="Книги">
+                <i class="icon-book-text"></i>
+            </button>
+            <button type="button"
+                    class="sidebar-btn sidebar-btn-type"
+                    :class="{ 'active': workTypes.includes('film') }"
+                    @click="toggleType('film')"
+                    title="Фильмы">
+                <i class="icon-clapperboard"></i>
+            </button>
+            <button type="button"
+                    class="sidebar-btn sidebar-btn-type"
+                    :class="{ 'active': workTypes.includes('game') }"
+                    @click="toggleType('game')"
+                    title="Игры">
+                <i class="icon-gamepad-2"></i>
+            </button>
+        </div>
+    </section>
+    <div class="dash-segments">
+        <section class="dash-segment">
+            <div class="dash-segment-head">
+                <h2 class="dash-segment-title">Обзор</h2>
+            </div>
+            <div class="dash-cards">
+                <article class="dash-card dash-card--chart">
+                    <div class="dash-card-title">Типы</div>
+                    <div class="dash-chart-canvas-wrap">
+                        <p class="dash-empty" x-show="!worksTotalCount" x-cloak>Нет данных для графика</p>
+                        <canvas x-ref="pieTypes" x-show="worksTotalCount"></canvas>
+                    </div>
+                </article>
+                <article class="dash-card dash-card--chart">
+                    <div class="dash-card-title">Возрастной рейтинг</div>
+                    <div class="dash-chart-canvas-wrap">
+                        <p class="dash-empty" x-show="!workTypes.length" x-cloak>Нет данных для графика</p>
+                        <canvas x-ref="pieAge" x-show="workTypes.length"></canvas>
+                    </div>
+                </article>
+            </div>
+        </section>
+        <section class="dash-segment">
+            <div class="dash-segment-head">
+                <h2 class="dash-segment-title">Оценки</h2>
+            </div>
+            <div class="dash-cards">
+                <article class="dash-card dash-card--chart">
+                    <div class="dash-card-title">Распределение</div>
+                    <div class="dash-chart-canvas-wrap">
+                        <p class="dash-empty" x-show="!workTypes.length" x-cloak>Нет данных для графика</p>
+                        <canvas x-ref="pieRating" x-show="workTypes.length"></canvas>
+                    </div>
+                </article>
+                <article class="dash-card dash-card--chart">
+                    <div class="dash-card-title">Среднее</div>
+                    <div class="dash-chart-canvas-wrap">
+                        <p class="dash-empty" x-show="!worksTotalCount" x-cloak>Нет данных для графика</p>
+                        <canvas x-ref="barRating" x-show="worksTotalCount"></canvas>
+                    </div>
+                </article>
+            </div>
+        </section>
+        <section class="dash-segment">
+            <div class="dash-segment-head">
+                <h2 class="dash-segment-title">Прогресс</h2>
+            </div>
+            <div class="dash-cards">
+                <article class="dash-card dash-card--chart">
+                        <div class="dash-card-title">Статусы</div>
+                        <div class="dash-chart-canvas-wrap">
+                            <p class="dash-empty" x-show="!workTypes.length" x-cloak>Нет данных для графика</p>
+                            <canvas x-ref="pieStatus" x-show="workTypes.length"></canvas>
+                        </div>
+                </article>
+                <article class="dash-card">
+                    <div class="dash-card-title">Результаты</div>
+                    <div class="dash-progress-metrics">
+                        <template x-for="item in spentProgressItems" :key="item.key">
+                            <div class="dash-progress-metric">
+                                <i :class="item.icon"></i>
+                                <span class="dash-card-value" x-text="formatNumber(item.count)"></span>
+                                <span class="dash-card-label" x-text="item.unit"></span>
+                            </div>
+                        </template>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </div>
+</div>

@@ -1,0 +1,4 @@
+-r base.txt
+
+# Deploy
+gunicorn==26.0.0

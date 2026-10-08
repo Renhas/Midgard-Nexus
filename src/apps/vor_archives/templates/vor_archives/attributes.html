@@ -1,0 +1,94 @@
+{% extends "vor_archives/base_vor.html" %}
+
+{% block title %}{{ block.super }} - Аттрибуты{% endblock %}
+
+{% block left_content %}
+<div class="sidebar-nav">
+    {% for tab in attr_tabs %}
+        <a href="{% url 'vor_archives:attributes_kind' tab.kind %}"
+           class="sidebar-btn sidebar-btn-full attr-tab{% if tab.kind == attr_kind %} active{% endif %}"
+           title="{{ tab.label }}">
+            <i class="{{ tab.icon }}"></i>
+            <span>{{ tab.label }}</span>
+        </a>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block vor_content %}
+<div class="attr-page">
+    <div class="attr-toolbar">
+        <div class="attr-search-wrap">
+            <i class="bi bi-search attr-search-icon"></i>
+            <input id="attr-search"
+                   class="form-control attr-search"
+                   type="search"
+                   name="q"
+                   placeholder="{{ search_placeholder }}"
+                   autocomplete="off"
+                   hx-get="{% url 'vor_archives:attr_list' attr_kind %}"
+                   hx-trigger="input changed delay:200ms"
+                   hx-target="#attr-list"
+                   hx-swap="outerHTML">
+        </div>
+        {% if is_staff %}
+        <button type="button"
+                class="sidebar-btn sidebar-btn-add sidebar-btn-icon"
+                title="Создать"
+                x-show="!$store.vorAttributes.deleteMode"
+                hx-get="{% url 'vor_archives:attr_new' attr_kind %}"
+                hx-target="#attr-detail"
+                hx-swap="innerHTML">
+            <i class="bi bi-plus-circle"></i>
+        </button>
+        <button type="button"
+                class="sidebar-btn sidebar-btn-add sidebar-btn-icon"
+                title="Отменить"
+                x-show="$store.vorAttributes.deleteMode"
+                x-cloak
+                @click="$store.vorAttributes.exitDeleteMode()">
+            <i class="bi bi-x-circle"></i>
+        </button>
+        <button type="button"
+                class="sidebar-btn sidebar-btn-delete sidebar-btn-icon"
+                title="Удалить"
+                x-show="!$store.vorAttributes.deleteMode"
+                @click="$store.vorAttributes.enterDeleteMode()">
+            <i class="bi bi-trash"></i>
+        </button>
+        <button type="button"
+                class="sidebar-btn sidebar-btn-delete sidebar-btn-icon"
+                title="Подтвердить"
+                x-show="$store.vorAttributes.deleteMode"
+                x-cloak
+                :disabled="!$store.vorAttributes.selectedIds.length"
+                @click="$store.vorAttributes.openPreview()">
+            <i class="bi bi-check-lg"></i>
+        </button>
+        {% endif %}
+    </div>
+    <div class="attr-split">
+        <div class="attr-list-pane">
+            <div id="attr-list"
+                 class="attr-list"
+                 hx-get="{% url 'vor_archives:attr_list' attr_kind %}"
+                 hx-trigger="load, vor:attr-list-refresh from:body"
+                 hx-include="#attr-search"
+                 hx-swap="outerHTML">
+                <div class="text-center text-muted py-4">Загрузка…</div>
+            </div>
+        </div>
+        <div class="attr-detail-pane">
+            <div id="attr-detail" class="attr-detail">
+                {% include "vor_archives/partials/attr_empty.html" %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_notifications %}
+{% csrf_token %}
+<div id="vor-modal"
+     data-vor-attr-delete-preview="{% url 'vor_archives:attr_delete_preview' attr_kind %}"></div>
+{% endblock %}
