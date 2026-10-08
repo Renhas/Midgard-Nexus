@@ -33,4 +33,4 @@ jobs:
         with:
           github-token: ${{ secrets.GH_PROJECT_TOKEN }}
           issue-numbers: ${{ steps.extract.outputs.issues }}
-          target-status: 'In Dev'
+          target-status: 'In dev'

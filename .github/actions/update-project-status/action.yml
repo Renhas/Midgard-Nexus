@@ -14,7 +14,7 @@ inputs:
   project-title:
     description: 'Project title'
     required: false
-    default: 'Test Project'
+    default: 'Midgard-Nexus-project'
   status-field-name:
     description: 'Status field name'
     required: false
