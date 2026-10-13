@@ -15,10 +15,14 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+from config.version import __version__ as _default_version
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+APP_VERSION = os.environ.get("APP_VERSION", _default_version)
 
 
 # Quick-start development settings - unsuitable for production
@@ -76,6 +80,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "config.context_processors.modules",
+                "config.context_processors.app_version",
             ],
         },
     },
