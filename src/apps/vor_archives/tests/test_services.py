@@ -127,11 +127,7 @@ def test_stats_payload_status_matrix(user, book, movie, tv_show, game):
     UserWorkFactory(user=user, work=BookFactory(), status=UserWorkStatusChoices.DROPPED)
     UserWorkFactory(user=user, work=movie, status=UserWorkStatusChoices.IN_PROGRESS)
     UserWorkFactory(user=user, work=tv_show, status=UserWorkStatusChoices.PLANNING)
-    game_uw = UserWorkFactory(
-        user=user, work=game, status=UserWorkStatusChoices.PLANNING
-    )
-    game_uw.status = UserWorkStatusChoices.COMPLETED  # из-за pre_save сигнала
-    game_uw.save()
+    UserWorkFactory(user=user, work=game, status=UserWorkStatusChoices.COMPLETED)
 
     payload = stats_payload(user)
     status_matrix = payload["stats_opts"]["status_matrix"]
