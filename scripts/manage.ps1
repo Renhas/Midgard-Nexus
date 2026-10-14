@@ -4,5 +4,5 @@ $ErrorActionPreference = "Stop"
 
 Set-Location (Join-Path $PSScriptRoot "..")
 
-docker compose exec web python src/manage.py @args
+docker compose exec -u django web python src/manage.py @args
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 mkdir -p /app/staticfiles /app/media
 chown -R django:django /app/staticfiles /app/media
@@ -19,11 +20,11 @@ if [ ! -f /app/src/static/vendor/htmx/htmx.min.js ]; then
     /app/download_static.sh
 fi
 
-python src/manage.py migrate
+gosu django python src/manage.py migrate
 
 if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
     echo "👤 Creating superuser if not exists..."
-    python src/manage.py shell -c "
+    gosu django python src/manage.py shell -c "
 import os
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -39,7 +40,7 @@ else:
 fi
 
 if [ "${COLLECTSTATIC:-0}" = "1" ]; then
-    python src/manage.py collectstatic --noinput
+    gosu django python src/manage.py collectstatic --noinput
 fi
 
 echo "🚀 Server starting..."
