@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 from datetime import timedelta
+from decimal import Decimal
 from pathlib import Path
 
 from django.contrib.auth import get_user_model
@@ -19,7 +20,6 @@ from django.db import transaction
 from django.utils import timezone
 
 from apps.vor_archives.constants import (
-    FeedItemActionTypeChoices,
     UserWorkStatusChoices,
 )
 from apps.vor_archives.models import (
@@ -271,8 +271,6 @@ class Command(BaseCommand):
                 continue
 
             content_type = ContentType.objects.get_for_model(work)
-
-            # Idempotency: skip anything already attached to this user.
             if UserWork.objects.filter(
                 user=admin,
                 work_content_type=content_type,
@@ -280,13 +278,8 @@ class Command(BaseCommand):
             ).exists():
                 continue
 
-            # Two-step create, same workaround as the test suite.
-            # `userwork_pre_save` (signals.py) fires from pre_save and tries
-            # to create CompletionRecord(user_work=instance); at that point
-            # the instance has no pk yet → ValueError. So we create with the
-            # default status and patch the real fields through queryset.update(),
-            # which bypasses signals and auto_now_add entirely.
-            # TODO: collapse into a single create once the signal is fixed.
+            added_at = now - timedelta(days=spec.added_days_ago)
+
             uw = UserWork.objects.create(
                 user=admin,
                 work_content_type=content_type,
@@ -294,58 +287,47 @@ class Command(BaseCommand):
                 status=UserWorkStatusChoices.PLANNING,
             )
 
-            added_at = now - timedelta(days=spec.added_days_ago)
-            UserWork.objects.filter(pk=uw.pk).update(
-                status=spec.status,
-                rating=spec.rating,
-                progress=spec.progress,
-                times_completed=spec.times_completed,
-                date_added=added_at,  # auto_now_add is bypassed by .update()
-            )
-            uw.refresh_from_db()
+            sequence: list[str] = []
+            if spec.status in (
+                UserWorkStatusChoices.COMPLETED,
+                UserWorkStatusChoices.DROPPED,
+            ):
+                sequence.append(UserWorkStatusChoices.IN_PROGRESS)
+            if spec.status != UserWorkStatusChoices.PLANNING:
+                sequence.append(spec.status)
 
-            self._emit_feed_items(uw, added_at)
-            if uw.status == UserWorkStatusChoices.COMPLETED:
-                self._emit_completion(uw, added_at)
+            for new_status in sequence:
+                uw.status = new_status
+                uw.progress = (
+                    spec.progress if new_status == spec.status else Decimal("50")
+                )
+                uw.save()
 
-    def _emit_feed_items(self, uw: UserWork, added_at) -> None:
-        A = FeedItemActionTypeChoices
-        status = uw.status
+            if spec.rating is not None:
+                uw.rating = spec.rating
+                uw.save()
 
-        actions = [A.ADDED]
-        if status in (
-            UserWorkStatusChoices.IN_PROGRESS,
-            UserWorkStatusChoices.COMPLETED,
-            UserWorkStatusChoices.DROPPED,
-        ):
-            actions.append(A.IN_PROGRESS)
-        if status == UserWorkStatusChoices.COMPLETED:
-            actions.append(A.COMPLETED)
-        if status == UserWorkStatusChoices.DROPPED:
-            actions.append(A.DROPPED)
-        if uw.rating:
-            actions.append(A.RATED)
+            UserWork.objects.filter(pk=uw.pk).update(date_added=added_at)
 
-        step_days = 3 if status == UserWorkStatusChoices.COMPLETED else 7
-        now = timezone.now()
-        for idx, action in enumerate(actions):
-            ts = added_at + timedelta(days=idx * step_days)
-            if ts > now:
-                ts = now
-            item = FeedItem.objects.create(
-                user=uw.user, user_work=uw, action_type=action
-            )
-            # `timestamp` is auto_now_add -> bypass via queryset .update().
-            FeedItem.objects.filter(pk=item.pk).update(timestamp=ts)
+            items = list(FeedItem.objects.filter(user_work=uw).order_by("pk"))
+            for idx, item in enumerate(items):
+                when = min(added_at + timedelta(days=idx * 4), now)
+                FeedItem.objects.filter(pk=item.pk).update(timestamp=when)
 
-    def _emit_completion(self, uw: UserWork, added_at) -> None:
-        now = timezone.now()
-        when = added_at + timedelta(days=14)
-        if when > now:
-            when = now
-        record = CompletionRecord.objects.create(user_work=uw)
-        CompletionRecord.objects.filter(pk=record.pk).update(date=when)
-        UserWork.objects.filter(pk=uw.pk).update(last_completed_date=when.date())
+            completion = uw.completions.first()
+            if completion is not None:
+                completed_at = min(added_at + timedelta(days=len(items) * 4), now)
+                CompletionRecord.objects.filter(pk=completion.pk).update(
+                    date=completed_at,
+                )
+                UserWork.objects.filter(pk=uw.pk).update(
+                    last_completed_date=completed_at.date(),
+                )
+
+            if spec.status == UserWorkStatusChoices.COMPLETED:
+                UserWork.objects.filter(pk=uw.pk).update(
+                    times_completed=spec.times_completed,
+                )
 
     # ── collections ─────────────────────────────────────────────────────────
 
