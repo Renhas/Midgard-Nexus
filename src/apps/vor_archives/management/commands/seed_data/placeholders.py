@@ -1,5 +1,6 @@
 import colorsys
 import hashlib
+from pathlib import Path
 
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont
@@ -45,6 +46,8 @@ _TRANSLIT = {
     "/": "-",
     ":": "-",
 }
+_FONT_DIR = Path(__file__).resolve().parent / "fonts"
+_FONT_REGULAR = _FONT_DIR / "DejaVuSans.ttf"
 
 
 def slugify_title(title: str, max_len: int = 60) -> str:
@@ -106,10 +109,13 @@ def _wrap(draw, text, font, max_width):
 
 
 def _load_font(size: int):
+    if _FONT_REGULAR.exists():
+        return ImageFont.truetype(str(_FONT_REGULAR), size=size)
+    # Фолбэк: без кириллицы, но код не падает.
     try:
-        return ImageFont.load_default(size=size)  # Pillow ≥ 10.1
+        return ImageFont.load_default(size=size)
     except TypeError:
-        return ImageFont.load_default()  # старые Pillow
+        return ImageFont.load_default()
 
 
 def _text_width(draw, text, font) -> int:
