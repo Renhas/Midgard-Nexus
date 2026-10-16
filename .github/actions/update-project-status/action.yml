@@ -19,6 +19,10 @@ inputs:
     description: 'Status field name'
     required: false
     default: 'Status'
+  forbidden-source-statuses:
+    description: 'Comma-separated list of statuses. If current issue status matches any, the update is skipped.'
+    required: false
+    default: ''
 
 runs:
   using: 'composite'
@@ -30,6 +34,7 @@ runs:
         TARGET_STATUS: ${{ inputs.target-status }}
         PROJECT_TITLE: ${{ inputs.project-title }}
         STATUS_FIELD_NAME: ${{ inputs.status-field-name }}
+        FORBIDDEN_SOURCES: ${{ inputs.forbidden-source-statuses }}
       with:
         github-token: ${{ inputs.github-token }}
         script: |
@@ -48,6 +53,10 @@ runs:
           const targetStatus = process.env.TARGET_STATUS;
           const projectTitle = process.env.PROJECT_TITLE;
           const statusFieldName = process.env.STATUS_FIELD_NAME;
+          const forbiddenSources = process.env.FORBIDDEN_SOURCES
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean);
           console.log(`Updating issues [${issueNumbers.join(', ')}] to "${targetStatus}"`);
 
           // === 2. Резолвим проект (в try/catch) ===
@@ -145,6 +154,35 @@ runs:
               if (!projectItem) {
                 console.log(`Issue #${issueNumber} is not in project "${projectTitle}", skipping`);
                 continue;
+              }
+              // Проверяем текущий статус: если он запрещён для перехода, пропускаем
+              if (forbiddenSources.length > 0) {
+                try {
+                  const statusQuery = `
+                    query($itemId: ID!) {
+                      node(id: $itemId) {
+                        ... on ProjectV2Item {
+                          fieldValueByName(name: "${statusFieldName}") {
+                            ... on ProjectV2ItemFieldSingleSelectValue {
+                              name
+                            }
+                          }
+                        }
+                      }
+                    }
+                  `;
+                  const statusResult = await github.graphql(statusQuery, {
+                    itemId: projectItem.id
+                  });
+                  const currentStatus = statusResult?.node?.fieldValueByName?.name;
+                  if (currentStatus && forbiddenSources.includes(currentStatus)) {
+                    console.log(`Issue #${issueNumber} in "${currentStatus}", skipping (forbidden source)`);
+                    continue;
+                  }
+                } catch (err) {
+                  console.log(`Failed to read status for issue #${issueNumber}: ${err.message}, skipping check`);
+                  // не падаем, продолжаем - вдруг статус не критичен
+                }
               }
               await github.graphql(mutation, {
                 projectId: project.id,
