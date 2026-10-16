@@ -34,3 +34,4 @@ jobs:
           github-token: ${{ secrets.GH_PROJECT_TOKEN }}
           issue-numbers: ${{ steps.extract.outputs.issues }}
           target-status: 'Pre-release'
+          forbidden-source-statuses: 'Done'

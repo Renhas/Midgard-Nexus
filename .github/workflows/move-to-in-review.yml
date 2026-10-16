@@ -7,6 +7,7 @@ on:
 
 jobs:
   move-to-in-review:
+    if: github.event.pull_request.state == 'open'
     runs-on: ubuntu-latest
 
     steps:
@@ -34,3 +35,4 @@ jobs:
           github-token: ${{ secrets.GH_PROJECT_TOKEN }}
           issue-numbers: ${{ steps.extract.outputs.issues }}
           target-status: 'In review'
+          forbidden-source-statuses: 'In Dev,Pre-release,Done'
