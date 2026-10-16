@@ -25,7 +25,8 @@ from apps.vor_archives.dashboard import (
     _sunday,
     _heat_level,
 )
-from apps.vor_archives.models import FeedItem
+from apps.vor_archives.services import reorder_user_works
+from apps.vor_archives.models import FeedItem, UserWork
 from apps.vor_archives.tests.factories import (
     BookFactory,
     BookGenreFactory,
@@ -38,6 +39,53 @@ from apps.vor_archives.tests.factories import (
     TagFactory,
     UserWorkFactory,
 )
+
+
+# ─── Artworks ──────────────────────────────────────────────────────────
+
+
+@pytest.mark.django_db
+def test_reorder_normalizes_non_unique_positions(user, book, movie):
+    uw1 = UserWork.objects.create(user=user, work=book)
+    uw2 = UserWork.objects.create(user=user, work=movie)
+    UserWork.objects.filter(pk__in=[uw1.pk, uw2.pk]).update(order_position=0)
+
+    reorder_user_works(user, [uw1.pk, uw2.pk])
+
+    uw1.refresh_from_db()
+    uw2.refresh_from_db()
+    assert uw1.order_position == 0
+    assert uw2.order_position == 1
+
+
+@pytest.mark.django_db
+def test_reorder_normalizes_gaps_in_positions(user, book, movie, game):
+    uw1 = UserWork.objects.create(user=user, work=book, order_position=5)
+    uw2 = UserWork.objects.create(user=user, work=movie, order_position=10)
+    uw3 = UserWork.objects.create(user=user, work=game, order_position=15)
+
+    reorder_user_works(user, [uw1.pk, uw2.pk, uw3.pk])
+
+    uw1.refresh_from_db()
+    uw2.refresh_from_db()
+    uw3.refresh_from_db()
+    assert (uw1.order_position, uw2.order_position, uw3.order_position) == (0, 1, 2)
+
+
+@pytest.mark.django_db
+def test_reorder_ignores_foreign_ids(user, book):
+    other_user = UserFactory()
+    uw = UserWork.objects.create(user=user, work=book)
+    foreign = UserWork.objects.create(user=other_user, work=BookFactory())
+
+    result = reorder_user_works(user, [uw.pk, foreign.pk])
+
+    assert result == 1
+    foreign.refresh_from_db()
+    assert foreign.order_position == 0
+
+
+# ─── Dashboard ──────────────────────────────────────────────────────────
 
 
 def _set_timestamp(item, when):
