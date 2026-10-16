@@ -132,11 +132,6 @@ def delete_user_works(user, ids):
     return len(user_works)
 
 
-def next_order_position(user):
-    current = UserWork.objects.filter(user=user).aggregate(m=Max("order_position"))["m"]
-    return 0 if current is None else current + 1
-
-
 def attach_work(user, type_key, work_id, cleaned_user_data=None):
     work = get_work(type_key, work_id)
     ct = ContentType.objects.get_for_model(work)
@@ -149,7 +144,7 @@ def attach_work(user, type_key, work_id, cleaned_user_data=None):
             else:
                 defaults[key] = value
     if "order_position" not in defaults:
-        defaults["order_position"] = next_order_position(user)
+        defaults["order_position"] = UserWork.next_position(user)
 
     user_work, created = UserWork.objects.get_or_create(
         user=user,
@@ -333,7 +328,7 @@ def create_work_and_attach(user, work, user_work_form):
     user_work = user_work_form.save(commit=False)
     user_work.user = user
     user_work.work = work
-    user_work.order_position = next_order_position(user)
+    user_work.order_position = UserWork.next_position(user)
     user_work.save()
     user_work_form.save_m2m()
     return user_work
@@ -727,9 +722,8 @@ def reorder_user_works(user, ids):
         for user_work in UserWork.objects.filter(user=user, pk__in=ids)
     }
     ordered = [existing[uw_id] for uw_id in ids if uw_id in existing]
-    positions = sorted(user_work.order_position for user_work in ordered)
     to_update = []
-    for position, user_work in zip(positions, ordered):
+    for position, user_work in enumerate(ordered):
         if user_work.order_position != position:
             user_work.order_position = position
             to_update.append(user_work)

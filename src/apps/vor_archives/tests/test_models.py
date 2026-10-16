@@ -409,6 +409,50 @@ def test_user_work_duplicate_hits_db_unique(book, user):
         )
 
 
+@pytest.mark.django_db
+def test_next_position_returns_one_for_first_work(user):
+    assert UserWork.next_position(user) == 0
+
+
+@pytest.mark.django_db
+def test_next_position_increments_for_each_existing(user, book, movie):
+    UserWork.objects.create(user=user, work=book)
+    UserWork.objects.create(user=user, work=movie)
+    assert UserWork.next_position(user) == 2
+
+
+@pytest.mark.django_db
+def test_next_position_is_per_user(user, book, movie):
+    other_user = UserFactory()
+    UserWork.objects.create(user=user, work=book)
+    UserWork.objects.create(user=other_user, work=movie)
+    assert UserWork.next_position(user) == 1
+    assert UserWork.next_position(other_user) == 1
+
+
+@pytest.mark.django_db
+def test_save_assigns_unique_position_on_create(user, book, movie):
+    uw1 = UserWork.objects.create(user=user, work=book)
+    uw2 = UserWork.objects.create(user=user, work=movie)
+    assert uw1.order_position == 0
+    assert uw2.order_position == 1
+
+
+@pytest.mark.django_db
+def test_save_does_not_override_explicit_position(user, book):
+    uw = UserWork.objects.create(user=user, work=book, order_position=99)
+    assert uw.order_position == 99
+
+
+@pytest.mark.django_db
+def test_save_does_not_reassign_on_update(user, book):
+    uw = UserWork.objects.create(user=user, work=book)
+    uw.order_position = 5
+    uw.save()
+    uw.refresh_from_db()
+    assert uw.order_position == 5
+
+
 # ─── CollectionItem ──────────────────────────────────────────────────────────
 
 

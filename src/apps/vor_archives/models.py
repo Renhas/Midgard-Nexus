@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Max
 from mptt.models import MPTTModel, TreeForeignKey
 
 from .constants import (
@@ -320,12 +320,19 @@ class UserWork(models.Model):
     def __str__(self):
         return f"{self.user} — {self.work} ({self.status})"
 
+    @classmethod
+    def next_position(cls, user) -> int:
+        current = cls.objects.filter(user=user).aggregate(m=Max("order_position"))["m"]
+        return 0 if current is None else current + 1
+
     def clean(self):
         super().clean()
         if self.work_content_type_id and self.work_object_id:
             validate_gfk(self.work_content_type, self.work_object_id)
 
     def save(self, *args, **kwargs):
+        if not self.pk and not self.order_position:
+            self.order_position = self.next_position(self.user)
         self.full_clean()
         super().save(*args, **kwargs)
 
