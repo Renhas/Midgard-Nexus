@@ -10,41 +10,52 @@ from .constants import FeedItemActionTypeChoices, UserWorkStatusChoices
 
 
 @receiver(pre_save, sender=vor_models.UserWork)
-def userwork_pre_save(sender, instance, **kwargs):
+def userwork_pre_save(sender, instance, raw=False, **kwargs):
     """Handle status changes, completions, and rating updates."""
-    try:
-        old_instance = vor_models.UserWork.objects.get(pk=instance.pk)
-    except vor_models.UserWork.DoesNotExist:
-        old_instance = None
+    if raw:
+        return
+    old_instance = (
+        sender.objects.filter(pk=instance.pk).first() if instance.pk else None
+    )
 
     new_status = instance.status
     old_status = old_instance.status if old_instance else None
 
+    instance._completed_transition = False
+
     if new_status == UserWorkStatusChoices.COMPLETED and old_status != new_status:
         instance.times_completed += 1
         instance.last_completed_date = timezone.now().date()
-        vor_models.CompletionRecord.objects.create(user_work=instance)
+        instance._completed_transition = True
 
     instance._old_status = old_status
     instance._old_rating = old_instance.rating if old_instance else None
 
 
 @receiver(post_save, sender=vor_models.UserWork)
-def userwork_post_save(sender, instance, created, **kwargs):
+def userwork_post_save(sender, instance, created, raw=False, **kwargs):
+    if raw:
+        return
     if created:
         vor_models.FeedItem.objects.create(
             user=instance.user,
             user_work=instance,
             action_type=FeedItemActionTypeChoices.ADDED,
         )
+
+    if getattr(instance, "_completed_transition", False):
+        vor_models.CompletionRecord.objects.create(user_work=instance)
+
     new_status = instance.status
     old_status = instance._old_status
+
     if old_status and new_status != old_status:
         vor_models.FeedItem.objects.create(
             user=instance.user,
             user_work=instance,
             action_type=new_status,
         )
+
     if instance.rating != instance._old_rating:
         vor_models.FeedItem.objects.create(
             user=instance.user,

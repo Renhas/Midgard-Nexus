@@ -12,6 +12,11 @@ def user():
 
 
 @pytest.fixture
+def admin_user():
+    return UserFactory(username="admin", is_superuser=True, is_staff=True)
+
+
+@pytest.fixture
 def book():
     return BookFactory()
 

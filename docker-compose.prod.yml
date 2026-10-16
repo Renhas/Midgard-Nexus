@@ -14,8 +14,8 @@ services:
       db:
         condition: service_healthy
     environment:
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
+      - DB_HOST=db
+      - DB_PORT=5432
       - DJANGO_SETTINGS_MODULE=config.settings.production
       - COLLECTSTATIC=1
 
