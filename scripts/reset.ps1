@@ -5,6 +5,8 @@
 .DESCRIPTION
     Deletes the database, uploaded files and users. Does NOT touch .env
     or the source code. Asks for confirmation unless -Yes is passed.
+.PARAMETER Yes
+    Skip the confirmation prompt.
 #>
 [CmdletBinding()]
 param(
@@ -13,6 +15,33 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+
+function Invoke-NativeQuiet {
+    param([scriptblock]$Command)
+    $prev = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = 'Continue'
+        $null = & $Command 2>&1
+        if ($null -eq $LASTEXITCODE) { return 1 }
+        return $LASTEXITCODE
+    } catch {
+        return 1
+    } finally {
+        $ErrorActionPreference = $prev
+    }
+}
+
+function Invoke-NativeCapture {
+    param([scriptblock]$Command)
+    $prev = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = 'Continue'
+        & $Command
+    } catch {
+    } finally {
+        $ErrorActionPreference = $prev
+    }
+}
 
 $projectRoot = Split-Path -Parent $PSScriptRoot
 if (-not (Test-Path (Join-Path $projectRoot 'docker-compose.yml'))) {
@@ -24,13 +53,19 @@ if (-not (Test-Path (Join-Path $projectRoot 'docker-compose.yml'))) {
     }
 }
 
-if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+if (-not (Get-Command docker -CommandType Application -ErrorAction SilentlyContinue)) {
     Write-Host "ERROR: Docker is not installed or not in PATH." -ForegroundColor Red
     Write-Host "       Install Docker Desktop: https://www.docker.com/products/docker-desktop/" -ForegroundColor Yellow
     exit 1
 }
-$null = docker info 2>&1
-if ($LASTEXITCODE -ne 0) {
+
+$isWindowsHost = ($PSVersionTable.PSEdition -eq 'Desktop') -or $IsWindows
+if ($isWindowsHost -and -not (Test-Path '\\.\pipe\docker_engine')) {
+    Write-Host "ERROR: Docker is not running. Start Docker Desktop and try again." -ForegroundColor Red
+    exit 1
+}
+
+if ((Invoke-NativeQuiet { docker info }) -ne 0) {
     Write-Host "ERROR: Docker is not running. Start Docker Desktop and try again." -ForegroundColor Red
     exit 1
 }
@@ -52,11 +87,29 @@ if (-not $Yes) {
 Push-Location $projectRoot
 try {
     Write-Host "Removing containers and volumes..." -ForegroundColor Yellow
-    & docker compose down -v
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "ERROR: docker compose down -v failed." -ForegroundColor Red
+
+    # Call docker directly so it keeps a real console handle. Piping
+    # through a function breaks the TTY and produces plain output
+    # instead of Compose progress. Do not trust $LASTEXITCODE alone:
+    # Compose returns non-zero on some Docker Desktop builds for the
+    # non-fatal control server error even when the operation succeeded.
+    $prevEAP = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        & docker compose down -v
+    } catch {
+    } finally {
+        $ErrorActionPreference = $prevEAP
+    }
+
+    # Defensive: if down reported non-zero, verify no containers remain.
+    # If none do, the reset actually worked and we should not fail.
+    $left = Invoke-NativeCapture { docker compose ps -q 2>$null } | Where-Object { $_ }
+    if ($left) {
+        Write-Host "ERROR: docker compose down -v failed; containers are still present." -ForegroundColor Red
         exit 1
     }
+
     Write-Host "OK: all data reset." -ForegroundColor Green
     Write-Host "    Run scripts\run.ps1 to start with a clean database." -ForegroundColor Green
 } finally {

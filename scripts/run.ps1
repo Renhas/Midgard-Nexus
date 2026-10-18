@@ -4,9 +4,9 @@
     Starts the application stack and prints the URL.
 .DESCRIPTION
     Checks Docker, creates .env if missing, validates the secret key,
-    runs docker compose up -d, waits for services to become healthy,
-    optionally seeds demo data, and prints the URL. Non-interactive by
-    default when -NonInteractive is set (defaults: seed=yes, browser=no).
+    runs docker compose up -d, waits for containers to reach the running
+    state, optionally seeds demo data, and prints the URL. Non-interactive
+    by default when -NonInteractive is set (defaults: seed=yes, browser=no).
 .PARAMETER Seed
     Load demo data after startup. Skips the prompt.
 .PARAMETER NoSeed
@@ -30,6 +30,39 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# --- Native helpers -------------------------------------------------------
+# Under $ErrorActionPreference = 'Stop', stderr from a native command can
+# become a terminating NativeCommandError. These helpers run the command
+# with Continue for the duration and return only a scalar, so callers can
+# use `-eq 0` / `-ne 0` without array-vs-scalar surprises.
+
+function Invoke-NativeQuiet {
+    param([scriptblock]$Command)
+    $prev = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = 'Continue'
+        $null = & $Command 2>&1
+        if ($null -eq $LASTEXITCODE) { return 1 }
+        return $LASTEXITCODE
+    } catch {
+        return 1
+    } finally {
+        $ErrorActionPreference = $prev
+    }
+}
+
+function Invoke-NativeCapture {
+    param([scriptblock]$Command)
+    $prev = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = 'Continue'
+        & $Command
+    } catch {
+    } finally {
+        $ErrorActionPreference = $prev
+    }
+}
+
 # --- Locate project root ---------------------------------------------------
 $projectRoot = Split-Path -Parent $PSScriptRoot
 if (-not (Test-Path (Join-Path $projectRoot 'docker-compose.yml'))) {
@@ -42,13 +75,20 @@ if (-not (Test-Path (Join-Path $projectRoot 'docker-compose.yml'))) {
 }
 
 # --- Docker sanity ---------------------------------------------------------
-if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+if (-not (Get-Command docker -CommandType Application -ErrorAction SilentlyContinue)) {
     Write-Host "ERROR: Docker is not installed or not in PATH." -ForegroundColor Red
     Write-Host "       Install Docker Desktop: https://www.docker.com/products/docker-desktop/" -ForegroundColor Yellow
     exit 1
 }
-$null = docker info 2>&1
-if ($LASTEXITCODE -ne 0) {
+
+# Fast path on Windows: the named pipe is absent when the daemon is down.
+$isWindowsHost = ($PSVersionTable.PSEdition -eq 'Desktop') -or $IsWindows
+if ($isWindowsHost -and -not (Test-Path '\\.\pipe\docker_engine')) {
+    Write-Host "ERROR: Docker is not running. Start Docker Desktop and try again." -ForegroundColor Red
+    exit 1
+}
+
+if ((Invoke-NativeQuiet { docker info }) -ne 0) {
     Write-Host "ERROR: Docker is not running. Start Docker Desktop and try again." -ForegroundColor Red
     exit 1
 }
@@ -104,42 +144,66 @@ try {
     $upArgs = @('compose', 'up', '-d')
     if ($Rebuild) { $upArgs += '--build' }
 
-    Write-Host "Starting containers..." -ForegroundColor Yellow
-    & docker @upArgs
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "ERROR: docker compose up failed." -ForegroundColor Red
-        Write-Host "       Run 'docker compose logs' to see details." -ForegroundColor Yellow
-        exit 1
+        Write-Host "Starting containers..." -ForegroundColor Yellow
+
+    # Call docker directly so it keeps a real console handle. Pipe or
+    # function wrapper breaks the TTY on Windows and can emit
+    # "failed to get console: The handle is invalid".
+    $prevEAP = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    $upCode = 1
+    try {
+        & docker @upArgs
+        $upCode = if ($null -eq $LASTEXITCODE) { 1 } else { $LASTEXITCODE }
+    } catch {
+        $upCode = 1
+    } finally {
+        $ErrorActionPreference = $prevEAP
     }
 
-        # --- Wait for containers to be running --------------------------------
+    # Compose can return non-zero even when containers start (control
+    # server startup error on some Docker Desktop builds). Only treat
+    # non-zero as a failure if no containers exist after a short settle.
+    if ($upCode -ne 0) {
+        Start-Sleep -Seconds 2
+        $anyContainer = Invoke-NativeCapture { docker compose ps -q 2>$null } | Where-Object { $_ }
+        if (-not $anyContainer) {
+            Write-Host "ERROR: docker compose up failed." -ForegroundColor Red
+            Write-Host "       Run 'docker compose logs' to see details." -ForegroundColor Yellow
+            exit 1
+        }
+        Write-Host "WARNING: docker compose up returned non-zero, but containers exist; continuing." -ForegroundColor Yellow
+    }
+
+    # --- Wait for containers to be running --------------------------------
     Write-Host "Waiting for containers to start..." -ForegroundColor Yellow
     $running = $false
     for ($i = 0; $i -lt 30; $i++) {
         Start-Sleep -Seconds 1
-        $states = & docker compose ps --format "{{.State}}" 2>$null | Where-Object { $_ }
+        $states = Invoke-NativeCapture { docker compose ps --format "{{.State}}" 2>$null } | Where-Object { $_ }
         if ($states -and -not ($states | Where-Object { $_ -ne 'running' })) {
             $running = $true
             break
         }
     }
     if (-not $running) {
-        Write-Host "WARNING: containers did not reach running state within 30 seconds." -ForegroundColor Yellow
-        Write-Host "         Run 'docker compose logs' to see what is wrong." -ForegroundColor Yellow
+        Write-Host "ERROR: containers did not reach running state." -ForegroundColor Red
+        Write-Host "       Run 'docker compose logs' to see details." -ForegroundColor Yellow
+        exit 1
     }
 
     # --- Wait for the superuser (created by entrypoint after migrations) --
-    # The container is "running" as soon as entrypoint.sh starts, but the
-    # superuser exists only after migrations. Poll for it before seeding,
-    # otherwise seed_demo aborts with "Superuser 'admin' not found".
-    if ($doSeed -and $running) {
+    # The container reports "running" as soon as entrypoint.sh starts, but
+    # the superuser exists only after migrations. Poll for it before
+    # seeding, otherwise seed_demo aborts with
+    # "Superuser 'admin' not found".
+    if ($doSeed) {
         Write-Host "Waiting for the superuser to be created..." -ForegroundColor Yellow
         $superuserReady = $false
         $probe = "from django.contrib.auth import get_user_model; import sys; sys.exit(0 if get_user_model().objects.filter(is_superuser=True).exists() else 1)"
         for ($i = 0; $i -lt 180; $i++) {
             Start-Sleep -Seconds 1
-            $null = & docker compose exec -T web python src/manage.py shell -c $probe 2>&1
-            if ($LASTEXITCODE -eq 0) {
+            if ((Invoke-NativeQuiet { & docker compose exec -T web python src/manage.py shell -c $probe }) -eq 0) {
                 $superuserReady = $true
                 break
             }
@@ -155,8 +219,14 @@ try {
     # --- Seed demo data ----------------------------------------------------
     if ($doSeed) {
         Write-Host "Loading demo data..." -ForegroundColor Yellow
-        & docker compose exec -T web python src/manage.py seed_demo
-        if ($LASTEXITCODE -ne 0) {
+        $seedCode = 1
+        try {
+            & docker compose exec -T web python src/manage.py seed_demo
+            $seedCode = if ($null -eq $LASTEXITCODE) { 1 } else { $LASTEXITCODE }
+        } catch {
+            $seedCode = 1
+        }
+        if ($seedCode -ne 0) {
             Write-Host "WARNING: seed_demo failed. The app is still running." -ForegroundColor Yellow
             Write-Host "         Retry manually with:" -ForegroundColor Yellow
             Write-Host "           docker compose exec web python src/manage.py seed_demo" -ForegroundColor Yellow
