@@ -89,6 +89,9 @@ KEEP_OVERRIDES = {
     ".env.template",
     "scripts/manage.sh",
     "scripts/manage.ps1",
+    "scripts/init-env.ps1",
+    "scripts/reset.ps1",
+    "scripts/run.ps1",
 }
 
 RENAMES = {
