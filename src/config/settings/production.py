@@ -5,6 +5,20 @@ from django.core.exceptions import ImproperlyConfigured
 
 from .base import *
 
+# HTTPS-related checks from `manage.py check --deploy`.
+# This app is served on a local network without HTTPS, and TLS is not
+# planned, so redirects, HSTS and secure-cookie flags have nothing to
+# protect. Silencing them keeps `check --deploy` meaningful for the
+# warnings that do apply, instead of failing on settings that are correct
+# for this deployment model. Revisit if HTTPS is ever introduced.
+# W019 (X_FRAME_OPTIONS) is not silenced: it defaults to DENY and passes.
+SILENCED_SYSTEM_CHECKS = [
+    "security.W004",  # SECURE_HSTS_SECONDS not set
+    "security.W008",  # SECURE_SSL_REDIRECT not set
+    "security.W012",  # SESSION_COOKIE_SECURE not set
+    "security.W016",  # CSRF_COOKIE_SECURE not set
+]
+
 if not SECRET_KEY or SECRET_KEY.startswith("your-secret"):
     raise ImproperlyConfigured("DJANGO_SECRET_KEY is required")
 
