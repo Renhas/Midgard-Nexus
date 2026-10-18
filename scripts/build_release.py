@@ -87,8 +87,14 @@ KEEP_OVERRIDES = {
     ".env.example",
     ".env.sample",
     ".env.template",
-    "scripts/manage.sh",
     "scripts/manage.ps1",
+    "scripts/init-env.ps1",
+    "scripts/reset.ps1",
+    "scripts/run.ps1",
+    "scripts/manage.sh",
+    "scripts/init-env.sh",
+    "scripts/reset.sh",
+    "scripts/run.sh",
 }
 
 RENAMES = {
@@ -99,6 +105,9 @@ EXECUTABLE_FILES = {
     "docker/web/entrypoint.sh",
     "docker/web/download_static.sh",
     "scripts/manage.sh",
+    "scripts/init-env.sh",
+    "scripts/reset.sh",
+    "scripts/run.sh",
 }
 
 
