@@ -183,6 +183,32 @@ if [ "$DO_SEED" -eq 1 ]; then
     fi
 fi
 
+# --- Wait for the app to respond through nginx -----------------------------
+# entrypoint.sh creates the superuser before exec'ing gunicorn, so a
+# request in that window gets 502 from nginx. Poll for a status below
+# 500 so the URL is printed and the browser is opened only when the app
+# actually answers. 127.0.0.1 instead of localhost: on some systems
+# localhost resolves to ::1 first, and nginx may listen on IPv4 only.
+if command -v curl >/dev/null 2>&1; then
+    echo "Waiting for the application to respond..."
+    app_ready=0
+    for ((i=0; i<60; i++)); do
+        code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 3 \
+            "http://127.0.0.1:${NGINX_PORT}/" 2>/dev/null || echo 000)"
+        if [ "$code" -ge 200 ] && [ "$code" -lt 500 ]; then
+            app_ready=1
+            break
+        fi
+        sleep 1
+    done
+    if [ "$app_ready" -ne 1 ]; then
+        warn "The application did not respond within 60 seconds."
+        warn "Containers are running; open http://localhost:${NGINX_PORT}/ manually and check logs."
+    fi
+else
+    warn "curl not found; skipping HTTP readiness check."
+fi
+
 # --- Print URL and next steps ----------------------------------------------
 echo ""
 printf '%s============================================%s\n' "$GREEN" "$NC"

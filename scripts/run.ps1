@@ -192,6 +192,27 @@ try {
         exit 1
     }
 
+    Write-Host "Waiting for the application to respond..." -ForegroundColor Yellow
+    $appReady = $false
+    for ($i = 0; $i -lt 60; $i++) {
+        try {
+            $resp = Invoke-WebRequest -Uri "http://127.0.0.1:$nginxPort/" -UseBasicParsing -TimeoutSec 3 -ErrorAction Stop
+            $code = [int]$resp.StatusCode
+        } catch {
+            $r = $_.Exception.Response
+            $code = if ($r) { [int]$r.StatusCode } else { 0 }
+        }
+        if ($code -ge 200 -and $code -lt 500) {
+            $appReady = $true
+            break
+        }
+        Start-Sleep -Seconds 1
+    }
+    if (-not $appReady) {
+        Write-Host "WARNING: the application did not respond within 60 seconds." -ForegroundColor Yellow
+        Write-Host "         Containers are running; open http://localhost:$nginxPort/ manually and check logs." -ForegroundColor Yellow
+    }
+
     # --- Wait for the superuser (created by entrypoint after migrations) --
     # The container reports "running" as soon as entrypoint.sh starts, but
     # the superuser exists only after migrations. Poll for it before
