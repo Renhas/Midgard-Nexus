@@ -1,5 +1,5 @@
 # Django
-Django==6.0.7
+Django==6.0.8
 django-crispy-forms==2.6
 django-mptt==0.18.0
 django-htmx==1.28.0
