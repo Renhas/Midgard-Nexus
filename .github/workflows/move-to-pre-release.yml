@@ -26,6 +26,18 @@ jobs:
             | paste -sd, - || true)
           echo "issues=$ISSUES" >> "$GITHUB_OUTPUT"
 
+      - name: Determine target status
+        id: target
+        shell: bash
+        env:
+          MERGED: ${{ github.event.pull_request.merged }}
+        run: |
+          if [[ "$MERGED" == "true" ]]; then
+            echo "status=Done" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=Pre-release" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Update project status
         if: steps.extract.outputs.issues != ''
         continue-on-error: true
@@ -33,4 +45,5 @@ jobs:
         with:
           github-token: ${{ secrets.GH_PROJECT_TOKEN }}
           issue-numbers: ${{ steps.extract.outputs.issues }}
-          target-status: 'Pre-release'
+          target-status: ${{ steps.target.outputs.status }}
+          forbidden-source-statuses: 'Done'
