@@ -1,6 +1,6 @@
 [![Version](https://img.shields.io/github/v/release/Renhas/Midgard-Nexus)](https://github.com/Renhas/Midgard-Nexus/releases)
 [![License](https://img.shields.io/github/license/Renhas/Midgard-Nexus)](LICENSE)
-[![Tests](https://github.com/Renhas/Midgard-Nexus/actions/workflows/tests.yml/badge.svg)](https://github.com/Renhas/Midgard-Nexus/actions/workflows/tests.yml)
+[![Tests](https://github.com/Renhas/Midgard-Nexus/actions/workflows/test.yml/badge.svg)](https://github.com/Renhas/Midgard-Nexus/actions/workflows/test.yml)
 
 # Midgard Nexus
 
