@@ -24,16 +24,30 @@
 
 Мобильная версия пока не разрабатывается.
 
-## Скриншоты
+## Демонстрация
 
+### Создание и редактирование
 <div align="center">
-  <img src="docs/assets/screenshots/work_info.png" alt="Artwork Info" width="100%" style="max-width: 800px;">
-  <p><em>Подробная информация о произведении</em></p>
+  <img src="docs/assets/gifs/CreateEdit.gif" alt="Создание и редактирование произведения" width="100%" style="max-width: 800px;">
+  <p><em>Добавление произведения, загрузка обложки и настройка связей</em></p>
 </div>
 
+### Организация и фильтрация
+<div align="center">
+  <img src="docs/assets/gifs/DnD.gif" alt="Смена отображения и DnD в коллекцию" width="100%" style="max-width: 800px;">
+  <p><em>Смена вида отображения и Drag'n'Drop в коллекцию</em></p>
+</div>
+
+### Детальная информация
+<div align="center">
+  <img src="docs/assets/screenshots/work_info.png" alt="Artwork Info" width="100%" style="max-width: 800px;">
+  <p><em>Карточка произведения</em></p>
+</div>
+
+### Аналитика
 <div align="center">
   <img src="docs/assets/screenshots/dashboard.png" alt="Dashboard" width="100%" style="max-width: 800px;">
-  <p><em>Дашборд со статистикой</em></p>
+  <p><em>Дашборд со статистикой и графиками</em></p>
 </div>
 
 ## Модули
