@@ -26,12 +26,15 @@
 
 ## Скриншоты
 
-<!--
 <div align="center">
-  <img src="docs/assets/screenshots/dashboard.png" alt="Dashboard" width="800">
+  <img src="docs/assets/screenshots/work_info.png" alt="Artwork Info" width="100%" style="max-width: 800px;">
+  <p><em>Подробная информация о произведении</em></p>
+</div>
+
+<div align="center">
+  <img src="docs/assets/screenshots/dashboard.png" alt="Dashboard" width="100%" style="max-width: 800px;">
   <p><em>Дашборд со статистикой</em></p>
 </div>
--->
 
 ## Модули
 
