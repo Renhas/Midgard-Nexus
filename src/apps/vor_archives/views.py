@@ -58,7 +58,7 @@ from .models import (
     Tag,
     UserWork,
 )
-from .services import (
+from .artworks.services import (
     WORK_MODELS,
     add_user_work_to_collection,
     attach_work,
