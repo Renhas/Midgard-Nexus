@@ -122,9 +122,9 @@ def index(request):
                 "reorderUrl": reverse("vor_archives:artworks:reorder"),
                 "searchUrl": reverse("vor_archives:artworks:library_search"),
                 "attachUrl": reverse("vor_archives:artworks:attach"),
-                "collectionTreeUrl": reverse("vor_archives:collection_tree"),
-                "collectionReorderUrl": reverse("vor_archives:collection_reorder"),
-                "collectionNewUrl": reverse("vor_archives:collection_new"),
+                "collectionTreeUrl": reverse("vor_archives:collections:tree"),
+                "collectionReorderUrl": reverse("vor_archives:collections:reorder"),
+                "collectionNewUrl": reverse("vor_archives:collections:new"),
                 "isStaff": request.user.is_staff,
                 "filterCatalog": {
                     "status": [item["value"] for item in status_options],

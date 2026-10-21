@@ -74,7 +74,7 @@ def collection_new(request):
         {
             "title": "Новая коллекция",
             "submit_label": "Создать",
-            "action_url": reverse("vor_archives:collection_new"),
+            "action_url": reverse("vor_archives:collections:new"),
             "name": name,
             "error": error,
         },
@@ -92,7 +92,7 @@ def collection_edit(request, pk):
             "title": "Переименовать коллекцию",
             "submit_label": "Сохранить",
             "action_url": reverse(
-                "vor_archives:collection_update", args=[collection.pk]
+                "vor_archives:collections:update", args=[collection.pk]
             ),
             "name": collection.name,
             "error": "",
@@ -121,7 +121,7 @@ def collection_update(request, pk):
                 "title": "Переименовать коллекцию",
                 "submit_label": "Сохранить",
                 "action_url": reverse(
-                    "vor_archives:collection_update", args=[collection.pk]
+                    "vor_archives:collections:update", args=[collection.pk]
                 ),
                 "name": name,
                 "error": error,
