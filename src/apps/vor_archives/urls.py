@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 
 from . import views
 from .artworks import views as works_views
@@ -38,37 +38,7 @@ urlpatterns = [
     path("attributes/<str:kind>/<int:pk>/edit/", views.attr_edit, name="attr_edit"),
     path("attributes/<str:kind>/<int:pk>/", views.attr_detail, name="attr_detail"),
     path("attributes/<str:kind>/", views.attributes_kind, name="attributes_kind"),
-    path("artworks/", works_views.artwork_list, name="artwork_list"),
-    path("artworks/new/", works_views.artwork_add, name="artwork_add"),
-    path("artworks/search/", works_views.artwork_search, name="artwork_search"),
-    path(
-        "artworks/library-search/",
-        works_views.artwork_library_search,
-        name="artwork_library_search",
-    ),
-    path("artworks/reorder/", works_views.artwork_reorder, name="artwork_reorder"),
-    path(
-        "artworks/relation-search/",
-        works_views.artwork_relation_search,
-        name="artwork_relation_search",
-    ),
-    path("artworks/preview/", works_views.artwork_preview, name="artwork_preview"),
-    path("artworks/attach/", works_views.artwork_attach, name="artwork_attach"),
-    path(
-        "artworks/delete/preview/",
-        works_views.artwork_delete_preview,
-        name="artwork_delete_preview",
-    ),
-    path("artworks/delete/", works_views.artwork_delete, name="artwork_delete"),
-    path(
-        "artworks/<int:uw_id>/quick/", works_views.artwork_quick, name="artwork_quick"
-    ),
-    path(
-        "artworks/<int:uw_id>/collections/",
-        works_views.artwork_collections,
-        name="artwork_collections",
-    ),
-    path("artworks/<int:uw_id>/", works_views.artwork_detail, name="artwork_detail"),
+    path("artworks/", include("apps.vor_archives.artworks.urls")),
     path("collections/tree/", works_views.collection_tree, name="collection_tree"),
     path("collections/new/", works_views.collection_new, name="collection_new"),
     path(
@@ -103,10 +73,5 @@ urlpatterns = [
     ),
     path(
         "collections/<int:pk>/", works_views.collection_update, name="collection_update"
-    ),
-    path(
-        "works/<str:type_key>/<int:work_id>/",
-        works_views.artwork_work,
-        name="artwork_work",
     ),
 ]

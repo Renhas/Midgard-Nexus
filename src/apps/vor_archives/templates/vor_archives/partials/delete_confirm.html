@@ -19,7 +19,7 @@
             </div>
         {% endif %}
         <form class="vor-modal-actions"
-              hx-post="{% url 'vor_archives:artwork_delete' %}"
+              hx-post="{% url 'vor_archives:artworks:delete' %}"
               hx-swap="none">
             {% csrf_token %}
             {% for id in ids %}

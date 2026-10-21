@@ -122,12 +122,12 @@ def artwork_add(request):
         {
             "add_opts": {
                 "workType": "book",
-                "saveUrl": reverse("vor_archives:artwork_add"),
-                "searchUrl": reverse("vor_archives:artwork_search"),
-                "previewUrl": reverse("vor_archives:artwork_preview"),
-                "attachUrl": reverse("vor_archives:artwork_attach"),
-                "listUrl": reverse("vor_archives:artwork_list"),
-                "relationSearchUrl": reverse("vor_archives:artwork_relation_search"),
+                "saveUrl": reverse("vor_archives:artworks:add"),
+                "searchUrl": reverse("vor_archives:artworks:search"),
+                "previewUrl": reverse("vor_archives:artworks:preview"),
+                "attachUrl": reverse("vor_archives:artworks:attach"),
+                "listUrl": reverse("vor_archives:artworks:list"),
+                "relationSearchUrl": reverse("vor_archives:artworks:relation_search"),
                 "relationTypes": RELATION_TYPE_OPTIONS,
                 "catalogs": all_attr_catalogs(),
                 "ageChoices": [

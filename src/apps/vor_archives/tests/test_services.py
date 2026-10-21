@@ -25,7 +25,7 @@ from apps.vor_archives.dashboard import (
     _sunday,
     _heat_level,
 )
-from apps.vor_archives.services import reorder_user_works
+from apps.vor_archives.artworks.services import reorder_user_works
 from apps.vor_archives.models import FeedItem, UserWork
 from apps.vor_archives.tests.factories import (
     BookFactory,
@@ -409,7 +409,7 @@ def test_feed_page_orders_and_paginates(user, book, movie):
     assert has_more is True
     assert page[0]["work_title"] == movie.title
     assert page[0]["detail_url"] == reverse(
-        "vor_archives:artwork_detail", args=[second.pk]
+        "vor_archives:artworks:detail", args=[second.pk]
     )
     assert page[0]["label"] == FEED_ACTION_LABELS_RU["added"]
     assert page[0]["icon"] == FEED_ACTION_ICONS["added"]
@@ -417,7 +417,7 @@ def test_feed_page_orders_and_paginates(user, book, movie):
     rest, rest_more = feed_page(user, offset=1, limit=1)
     assert rest[0]["work_title"] == book.title
     assert rest[0]["detail_url"] == reverse(
-        "vor_archives:artwork_detail", args=[first.pk]
+        "vor_archives:artworks:detail", args=[first.pk]
     )
     assert rest_more is False
 

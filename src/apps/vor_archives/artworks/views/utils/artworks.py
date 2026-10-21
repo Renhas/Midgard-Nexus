@@ -323,9 +323,9 @@ def _detail_context(
         )
     catalog = _attr_catalog(type_key)
     save_url = (
-        reverse("vor_archives:artwork_detail", args=[user_work.pk])
+        reverse("vor_archives:artworks:detail", args=[user_work.pk])
         if owned
-        else reverse("vor_archives:artwork_work", args=[type_key, work.pk])
+        else reverse("vor_archives:artworks:work", args=[type_key, work.pk])
     )
     return {
         "user_work": user_work,
@@ -360,7 +360,7 @@ def _detail_context(
                 {"value": value, "label": STATUS_LABELS_RU.get(value, label)}
                 for value, label in UserWorkStatusChoices.choices
             ],
-            "attachUrl": reverse("vor_archives:artwork_attach"),
+            "attachUrl": reverse("vor_archives:artworks:attach"),
             "rating": (user_work.rating or 0) if owned else 0,
             "isHidden": user_work.is_hidden if owned else False,
             "progress": progress_meta.get("value", 0),
@@ -374,13 +374,13 @@ def _detail_context(
                 else ""
             ),
             "quickUrl": (
-                reverse("vor_archives:artwork_quick", args=[user_work.pk])
+                reverse("vor_archives:artworks:quick", args=[user_work.pk])
                 if owned
                 else ""
             ),
-            "listUrl": reverse("vor_archives:artwork_list"),
+            "listUrl": reverse("vor_archives:artworks:list"),
             "saveUrl": save_url,
-            "relationSearchUrl": reverse("vor_archives:artwork_relation_search"),
+            "relationSearchUrl": reverse("vor_archives:artworks:relation_search"),
             "title": work.title,
             "description": work.description or "",
             "releaseDate": work.release_date.isoformat() if work.release_date else "",

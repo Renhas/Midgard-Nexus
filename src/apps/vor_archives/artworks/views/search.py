@@ -19,11 +19,11 @@ def artwork_library_search(request):
     result = search_library_works(request.user, request.GET.get("q") or "")
     for item in result["owned"]:
         item["detail_url"] = reverse(
-            "vor_archives:artwork_detail", args=[item["uw_id"]]
+            "vor_archives:artworks:detail", args=[item["uw_id"]]
         )
     for item in result["other"]:
         item["detail_url"] = reverse(
-            "vor_archives:artwork_work", args=[item["type_key"], item["work_id"]]
+            "vor_archives:artworks:work", args=[item["type_key"], item["work_id"]]
         )
     return render(
         request,

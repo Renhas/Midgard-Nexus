@@ -25,7 +25,7 @@
                 class="sidebar-btn sidebar-btn-add"
                 title="Добавить"
                 x-show="!$store.vorArtworks.deleteMode"
-                hx-get="{% url 'vor_archives:artwork_add' %}"
+                hx-get="{% url 'vor_archives:artworks:add' %}"
                 hx-target="#vor-overlay"
                 hx-swap="innerHTML">
             <i class="bi bi-plus-circle"></i>
@@ -206,7 +206,7 @@
 {% csrf_token %}
 <div id="vor-overlay"></div>
 <div id="vor-modal"
-     data-vor-delete-preview="{% url 'vor_archives:artwork_delete_preview' %}"></div>
+     data-vor-delete-preview="{% url 'vor_archives:artworks:delete_preview' %}"></div>
 <div class="vor-search-backdrop"
      x-show="$store.vorArtworks.searchOpen"
      x-cloak
