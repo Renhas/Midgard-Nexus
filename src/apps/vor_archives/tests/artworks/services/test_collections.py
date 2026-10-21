@@ -32,17 +32,17 @@ from apps.vor_archives.tests.factories import (
 )
 from ...conftest import ALL_STATUSES
 
+pytestmark = pytest.mark.django_db
+
 # ─── get_user_collection ────────────────────────────────────────────────────
 
 
-@pytest.mark.django_db
 def test_get_user_collection_returns_own(user):
     coll = CollectionFactory(user=user)
 
     assert get_user_collection(user, coll.pk) == coll
 
 
-@pytest.mark.django_db
 def test_get_user_collection_foreign_raises_404(user):
     other = UserFactory()
     coll = CollectionFactory(user=other)
@@ -51,7 +51,6 @@ def test_get_user_collection_foreign_raises_404(user):
         get_user_collection(user, coll.pk)
 
 
-@pytest.mark.django_db
 def test_get_user_collection_missing_raises_404(user):
     with pytest.raises(Http404):
         get_user_collection(user, 999999)
@@ -60,7 +59,6 @@ def test_get_user_collection_missing_raises_404(user):
 # ─── get_user_collection_trees ──────────────────────────────────────────────
 
 
-@pytest.mark.django_db
 def test_get_user_collection_trees_returns_roots(user):
     root = CollectionFactory(user=user)
     CollectionFactory(user=user, parent=root)
@@ -71,7 +69,6 @@ def test_get_user_collection_trees_returns_roots(user):
     assert trees[0].pk == root.pk
 
 
-@pytest.mark.django_db
 def test_get_user_collection_trees_ignores_other_users(user):
     other = UserFactory()
     CollectionFactory(user=other)
@@ -82,19 +79,16 @@ def test_get_user_collection_trees_ignores_other_users(user):
 # ─── next_collection_order / next_collection_item_order ─────────────────────
 
 
-@pytest.mark.django_db
 def test_next_collection_order_empty_root(user):
     assert next_collection_order(user) == 1
 
 
-@pytest.mark.django_db
 def test_next_collection_order_with_existing_root(user):
     CollectionFactory(user=user, order=5)
 
     assert next_collection_order(user) == 6
 
 
-@pytest.mark.django_db
 def test_next_collection_order_scoped_to_parent(user):
     parent = CollectionFactory(user=user, order=5)
     CollectionFactory(user=user, parent=parent, order=3)
@@ -103,14 +97,12 @@ def test_next_collection_order_scoped_to_parent(user):
     assert next_collection_order(user) == 6
 
 
-@pytest.mark.django_db
 def test_next_collection_item_order_empty(user):
     coll = CollectionFactory(user=user)
 
     assert next_collection_item_order(coll) == 1
 
 
-@pytest.mark.django_db
 def test_next_collection_item_order_with_items(user, book):
     coll = CollectionFactory(user=user)
     CollectionItemFactory(collection=coll, work=book, order=7)
@@ -121,7 +113,6 @@ def test_next_collection_item_order_with_items(user, book):
 # ─── create_collection ──────────────────────────────────────────────────────
 
 
-@pytest.mark.django_db
 def test_create_collection_basic(user):
     coll = create_collection(user, "My List")
 
@@ -130,32 +121,27 @@ def test_create_collection_basic(user):
     assert coll.parent is None
 
 
-@pytest.mark.django_db
 def test_create_collection_strips_name(user):
     coll = create_collection(user, "  My List  ")
 
     assert coll.name == "My List"
 
 
-@pytest.mark.django_db
 def test_create_collection_empty_name_raises(user):
     with pytest.raises(ValidationError):
         create_collection(user, "")
 
 
-@pytest.mark.django_db
 def test_create_collection_whitespace_name_raises(user):
     with pytest.raises(ValidationError):
         create_collection(user, "   ")
 
 
-@pytest.mark.django_db
 def test_create_collection_none_name_raises(user):
     with pytest.raises(ValidationError):
         create_collection(user, None)
 
 
-@pytest.mark.django_db
 def test_create_collection_under_parent(user):
     parent = CollectionFactory(user=user)
 
@@ -167,7 +153,6 @@ def test_create_collection_under_parent(user):
 # ─── rename_collection ──────────────────────────────────────────────────────
 
 
-@pytest.mark.django_db
 def test_rename_collection(user):
     coll = CollectionFactory(user=user, name="Old")
 
@@ -177,7 +162,6 @@ def test_rename_collection(user):
     assert coll.name == "New"
 
 
-@pytest.mark.django_db
 def test_rename_collection_strips_name(user):
     coll = CollectionFactory(user=user)
 
@@ -187,7 +171,6 @@ def test_rename_collection_strips_name(user):
     assert coll.name == "New"
 
 
-@pytest.mark.django_db
 def test_rename_collection_empty_raises(user):
     coll = CollectionFactory(user=user)
 
@@ -195,7 +178,6 @@ def test_rename_collection_empty_raises(user):
         rename_collection(user, coll.pk, "")
 
 
-@pytest.mark.django_db
 def test_rename_collection_foreign_raises_404(user):
     other = UserFactory()
     coll = CollectionFactory(user=other)
@@ -207,7 +189,6 @@ def test_rename_collection_foreign_raises_404(user):
 # ─── delete_collection ──────────────────────────────────────────────────────
 
 
-@pytest.mark.django_db
 def test_delete_collection(user):
     coll = CollectionFactory(user=user)
 
@@ -216,7 +197,6 @@ def test_delete_collection(user):
     assert not Collection.objects.filter(pk=coll.pk).exists()
 
 
-@pytest.mark.django_db
 def test_delete_collection_cascades_to_children(user):
     parent = CollectionFactory(user=user)
     child = CollectionFactory(user=user, parent=parent)
@@ -226,7 +206,6 @@ def test_delete_collection_cascades_to_children(user):
     assert not Collection.objects.filter(pk=child.pk).exists()
 
 
-@pytest.mark.django_db
 def test_delete_collection_foreign_raises_404(user):
     other = UserFactory()
     coll = CollectionFactory(user=other)
@@ -238,7 +217,6 @@ def test_delete_collection_foreign_raises_404(user):
 # ─── move_collection ────────────────────────────────────────────────────────
 
 
-@pytest.mark.django_db
 def test_move_collection_to_self_raises(user):
     coll = CollectionFactory(user=user)
 
@@ -246,7 +224,6 @@ def test_move_collection_to_self_raises(user):
         move_collection(user, coll.pk, coll.pk, [])
 
 
-@pytest.mark.django_db
 def test_move_collection_to_descendant_raises(user):
     parent = CollectionFactory(user=user)
     child = CollectionFactory(user=user, parent=parent)
@@ -255,7 +232,6 @@ def test_move_collection_to_descendant_raises(user):
         move_collection(user, parent.pk, child.pk, [])
 
 
-@pytest.mark.django_db
 def test_move_collection_reparents(user):
     root_a = CollectionFactory(user=user)
     root_b = CollectionFactory(user=user)
@@ -267,7 +243,6 @@ def test_move_collection_reparents(user):
     assert child.parent_id == root_b.pk
 
 
-@pytest.mark.django_db
 def test_move_collection_to_root(user):
     root = CollectionFactory(user=user)
     other_root = CollectionFactory(user=user)
@@ -279,7 +254,6 @@ def test_move_collection_to_root(user):
     assert child.parent_id is None
 
 
-@pytest.mark.django_db
 def test_move_collection_reorders_siblings(user):
     root = CollectionFactory(user=user)
     a = CollectionFactory(user=user, parent=root, order=0)
@@ -294,7 +268,6 @@ def test_move_collection_reorders_siblings(user):
     assert (c.order, a.order, b.order) == (0, 1, 2)
 
 
-@pytest.mark.django_db
 def test_move_collection_appends_unspecified_siblings(user):
     root = CollectionFactory(user=user)
     a = CollectionFactory(user=user, parent=root, order=0)
@@ -309,7 +282,6 @@ def test_move_collection_appends_unspecified_siblings(user):
     assert (c.order, a.order, b.order) == (0, 1, 2)
 
 
-@pytest.mark.django_db
 def test_move_collection_ignores_invalid_sibling_ids(user):
     root = CollectionFactory(user=user)
     a = CollectionFactory(user=user, parent=root, order=0)
@@ -323,7 +295,6 @@ def test_move_collection_ignores_invalid_sibling_ids(user):
 # ─── list_collection_segments ───────────────────────────────────────────────
 
 
-@pytest.mark.django_db
 def test_list_collection_segments_empty(user):
     coll = CollectionFactory(user=user)
 
@@ -332,7 +303,6 @@ def test_list_collection_segments_empty(user):
     assert result == {"direct": [], "nested": []}
 
 
-@pytest.mark.django_db
 def test_list_collection_segments_direct(user, book):
     coll = CollectionFactory(user=user)
     CollectionItemFactory(collection=coll, work=book)
@@ -353,7 +323,6 @@ def test_list_collection_segments_direct(user, book):
     assert result["nested"] == []
 
 
-@pytest.mark.django_db
 def test_list_collection_segments_nested(user, movie):
     root = CollectionFactory(user=user)
     child = CollectionFactory(user=user, parent=root)
@@ -376,7 +345,6 @@ def test_list_collection_segments_nested(user, movie):
     assert len(result["nested"][0]["user_works"]) == 1
 
 
-@pytest.mark.django_db
 def test_list_collection_segments_skips_unowned(user, book):
     coll = CollectionFactory(user=user)
     CollectionItemFactory(collection=coll, work=book)
@@ -390,7 +358,6 @@ def test_list_collection_segments_skips_unowned(user, book):
 # ─── add_user_work_to_collection ────────────────────────────────────────────
 
 
-@pytest.mark.django_db
 def test_add_user_work_creates_item(user, book):
     coll = CollectionFactory(user=user)
     uw = UserWorkFactory(user=user, work=book)
@@ -402,7 +369,6 @@ def test_add_user_work_creates_item(user, book):
     assert item.work_object_id == book.pk
 
 
-@pytest.mark.django_db
 def test_add_user_work_is_idempotent(user, book):
     coll = CollectionFactory(user=user)
     uw = UserWorkFactory(user=user, work=book)
@@ -415,7 +381,6 @@ def test_add_user_work_is_idempotent(user, book):
     assert item1.pk == item2.pk
 
 
-@pytest.mark.django_db
 def test_add_user_work_foreign_uw_raises(user, book):
     coll = CollectionFactory(user=user)
     other = UserFactory()
@@ -425,7 +390,6 @@ def test_add_user_work_foreign_uw_raises(user, book):
         add_user_work_to_collection(user, coll, foreign_uw)
 
 
-@pytest.mark.django_db
 def test_add_user_work_foreign_collection_raises(user, book):
     other = UserFactory()
     foreign_coll = CollectionFactory(user=other)
@@ -438,7 +402,6 @@ def test_add_user_work_foreign_collection_raises(user, book):
 # ─── remove_user_work_from_collection ───────────────────────────────────────
 
 
-@pytest.mark.django_db
 def test_remove_user_work_returns_true_when_deleted(user, book):
     coll = CollectionFactory(user=user)
     uw = UserWorkFactory(user=user, work=book)
@@ -448,7 +411,6 @@ def test_remove_user_work_returns_true_when_deleted(user, book):
     assert remove_user_work_from_collection(user, coll, uw) is False
 
 
-@pytest.mark.django_db
 def test_remove_user_work_foreign_raises(user, book):
     coll = CollectionFactory(user=user)
     other = UserFactory()
@@ -461,7 +423,6 @@ def test_remove_user_work_foreign_raises(user, book):
 # ─── user_work_collection_ids ───────────────────────────────────────────────
 
 
-@pytest.mark.django_db
 def test_user_work_collection_ids(user, book):
     c1 = CollectionFactory(user=user)
     c2 = CollectionFactory(user=user)
@@ -476,7 +437,6 @@ def test_user_work_collection_ids(user, book):
     assert c3.pk not in ids
 
 
-@pytest.mark.django_db
 def test_user_work_collection_ids_ignores_other_users(user, book):
     other = UserFactory()
     foreign_coll = CollectionFactory(user=other)
@@ -489,7 +449,6 @@ def test_user_work_collection_ids_ignores_other_users(user, book):
 # ─── collection_tree_payload ────────────────────────────────────────────────
 
 
-@pytest.mark.django_db
 def test_collection_tree_payload_structure(user):
     root = CollectionFactory(user=user, name="Root")
     child = CollectionFactory(user=user, parent=root, name="Child")
@@ -505,7 +464,6 @@ def test_collection_tree_payload_structure(user):
     assert node["children"][0]["id"] == child.pk
 
 
-@pytest.mark.django_db
 def test_collection_tree_payload_marks_membership(user):
     root = CollectionFactory(user=user)
     child = CollectionFactory(user=user, parent=root)
@@ -516,7 +474,6 @@ def test_collection_tree_payload_marks_membership(user):
     assert payload[0]["children"][0]["in_collection"] is True
 
 
-@pytest.mark.django_db
 def test_collection_tree_payload_ignores_other_users(user):
     other = UserFactory()
     CollectionFactory(user=other)
@@ -527,7 +484,6 @@ def test_collection_tree_payload_ignores_other_users(user):
 # ─── reorder_collection_items ───────────────────────────────────────────────
 
 
-@pytest.mark.django_db
 def test_reorder_collection_items_full(user, book, movie, game):
     coll = CollectionFactory(user=user)
     uw_book = UserWorkFactory(user=user, work=book)
@@ -549,7 +505,6 @@ def test_reorder_collection_items_full(user, book, movie, game):
     assert items[movie.pk].order == 2
 
 
-@pytest.mark.django_db
 def test_reorder_collection_items_partial(user, book, movie, game):
     coll = CollectionFactory(user=user)
     uw_book = UserWorkFactory(user=user, work=book)
@@ -572,7 +527,6 @@ def test_reorder_collection_items_partial(user, book, movie, game):
     assert items[game.pk].order == 3
 
 
-@pytest.mark.django_db
 def test_reorder_collection_items_foreign_collection_raises(user):
     other = UserFactory()
     foreign_coll = CollectionFactory(user=other)
@@ -581,7 +535,6 @@ def test_reorder_collection_items_foreign_collection_raises(user):
         reorder_collection_items(user, foreign_coll, [])
 
 
-@pytest.mark.django_db
 def test_reorder_collection_items_ignores_foreign_uw(user, book):
     coll = CollectionFactory(user=user)
     uw = UserWorkFactory(user=user, work=book)
@@ -594,7 +547,6 @@ def test_reorder_collection_items_ignores_foreign_uw(user, book):
     assert count == 1
 
 
-@pytest.mark.django_db
 def test_reorder_collection_items_ignores_items_not_in_collection(user, book, movie):
     coll = CollectionFactory(user=user)
     uw_book = UserWorkFactory(user=user, work=book)
