@@ -1,32 +1,20 @@
-"""Tests for apps.vor_archives.artworks.services.collections."""
+"""Tests for CollectionItems actions from apps.vor_archives.artworks.services.collections."""
 
 from unittest import mock
 
 from django.db import IntegrityError
 import pytest
 from django.core.exceptions import ValidationError
-from django.http import Http404
 
 from apps.users.tests.factories import UserFactory
 from apps.vor_archives.artworks.services import (
     add_user_work_to_collection,
-    collection_tree_payload,
-    create_collection,
-    delete_collection,
-    get_user_collection,
-    get_user_collection_trees,
     list_collection_segments,
-    move_collection,
     remove_user_work_from_collection,
-    rename_collection,
     reorder_collection_items,
     user_work_collection_ids,
 )
-from apps.vor_archives.artworks.services.collections import (
-    next_collection_item_order,
-    next_collection_order,
-)
-from apps.vor_archives.models import Collection, CollectionItem
+from apps.vor_archives.models import CollectionItem
 from apps.vor_archives.tests.factories import (
     BookFactory,
     CollectionFactory,
@@ -34,266 +22,9 @@ from apps.vor_archives.tests.factories import (
     FilmFactory,
     UserWorkFactory,
 )
-from ...conftest import ALL_STATUSES
+from apps.vor_archives.tests.conftest import ALL_STATUSES
 
 pytestmark = pytest.mark.django_db
-
-# ─── get_user_collection ────────────────────────────────────────────────────
-
-
-def test_get_user_collection_returns_own(user):
-    coll = CollectionFactory(user=user)
-
-    assert get_user_collection(user, coll.pk) == coll
-
-
-def test_get_user_collection_foreign_raises_404(user):
-    other = UserFactory()
-    coll = CollectionFactory(user=other)
-
-    with pytest.raises(Http404):
-        get_user_collection(user, coll.pk)
-
-
-def test_get_user_collection_missing_raises_404(user):
-    with pytest.raises(Http404):
-        get_user_collection(user, 999999)
-
-
-# ─── get_user_collection_trees ──────────────────────────────────────────────
-
-
-def test_get_user_collection_trees_returns_roots(user):
-    root = CollectionFactory(user=user)
-    CollectionFactory(user=user, parent=root)
-
-    trees = get_user_collection_trees(user)
-
-    assert len(trees) == 1
-    assert trees[0].pk == root.pk
-
-
-def test_get_user_collection_trees_ignores_other_users(user):
-    other = UserFactory()
-    CollectionFactory(user=other)
-
-    assert list(get_user_collection_trees(user)) == []
-
-
-# ─── next_collection_order / next_collection_item_order ─────────────────────
-
-
-def test_next_collection_order_empty_root(user):
-    assert next_collection_order(user) == 1
-
-
-def test_next_collection_order_with_existing_root(user):
-    CollectionFactory(user=user, order=5)
-
-    assert next_collection_order(user) == 6
-
-
-def test_next_collection_order_scoped_to_parent(user):
-    parent = CollectionFactory(user=user, order=5)
-    CollectionFactory(user=user, parent=parent, order=3)
-
-    assert next_collection_order(user, parent) == 4
-    assert next_collection_order(user) == 6
-
-
-def test_next_collection_item_order_empty(user):
-    coll = CollectionFactory(user=user)
-
-    assert next_collection_item_order(coll) == 1
-
-
-def test_next_collection_item_order_with_items(user, book):
-    coll = CollectionFactory(user=user)
-    CollectionItemFactory(collection=coll, work=book, order=7)
-
-    assert next_collection_item_order(coll) == 8
-
-
-# ─── create_collection ──────────────────────────────────────────────────────
-
-
-def test_create_collection_basic(user):
-    coll = create_collection(user, "My List")
-
-    assert coll.name == "My List"
-    assert coll.user == user
-    assert coll.parent is None
-
-
-def test_create_collection_strips_name(user):
-    coll = create_collection(user, "  My List  ")
-
-    assert coll.name == "My List"
-
-
-def test_create_collection_empty_name_raises(user):
-    with pytest.raises(ValidationError):
-        create_collection(user, "")
-
-
-def test_create_collection_whitespace_name_raises(user):
-    with pytest.raises(ValidationError):
-        create_collection(user, "   ")
-
-
-def test_create_collection_none_name_raises(user):
-    with pytest.raises(ValidationError):
-        create_collection(user, None)
-
-
-def test_create_collection_under_parent(user):
-    parent = CollectionFactory(user=user)
-
-    child = create_collection(user, "Child", parent=parent)
-
-    assert child.parent == parent
-
-
-# ─── rename_collection ──────────────────────────────────────────────────────
-
-
-def test_rename_collection(user):
-    coll = CollectionFactory(user=user, name="Old")
-
-    rename_collection(user, coll.pk, "New")
-
-    coll.refresh_from_db()
-    assert coll.name == "New"
-
-
-def test_rename_collection_strips_name(user):
-    coll = CollectionFactory(user=user)
-
-    rename_collection(user, coll.pk, "  New  ")
-
-    coll.refresh_from_db()
-    assert coll.name == "New"
-
-
-def test_rename_collection_empty_raises(user):
-    coll = CollectionFactory(user=user)
-
-    with pytest.raises(ValidationError):
-        rename_collection(user, coll.pk, "")
-
-
-def test_rename_collection_foreign_raises_404(user):
-    other = UserFactory()
-    coll = CollectionFactory(user=other)
-
-    with pytest.raises(Http404):
-        rename_collection(user, coll.pk, "New")
-
-
-# ─── delete_collection ──────────────────────────────────────────────────────
-
-
-def test_delete_collection(user):
-    coll = CollectionFactory(user=user)
-
-    delete_collection(user, coll.pk)
-
-    assert not Collection.objects.filter(pk=coll.pk).exists()
-
-
-def test_delete_collection_cascades_to_children(user):
-    parent = CollectionFactory(user=user)
-    child = CollectionFactory(user=user, parent=parent)
-
-    delete_collection(user, parent.pk)
-
-    assert not Collection.objects.filter(pk=child.pk).exists()
-
-
-def test_delete_collection_foreign_raises_404(user):
-    other = UserFactory()
-    coll = CollectionFactory(user=other)
-
-    with pytest.raises(Http404):
-        delete_collection(user, coll.pk)
-
-
-# ─── move_collection ────────────────────────────────────────────────────────
-
-
-def test_move_collection_to_self_raises(user):
-    coll = CollectionFactory(user=user)
-
-    with pytest.raises(ValidationError):
-        move_collection(user, coll.pk, coll.pk, [])
-
-
-def test_move_collection_to_descendant_raises(user):
-    parent = CollectionFactory(user=user)
-    child = CollectionFactory(user=user, parent=parent)
-
-    with pytest.raises(ValidationError):
-        move_collection(user, parent.pk, child.pk, [])
-
-
-def test_move_collection_reparents(user):
-    root_a = CollectionFactory(user=user)
-    root_b = CollectionFactory(user=user)
-    child = CollectionFactory(user=user, parent=root_a)
-
-    move_collection(user, child.pk, root_b.pk, [child.pk])
-
-    child.refresh_from_db()
-    assert child.parent_id == root_b.pk
-
-
-def test_move_collection_to_root(user):
-    root = CollectionFactory(user=user)
-    other_root = CollectionFactory(user=user)
-    child = CollectionFactory(user=user, parent=other_root)
-
-    move_collection(user, child.pk, None, [child.pk, root.pk])
-
-    child.refresh_from_db()
-    assert child.parent_id is None
-
-
-def test_move_collection_reorders_siblings(user):
-    root = CollectionFactory(user=user)
-    a = CollectionFactory(user=user, parent=root, order=0)
-    b = CollectionFactory(user=user, parent=root, order=1)
-    c = CollectionFactory(user=user, parent=root, order=2)
-
-    move_collection(user, a.pk, root.pk, [c.pk, a.pk, b.pk])
-
-    a.refresh_from_db()
-    b.refresh_from_db()
-    c.refresh_from_db()
-    assert (c.order, a.order, b.order) == (0, 1, 2)
-
-
-def test_move_collection_appends_unspecified_siblings(user):
-    root = CollectionFactory(user=user)
-    a = CollectionFactory(user=user, parent=root, order=0)
-    b = CollectionFactory(user=user, parent=root, order=1)
-    c = CollectionFactory(user=user, parent=root, order=2)
-
-    move_collection(user, a.pk, root.pk, [c.pk])
-
-    a.refresh_from_db()
-    b.refresh_from_db()
-    c.refresh_from_db()
-    assert (c.order, a.order, b.order) == (0, 1, 2)
-
-
-def test_move_collection_ignores_invalid_sibling_ids(user):
-    root = CollectionFactory(user=user)
-    a = CollectionFactory(user=user, parent=root, order=0)
-
-    move_collection(user, a.pk, root.pk, ["not-an-int", None, a.pk])
-
-    a.refresh_from_db()
-    assert a.order == 0
 
 
 # ─── list_collection_segments ───────────────────────────────────────────────
@@ -489,41 +220,6 @@ def test_user_work_collection_ids_ignores_other_users(user, book):
     CollectionItemFactory(collection=foreign_coll, work=book)
 
     assert user_work_collection_ids(user, uw) == set()
-
-
-# ─── collection_tree_payload ────────────────────────────────────────────────
-
-
-def test_collection_tree_payload_structure(user):
-    root = CollectionFactory(user=user, name="Root")
-    child = CollectionFactory(user=user, parent=root, name="Child")
-
-    payload = collection_tree_payload(user)
-
-    assert len(payload) == 1
-    node = payload[0]
-    assert node["id"] == root.pk
-    assert node["name"] == "Root"
-    assert node["in_collection"] is False
-    assert len(node["children"]) == 1
-    assert node["children"][0]["id"] == child.pk
-
-
-def test_collection_tree_payload_marks_membership(user):
-    root = CollectionFactory(user=user)
-    child = CollectionFactory(user=user, parent=root)
-
-    payload = collection_tree_payload(user, member_ids=[child.pk])
-
-    assert payload[0]["in_collection"] is False
-    assert payload[0]["children"][0]["in_collection"] is True
-
-
-def test_collection_tree_payload_ignores_other_users(user):
-    other = UserFactory()
-    CollectionFactory(user=other)
-
-    assert collection_tree_payload(user) == []
 
 
 # ─── reorder_collection_items ───────────────────────────────────────────────
