@@ -11,7 +11,7 @@
             </div>
         {% endif %}
         <form class="vor-modal-actions"
-              hx-post="{% url 'vor_archives:collection_delete' collection.pk %}"
+              hx-post="{% url 'vor_archives:collections:delete' collection.pk %}"
               hx-target="#vor-modal"
               hx-swap="innerHTML">
             {% csrf_token %}

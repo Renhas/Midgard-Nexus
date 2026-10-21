@@ -39,3 +39,13 @@ class FeedItemActionTypeChoices(models.TextChoices):
     COMPLETED = ("completed", "Completed")
     DROPPED = ("dropped", "Dropped")
     RATED = ("rated", "Rated")
+
+
+STATUS_LABELS_RU = {
+    UserWorkStatusChoices.PLANNING: "Запланировано",
+    UserWorkStatusChoices.IN_PROGRESS: "В процессе",
+    UserWorkStatusChoices.COMPLETED: "Завершено",
+    UserWorkStatusChoices.DROPPED: "Брошено",
+}
+
+LOGIN_URL = "users:login"

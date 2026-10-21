@@ -1767,7 +1767,7 @@
                 this.statusChoices = data.status_choices || {}
                 this.ageChoices = data.age_choices || {};
                 this.ratingChoices = data.rating_choices || {};
-                
+
                 console.log("[charts] init, raw data:", data);
                 console.log("[charts] typeMeta:", this.typeMeta);
                 this.$nextTick(() => {
@@ -1777,7 +1777,7 @@
                     this.renderPieRating();
                     this.renderBarRating();
                 });
-                
+
                 this.$watch("pieStatusItems", () => {
                     this.$nextTick(() => this.renderPieStatus());
                 });
@@ -1853,7 +1853,7 @@
                 }
             },
             sumByCol(col, matrix) {
-                return this.workTypes.reduce((sum, type) => 
+                return this.workTypes.reduce((sum, type) =>
                     sum + (matrix[type]?.[col] || 0), 0);
             },
             sumByRow(row, matrix) {
@@ -2066,15 +2066,15 @@
                 getCloudItems(attrKey) {
                     const items = this.attrs[attrKey];
                     if (!items.length) return [];
-                    
+
                     const counts = items.map(i => i.count);
                     const min = Math.min(...counts);
                     const max = Math.max(...counts);
 
                     return items.map(item => {
-                        const size = min === max ? (MIN_SIZE_PX + MAX_SIZE_PX) / 2 
+                        const size = min === max ? (MIN_SIZE_PX + MAX_SIZE_PX) / 2
                             : MIN_SIZE_PX + ((item.count - min) / (max - min)) * (MAX_SIZE_PX - MIN_SIZE_PX);
-                        
+
                         return {
                             label: item.name,
                             count: item.count,
@@ -2738,7 +2738,7 @@
             },
             openRelated(item) {
                 this.leaveOr(() => {
-                    htmx.ajax("GET", `/library/works/${item.type_key}/${item.work_id}/`, {
+                    htmx.ajax("GET", `/library/artworks/${item.type_key}/${item.work_id}/`, {
                         target: "#vor-overlay",
                         swap: "innerHTML",
                     });
@@ -2956,7 +2956,7 @@
                     }
                     this.attachOpen = false;
                     this.refreshList();
-                    htmx.ajax("GET", `/library/works/${this.workType}/${this.workId}/`, {
+                    htmx.ajax("GET", `/library/artworks/${this.workType}/${this.workId}/`, {
                         target: "#vor-overlay",
                         swap: "innerHTML",
                     });
