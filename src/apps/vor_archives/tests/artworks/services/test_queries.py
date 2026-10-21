@@ -353,6 +353,8 @@ def test_load_filtered_user_works_filters_by_book_genre(user):
         user,
         {
             "types": ["book"],
+            "statuses": ALL_STATUSES,
+            "all_statuses": ALL_STATUSES,
             "genre_book": [genre_other.pk],
             "all_genre_book": [genre_match.pk, genre_other.pk],
         },
@@ -372,6 +374,8 @@ def test_load_filtered_user_works_filters_by_platform(user):
         user,
         {
             "types": ["game"],
+            "statuses": ALL_STATUSES,
+            "all_statuses": ALL_STATUSES,
             "platforms": [platform_other.pk],
             "all_platforms": [platform_match.pk, platform_other.pk],
         },
@@ -394,6 +398,64 @@ def test_load_filtered_user_works_no_filter_when_selection_matches_all(user, boo
             "all_statuses": ALL_STATUSES,
             "genre_book": [genre.pk],
             "all_genre_book": [genre.pk],
+        },
+    )
+
+    assert len(result) == 1
+
+
+def test_load_filtered_user_works_skips_dangling_work(user, book):
+    uw = UserWorkFactory(user=user, work=book)
+    UserWork.objects.filter(pk=uw.pk).update(work_object_id=999999)
+
+    result = load_filtered_user_works(
+        user,
+        {
+            "types": ["book"],
+            "statuses": ALL_STATUSES,
+            "all_statuses": ALL_STATUSES,
+        },
+    )
+
+    assert result == []
+
+
+def test_load_filtered_user_works_keeps_matching_genre(user):
+    genre = BookGenreFactory()
+    book = BookFactory()
+    book.genres.add(genre)
+    other = BookGenreFactory()
+    UserWorkFactory(user=user, work=book)
+
+    result = load_filtered_user_works(
+        user,
+        {
+            "types": ["book"],
+            "statuses": ALL_STATUSES,
+            "all_statuses": ALL_STATUSES,
+            "genre_book": [genre.pk],
+            "all_genre_book": [genre.pk, other.pk],
+        },
+    )
+
+    assert len(result) == 1
+    assert result[0].work_object_id == book.pk
+
+
+def test_load_filtered_user_works_keeps_matching_platform(user):
+    platform = PlatformFactory()
+    game = GameFactory()
+    game.platforms.add(platform)
+    UserWorkFactory(user=user, work=game)
+
+    result = load_filtered_user_works(
+        user,
+        {
+            "types": ["game"],
+            "statuses": ALL_STATUSES,
+            "all_statuses": ALL_STATUSES,
+            "platforms": [platform.pk],
+            "all_platforms": [platform.pk],
         },
     )
 

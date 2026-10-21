@@ -83,7 +83,7 @@ def move_collection(user, collection_id, parent_id, sibling_ids):
             )
             if other_root is not None:
                 collection.move_to(other_root, "right")
-            else:
+            else:  # pragma: no cover - unreachable with valid MPTT tree
                 collection.parent = None
                 collection.save()
 

@@ -1,5 +1,8 @@
 """Tests for apps.vor_archives.artworks.services.collections."""
 
+from unittest import mock
+
+from django.db import IntegrityError
 import pytest
 from django.core.exceptions import ValidationError
 from django.http import Http404
@@ -28,6 +31,7 @@ from apps.vor_archives.tests.factories import (
     BookFactory,
     CollectionFactory,
     CollectionItemFactory,
+    FilmFactory,
     UserWorkFactory,
 )
 from ...conftest import ALL_STATUSES
@@ -355,6 +359,30 @@ def test_list_collection_segments_skips_unowned(user, book):
     assert result["direct"] == []
 
 
+def test_list_collection_segments_non_custom_sort(user):
+    coll = CollectionFactory(user=user)
+    film = FilmFactory(title="Alpha")
+    book = BookFactory(title="Zeta")
+    CollectionItemFactory(collection=coll, work=film, order=0)
+    CollectionItemFactory(collection=coll, work=book, order=1)
+    UserWorkFactory(user=user, work=film)
+    UserWorkFactory(user=user, work=book)
+
+    result = list_collection_segments(
+        user,
+        coll,
+        {
+            "types": ["book", "film"],
+            "statuses": ALL_STATUSES,
+            "all_statuses": ALL_STATUSES,
+            "sort": "title",
+            "sort_asc": True,
+        },
+    )
+
+    assert [uw.work.title for uw in result["direct"]] == ["Alpha", "Zeta"]
+
+
 # ─── add_user_work_to_collection ────────────────────────────────────────────
 
 
@@ -397,6 +425,23 @@ def test_add_user_work_foreign_collection_raises(user, book):
 
     with pytest.raises(ValidationError):
         add_user_work_to_collection(user, foreign_coll, uw)
+
+
+@pytest.mark.django_db
+def test_add_user_work_handles_integrity_error(user, book):
+    coll = CollectionFactory(user=user)
+    uw = UserWorkFactory(user=user, work=book)
+    existing = CollectionItemFactory(collection=coll, work=book)
+
+    with mock.patch.object(
+        CollectionItem.objects,
+        "get_or_create",
+        side_effect=IntegrityError("simulated race"),
+    ):
+        item, created = add_user_work_to_collection(user, coll, uw)
+
+    assert created is False
+    assert item.pk == existing.pk
 
 
 # ─── remove_user_work_from_collection ───────────────────────────────────────

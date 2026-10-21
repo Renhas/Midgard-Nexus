@@ -595,6 +595,24 @@ def test_work_relation_items_both_directions(book):
     assert {item["direction"] for item in items} == {"out", "in"}
 
 
+@pytest.mark.django_db
+def test_work_relation_items_skips_dangling_target(book):
+    other = BookFactory()
+    rel = WorkRelationFactory(source=book, target=other)
+    WorkRelation.objects.filter(pk=rel.pk).update(target_object_id=999999)
+
+    assert work_relation_items(book) == []
+
+
+@pytest.mark.django_db
+def test_work_relation_items_skips_dangling_source(book):
+    other = BookFactory()
+    rel = WorkRelationFactory(source=other, target=book)
+    WorkRelation.objects.filter(pk=rel.pk).update(source_object_id=999999)
+
+    assert work_relation_items(book) == []
+
+
 # ─── clamp_progress_for_work ────────────────────────────────────────────────
 
 
