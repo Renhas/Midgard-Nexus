@@ -1,10 +1,11 @@
-"""Tests for artwork_reorder and artwork_delete_preview views."""
+"""Tests for artwork_reorder, artwork_delete_preview and artwork_delete views."""
 
 import json
 
 import pytest
 from django.urls import reverse
 
+from apps.vor_archives.models import UserWork
 from apps.vor_archives.tests.factories import (
     UserWorkFactory,
     UserFactory,
@@ -95,3 +96,35 @@ def test_delete_preview_shared_work_not_orphan(client_logged_in, user, book):
     )
     assert response.status_code == 200
     assert response.context["orphan_titles"] == []
+
+
+# ─── artwork_delete ─────────────────────────────────────────────────────────
+
+
+def test_delete_requires_login(client):
+    response = client.post(reverse("vor_archives:artworks:delete"), {"ids": "1"})
+    assert response.status_code == 302
+
+
+def test_delete_get_405(client_logged_in):
+    response = client_logged_in.get(reverse("vor_archives:artworks:delete"))
+    assert response.status_code == 405
+
+
+def test_delete_removes_userwork(client_logged_in, user, book):
+    uw = UserWorkFactory(user=user, work=book)
+    response = client_logged_in.post(
+        reverse("vor_archives:artworks:delete"), {"ids": [str(uw.pk)]}
+    )
+    assert response.status_code == 200
+    assert not UserWork.objects.filter(pk=uw.pk).exists()
+    trigger = json.loads(response["HX-Trigger"])
+    assert trigger.get("vor:reload-list") is True
+    assert trigger.get("vor:close-overlay") is True
+
+
+def test_delete_empty_ids_noop(client_logged_in, user, book):
+    uw = UserWorkFactory(user=user, work=book)
+    response = client_logged_in.post(reverse("vor_archives:artworks:delete"), {})
+    assert response.status_code == 200
+    assert UserWork.objects.filter(pk=uw.pk).exists()
