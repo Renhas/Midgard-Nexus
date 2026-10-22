@@ -7,14 +7,16 @@ from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.vor_archives.constants import UserWorkStatusChoices, LOGIN_URL
+from apps.vor_archives.artworks.forms import AttachWorkForm
+from apps.vor_archives.templatetags.vor_archives_extras import get_progress_info
 from apps.vor_archives.models import UserWork
 from ..services import (
-    attach_work,
+    AlreadyAttached,
+    attach_work_from_form,
     get_work,
     orphan_works,
     reorder_user_works,
     user_has_work,
-    get_progress_info,
 )
 
 from .utils import (
@@ -35,54 +37,38 @@ def artwork_reorder(request):
 @login_required(login_url=LOGIN_URL)
 @require_POST
 def artwork_attach(request):
-    type_key = request.POST.get("work_type")
-    work_id = request.POST.get("work_id")
-    if not type_key or not work_id:
-        return HttpResponseBadRequest("Не указано произведение")
-    work = get_work(type_key, work_id)
-    if user_has_work(request.user, work):
-        if wants_json(request):
-            return JsonResponse({"ok": False, "error": "already"}, status=400)
-        meta = progress_meta_for_work(work)
-        return render(
-            request,
-            "vor_archives/partials/work_preview_card.html",
-            {
-                "work": work,
-                "work_type": type_key,
-                "already": True,
-                "progress_max": meta["maximum"],
-                "progress_unit": meta["unit"],
-                "progress_step": meta["step"],
-            },
-        )
-    status = request.POST.get("status") or UserWorkStatusChoices.PLANNING
-    if status not in {choice[0] for choice in UserWorkStatusChoices.choices}:
-        return HttpResponseBadRequest("Некорректный статус")
-    rating = request.POST.get("rating") or ""
-    progress = request.POST.get("progress") or "0"
-    try:
-        rating_value = int(rating) if rating not in ("", "0") else None
-        progress_value = Decimal(progress)
-    except (TypeError, ValueError, InvalidOperation):
+    form = AttachWorkForm(request.POST)
+    if not form.is_valid():
         return HttpResponseBadRequest("Некорректные данные")
-    if rating_value is not None and (rating_value < 1 or rating_value > 10):
-        return HttpResponseBadRequest("Некорректный рейтинг")
-    if progress_value < 0:
-        progress_value = Decimal("0")
-    attach_work(
-        request.user,
-        type_key,
-        work_id,
-        {
-            "status": status,
-            "rating": rating_value,
-            "progress": progress_value,
-        },
-    )
+
+    try:
+        attach_work_from_form(request.user, form)
+    except AlreadyAttached as exc:
+        return _attach_already_response(
+            request, exc.work, form.cleaned_data["work_type"]
+        )
+
     if wants_json(request):
         return JsonResponse({"ok": True})
     return list_response(request, '{"vor:close-overlay": true}')
+
+
+def _attach_already_response(request, work, type_key):
+    if wants_json(request):
+        return JsonResponse({"ok": False, "error": "already"}, status=400)
+    meta = progress_meta_for_work(work)
+    return render(
+        request,
+        "vor_archives/partials/work_preview_card.html",
+        {
+            "work": work,
+            "work_type": type_key,
+            "already": True,
+            "progress_max": meta["maximum"],
+            "progress_unit": meta["unit"],
+            "progress_step": meta["step"],
+        },
+    )
 
 
 @login_required(login_url=LOGIN_URL)

@@ -15,7 +15,7 @@ from apps.vor_archives.constants import (
     WorkRelationTypeChoices,
     STATUS_LABELS_RU,
 )
-from apps.vor_archives.forms import WORK_FORMS, UserWorkEditForm
+from apps.vor_archives.artworks.forms import WORK_FORMS, UserWorkEditForm
 from apps.vor_archives.models import (
     BookGenre,
     FilmGenre,

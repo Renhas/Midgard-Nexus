@@ -13,8 +13,9 @@ from .queries import (
     search_library_works,
 )
 from .works import (
+    AlreadyAttached,
     get_work,
-    attach_work,
+    attach_work_from_form,
     get_user_work,
     list_user_works,
     reorder_user_works,

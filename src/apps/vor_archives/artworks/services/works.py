@@ -14,6 +14,15 @@ from apps.vor_archives.models import (
 from .utils import work_key, relation_cover_url
 from .constants import WORK_MODELS, RELATION_LABELS, WORK_TYPE_ICONS
 from .queries import load_filtered_user_works, sort_user_works
+from .progress import clamp_progress
+
+
+class AlreadyAttached(Exception):
+    """Raised when the user already owns the work being attached."""
+
+    def __init__(self, work):
+        self.work = work
+        super().__init__("already")
 
 
 ## TODO: Move to collections.py once refactor list_user_works
@@ -153,8 +162,12 @@ def delete_user_works(user, ids):
     return len(user_works)
 
 
-def attach_work(user, type_key, work_id, cleaned_user_data=None):
-    work = get_work(type_key, work_id)
+def _attach_work(user, work, cleaned_user_data=None):
+    """Create UserWork for a work instance. Internal helper.
+
+    cleaned_user_data may contain status, rating, progress, order_position
+    and owned_platforms (m2m, set after creation).
+    """
     ct = ContentType.objects.get_for_model(work)
     defaults = {}
     m2m_platforms = None
@@ -166,7 +179,6 @@ def attach_work(user, type_key, work_id, cleaned_user_data=None):
                 defaults[key] = value
     if "order_position" not in defaults:
         defaults["order_position"] = UserWork.next_position(user)
-
     user_work, created = UserWork.objects.get_or_create(
         user=user,
         work_content_type=ct,
@@ -175,6 +187,34 @@ def attach_work(user, type_key, work_id, cleaned_user_data=None):
     )
     if created and m2m_platforms is not None:
         user_work.owned_platforms.set(m2m_platforms)
+    return user_work, created
+
+
+@transaction.atomic
+def attach_work_from_form(user, form):
+    """Attach a work using validated AttachWorkForm data.
+
+    Raises AlreadyAttached if the user already owns the work.
+    Clamps progress to the work maximum.
+    """
+    type_key = form.cleaned_data["work_type"]
+    work = get_work(type_key, form.cleaned_data["work_id"])
+    if user_has_work(user, work):
+        raise AlreadyAttached(work)
+    original_progress = form.cleaned_data["progress"]
+    user_work, created = _attach_work(
+        user,
+        work,
+        {
+            "status": form.cleaned_data["status"],
+            "rating": form.cleaned_data["rating"],
+            "progress": original_progress,
+        },
+    )
+    if created:
+        clamp_progress(user_work)
+        if user_work.progress != original_progress:
+            user_work.save(update_fields=["progress"])
     return user_work, created
 
 

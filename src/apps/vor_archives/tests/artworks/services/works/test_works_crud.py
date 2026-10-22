@@ -1,75 +1,66 @@
 """Tests for apps.vor_archives.artworks.services.works - crud.
 
-Covers attach_work (creating UserWork, position handling, cleaned data
-application) and reorder_user_works (normalizing positions).
+Covers _attach_work (creating UserWork, position handling, owned_platforms
+m2m) and attach_work_from_form (form-driven attach with clamping and
+AlreadyAttached), plus reorder_user_works (normalizing positions).
 """
 
+from decimal import Decimal
+
 import pytest
-from django.http import Http404
 
 from apps.users.tests.factories import UserFactory
+from apps.vor_archives.artworks.forms import AttachWorkForm
 from apps.vor_archives.artworks.services import (
-    attach_work,
+    AlreadyAttached,
+    attach_work_from_form,
     reorder_user_works,
 )
+from apps.vor_archives.artworks.services.works import _attach_work
 from apps.vor_archives.constants import UserWorkStatusChoices
 from apps.vor_archives.models import UserWork
 from apps.vor_archives.tests.factories import (
     BookFactory,
+    GameFactory,
     PlatformFactory,
     UserWorkFactory,
 )
 
 pytestmark = pytest.mark.django_db
 
-# ─── attach_work ─────────────────────────────────────────────────────────────
+# ─── _attach_work ───────────────────────────────────────────────────────────
 
 
-def test_attach_work_creates_new(user, book):
-    uw, created = attach_work(user, "book", book.pk)
+def test_attach_work_first_uw_gets_position_zero(user, book):
+    uw, created = _attach_work(user, book)
 
     assert created is True
     assert uw.user == user
     assert uw.work_object_id == book.pk
-
-
-def test_attach_work_returns_existing(user, book):
-    existing = UserWorkFactory(user=user, work=book)
-
-    uw, created = attach_work(user, "book", book.pk)
-
-    assert created is False
-    assert uw.pk == existing.pk
-
-
-def test_attach_work_first_uw_gets_position_zero(user, book):
-    uw, _ = attach_work(user, "book", book.pk)
-
     assert uw.order_position == 0
 
 
 def test_attach_work_increments_position(user, movie, book):
     UserWorkFactory(user=user, work=movie)
 
-    uw, _ = attach_work(user, "book", book.pk)
+    uw, _ = _attach_work(user, book)
 
     assert uw.order_position == 1
 
 
 def test_attach_work_respects_explicit_order_position(user, book):
-    uw, _ = attach_work(user, "book", book.pk, cleaned_user_data={"order_position": 42})
+    uw, _ = _attach_work(user, book, {"order_position": 42})
 
     assert uw.order_position == 42
 
 
-def test_attach_work_applies_cleaned_user_data(user, book):
+def test_attach_work_applies_owned_platforms(user, game):
     platform = PlatformFactory()
 
-    uw, created = attach_work(
+    uw, created = _attach_work(
         user,
-        "book",
-        book.pk,
-        cleaned_user_data={
+        game,
+        {
             "status": UserWorkStatusChoices.COMPLETED,
             "rating": 9,
             "owned_platforms": [platform],
@@ -82,29 +73,78 @@ def test_attach_work_applies_cleaned_user_data(user, book):
     assert list(uw.owned_platforms.all()) == [platform]
 
 
-def test_attach_work_does_not_touch_platforms_on_existing(user, book):
+def test_attach_work_existing_does_not_touch_platforms(user, book):
     UserWorkFactory(user=user, work=book)
     platform = PlatformFactory()
 
-    uw, created = attach_work(
-        user, "book", book.pk, cleaned_user_data={"owned_platforms": [platform]}
-    )
+    uw, created = _attach_work(user, book, {"owned_platforms": [platform]})
 
     assert created is False
     assert list(uw.owned_platforms.all()) == []
 
 
-def test_attach_work_unknown_type_raises(user):
-    with pytest.raises(ValueError):
-        attach_work(user, "nope", 1)
+# ─── attach_work_from_form ──────────────────────────────────────────────────
 
 
-def test_attach_work_missing_work_raises_404(user):
-    with pytest.raises(Http404):
-        attach_work(user, "book", 999999)
+def test_attach_work_from_form_creates(user, book):
+    form = AttachWorkForm(data={"work_type": "book", "work_id": str(book.pk)})
+    assert form.is_valid()
+
+    uw, created = attach_work_from_form(user, form)
+
+    assert created is True
+    assert uw.user == user
+    assert uw.work_object_id == book.pk
+    assert uw.status == UserWorkStatusChoices.PLANNING
 
 
-# ─── reorder_user_works ─────────────────
+def test_attach_work_from_form_raises_already_attached(user, book):
+    UserWorkFactory(user=user, work=book)
+    form = AttachWorkForm(data={"work_type": "book", "work_id": str(book.pk)})
+    assert form.is_valid()
+
+    with pytest.raises(AlreadyAttached) as exc_info:
+        attach_work_from_form(user, form)
+    assert exc_info.value.work == book
+
+
+def test_attach_work_from_form_clamps_progress(user):
+    book = BookFactory(pages=100)
+    form = AttachWorkForm(
+        data={"work_type": "book", "work_id": str(book.pk), "progress": "999"}
+    )
+    assert form.is_valid()
+
+    uw, _ = attach_work_from_form(user, form)
+
+    assert uw.progress == Decimal("100")
+
+
+def test_attach_work_from_form_keeps_progress_below_max(user):
+    book = BookFactory(pages=100)
+    form = AttachWorkForm(
+        data={"work_type": "book", "work_id": str(book.pk), "progress": "50"}
+    )
+    assert form.is_valid()
+
+    uw, _ = attach_work_from_form(user, form)
+
+    assert uw.progress == Decimal("50")
+
+
+def test_attach_work_from_form_does_not_clamp_game(user):
+    game = GameFactory()
+    form = AttachWorkForm(
+        data={"work_type": "game", "work_id": str(game.pk), "progress": "9999"}
+    )
+    assert form.is_valid()
+
+    uw, _ = attach_work_from_form(user, form)
+
+    assert uw.progress == Decimal("9999")
+
+
+# ─── reorder_user_works ─────────────────────────────────────────────────────
 
 
 def test_reorder_normalizes_non_unique_positions(user, book, movie):
