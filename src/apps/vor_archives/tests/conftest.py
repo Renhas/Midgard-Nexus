@@ -4,10 +4,18 @@ import pytest
 
 from apps.users.tests.factories import UserFactory
 from apps.vor_archives.tests.factories import BookFactory, FilmFactory, GameFactory
+from apps.vor_archives.constants import UserWorkStatusChoices
+
+ALL_STATUSES = list(UserWorkStatusChoices.values)
 
 
 @pytest.fixture
 def user():
+    return UserFactory()
+
+
+@pytest.fixture
+def other_user():
     return UserFactory()
 
 
