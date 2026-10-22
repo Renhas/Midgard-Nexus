@@ -1,4 +1,4 @@
-"""Tests for apps.vor_archives.artworks.views.crud."""
+"""Tests for artwork_add view: new work form for book, film and game types."""
 
 import json
 

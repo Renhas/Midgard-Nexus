@@ -1,4 +1,4 @@
-"""Tests for apps.vor_archives.artworks.views.collections."""
+"""Tests for collection CRUD views: new, edit, update, delete preview, delete."""
 
 import json
 

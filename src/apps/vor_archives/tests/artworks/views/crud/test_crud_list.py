@@ -1,4 +1,4 @@
-"""Tests for apps.vor_archives.artworks.views.crud."""
+"""Tests for artwork_list view: library listing with filters and collections."""
 
 import pytest
 from django.urls import reverse

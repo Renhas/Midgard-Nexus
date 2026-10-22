@@ -1,4 +1,4 @@
-"""Tests for apps.vor_archives.artworks.views.actions."""
+"""Tests for artwork_attach and artwork_preview views."""
 
 import json
 from decimal import Decimal

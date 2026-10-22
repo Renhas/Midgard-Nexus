@@ -1,4 +1,4 @@
-"""Tests for apps.vor_archives.artworks.views.crud."""
+"""Tests for artwork_detail, artwork_work and artwork_delete views."""
 
 import json
 from unittest import mock

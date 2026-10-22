@@ -1,4 +1,4 @@
-"""Tests for apps.vor_archives.artworks.views.actions."""
+"""Tests for artwork_quick view: inline field updates from the list."""
 
 import json
 from decimal import Decimal

@@ -1,4 +1,4 @@
-"""Tests for apps.vor_archives.artworks.views.collections."""
+"""Tests for collection tree views: artwork_collections, collection_tree, collection_reorder."""
 
 import json
 
