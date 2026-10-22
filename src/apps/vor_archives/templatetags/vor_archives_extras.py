@@ -1,6 +1,6 @@
 from django import template
 
-from ..constants import FilmTypeChoices
+from apps.vor_archives.artworks.services.progress import get_progress_info
 
 register = template.Library()
 
@@ -48,42 +48,6 @@ FEED_ACTION_ICONS = {
     "dropped": "bi bi-x-circle",
     "rated": "bi bi-star",
 }
-
-
-def _display_progress_value(value):
-    number = float(value or 0)
-    rounded = round(number, 1)
-    if rounded == int(rounded):
-        return str(int(rounded))
-    return str(rounded)
-
-
-def get_progress_info(user_work):
-    if not user_work or not getattr(user_work, "work", None):
-        return None
-    work = user_work.work
-    model_name = work._meta.model_name
-    info = {
-        "value": float(user_work.progress or 0),
-        "display_value": _display_progress_value(user_work.progress),
-        "maximum": None,
-        "unit": "",
-        "step": 1,
-    }
-    if model_name == "book":
-        info["maximum"] = work.pages
-        info["unit"] = "стр."
-    elif model_name == "game":
-        info["unit"] = "ч."
-        info["step"] = 0.5
-    elif model_name == "film":
-        if work.film_type == FilmTypeChoices.TV_SHOW:
-            info["maximum"] = work.episode_count
-            info["unit"] = "эп."
-        else:
-            info["maximum"] = work.duration_minutes
-            info["unit"] = "мин."
-    return info
 
 
 @register.filter

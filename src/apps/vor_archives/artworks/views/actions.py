@@ -7,7 +7,6 @@ from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.vor_archives.constants import UserWorkStatusChoices, LOGIN_URL
-from apps.vor_archives.templatetags.vor_archives_extras import get_progress_info
 from apps.vor_archives.models import UserWork
 from ..services import (
     attach_work,
@@ -15,6 +14,7 @@ from ..services import (
     orphan_works,
     reorder_user_works,
     user_has_work,
+    get_progress_info,
 )
 
 from .utils import (

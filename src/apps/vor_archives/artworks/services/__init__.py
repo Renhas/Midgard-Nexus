@@ -1,4 +1,13 @@
 from .constants import WORK_MODELS  ## TODO: Move up!
+from .progress import (
+    ProgressMeta,
+    clamp_progress,
+    clamp_progress_for_work,
+    get_progress_info,
+    unit_for_type,
+    user_work_progress,
+    work_progress,
+)
 from .queries import (
     search_works,
     search_library_works,
@@ -6,7 +15,6 @@ from .queries import (
 from .works import (
     get_work,
     attach_work,
-    clamp_progress_for_work,
     get_user_work,
     list_user_works,
     reorder_user_works,

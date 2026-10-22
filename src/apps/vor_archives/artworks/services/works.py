@@ -1,11 +1,9 @@
-from decimal import Decimal
-
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.db.models import Count, Q, prefetch_related_objects
 from django.shortcuts import get_object_or_404
 
-from apps.vor_archives.constants import FilmTypeChoices, WorkRelationTypeChoices
+from apps.vor_archives.constants import WorkRelationTypeChoices
 from apps.vor_archives.models import (
     Collection,
     CollectionItem,
@@ -232,29 +230,6 @@ def work_relation_items(work):
             )
         )
     return items
-
-
-def _work_progress_maximum(work):
-    model_name = work._meta.model_name
-    if model_name == "book":
-        return work.pages
-    if model_name == "film":
-        if work.film_type == FilmTypeChoices.TV_SHOW:
-            return work.episode_count
-        return work.duration_minutes
-    return None
-
-
-def clamp_progress_for_work(work):
-    maximum = _work_progress_maximum(work)
-    if maximum is None:
-        return
-    limit = Decimal(str(maximum))
-    user_works = list(work.user_works.all())
-    for user_work in user_works:
-        if user_work.progress > limit:
-            user_work.progress = limit
-            user_work.save()
 
 
 @transaction.atomic

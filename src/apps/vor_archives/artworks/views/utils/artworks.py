@@ -11,13 +11,11 @@ from django.urls import reverse
 
 from apps.vor_archives.constants import (
     AgeRatingChoices,
-    FilmTypeChoices,
     UserWorkStatusChoices,
     WorkRelationTypeChoices,
     STATUS_LABELS_RU,
 )
 from apps.vor_archives.forms import WORK_FORMS, UserWorkEditForm
-from apps.vor_archives.templatetags.vor_archives_extras import get_progress_info
 from apps.vor_archives.models import (
     BookGenre,
     FilmGenre,
@@ -29,7 +27,10 @@ from apps.vor_archives.models import (
 from apps.vor_archives.artworks.services import (
     WORK_MODELS,
     clamp_progress_for_work,
+    get_progress_info,
     sync_work_relations,
+    unit_for_type,
+    work_progress,
     work_relation_items,
     work_type_key,
 )
@@ -43,18 +44,8 @@ def all_attr_catalogs():
 
 
 def progress_meta_for_work(work):
-    type_key = work_type_key(work)
-    if type_key == "book":
-        return {"maximum": work.pages, "unit": "стр.", "step": 1}
-    if type_key == "game":
-        return {"maximum": None, "unit": "ч.", "step": 0.5}
-    if getattr(work, "film_type", None) == FilmTypeChoices.TV_SHOW:
-        return {"maximum": work.episode_count, "unit": "эп.", "step": 1}
-    return {
-        "maximum": getattr(work, "duration_minutes", None),
-        "unit": "мин.",
-        "step": 1,
-    }
+    meta = work_progress(work)
+    return {"maximum": meta.maximum, "unit": meta.unit, "step": meta.step}
 
 
 def wants_json(request):
@@ -272,17 +263,9 @@ def _prefetch_work(work, user_work=None):
 
 
 def _progress_unit(work=None, type_key=None, film_type=None):
-    key = type_key or (work_type_key(work) if work else "")
-    if key == "book":
-        return "стр."
-    if key == "game":
-        return "ч."
-    if key == "film":
-        f_type = film_type or getattr(work, "film_type", None)
-        if f_type == FilmTypeChoices.TV_SHOW:
-            return "эп."
-        return "мин."
-    return ""
+    if work is not None:
+        return work_progress(work).unit
+    return unit_for_type(type_key, film_type=film_type)
 
 
 def _id_list(request, name):
