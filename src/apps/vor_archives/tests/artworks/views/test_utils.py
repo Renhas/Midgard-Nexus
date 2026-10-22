@@ -1,7 +1,5 @@
 """Tests for apps.vor_archives.artworks.views.utils.artworks helpers."""
 
-import json
-
 import pytest
 from django.test import RequestFactory
 
@@ -15,203 +13,176 @@ from apps.vor_archives.artworks.views.utils.artworks import (
     progress_meta_for_work,
 )
 from apps.vor_archives.constants import FilmTypeChoices
-from apps.vor_archives.tests.factories import (
-    GameFactory,
-    PersonFactory,
-    UserWorkFactory,
-)
+from apps.vor_archives.tests.factories import PersonFactory, UserWorkFactory
 
 
 # ─── parse_id_list ──────────────────────────────────────────────────────────
 
 
-def test_parse_id_list_valid():
-    rf = RequestFactory()
-    request = rf.post("/", {"authors": ["1", "2"]})
-    assert parse_id_list(request, "authors") == [1, 2]
-
-
-def test_parse_id_list_comma_separated():
-    rf = RequestFactory()
-    request = rf.post("/", {"authors": ["1,2,3"]})
-    assert parse_id_list(request, "authors") == [1, 2, 3]
-
-
-def test_parse_id_list_empty_and_whitespace_parts_skipped():
-    rf = RequestFactory()
-    request = rf.post("/", {"authors": ["1,,2,  ,3,"]})
-    assert parse_id_list(request, "authors") == [1, 2, 3]
-
-
-def test_parse_id_list_invalid_parts_skipped():
-    rf = RequestFactory()
-    request = rf.post("/", {"authors": ["abc", "1", "xyz"]})
-    assert parse_id_list(request, "authors") == [1]
-
-
-def test_parse_id_list_missing_key():
-    rf = RequestFactory()
-    request = rf.post("/", {})
-    assert parse_id_list(request, "authors") == []
+@pytest.mark.parametrize(
+    "post_data,expected",
+    [
+        pytest.param({"authors": ["1", "2"]}, [1, 2], id="valid-list"),
+        pytest.param({"authors": ["1,2,3"]}, [1, 2, 3], id="comma-separated"),
+        pytest.param({"authors": ["1,,2,  ,3,"]}, [1, 2, 3], id="empty-parts-skipped"),
+        pytest.param({"authors": ["abc", "1", "xyz"]}, [1], id="invalid-parts-skipped"),
+        pytest.param({}, [], id="missing-key"),
+    ],
+)
+def test_parse_id_list(post_data, expected):
+    request = RequestFactory().post("/", post_data)
+    assert parse_id_list(request, "authors") == expected
 
 
 # ─── parse_relations_payload ────────────────────────────────────────────────
 
 
-def test_parse_relations_payload_missing_field():
-    rf = RequestFactory()
-    request = rf.post("/", {})
+@pytest.mark.parametrize(
+    "payload",
+    [
+        pytest.param(None, id="missing-field"),
+        pytest.param("", id="empty-string"),
+        pytest.param("{bad", id="invalid-json"),
+        pytest.param('"string"', id="not-a-list"),
+        pytest.param("[1, 2]", id="list-of-non-dicts"),
+    ],
+)
+def test_parse_relations_payload_invalid_returns_empty(payload):
+    data = {} if payload is None else {"relations_json": payload}
+    request = RequestFactory().post("/", data)
     assert parse_relations_payload(request) == []
 
 
-def test_parse_relations_payload_empty_string():
-    rf = RequestFactory()
-    request = rf.post("/", {"relations_json": ""})
-    assert parse_relations_payload(request) == []
-
-
-def test_parse_relations_payload_invalid_json():
-    rf = RequestFactory()
-    request = rf.post("/", {"relations_json": "{bad"})
-    assert parse_relations_payload(request) == []
-
-
-def test_parse_relations_payload_not_a_list():
-    rf = RequestFactory()
-    request = rf.post("/", {"relations_json": '"string"'})
-    assert parse_relations_payload(request) == []
-
-
-def test_parse_relations_payload_list_of_non_dicts_skipped():
-    rf = RequestFactory()
-    request = rf.post("/", {"relations_json": "[1, 2]"})
-    assert parse_relations_payload(request) == []
-
-
-def test_parse_relations_payload_valid():
-    rf = RequestFactory()
-    request = rf.post(
-        "/",
-        {
-            "relations_json": json.dumps(
-                [
-                    {
-                        "type_key": "book",
-                        "work_id": 5,
-                        "relation_type": "sequel",
-                    }
-                ]
-            )
-        },
-    )
-    result = parse_relations_payload(request)
-    assert result == [
-        {
-            "id": None,
-            "relation_type": "sequel",
-            "type_key": "book",
-            "work_id": 5,
-        }
-    ]
-
-
-def test_parse_relations_payload_default_relation_type():
-    rf = RequestFactory()
-    request = rf.post("/", {"relations_json": '[{"type_key": "book", "work_id": 5}]'})
-    result = parse_relations_payload(request)
-    assert result[0]["relation_type"] == "other"
-
-
-def test_parse_relations_payload_invalid_id_string_null():
-    rf = RequestFactory()
-    request = rf.post(
-        "/",
-        {"relations_json": '[{"id": "abc", "type_key": "book", "work_id": 5}]'},
-    )
-    result = parse_relations_payload(request)
-    assert result[0]["id"] is None
-    assert result[0]["work_id"] == 5
-
-
-def test_parse_relations_payload_invalid_work_id_string_null():
-    rf = RequestFactory()
-    request = rf.post("/", {"relations_json": '[{"id": 1, "work_id": "abc"}]'})
-    result = parse_relations_payload(request)
-    assert result[0]["work_id"] is None
-    assert result[0]["id"] == 1
+@pytest.mark.parametrize(
+    "payload,expected",
+    [
+        pytest.param(
+            '[{"type_key": "book", "work_id": 5, "relation_type": "sequel"}]',
+            [
+                {
+                    "id": None,
+                    "relation_type": "sequel",
+                    "type_key": "book",
+                    "work_id": 5,
+                }
+            ],
+            id="valid",
+        ),
+        pytest.param(
+            '[{"type_key": "book", "work_id": 5}]',
+            [
+                {
+                    "id": None,
+                    "relation_type": "other",
+                    "type_key": "book",
+                    "work_id": 5,
+                }
+            ],
+            id="default-relation-type",
+        ),
+        pytest.param(
+            '[{"id": "abc", "type_key": "book", "work_id": 5}]',
+            [
+                {
+                    "id": None,
+                    "relation_type": "other",
+                    "type_key": "book",
+                    "work_id": 5,
+                }
+            ],
+            id="invalid-id-string-to-null",
+        ),
+        pytest.param(
+            '[{"id": 1, "work_id": "abc"}]',
+            [
+                {
+                    "id": 1,
+                    "relation_type": "other",
+                    "type_key": None,
+                    "work_id": None,
+                }
+            ],
+            id="invalid-work-id-string-to-null",
+        ),
+    ],
+)
+def test_parse_relations_payload_valid(payload, expected):
+    request = RequestFactory().post("/", {"relations_json": payload})
+    assert parse_relations_payload(request) == expected
 
 
 # ─── progress_meta_for_work ─────────────────────────────────────────────────
 
 
 @pytest.mark.django_db
-def test_progress_meta_for_book(book):
-    assert progress_meta_for_work(book) == {
-        "maximum": book.pages,
-        "unit": "стр.",
-        "step": 1,
-    }
-
-
-@pytest.mark.django_db
-def test_progress_meta_for_movie(movie):
-    assert progress_meta_for_work(movie) == {
-        "maximum": movie.duration_minutes,
-        "unit": "мин.",
-        "step": 1,
-    }
-
-
-@pytest.mark.django_db
-def test_progress_meta_for_tv_show(tv_show):
-    assert progress_meta_for_work(tv_show) == {
-        "maximum": tv_show.episode_count,
-        "unit": "эп.",
-        "step": 1,
-    }
-
-
-@pytest.mark.django_db
-def test_progress_meta_for_game(game):
-    assert progress_meta_for_work(game) == {
-        "maximum": None,
-        "unit": "ч.",
-        "step": 0.5,
-    }
+@pytest.mark.parametrize(
+    "fixture_name,expected_fn",
+    [
+        pytest.param(
+            "book",
+            lambda w: {"maximum": w.pages, "unit": "стр.", "step": 1},
+            id="book",
+        ),
+        pytest.param(
+            "movie",
+            lambda w: {"maximum": w.duration_minutes, "unit": "мин.", "step": 1},
+            id="movie",
+        ),
+        pytest.param(
+            "tv_show",
+            lambda w: {"maximum": w.episode_count, "unit": "эп.", "step": 1},
+            id="tv-show",
+        ),
+        pytest.param(
+            "game",
+            lambda _w: {"maximum": None, "unit": "ч.", "step": 0.5},
+            id="game",
+        ),
+    ],
+)
+def test_progress_meta_for_work(request, fixture_name, expected_fn):
+    work = request.getfixturevalue(fixture_name)
+    assert progress_meta_for_work(work) == expected_fn(work)
 
 
 # ─── _progress_unit ─────────────────────────────────────────────────────────
 
 
 @pytest.mark.django_db
-def test_progress_unit_book(book):
-    assert _progress_unit(book) == "стр."
+@pytest.mark.parametrize(
+    "fixture_name,expected",
+    [
+        pytest.param("book", "стр.", id="book"),
+        pytest.param("movie", "мин.", id="movie"),
+        pytest.param("tv_show", "эп.", id="tv-show"),
+        pytest.param("game", "ч.", id="game"),
+    ],
+)
+def test_progress_unit_by_work(request, fixture_name, expected):
+    work = request.getfixturevalue(fixture_name)
+    assert _progress_unit(work) == expected
 
 
-@pytest.mark.django_db
-def test_progress_unit_movie(movie):
-    assert _progress_unit(movie) == "мин."
-
-
-@pytest.mark.django_db
-def test_progress_unit_tv_show(tv_show):
-    assert _progress_unit(tv_show) == "эп."
-
-
-@pytest.mark.django_db
-def test_progress_unit_game(game):
-    assert _progress_unit(game) == "ч."
-
-
-def test_progress_unit_by_type_and_film_type():
-    assert _progress_unit(type_key="book") == "стр."
-    assert _progress_unit(type_key="game") == "ч."
-    assert _progress_unit(type_key="film", film_type=FilmTypeChoices.TV_SHOW) == "эп."
-    assert _progress_unit(type_key="film", film_type=FilmTypeChoices.MOVIE) == "мин."
-
-
-def test_progress_unit_no_args():
-    assert _progress_unit() == ""
+@pytest.mark.parametrize(
+    "kwargs,expected",
+    [
+        pytest.param({"type_key": "book"}, "стр.", id="type-book"),
+        pytest.param({"type_key": "game"}, "ч.", id="type-game"),
+        pytest.param(
+            {"type_key": "film", "film_type": FilmTypeChoices.TV_SHOW},
+            "эп.",
+            id="type-film-tv-show",
+        ),
+        pytest.param(
+            {"type_key": "film", "film_type": FilmTypeChoices.MOVIE},
+            "мин.",
+            id="type-film-movie",
+        ),
+        pytest.param({}, "", id="no-args"),
+    ],
+)
+def test_progress_unit_by_type(kwargs, expected):
+    assert _progress_unit(**kwargs) == expected
 
 
 # ─── _chip_payload ──────────────────────────────────────────────────────────
@@ -222,38 +193,34 @@ def test_chip_payload_empty():
 
 
 @pytest.mark.django_db
-def test_chip_payload_person_with_bio():
+@pytest.mark.parametrize(
+    "tip_field,expected_tip",
+    [
+        pytest.param("bio", "Author", id="bio-field"),
+        pytest.param("missing_attr", "", id="missing-attr"),
+    ],
+)
+def test_chip_payload_person(tip_field, expected_tip):
     person = PersonFactory(name="Tolkien", bio="Author")
-    result = _chip_payload([person], "bio")
-    assert result == [{"id": person.pk, "name": "Tolkien", "tip": "Author"}]
-
-
-@pytest.mark.django_db
-def test_chip_payload_default_tip_field():
-    person = PersonFactory(name="X", bio="")
-    result = _chip_payload([person])
-    assert result == [{"id": person.pk, "name": "X", "tip": ""}]
+    assert _chip_payload([person], tip_field) == [
+        {"id": person.pk, "name": "Tolkien", "tip": expected_tip}
+    ]
 
 
 # ─── _id_list ───────────────────────────────────────────────────────────────
 
 
-def test_id_list_valid():
-    rf = RequestFactory()
-    request = rf.get("/?tags=1&tags=2")
-    assert _id_list(request, "tags") == [1, 2]
-
-
-def test_id_list_empty():
-    rf = RequestFactory()
-    request = rf.get("/")
-    assert _id_list(request, "tags") == []
-
-
-def test_id_list_invalid_skipped():
-    rf = RequestFactory()
-    request = rf.get("/?tags=abc&tags=1&tags=x")
-    assert _id_list(request, "tags") == [1]
+@pytest.mark.parametrize(
+    "query,expected",
+    [
+        pytest.param("?tags=1&tags=2", [1, 2], id="valid"),
+        pytest.param("", [], id="empty"),
+        pytest.param("?tags=abc&tags=1&tags=x", [1], id="invalid-skipped"),
+    ],
+)
+def test_id_list(query, expected):
+    request = RequestFactory().get(f"/{query}")
+    assert _id_list(request, "tags") == expected
 
 
 # ─── _prefetch_work ─────────────────────────────────────────────────────────
@@ -270,8 +237,7 @@ def test_prefetch_work_book_caches_related(book):
 
 
 @pytest.mark.django_db
-def test_prefetch_work_game_caches_platforms():
-    game = GameFactory()
+def test_prefetch_work_game_caches_platforms(game):
     result = _prefetch_work(game)
     assert result == "game"
     assert "authors" in game._prefetched_objects_cache
@@ -279,8 +245,7 @@ def test_prefetch_work_game_caches_platforms():
 
 
 @pytest.mark.django_db
-def test_prefetch_work_with_user_work_caches_owned_platforms(user):
-    game = GameFactory()
+def test_prefetch_work_with_user_work_caches_owned_platforms(user, game):
     uw = UserWorkFactory(user=user, work=game)
     _prefetch_work(game, uw)
     assert "owned_platforms" in uw._prefetched_objects_cache
