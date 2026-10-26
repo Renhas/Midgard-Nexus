@@ -100,8 +100,6 @@ def parse_relations_payload(request):
 
 def artwork_list_params(request):
     types = [key for key in request.GET.getlist("types") if key in WORK_MODELS]
-    if "types" not in request.GET:
-        types = list(WORK_MODELS.keys())
     return {
         "types": types,
         "statuses": [value for value in request.GET.getlist("status") if value],

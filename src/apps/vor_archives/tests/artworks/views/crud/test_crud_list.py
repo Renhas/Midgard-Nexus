@@ -3,6 +3,7 @@
 import pytest
 from django.urls import reverse
 
+from apps.vor_archives.artworks.services.constants import WORK_MODELS
 from apps.vor_archives.constants import (
     AgeRatingChoices,
     UserWorkStatusChoices,
@@ -24,10 +25,15 @@ pytestmark = pytest.mark.django_db
 
 ALL_STATUSES = list(UserWorkStatusChoices.values)
 ALL_AGE_RATINGS = list(AgeRatingChoices.values)
+ALL_TYPES = list(WORK_MODELS.keys())
 
 
 def _filters(**overrides):
-    params = {"status": ALL_STATUSES, "age_rating": ALL_AGE_RATINGS}
+    params = {
+        "types": ALL_TYPES,
+        "status": ALL_STATUSES,
+        "age_rating": ALL_AGE_RATINGS,
+    }
     params.update(overrides)
     return params
 
@@ -85,8 +91,17 @@ def test_list_empty_without_age_rating_param(client_logged_in, user, book):
     """
     UserWorkFactory(user=user, work=book)
     response = client_logged_in.get(
-        reverse("vor_archives:artworks:list"), {"status": ALL_STATUSES}
+        reverse("vor_archives:artworks:list"),
+        {"types": ALL_TYPES, "status": ALL_STATUSES},
     )
+    assert response.status_code == 200
+    assert response.context["user_works"] == []
+
+
+def test_list_empty_without_types(client_logged_in, user, book):
+    """Missing types now yields an empty list, matching every other filter."""
+    UserWorkFactory(user=user, work=book)
+    response = client_logged_in.get(reverse("vor_archives:artworks:list"))
     assert response.status_code == 200
     assert response.context["user_works"] == []
 
