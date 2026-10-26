@@ -1,10 +1,8 @@
+import json
+
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
-from django.db import transaction
-from django.http import (
-    HttpResponseBadRequest,
-    JsonResponse,
-)
+from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
@@ -15,10 +13,10 @@ from apps.vor_archives.constants import (
     STATUS_LABELS_RU,
     LOGIN_URL,
 )
-from apps.vor_archives.models import (
-    UserWork,
-)
-from ..services import (
+from apps.vor_archives.models import UserWork
+from apps.vor_archives.artworks.forms import RelationsForm, UserWorkEditForm
+from apps.vor_archives.artworks.presenters import build_overlay_context
+from apps.vor_archives.artworks.services import (
     WORK_MODELS,
     delete_user_works,
     get_user_collection,
@@ -26,21 +24,19 @@ from ..services import (
     get_work,
     list_collection_segments,
     list_user_works,
-    sync_work_relations,
+    save_work_with_relations,
 )
+from apps.vor_archives.artworks.services.catalog import all_attr_catalogs, prefetch_work
+from apps.vor_archives.artworks.constants import RELATION_TYPE_OPTIONS
 
 from .utils import (
     parse_ids,
     artwork_list_params,
-    artwork_overlay_response,
     get_work_form_class,
     parse_id_list,
-    parse_relations_payload,
     progress_meta_for_work,
-    all_attr_catalogs,
     list_response,
 )
-from .constants import RELATION_TYPE_OPTIONS
 
 
 @login_required(login_url=LOGIN_URL)
@@ -84,11 +80,13 @@ def artwork_add(request):
             ids = parse_id_list(request, name)
             post.setlist(name, [str(item) for item in ids])
         work_form = work_form_class(post, request.FILES)
-        if work_form.is_valid():
+        relations_form = RelationsForm(post)
+
+        if work_form.is_valid() and relations_form.is_valid():
             try:
-                with transaction.atomic():
-                    work = work_form.save()
-                    sync_work_relations(work, parse_relations_payload(request))
+                work = save_work_with_relations(
+                    work_form, relations_form.cleaned_data["relations_json"]
+                )
             except ValidationError as error:
                 message = (
                     " ".join(error.messages)
@@ -169,3 +167,79 @@ def artwork_delete(request):
     ids = parse_ids(request)
     delete_user_works(request.user, ids)
     return list_response(request, '{"vor:close-overlay": true}')
+
+
+def artwork_overlay_response(request, work, user_work=None):
+    type_key = prefetch_work(work, user_work)
+    work_form_class = get_work_form_class(type_key)
+
+    if request.method == "POST":
+        if not request.user.is_staff:
+            return HttpResponseBadRequest("Недостаточно прав")
+        post = request.POST.copy()
+        for name in ("authors", "tags", "genres", "platforms"):
+            ids = parse_id_list(request, name)
+            post.setlist(name, [str(item) for item in ids])
+
+        work_form = work_form_class(post, request.FILES, instance=work)
+        relations_form = RelationsForm(post)
+
+        if work_form.is_valid() and relations_form.is_valid():
+            try:
+                saved = save_work_with_relations(
+                    work_form,
+                    relations_form.cleaned_data["relations_json"],
+                    user_work,
+                )
+            except ValidationError as error:
+                work_form.add_error(None, error)
+            else:
+                prefetch_work(saved, user_work)
+                response = render(
+                    request,
+                    "vor_archives/partials/artwork_overlay.html",
+                    build_overlay_context(
+                        request,
+                        saved,
+                        user_work,
+                        work_form_class(instance=saved),
+                        UserWorkEditForm(instance=user_work)
+                        if user_work is not None
+                        else None,
+                    ),
+                )
+                response["HX-Trigger"] = json.dumps({"vor:reload-list": True})
+                return response
+
+        return render(
+            request,
+            "vor_archives/partials/artwork_overlay.html",
+            build_overlay_context(
+                request,
+                work,
+                user_work,
+                work_form,
+                UserWorkEditForm(instance=user_work) if user_work is not None else None,
+                editing=True,
+                global_edit=True,
+            ),
+        )
+
+    start_editing = (
+        request.method == "GET"
+        and request.GET.get("edit") == "1"
+        and request.user.is_staff
+    )
+    return render(
+        request,
+        "vor_archives/partials/artwork_overlay.html",
+        build_overlay_context(
+            request,
+            work,
+            user_work,
+            work_form_class(instance=work),
+            UserWorkEditForm(instance=user_work) if user_work is not None else None,
+            editing=start_editing,
+            global_edit=start_editing,
+        ),
+    )

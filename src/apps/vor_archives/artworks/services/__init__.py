@@ -4,7 +4,6 @@ from .progress import (
     clamp_progress,
     clamp_progress_for_work,
     get_progress_info,
-    unit_for_type,
     user_work_progress,
     work_progress,
 )
@@ -18,6 +17,7 @@ from .works import (
     attach_work_from_form,
     get_user_work,
     list_user_works,
+    save_work_with_relations,
     reorder_user_works,
     delete_user_works,
     orphan_works,

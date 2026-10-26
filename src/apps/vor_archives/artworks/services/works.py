@@ -14,7 +14,7 @@ from apps.vor_archives.models import (
 from .utils import work_key, relation_cover_url
 from .constants import WORK_MODELS, RELATION_LABELS, WORK_TYPE_ICONS
 from .queries import load_filtered_user_works, sort_user_works
-from .progress import clamp_progress
+from .progress import clamp_progress, clamp_progress_for_work
 
 
 class AlreadyAttached(Exception):
@@ -84,6 +84,34 @@ def user_owned_work_ids(user, type_key):
         user=user,
         work_content_type=ct,
     ).values_list("work_object_id", flat=True)
+
+
+@transaction.atomic
+def save_work_with_relations(work_form, relations, user_work=None):
+    """Atomically save work form, relations, and prune stale UserWork data."""
+    saved_work = work_form.save()
+
+    if work_form.data.get("cover_clear") == "1" and not work_form.files.get("cover"):
+        if saved_work.cover:
+            saved_work.cover.delete(save=False)
+        saved_work.cover = None
+        saved_work.save(update_fields=["cover"])
+
+    sync_work_relations(saved_work, relations)
+    clamp_progress_for_work(saved_work)
+
+    type_key = work_type_key(saved_work)
+    if type_key == "game" and user_work is not None:
+        valid_ids = set(saved_work.platforms.values_list("pk", flat=True))
+        stale_ids = [
+            pk
+            for pk in user_work.owned_platforms.values_list("pk", flat=True)
+            if pk not in valid_ids
+        ]
+        if stale_ids:
+            user_work.owned_platforms.remove(*stale_ids)
+
+    return saved_work
 
 
 def reorder_user_works(user, ids):

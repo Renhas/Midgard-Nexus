@@ -35,19 +35,6 @@ def user_work_progress(user_work) -> ProgressMeta:
     return work_progress(getattr(user_work, "work", None))
 
 
-def unit_for_type(type_key: str | None, film_type: str | None = None) -> str:
-    """Return a progress unit label for a work type key without a work instance."""
-    if type_key == "book":
-        return "стр."
-    if type_key == "game":
-        return "ч."
-    if type_key == "film":
-        if film_type == FilmTypeChoices.TV_SHOW:
-            return "эп."
-        return "мин."
-    return ""
-
-
 def display_progress_value(value) -> str:
     """Format a progress value for display: integer when whole, else one decimal."""
     number = float(value or 0)

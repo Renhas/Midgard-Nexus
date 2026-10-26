@@ -1,6 +1,7 @@
 """Forms for the artworks page."""
 
 from decimal import Decimal, InvalidOperation
+import json
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -9,6 +10,7 @@ from apps.vor_archives.constants import (
     AgeRatingChoices,
     FilmTypeChoices,
     UserWorkStatusChoices,
+    WorkRelationTypeChoices,
 )
 from apps.vor_archives.models import (
     Book,
@@ -355,3 +357,41 @@ def _int_or_none(value):
         return int(value)
     except (TypeError, ValueError):
         return None
+
+
+class RelationsForm(forms.Form):
+    """Validated relations_json payload."""
+
+    relations_json = forms.CharField(required=False)
+
+    def clean_relations_json(self):
+        raw = self.cleaned_data.get("relations_json") or "[]"
+        try:
+            items = json.loads(raw)
+        except json.JSONDecodeError:
+            return []
+        if not isinstance(items, list):
+            return []
+        parsed = []
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            entry = {
+                "id": item.get("id") or None,
+                "relation_type": item.get("relation_type")
+                or WorkRelationTypeChoices.OTHER,
+                "type_key": item.get("type_key"),
+                "work_id": item.get("work_id"),
+            }
+            if entry["id"]:
+                try:
+                    entry["id"] = int(entry["id"])
+                except (TypeError, ValueError):
+                    entry["id"] = None
+            if entry["work_id"]:
+                try:
+                    entry["work_id"] = int(entry["work_id"])
+                except (TypeError, ValueError):
+                    entry["work_id"] = None
+            parsed.append(entry)
+        return parsed

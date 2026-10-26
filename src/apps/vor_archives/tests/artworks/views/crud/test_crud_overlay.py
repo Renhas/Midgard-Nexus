@@ -274,8 +274,9 @@ def test_staff_post_game_prunes_stale_platforms(staff_client, staff_user):
 
 def test_staff_post_relation_validation_error(staff_client, staff_user, book):
     uw = UserWorkFactory(user=staff_user, work=book)
+    original_title = book.title
     with mock.patch(
-        "apps.vor_archives.artworks.views.utils.artworks.sync_work_relations",
+        "apps.vor_archives.artworks.services.works.sync_work_relations",
         side_effect=ValidationError("conflict"),
     ):
         response = staff_client.post(
@@ -287,7 +288,6 @@ def test_staff_post_relation_validation_error(staff_client, staff_user, book):
     work_form = response.context["work_form"]
     assert not work_form.is_valid()
     assert work_form.non_field_errors()
-    # Documents current behavior: form save is not inside an atomic block,
-    # so the updated title persists even though relation sync failed.
+    # FIXED: form save is inside transaction.atomic, so the title is rolled back
     book.refresh_from_db()
-    assert book.title == "Updated"
+    assert book.title == original_title
