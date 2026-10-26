@@ -15,7 +15,11 @@ from apps.vor_archives.constants import (
     WorkRelationTypeChoices,
     STATUS_LABELS_RU,
 )
-from apps.vor_archives.artworks.forms import WORK_FORMS, UserWorkEditForm
+from apps.vor_archives.artworks.forms import (
+    WORK_FORMS,
+    UserWorkEditForm,
+    ArtworkListFilterForm,
+)
 from apps.vor_archives.models import (
     BookGenre,
     FilmGenre,
@@ -25,7 +29,6 @@ from apps.vor_archives.models import (
     Tag,
 )
 from apps.vor_archives.artworks.services import (
-    WORK_MODELS,
     clamp_progress_for_work,
     get_progress_info,
     sync_work_relations,
@@ -35,7 +38,9 @@ from apps.vor_archives.artworks.services import (
     work_type_key,
 )
 
-from .common import optional_int
+from .common import (
+    parse_id_list,
+)
 from ..constants import RELATION_TYPE_OPTIONS
 
 
@@ -50,20 +55,6 @@ def progress_meta_for_work(work):
 
 def wants_json(request):
     return request.headers.get("X-Requested-With") == "XMLHttpRequest"
-
-
-def parse_id_list(request, name):
-    values = []
-    for raw in request.POST.getlist(name):
-        for part in str(raw).split(","):
-            part = part.strip()
-            if not part:
-                continue
-            try:
-                values.append(int(part))
-            except ValueError:
-                continue
-    return values
 
 
 def parse_relations_payload(request):
@@ -99,28 +90,10 @@ def parse_relations_payload(request):
 
 
 def artwork_list_params(request):
-    types = [key for key in request.GET.getlist("types") if key in WORK_MODELS]
-    return {
-        "types": types,
-        "statuses": [value for value in request.GET.getlist("status") if value],
-        "age_ratings": [value for value in request.GET.getlist("age_rating") if value],
-        "tags": _id_list(request, "tags"),
-        "genre_book": _id_list(request, "genre_book"),
-        "genre_film": _id_list(request, "genre_film"),
-        "genre_game": _id_list(request, "genre_game"),
-        "platforms": _id_list(request, "platform"),
-        "all_statuses": list(UserWorkStatusChoices.values),
-        "all_age_ratings": list(AgeRatingChoices.values),
-        "all_tags": list(Tag.objects.values_list("pk", flat=True)),
-        "all_genre_book": list(BookGenre.objects.values_list("pk", flat=True)),
-        "all_genre_film": list(FilmGenre.objects.values_list("pk", flat=True)),
-        "all_genre_game": list(GameGenre.objects.values_list("pk", flat=True)),
-        "all_platforms": list(Platform.objects.values_list("pk", flat=True)),
-        "sort": request.GET.get("sort") or "custom",
-        "sort_asc": request.GET.get("dir", "asc") != "desc",
-        "show_hidden": request.GET.get("hidden", "1") != "0",
-        "collection_id": optional_int(request.GET.get("collection")),
-    }
+    form = ArtworkListFilterForm(request.GET)
+    if not form.is_valid():
+        form = ArtworkListFilterForm({})
+    return form.to_service_params()
 
 
 def list_response(request, trigger=None):
@@ -264,16 +237,6 @@ def _progress_unit(work=None, type_key=None, film_type=None):
     if work is not None:
         return work_progress(work).unit
     return unit_for_type(type_key, film_type=film_type)
-
-
-def _id_list(request, name):
-    values = []
-    for raw in request.GET.getlist(name):
-        try:
-            values.append(int(raw))
-        except (TypeError, ValueError):
-            continue
-    return values
 
 
 def _detail_context(

@@ -5,8 +5,22 @@ from decimal import Decimal, InvalidOperation
 from django import forms
 from django.core.exceptions import ValidationError
 
-from apps.vor_archives.constants import FilmTypeChoices, UserWorkStatusChoices
-from apps.vor_archives.models import Book, Film, Game, UserWork
+from apps.vor_archives.constants import (
+    AgeRatingChoices,
+    FilmTypeChoices,
+    UserWorkStatusChoices,
+)
+from apps.vor_archives.models import (
+    Book,
+    BookGenre,
+    Film,
+    FilmGenre,
+    Game,
+    GameGenre,
+    Platform,
+    Tag,
+    UserWork,
+)
 
 from .services.constants import WORK_MODELS
 from .services.quick import QUICK_UPDATE_FIELDS
@@ -254,3 +268,90 @@ class QuickUpdateForm(forms.Form):
             return int(raw)
         except (TypeError, ValueError):
             raise ValidationError("Некорректная платформа")
+
+
+class ArtworkListFilterForm(forms.Form):
+    """Validated query-string filters for the artwork list.
+
+    Filter fields (types, status, age_rating, tags, genres, platform)
+    use choice / model-multiple validation: unknown values raise a form
+    error and the caller falls back to an empty form, producing an empty
+    result set. Non-filter fields (sort, dir, hidden, collection) stay
+    lenient on purpose: invalid values fall back to safe defaults, which
+    matches the behaviour before this form existed.
+    """
+
+    types = forms.MultipleChoiceField(
+        choices=[(key, key) for key in WORK_MODELS],
+        required=False,
+    )
+    status = forms.MultipleChoiceField(
+        choices=UserWorkStatusChoices.choices,
+        required=False,
+    )
+    age_rating = forms.MultipleChoiceField(
+        choices=AgeRatingChoices.choices,
+        required=False,
+    )
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all(),
+        required=False,
+    )
+    genre_book = forms.ModelMultipleChoiceField(
+        queryset=BookGenre.objects.all(),
+        required=False,
+    )
+    genre_film = forms.ModelMultipleChoiceField(
+        queryset=FilmGenre.objects.all(),
+        required=False,
+    )
+    genre_game = forms.ModelMultipleChoiceField(
+        queryset=GameGenre.objects.all(),
+        required=False,
+    )
+    platform = forms.ModelMultipleChoiceField(
+        queryset=Platform.objects.all(),
+        required=False,
+    )
+    sort = forms.CharField(required=False)
+    dir = forms.CharField(required=False)
+    hidden = forms.CharField(required=False)
+    collection = forms.CharField(required=False)
+
+    def to_service_params(self):
+        if not hasattr(self, "cleaned_data"):
+            self.is_valid()
+        return {
+            "types": list(self.cleaned_data.get("types") or []),
+            "statuses": list(self.cleaned_data.get("status") or []),
+            "age_ratings": list(self.cleaned_data.get("age_rating") or []),
+            "tags": [obj.pk for obj in (self.cleaned_data.get("tags") or [])],
+            "genre_book": [
+                obj.pk for obj in (self.cleaned_data.get("genre_book") or [])
+            ],
+            "genre_film": [
+                obj.pk for obj in (self.cleaned_data.get("genre_film") or [])
+            ],
+            "genre_game": [
+                obj.pk for obj in (self.cleaned_data.get("genre_game") or [])
+            ],
+            "platforms": [obj.pk for obj in (self.cleaned_data.get("platform") or [])],
+            "all_statuses": list(UserWorkStatusChoices.values),
+            "all_age_ratings": list(AgeRatingChoices.values),
+            "all_tags": list(Tag.objects.values_list("pk", flat=True)),
+            "all_genre_book": list(BookGenre.objects.values_list("pk", flat=True)),
+            "all_genre_film": list(FilmGenre.objects.values_list("pk", flat=True)),
+            "all_genre_game": list(GameGenre.objects.values_list("pk", flat=True)),
+            "all_platforms": list(Platform.objects.values_list("pk", flat=True)),
+            "sort": self.cleaned_data.get("sort") or "custom",
+            "sort_asc": self.cleaned_data.get("dir") != "desc",
+            "show_hidden": self.cleaned_data.get("hidden") != "0",
+            "collection_id": _int_or_none(self.cleaned_data.get("collection")),
+        }
+
+
+def _int_or_none(value):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None

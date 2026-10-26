@@ -121,6 +121,17 @@ def test_list_get_only(client_logged_in):
     assert response.status_code == 405
 
 
+def test_list_invalid_filter_value_returns_empty(client_logged_in, user, book):
+    """Invalid filter values fall back to an empty form -> empty list."""
+    UserWorkFactory(user=user, work=book)
+    response = client_logged_in.get(
+        reverse("vor_archives:artworks:list"),
+        {"types": ALL_TYPES, "status": "bogus"},
+    )
+    assert response.status_code == 200
+    assert response.context["user_works"] == []
+
+
 # ─── artwork_list: filter query params ──────────────────────────────────────
 
 

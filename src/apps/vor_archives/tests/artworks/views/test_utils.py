@@ -5,13 +5,12 @@ from django.test import RequestFactory
 
 from apps.vor_archives.artworks.views.utils.artworks import (
     _chip_payload,
-    _id_list,
     _prefetch_work,
     _progress_unit,
-    parse_id_list,
     parse_relations_payload,
     progress_meta_for_work,
 )
+from apps.vor_archives.artworks.views.utils.common import parse_id_list
 from apps.vor_archives.constants import FilmTypeChoices
 from apps.vor_archives.tests.factories import PersonFactory, UserWorkFactory
 
@@ -205,22 +204,6 @@ def test_chip_payload_person(tip_field, expected_tip):
     assert _chip_payload([person], tip_field) == [
         {"id": person.pk, "name": "Tolkien", "tip": expected_tip}
     ]
-
-
-# ─── _id_list ───────────────────────────────────────────────────────────────
-
-
-@pytest.mark.parametrize(
-    "query,expected",
-    [
-        pytest.param("?tags=1&tags=2", [1, 2], id="valid"),
-        pytest.param("", [], id="empty"),
-        pytest.param("?tags=abc&tags=1&tags=x", [1], id="invalid-skipped"),
-    ],
-)
-def test_id_list(query, expected):
-    request = RequestFactory().get(f"/{query}")
-    assert _id_list(request, "tags") == expected
 
 
 # ─── _prefetch_work ─────────────────────────────────────────────────────────
