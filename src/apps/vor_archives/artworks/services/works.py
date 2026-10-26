@@ -1,4 +1,3 @@
-from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.db.models import Count, Q, prefetch_related_objects
 from django.shortcuts import get_object_or_404
@@ -11,10 +10,13 @@ from apps.vor_archives.models import (
     UserWork,
     WorkRelation,
 )
-from .utils import work_key, relation_cover_url
-from .constants import WORK_MODELS, RELATION_LABELS, WORK_TYPE_ICONS
-from .queries import load_filtered_user_works, sort_user_works
+from .constants import WORK_MODELS, WORK_TYPE_ICONS
+from .content_types import ct_for, ct_for_type
 from .progress import clamp_progress, clamp_progress_for_work
+from .queries import load_filtered_user_works, sort_user_works
+from .utils import work_key, relation_cover_url
+
+from apps.vor_archives.artworks.constants import RELATION_LABELS
 
 
 class AlreadyAttached(Exception):
@@ -65,10 +67,9 @@ def work_type_key(work) -> str:
 
 
 def get_user_work(user, work):
-    ct = ContentType.objects.get_for_model(work)
     return UserWork.objects.filter(
         user=user,
-        work_content_type=ct,
+        work_content_type=ct_for(work),
         work_object_id=work.pk,
     ).first()
 
@@ -78,11 +79,9 @@ def user_has_work(user, work) -> bool:
 
 
 def user_owned_work_ids(user, type_key):
-    model = get_work_model(type_key)
-    ct = ContentType.objects.get_for_model(model)
     return UserWork.objects.filter(
         user=user,
-        work_content_type=ct,
+        work_content_type=ct_for_type(type_key),
     ).values_list("work_object_id", flat=True)
 
 
@@ -196,7 +195,6 @@ def _attach_work(user, work, cleaned_user_data=None):
     cleaned_user_data may contain status, rating, progress, order_position
     and owned_platforms (m2m, set after creation).
     """
-    ct = ContentType.objects.get_for_model(work)
     defaults = {}
     m2m_platforms = None
     if cleaned_user_data:
@@ -209,7 +207,7 @@ def _attach_work(user, work, cleaned_user_data=None):
         defaults["order_position"] = UserWork.next_position(user)
     user_work, created = UserWork.objects.get_or_create(
         user=user,
-        work_content_type=ct,
+        work_content_type=ct_for(work),
         work_object_id=work.pk,
         defaults=defaults,
     )
@@ -269,7 +267,7 @@ def _relation_item(work, label, relation, direction):
 
 def work_relation_items(work):
     """Связанные произведения с подписью относительно текущего."""
-    ct = ContentType.objects.get_for_model(work)
+    ct = ct_for(work)
     items = []
     outgoing = WorkRelation.objects.filter(
         source_content_type=ct,
@@ -302,7 +300,7 @@ def work_relation_items(work):
 
 @transaction.atomic
 def sync_work_relations(work, items):
-    ct = ContentType.objects.get_for_model(work)
+    ct = ct_for(work)
     keep_ids = []
     new_items = []
     for item in items:
@@ -338,10 +336,11 @@ def sync_work_relations(work, items):
         target = get_work(type_key, work_id)
         if target.pk == work.pk and work_type_key(target) == work_type_key(work):
             continue
+        target_ct = ct_for_type(type_key)
         relation = WorkRelation(
             source_content_type=ct,
             source_object_id=work.pk,
-            target_content_type=ContentType.objects.get_for_model(target),
+            target_content_type=target_ct,
             target_object_id=target.pk,
             relation_type=relation_type,
         )

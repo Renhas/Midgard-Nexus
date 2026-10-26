@@ -1,9 +1,16 @@
 from apps.vor_archives.constants import WorkRelationTypeChoices
 
+
+RELATION_LABELS = {
+    WorkRelationTypeChoices.SEQUEL: ("Продолжение", "Предыстория"),
+    WorkRelationTypeChoices.SPIN_OFF: ("Спин-офф", "Оригинал"),
+    WorkRelationTypeChoices.ADAPTATION: ("Адаптация", "Первоисточник"),
+    WorkRelationTypeChoices.REMAKE: ("Ремейк", "Оригинал"),
+    WorkRelationTypeChoices.OTHER: ("Связано", "Связано"),
+}
+
+
 RELATION_TYPE_OPTIONS = [
-    {"value": WorkRelationTypeChoices.SEQUEL, "label": "Продолжение"},
-    {"value": WorkRelationTypeChoices.SPIN_OFF, "label": "Спин-офф"},
-    {"value": WorkRelationTypeChoices.ADAPTATION, "label": "Адаптация"},
-    {"value": WorkRelationTypeChoices.REMAKE, "label": "Ремейк"},
-    {"value": WorkRelationTypeChoices.OTHER, "label": "Связано"},
+    {"value": rel_type, "label": labels[0]}
+    for rel_type, labels in RELATION_LABELS.items()
 ]
