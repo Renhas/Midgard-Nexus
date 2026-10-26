@@ -88,8 +88,35 @@ def test_quick_status_completed_sets_progress_to_max(client_logged_in, user):
     assert uw.status == UserWorkStatusChoices.COMPLETED
 
 
-def test_quick_status_in_progress_resets_progress(client_logged_in, user, book):
+def test_quick_status_in_progress_from_planning_keeps_progress(
+    client_logged_in, user, book
+):
+    uw = UserWorkFactory(
+        user=user,
+        work=book,
+        progress=Decimal("50"),
+        status=UserWorkStatusChoices.PLANNING,
+    )
+    response = client_logged_in.post(
+        reverse("vor_archives:artworks:quick", args=[uw.pk]),
+        {"field": "status", "value": UserWorkStatusChoices.IN_PROGRESS},
+    )
+    assert response.status_code == 200
+    uw.refresh_from_db()
+    assert uw.progress == Decimal("50")
+
+
+@pytest.mark.parametrize(
+    "old_status",
+    [UserWorkStatusChoices.COMPLETED, UserWorkStatusChoices.DROPPED],
+)
+def test_quick_status_in_progress_from_terminal_resets_progress(
+    client_logged_in, user, book, old_status
+):
     uw = UserWorkFactory(user=user, work=book, progress=Decimal("50"))
+    UserWork = type(uw)
+    UserWork.objects.filter(pk=uw.pk).update(status=old_status)
+    uw.refresh_from_db()
     response = client_logged_in.post(
         reverse("vor_archives:artworks:quick", args=[uw.pk]),
         {"field": "status", "value": UserWorkStatusChoices.IN_PROGRESS},

@@ -41,3 +41,7 @@ from .collections import (
     remove_user_work_from_collection,
     user_work_collection_ids,
 )
+from .quick import (
+    PlatformNotRelated,
+    quick_update,
+)

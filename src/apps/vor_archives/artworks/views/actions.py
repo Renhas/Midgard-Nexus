@@ -1,20 +1,19 @@
-from decimal import Decimal, InvalidOperation
-
 from django.contrib.auth.decorators import login_required
 from django.db.models import prefetch_related_objects
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET, require_POST
 
-from apps.vor_archives.constants import UserWorkStatusChoices, LOGIN_URL
-from apps.vor_archives.artworks.forms import AttachWorkForm
-from apps.vor_archives.templatetags.vor_archives_extras import get_progress_info
+from apps.vor_archives.constants import LOGIN_URL
+from apps.vor_archives.artworks.forms import AttachWorkForm, QuickUpdateForm
 from apps.vor_archives.models import UserWork
 from ..services import (
     AlreadyAttached,
+    PlatformNotRelated,
     attach_work_from_form,
     get_work,
     orphan_works,
+    quick_update,
     reorder_user_works,
     user_has_work,
 )
@@ -120,84 +119,13 @@ def artwork_preview(request):
 @require_POST
 def artwork_quick(request, uw_id):
     user_work = get_object_or_404(UserWork, pk=uw_id, user=request.user)
-    field = request.POST.get("field")
-    value = request.POST.get("value", "")
-
-    if field == "status":
-        if value not in {choice[0] for choice in UserWorkStatusChoices.choices}:
-            return HttpResponseBadRequest("Некорректный статус")
-        user_work.status = value
-        if value == UserWorkStatusChoices.COMPLETED:
-            meta = get_progress_info(user_work)
-            if meta and meta["maximum"] is not None:
-                user_work.progress = Decimal(str(meta["maximum"]))
-        elif value == UserWorkStatusChoices.IN_PROGRESS:
-            user_work.progress = Decimal("0")
-    elif field == "progress":
-        try:
-            progress = Decimal(value)
-        except (InvalidOperation, TypeError, ValueError):
-            return HttpResponseBadRequest("Некорректный прогресс")
-        if progress < 0:
-            progress = Decimal("0")
-        meta = get_progress_info(user_work)
-        if meta and meta["maximum"] is not None:
-            maximum = Decimal(str(meta["maximum"]))
-            progress = min(progress, maximum)
-            if progress >= maximum:
-                user_work.status = UserWorkStatusChoices.COMPLETED
-        user_work.progress = progress
-    elif field == "rating":
-        if value in ("", "0"):
-            user_work.rating = None
-        else:
-            try:
-                rating = int(value)
-            except (TypeError, ValueError):
-                return HttpResponseBadRequest("Некорректный рейтинг")
-            if rating < 1 or rating > 10:
-                return HttpResponseBadRequest("Некорректный рейтинг")
-            user_work.rating = rating
-    elif field == "is_hidden":
-        user_work.is_hidden = value in ("1", "true", "True")
-    elif field == "times_completed":
-        try:
-            times_completed = int(value)
-        except (TypeError, ValueError):
-            return HttpResponseBadRequest("Некорректное число завершений")
-        user_work.times_completed = max(times_completed, 0)
-    elif field == "owned_platform":
-        try:
-            platform_id = int(value)
-        except (TypeError, ValueError):
-            return HttpResponseBadRequest("Некорректная платформа")
-        work = user_work.work
-        if work is None or not work.platforms.filter(pk=platform_id).exists():
-            return HttpResponseBadRequest("Платформа не относится к произведению")
-        if user_work.owned_platforms.filter(pk=platform_id).exists():
-            user_work.owned_platforms.remove(platform_id)
-        else:
-            user_work.owned_platforms.add(platform_id)
-        return JsonResponse(
-            {
-                "owned_platform_ids": list(
-                    user_work.owned_platforms.values_list("pk", flat=True)
-                ),
-            }
+    form = QuickUpdateForm(request.POST)
+    if not form.is_valid():
+        return HttpResponseBadRequest("Некорректные данные")
+    try:
+        payload = quick_update(
+            user_work, form.cleaned_data["field"], form.cleaned_data["value"]
         )
-    else:
-        return HttpResponseBadRequest("Неизвестное поле")
-
-    user_work.save()
-    return JsonResponse(
-        {
-            "status": user_work.status,
-            "progress": float(user_work.progress or 0),
-            "times_completed": user_work.times_completed,
-            "last_completed_date": (
-                user_work.last_completed_date.strftime("%d.%m.%Y")
-                if user_work.last_completed_date
-                else ""
-            ),
-        }
-    )
+    except PlatformNotRelated:
+        return HttpResponseBadRequest("Платформа не относится к произведению")
+    return JsonResponse(payload)

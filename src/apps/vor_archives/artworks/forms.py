@@ -1,8 +1,9 @@
 """Forms for the artworks page."""
 
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from django import forms
+from django.core.exceptions import ValidationError
 
 from apps.vor_archives.constants import FilmTypeChoices, UserWorkStatusChoices
 from apps.vor_archives.models import Book, Film, Game, UserWork
@@ -185,3 +186,78 @@ class AttachWorkForm(forms.Form):
         if value is None or value < 0:
             return Decimal("0")
         return value
+
+
+class QuickUpdateForm(forms.Form):
+    """Validated payload for artwork_quick.
+
+    `value` is polymorphic: parsing is dispatched per field.
+    Unknown fields and invalid values produce form errors, not exceptions.
+    """
+
+    FIELD_CHOICES = (
+        ("status", "Статус"),
+        ("progress", "Прогресс"),
+        ("rating", "Рейтинг"),
+        ("is_hidden", "Скрыто"),
+        ("times_completed", "Завершений"),
+        ("owned_platform", "Платформа"),
+    )
+
+    field = forms.ChoiceField(choices=FIELD_CHOICES)
+    value = forms.CharField(required=False)
+
+    def clean(self):
+        cleaned = super().clean()
+        field = cleaned.get("field")
+        if not field:
+            return cleaned
+        raw = cleaned.get("value", "")
+        try:
+            cleaned["value"] = self._parse_value(field, raw)
+        except ValidationError as exc:
+            self.add_error("value", exc)
+        return cleaned
+
+    def _parse_value(self, field, raw):
+        parser = getattr(self, f"_parse_{field}")
+        return parser(raw)
+
+    def _parse_status(self, raw):
+        if raw not in {choice[0] for choice in UserWorkStatusChoices.choices}:
+            raise ValidationError("Некорректный статус")
+        return raw
+
+    def _parse_progress(self, raw):
+        try:
+            value = Decimal(raw)
+        except (InvalidOperation, TypeError, ValueError):
+            raise ValidationError("Некорректный прогресс")
+        return max(value, Decimal("0"))
+
+    def _parse_rating(self, raw):
+        if raw in ("", "0"):
+            return None
+        try:
+            value = int(raw)
+        except (TypeError, ValueError):
+            raise ValidationError("Некорректный рейтинг")
+        if value < 1 or value > 10:
+            raise ValidationError("Некорректный рейтинг")
+        return value
+
+    def _parse_is_hidden(self, raw):
+        return raw in ("1", "true", "True")
+
+    def _parse_times_completed(self, raw):
+        try:
+            value = int(raw)
+        except (TypeError, ValueError):
+            raise ValidationError("Некорректное число завершений")
+        return max(value, 0)
+
+    def _parse_owned_platform(self, raw):
+        try:
+            return int(raw)
+        except (TypeError, ValueError):
+            raise ValidationError("Некорректная платформа")
