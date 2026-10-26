@@ -1,14 +1,23 @@
 from .constants import WORK_MODELS  ## TODO: Move up!
+from .progress import (
+    ProgressMeta,
+    clamp_progress,
+    clamp_progress_for_work,
+    get_progress_info,
+    user_work_progress,
+    work_progress,
+)
 from .queries import (
     search_works,
     search_library_works,
 )
 from .works import (
+    AlreadyAttached,
     get_work,
-    attach_work,
-    clamp_progress_for_work,
+    attach_work_from_form,
     get_user_work,
     list_user_works,
+    save_work_with_relations,
     reorder_user_works,
     delete_user_works,
     orphan_works,
@@ -31,4 +40,8 @@ from .collections import (
     add_user_work_to_collection,
     remove_user_work_from_collection,
     user_work_collection_ids,
+)
+from .quick import (
+    PlatformNotRelated,
+    quick_update,
 )

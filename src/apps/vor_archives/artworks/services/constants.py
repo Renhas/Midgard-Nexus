@@ -1,4 +1,4 @@
-from apps.vor_archives.constants import UserWorkStatusChoices, WorkRelationTypeChoices
+from apps.vor_archives.constants import UserWorkStatusChoices
 from apps.vor_archives.models import (
     Book,
     Film,
@@ -22,12 +22,4 @@ WORK_TYPE_ICONS = {
     "book": "icon-book-text",
     "film": "icon-clapperboard",
     "game": "icon-gamepad-2",
-}
-
-RELATION_LABELS = {
-    WorkRelationTypeChoices.SEQUEL: ("Продолжение", "Предыстория"),
-    WorkRelationTypeChoices.SPIN_OFF: ("Спин-офф", "Оригинал"),
-    WorkRelationTypeChoices.ADAPTATION: ("Адаптация", "Первоисточник"),
-    WorkRelationTypeChoices.REMAKE: ("Ремейк", "Оригинал"),
-    WorkRelationTypeChoices.OTHER: ("Связано", "Связано"),
 }

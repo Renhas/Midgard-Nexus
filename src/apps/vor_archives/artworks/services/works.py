@@ -1,11 +1,8 @@
-from decimal import Decimal
-
-from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.db.models import Count, Q, prefetch_related_objects
 from django.shortcuts import get_object_or_404
 
-from apps.vor_archives.constants import FilmTypeChoices, WorkRelationTypeChoices
+from apps.vor_archives.constants import WorkRelationTypeChoices
 from apps.vor_archives.models import (
     Collection,
     CollectionItem,
@@ -13,9 +10,21 @@ from apps.vor_archives.models import (
     UserWork,
     WorkRelation,
 )
-from .utils import work_key, relation_cover_url
-from .constants import WORK_MODELS, RELATION_LABELS, WORK_TYPE_ICONS
+from .constants import WORK_MODELS, WORK_TYPE_ICONS
+from .content_types import ct_for, ct_for_type
+from .progress import clamp_progress, clamp_progress_for_work
 from .queries import load_filtered_user_works, sort_user_works
+from .utils import work_key, relation_cover_url
+
+from apps.vor_archives.artworks.constants import RELATION_LABELS
+
+
+class AlreadyAttached(Exception):
+    """Raised when the user already owns the work being attached."""
+
+    def __init__(self, work):
+        self.work = work
+        super().__init__("already")
 
 
 ## TODO: Move to collections.py once refactor list_user_works
@@ -58,10 +67,9 @@ def work_type_key(work) -> str:
 
 
 def get_user_work(user, work):
-    ct = ContentType.objects.get_for_model(work)
     return UserWork.objects.filter(
         user=user,
-        work_content_type=ct,
+        work_content_type=ct_for(work),
         work_object_id=work.pk,
     ).first()
 
@@ -71,12 +79,38 @@ def user_has_work(user, work) -> bool:
 
 
 def user_owned_work_ids(user, type_key):
-    model = get_work_model(type_key)
-    ct = ContentType.objects.get_for_model(model)
     return UserWork.objects.filter(
         user=user,
-        work_content_type=ct,
+        work_content_type=ct_for_type(type_key),
     ).values_list("work_object_id", flat=True)
+
+
+@transaction.atomic
+def save_work_with_relations(work_form, relations, user_work=None):
+    """Atomically save work form, relations, and prune stale UserWork data."""
+    saved_work = work_form.save()
+
+    if work_form.data.get("cover_clear") == "1" and not work_form.files.get("cover"):
+        if saved_work.cover:
+            saved_work.cover.delete(save=False)
+        saved_work.cover = None
+        saved_work.save(update_fields=["cover"])
+
+    sync_work_relations(saved_work, relations)
+    clamp_progress_for_work(saved_work)
+
+    type_key = work_type_key(saved_work)
+    if type_key == "game" and user_work is not None:
+        valid_ids = set(saved_work.platforms.values_list("pk", flat=True))
+        stale_ids = [
+            pk
+            for pk in user_work.owned_platforms.values_list("pk", flat=True)
+            if pk not in valid_ids
+        ]
+        if stale_ids:
+            user_work.owned_platforms.remove(*stale_ids)
+
+    return saved_work
 
 
 def reorder_user_works(user, ids):
@@ -155,9 +189,12 @@ def delete_user_works(user, ids):
     return len(user_works)
 
 
-def attach_work(user, type_key, work_id, cleaned_user_data=None):
-    work = get_work(type_key, work_id)
-    ct = ContentType.objects.get_for_model(work)
+def _attach_work(user, work, cleaned_user_data=None):
+    """Create UserWork for a work instance. Internal helper.
+
+    cleaned_user_data may contain status, rating, progress, order_position
+    and owned_platforms (m2m, set after creation).
+    """
     defaults = {}
     m2m_platforms = None
     if cleaned_user_data:
@@ -168,15 +205,42 @@ def attach_work(user, type_key, work_id, cleaned_user_data=None):
                 defaults[key] = value
     if "order_position" not in defaults:
         defaults["order_position"] = UserWork.next_position(user)
-
     user_work, created = UserWork.objects.get_or_create(
         user=user,
-        work_content_type=ct,
+        work_content_type=ct_for(work),
         work_object_id=work.pk,
         defaults=defaults,
     )
     if created and m2m_platforms is not None:
         user_work.owned_platforms.set(m2m_platforms)
+    return user_work, created
+
+
+@transaction.atomic
+def attach_work_from_form(user, form):
+    """Attach a work using validated AttachWorkForm data.
+
+    Raises AlreadyAttached if the user already owns the work.
+    Clamps progress to the work maximum.
+    """
+    type_key = form.cleaned_data["work_type"]
+    work = get_work(type_key, form.cleaned_data["work_id"])
+    if user_has_work(user, work):
+        raise AlreadyAttached(work)
+    original_progress = form.cleaned_data["progress"]
+    user_work, created = _attach_work(
+        user,
+        work,
+        {
+            "status": form.cleaned_data["status"],
+            "rating": form.cleaned_data["rating"],
+            "progress": original_progress,
+        },
+    )
+    if created:
+        clamp_progress(user_work)
+        if user_work.progress != original_progress:
+            user_work.save(update_fields=["progress"])
     return user_work, created
 
 
@@ -203,7 +267,7 @@ def _relation_item(work, label, relation, direction):
 
 def work_relation_items(work):
     """Связанные произведения с подписью относительно текущего."""
-    ct = ContentType.objects.get_for_model(work)
+    ct = ct_for(work)
     items = []
     outgoing = WorkRelation.objects.filter(
         source_content_type=ct,
@@ -234,39 +298,23 @@ def work_relation_items(work):
     return items
 
 
-def _work_progress_maximum(work):
-    model_name = work._meta.model_name
-    if model_name == "book":
-        return work.pages
-    if model_name == "film":
-        if work.film_type == FilmTypeChoices.TV_SHOW:
-            return work.episode_count
-        return work.duration_minutes
-    return None
-
-
-def clamp_progress_for_work(work):
-    maximum = _work_progress_maximum(work)
-    if maximum is None:
-        return
-    limit = Decimal(str(maximum))
-    user_works = list(work.user_works.all())
-    for user_work in user_works:
-        if user_work.progress > limit:
-            user_work.progress = limit
-            user_work.save()
-
-
 @transaction.atomic
 def sync_work_relations(work, items):
-    ct = ContentType.objects.get_for_model(work)
+    ct = ct_for(work)
     keep_ids = []
     new_items = []
     for item in items:
         relation_id = item.get("id")
         relation_type = item.get("relation_type") or WorkRelationTypeChoices.OTHER
         if relation_id:
-            relation = WorkRelation.objects.filter(pk=relation_id).first()
+            relation = (
+                WorkRelation.objects.filter(pk=relation_id)
+                .filter(
+                    Q(source_content_type=ct, source_object_id=work.pk)
+                    | Q(target_content_type=ct, target_object_id=work.pk)
+                )
+                .first()
+            )
             if relation is None:
                 continue
             if relation.relation_type != relation_type:
@@ -288,10 +336,11 @@ def sync_work_relations(work, items):
         target = get_work(type_key, work_id)
         if target.pk == work.pk and work_type_key(target) == work_type_key(work):
             continue
+        target_ct = ct_for_type(type_key)
         relation = WorkRelation(
             source_content_type=ct,
             source_object_id=work.pk,
-            target_content_type=ContentType.objects.get_for_model(target),
+            target_content_type=target_ct,
             target_object_id=target.pk,
             relation_type=relation_type,
         )

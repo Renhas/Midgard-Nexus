@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from apps.vor_archives.constants import UserWorkStatusChoices
 from apps.vor_archives.models import UserWork
-from apps.vor_archives.tests.factories import UserWorkFactory
+from apps.vor_archives.tests.factories import BookFactory, UserWorkFactory
 
 
 pytestmark = pytest.mark.django_db
@@ -136,6 +136,40 @@ def test_attach_valid_html_returns_trigger(client_logged_in, user, book):
     trigger = json.loads(response["HX-Trigger"])
     assert trigger.get("vor:reload-list") is True
     assert trigger.get("vor:close-overlay") is True
+
+
+def test_attach_progress_clamped_to_max(client_logged_in, user):
+    """Progress above the work maximum is clamped (S12 fix)."""
+    book = BookFactory(pages=100)
+    response = client_logged_in.post(
+        reverse("vor_archives:artworks:attach"),
+        {
+            "work_type": "book",
+            "work_id": str(book.pk),
+            "progress": "999",
+        },
+        HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+    )
+    assert response.status_code == 200
+    uw = UserWork.objects.get(user=user)
+    assert uw.progress == Decimal("100")
+
+
+def test_attach_unknown_type_400(client_logged_in):
+    """Unknown work_type is now rejected by form validation (was: ValueError/500)."""
+    response = client_logged_in.post(
+        reverse("vor_archives:artworks:attach"),
+        {"work_type": "nope", "work_id": "1"},
+    )
+    assert response.status_code == 400
+
+
+def test_attach_missing_work_404(client_logged_in):
+    response = client_logged_in.post(
+        reverse("vor_archives:artworks:attach"),
+        {"work_type": "book", "work_id": "999999"},
+    )
+    assert response.status_code == 404
 
 
 # ─── artwork_preview ────────────────────────────────────────────────────────

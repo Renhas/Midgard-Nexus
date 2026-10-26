@@ -1,12 +1,10 @@
-from django.contrib.contenttypes.models import ContentType
 from django.db.models import prefetch_related_objects
 
 from .constants import WORK_MODELS, STATUS_SORT_ORDER, WORK_TYPE_ICONS
+from .content_types import ct_for_type
 from .utils import relation_cover_url, is_partial, item_ids
 from apps.vor_archives.constants import UserWorkStatusChoices
-from apps.vor_archives.models import (
-    UserWork,
-)
+from apps.vor_archives.models import UserWork
 
 
 def sort_user_works(items, params, order_key=None):
@@ -40,6 +38,71 @@ def sort_user_works(items, params, order_key=None):
             reverse=not sort_asc,
         )
     return items
+
+
+def load_filtered_user_works(user, params):
+    types = [key for key in (params.get("types") or []) if key in WORK_MODELS]
+    if not types:
+        return []
+
+    qs = UserWork.objects.filter(user=user).select_related("work_content_type")
+    content_types = [ct_for_type(key) for key in types]
+    qs = qs.filter(work_content_type__in=content_types)
+
+    statuses = params.get("statuses")
+    if is_partial(
+        statuses, params.get("all_statuses") or list(UserWorkStatusChoices.values)
+    ):
+        qs = qs.filter(status__in=statuses or [])
+
+    if not params.get("show_hidden", True):
+        qs = qs.filter(is_hidden=False)
+
+    items = list(qs)
+    _prefetch_work_filters(items)
+    return [
+        user_work for user_work in items if _work_matches_filters(user_work, params)
+    ]
+
+
+def search_works(query, exclude_type=None, exclude_id=None, limit=20):
+    exclude_id = int(exclude_id) if exclude_id not in (None, "") else None
+    results = [
+        _format_work_hit(type_key, work)
+        for type_key, work in _iter_work_matches(
+            query, limit, exclude_type=exclude_type, exclude_id=exclude_id
+        )
+    ]
+    results.sort(key=lambda item: item["title"].casefold())
+    return results[:limit]
+
+
+def search_library_works(user, query, limit=15):
+    query = (query or "").strip()
+    if len(query) < 1:
+        return {"owned": [], "other": []}
+
+    owned_map = {}
+    for user_work in UserWork.objects.filter(user=user).select_related(
+        "work_content_type"
+    ):
+        owned_map[(user_work.work_content_type.model, user_work.work_object_id)] = (
+            user_work.pk
+        )
+
+    owned = []
+    other = []
+    for type_key, work in _iter_work_matches(query, limit * 2):
+        item = _format_work_hit(type_key, work)
+        uw_id = owned_map.get((type_key, work.pk))
+        if uw_id:
+            item["uw_id"] = uw_id
+            owned.append(item)
+        else:
+            other.append(item)
+    owned.sort(key=lambda item: item["title"].casefold())
+    other.sort(key=lambda item: item["title"].casefold())
+    return {"owned": owned[:limit], "other": other[:limit]}
 
 
 def _work_matches_filters(user_work, params):
@@ -90,89 +153,24 @@ def _prefetch_work_filters(user_works):
         prefetch_related_objects(works, *related)
 
 
-def load_filtered_user_works(user, params):
-    types = [key for key in (params.get("types") or []) if key in WORK_MODELS]
-    if not types:
-        return []
-
-    qs = UserWork.objects.filter(user=user).select_related("work_content_type")
-    content_types = [
-        ContentType.objects.get_for_model(WORK_MODELS[key]) for key in types
-    ]
-    qs = qs.filter(work_content_type__in=content_types)
-
-    statuses = params.get("statuses")
-    if is_partial(
-        statuses, params.get("all_statuses") or list(UserWorkStatusChoices.values)
-    ):
-        qs = qs.filter(status__in=statuses or [])
-
-    if not params.get("show_hidden", True):
-        qs = qs.filter(is_hidden=False)
-
-    items = list(qs)
-    _prefetch_work_filters(items)
-    return [
-        user_work for user_work in items if _work_matches_filters(user_work, params)
-    ]
-
-
-def search_works(query, exclude_type=None, exclude_id=None, limit=20):
+def _iter_work_matches(query, limit, exclude_type=None, exclude_id=None):
+    """Yield (type_key, work) for every work matching the query."""
     query = (query or "").strip()
     if len(query) < 1:
-        return []
-    results = []
-    exclude_id = int(exclude_id) if exclude_id not in (None, "") else None
+        return
     for type_key, model in WORK_MODELS.items():
         qs = model.objects.filter(title__icontains=query)
         if type_key == exclude_type and exclude_id is not None:
             qs = qs.exclude(pk=exclude_id)
         for work in qs.order_by("title")[:limit]:
-            results.append(
-                {
-                    "type_key": type_key,
-                    "work_id": work.pk,
-                    "title": work.title,
-                    "cover_url": relation_cover_url(work),
-                    "icon": WORK_TYPE_ICONS.get(type_key, "bi bi-collection"),
-                }
-            )
-    results.sort(key=lambda item: item["title"].casefold())
-    return results[:limit]
+            yield type_key, work
 
 
-def search_library_works(user, query, limit=15):
-    query = (query or "").strip()
-    if len(query) < 1:
-        return {"owned": [], "other": []}
-
-    owned_map = {}
-    for user_work in UserWork.objects.filter(user=user).select_related(
-        "work_content_type"
-    ):
-        owned_map[(user_work.work_content_type.model, user_work.work_object_id)] = (
-            user_work.pk
-        )
-
-    owned = []
-    other = []
-    for type_key, model in WORK_MODELS.items():
-        for work in model.objects.filter(title__icontains=query).order_by("title")[
-            : limit * 2
-        ]:
-            item = {
-                "type_key": type_key,
-                "work_id": work.pk,
-                "title": work.title,
-                "cover_url": relation_cover_url(work),
-                "icon": WORK_TYPE_ICONS.get(type_key, "bi bi-collection"),
-            }
-            uw_id = owned_map.get((type_key, work.pk))
-            if uw_id:
-                item["uw_id"] = uw_id
-                owned.append(item)
-            else:
-                other.append(item)
-    owned.sort(key=lambda item: item["title"].casefold())
-    other.sort(key=lambda item: item["title"].casefold())
-    return {"owned": owned[:limit], "other": other[:limit]}
+def _format_work_hit(type_key, work):
+    return {
+        "type_key": type_key,
+        "work_id": work.pk,
+        "title": work.title,
+        "cover_url": relation_cover_url(work),
+        "icon": WORK_TYPE_ICONS.get(type_key, "bi bi-collection"),
+    }

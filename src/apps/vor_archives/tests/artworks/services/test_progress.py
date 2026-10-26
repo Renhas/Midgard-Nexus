@@ -1,17 +1,46 @@
-"""Tests for apps.vor_archives.artworks.services.works - progress clamping.
-
-Covers clamp_progress_for_work per work type: pages for books, duration
-for movies, episode count for TV shows, and no limit for games.
-"""
+"""Tests for apps.vor_archives.artworks.services.progress."""
 
 from decimal import Decimal
 
 import pytest
 
-from apps.vor_archives.artworks.services import clamp_progress_for_work
+from apps.vor_archives.artworks.services.progress import (
+    ProgressMeta,
+    clamp_progress_for_work,
+    work_progress,
+)
 from apps.vor_archives.tests.factories import UserWorkFactory
 
 pytestmark = pytest.mark.django_db
+
+# ─── work_progress ──────────────────────────────────────────────────────────
+
+
+@pytest.mark.parametrize(
+    "fixture_name,expected_fn",
+    [
+        pytest.param("book", lambda w: ProgressMeta(w.pages, "стр.", 1), id="book"),
+        pytest.param(
+            "movie",
+            lambda w: ProgressMeta(w.duration_minutes, "мин.", 1),
+            id="movie",
+        ),
+        pytest.param(
+            "tv_show",
+            lambda w: ProgressMeta(w.episode_count, "эп.", 1),
+            id="tv-show",
+        ),
+        pytest.param("game", lambda _w: ProgressMeta(None, "ч.", 0.5), id="game"),
+    ],
+)
+def test_work_progress(request, fixture_name, expected_fn):
+    work = request.getfixturevalue(fixture_name)
+    assert work_progress(work) == expected_fn(work)
+
+
+def test_work_progress_none():
+    assert work_progress(None) == ProgressMeta(None, "", 1)
+
 
 # ─── clamp_progress_for_work ────────────────────────────────────────────────
 
