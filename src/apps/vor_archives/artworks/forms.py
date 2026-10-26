@@ -9,6 +9,7 @@ from apps.vor_archives.constants import FilmTypeChoices, UserWorkStatusChoices
 from apps.vor_archives.models import Book, Film, Game, UserWork
 
 from .services.constants import WORK_MODELS
+from .services.quick import QUICK_UPDATE_FIELDS
 
 
 class StyledModelForm(forms.ModelForm):
@@ -195,15 +196,7 @@ class QuickUpdateForm(forms.Form):
     Unknown fields and invalid values produce form errors, not exceptions.
     """
 
-    FIELD_CHOICES = (
-        ("status", "Статус"),
-        ("progress", "Прогресс"),
-        ("rating", "Рейтинг"),
-        ("is_hidden", "Скрыто"),
-        ("times_completed", "Завершений"),
-        ("owned_platform", "Платформа"),
-    )
-
+    FIELD_CHOICES = [(key, spec.label) for key, spec in QUICK_UPDATE_FIELDS.items()]
     field = forms.ChoiceField(choices=FIELD_CHOICES)
     value = forms.CharField(required=False)
 

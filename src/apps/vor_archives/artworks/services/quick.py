@@ -1,10 +1,19 @@
 """Single-field updates to UserWork from the quick actions UI."""
 
 from decimal import Decimal
+from typing import TYPE_CHECKING, Any, Callable, NamedTuple
 
 from apps.vor_archives.constants import UserWorkStatusChoices
 
 from .progress import user_work_progress
+
+if TYPE_CHECKING:
+    from apps.vor_archives.models import UserWork
+
+
+class QuickField(NamedTuple):
+    label: str
+    handler: Callable[["UserWork", Any], dict]
 
 
 class PlatformNotRelated(Exception):
@@ -17,10 +26,10 @@ def quick_update(user_work, field, value):
     Returns a JSON-ready payload. Callers must pass field/value already
     parsed by QuickUpdateForm. Raises PlatformNotRelated for owned_platform.
     """
-    handler = _HANDLERS.get(field)
-    if handler is None:
+    spec = QUICK_UPDATE_FIELDS.get(field)
+    if spec is None:
         raise ValueError(f"Unknown quick-update field: {field}")
-    return handler(user_work, value)
+    return spec.handler(user_work, value)
 
 
 def _apply_status(user_work, value):
@@ -99,11 +108,11 @@ def _standard_payload(user_work):
     }
 
 
-_HANDLERS = {
-    "status": _apply_status,
-    "progress": _apply_progress,
-    "rating": _apply_rating,
-    "is_hidden": _apply_is_hidden,
-    "times_completed": _apply_times_completed,
-    "owned_platform": _apply_owned_platform,
+QUICK_UPDATE_FIELDS: dict[str, QuickField] = {
+    "status": QuickField("Статус", _apply_status),
+    "progress": QuickField("Прогресс", _apply_progress),
+    "rating": QuickField("Рейтинг", _apply_rating),
+    "is_hidden": QuickField("Скрыто", _apply_is_hidden),
+    "times_completed": QuickField("Завершений", _apply_times_completed),
+    "owned_platform": QuickField("Платформа", _apply_owned_platform),
 }
