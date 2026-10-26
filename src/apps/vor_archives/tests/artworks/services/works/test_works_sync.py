@@ -137,3 +137,21 @@ def test_sync_work_relations_ignores_unknown_relation_id(book):
 def test_sync_work_relations_invalid_target_raises_404(book):
     with pytest.raises(Http404):
         sync_work_relations(book, [{"type_key": "book", "work_id": 999999}])
+
+
+def test_sync_work_relations_ignores_relation_of_other_work(book):
+    other_a = BookFactory()
+    other_b = BookFactory()
+    foreign_rel = WorkRelationFactory(
+        source=other_a,
+        target=other_b,
+        relation_type=WorkRelationTypeChoices.SEQUEL,
+    )
+
+    sync_work_relations(
+        book,
+        [{"id": foreign_rel.pk, "relation_type": WorkRelationTypeChoices.OTHER}],
+    )
+
+    foreign_rel.refresh_from_db()
+    assert foreign_rel.relation_type == WorkRelationTypeChoices.SEQUEL

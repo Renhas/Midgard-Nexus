@@ -281,7 +281,14 @@ def sync_work_relations(work, items):
         relation_id = item.get("id")
         relation_type = item.get("relation_type") or WorkRelationTypeChoices.OTHER
         if relation_id:
-            relation = WorkRelation.objects.filter(pk=relation_id).first()
+            relation = (
+                WorkRelation.objects.filter(pk=relation_id)
+                .filter(
+                    Q(source_content_type=ct, source_object_id=work.pk)
+                    | Q(target_content_type=ct, target_object_id=work.pk)
+                )
+                .first()
+            )
             if relation is None:
                 continue
             if relation.relation_type != relation_type:
