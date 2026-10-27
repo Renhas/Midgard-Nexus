@@ -9,8 +9,8 @@ from apps.vor_archives.constants import (
     status_choices,
     status_options,
 )
+from apps.vor_archives.progress import get_progress_info, work_progress
 from .services.catalog import attr_catalog, chip_payload
-from .services.progress import get_progress_info, work_progress
 from .services.works import work_relation_items, work_type_key
 
 

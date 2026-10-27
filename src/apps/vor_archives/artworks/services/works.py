@@ -9,8 +9,8 @@ from apps.vor_archives.models import (
     WorkRelation,
 )
 from apps.vor_archives.registry import WORK_TYPE_ICONS, get_work_model
+from apps.vor_archives.progress import clamp_progress, clamp_progress_for_work
 from .content_types import ct_for, ct_for_type
-from .progress import clamp_progress, clamp_progress_for_work
 from .queries import load_filtered_user_works, sort_user_works
 from .utils import relation_cover_url
 

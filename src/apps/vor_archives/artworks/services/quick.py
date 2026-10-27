@@ -4,8 +4,8 @@ from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Callable, NamedTuple
 
 from apps.vor_archives.constants import UserWorkStatusChoices
+from apps.vor_archives.progress import user_work_progress
 
-from .progress import user_work_progress
 
 if TYPE_CHECKING:
     from apps.vor_archives.models import UserWork

@@ -1,6 +1,6 @@
 from django import template
 
-from apps.vor_archives.artworks.services.progress import get_progress_info
+from apps.vor_archives.progress import get_progress_info
 from apps.vor_archives.constants import (
     FEED_ACTION_ICONS,
     FEED_ACTION_LABELS_RU,

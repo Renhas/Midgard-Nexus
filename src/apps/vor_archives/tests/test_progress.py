@@ -1,10 +1,10 @@
-"""Tests for apps.vor_archives.artworks.services.progress."""
+"""Tests for apps.vor_archives.progress."""
 
 from decimal import Decimal
 
 import pytest
 
-from apps.vor_archives.artworks.services.progress import (
+from apps.vor_archives.progress import (
     ProgressMeta,
     clamp_progress_for_work,
     work_progress,
