@@ -24,9 +24,9 @@ from ..services import (
     rename_collection,
     reorder_collection_items,
     user_work_collection_ids,
+    optional_int,
 )
-
-from .utils import optional_int, parse_ids
+from .utils import parse_ids
 
 
 @login_required

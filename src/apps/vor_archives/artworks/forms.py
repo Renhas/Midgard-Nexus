@@ -6,6 +6,7 @@ import json
 from django import forms
 from django.core.exceptions import ValidationError
 
+from .services import optional_int
 from apps.vor_archives.constants import (
     AgeRatingChoices,
     FilmTypeChoices,
@@ -347,15 +348,8 @@ class ArtworkListFilterForm(forms.Form):
             "sort": self.cleaned_data.get("sort") or "custom",
             "sort_asc": self.cleaned_data.get("dir") != "desc",
             "show_hidden": self.cleaned_data.get("hidden") != "0",
-            "collection_id": _int_or_none(self.cleaned_data.get("collection")),
+            "collection_id": optional_int(self.cleaned_data.get("collection")),
         }
-
-
-def _int_or_none(value):
-    try:
-        return int(value)
-    except (TypeError, ValueError):
-        return None
 
 
 class RelationsForm(forms.Form):

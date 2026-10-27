@@ -24,3 +24,11 @@ def is_partial(selected, all_values):
 
 def item_ids(items):
     return {item.pk for item in items}
+
+
+def optional_int(value):
+    """Return ``int(value)`` or ``None`` for missing/invalid input."""
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None

@@ -9,6 +9,7 @@ from apps.vor_archives.artworks.services.utils import (
     item_ids,
     relation_cover_url,
     work_key,
+    optional_int,
 )
 
 # ─── work_key ────────────────────────────────────────────────────────────────
@@ -84,3 +85,25 @@ def test_item_ids_returns_set_of_pks():
 
 def test_item_ids_empty_list():
     assert item_ids([]) == set()
+
+
+# ─── optional_int ────────────────────────────────────────────────────────────
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        pytest.param("42", 42, id="str-int"),
+        pytest.param(42, 42, id="int"),
+        pytest.param("  -7 ", -7, id="str-int-with-spaces"),
+        pytest.param("0", 0, id="zero"),
+        pytest.param(None, None, id="none"),
+        pytest.param("", None, id="empty-string"),
+        pytest.param("abc", None, id="non-numeric"),
+        pytest.param("5.5", None, id="float-string"),
+        pytest.param([], None, id="list"),
+        pytest.param({}, None, id="dict"),
+    ],
+)
+def test_optional_int(value, expected):
+    assert optional_int(value) == expected

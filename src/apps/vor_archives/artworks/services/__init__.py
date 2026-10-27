@@ -37,3 +37,5 @@ from .quick import (
     PlatformNotRelated,
     quick_update,
 )
+
+from .utils import optional_int

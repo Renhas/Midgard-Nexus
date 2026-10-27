@@ -1,10 +1,3 @@
-def optional_int(value):
-    try:
-        return int(value)
-    except (TypeError, ValueError):
-        return None
-
-
 def parse_int_list(raw_values, *, comma_separated=False):
     """Parse raw string values into a list of ints.
 

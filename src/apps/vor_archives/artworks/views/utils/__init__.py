@@ -1,5 +1,4 @@
 from .common import (
-    optional_int,
     parse_id_list,
     parse_ids,
     parse_int_list,
