@@ -68,6 +68,13 @@ STATUS_LABELS_RU = {
     UserWorkStatusChoices.DROPPED: "Брошено",
 }
 
+STATUS_SORT_ORDER = {
+    UserWorkStatusChoices.PLANNING: 0,
+    UserWorkStatusChoices.IN_PROGRESS: 1,
+    UserWorkStatusChoices.COMPLETED: 2,
+    UserWorkStatusChoices.DROPPED: 3,
+}
+
 RELATION_LABELS = {
     WorkRelationTypeChoices.SEQUEL: ("Продолжение", "Предыстория"),
     WorkRelationTypeChoices.SPIN_OFF: ("Спин-офф", "Оригинал"),
