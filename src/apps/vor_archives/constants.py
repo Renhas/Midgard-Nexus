@@ -1,3 +1,5 @@
+from typing import NamedTuple
+
 from django.db import models
 
 # TODO: Remove duplicates in UserWork & FeedItemAction Types
@@ -41,6 +43,28 @@ class FeedItemActionTypeChoices(models.TextChoices):
     RATED = ("rated", "Rated")
 
 
+class FeedActionMeta(NamedTuple):
+    label: str
+    icon: str
+
+
+FEED_ACTION_META: dict[str, FeedActionMeta] = {
+    "added": FeedActionMeta("Добавлено", "bi bi-plus-circle"),
+    "planning": FeedActionMeta("Запланировано", "bi bi-clock"),
+    "in_progress": FeedActionMeta("В процессе", "bi bi-play-circle"),
+    "completed": FeedActionMeta("Завершено", "bi bi-check-circle"),
+    "dropped": FeedActionMeta("Брошено", "bi bi-x-circle"),
+    "rated": FeedActionMeta("Оценка", "bi bi-star"),
+}
+
+FEED_ACTION_LABELS_RU: dict[str, str] = {
+    key: meta.label for key, meta in FEED_ACTION_META.items()
+}
+
+FEED_ACTION_ICONS: dict[str, str] = {
+    key: meta.icon for key, meta in FEED_ACTION_META.items()
+}
+
 STATUS_LABELS_RU = {
     UserWorkStatusChoices.PLANNING: "Запланировано",
     UserWorkStatusChoices.IN_PROGRESS: "В процессе",
@@ -67,21 +91,3 @@ RELATION_TYPE_OPTIONS = [
     {"value": rel_type, "label": labels[0]}
     for rel_type, labels in RELATION_LABELS.items()
 ]
-
-FEED_ACTION_LABELS_RU = {
-    "added": "Добавлено",
-    "planning": "Запланировано",
-    "in_progress": "В процессе",
-    "completed": "Завершено",
-    "dropped": "Брошено",
-    "rated": "Оценка",
-}
-
-FEED_ACTION_ICONS = {
-    "added": "bi bi-plus-circle",
-    "planning": "bi bi-clock",
-    "in_progress": "bi bi-play-circle",
-    "completed": "bi bi-check-circle",
-    "dropped": "bi bi-x-circle",
-    "rated": "bi bi-star",
-}
