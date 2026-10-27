@@ -14,12 +14,12 @@ from .constants import (
     WORK_TYPES,
     WORK_TYPE_ICONS,
     WORK_TYPE_LABELS_PLURAL,
+    STATUS_LABELS_RU,
 )
 from .models import FeedItem, UserWork
 from .templatetags.vor_archives_extras import (
     FEED_ACTION_ICONS,
     FEED_ACTION_LABELS_RU,
-    STATUS_LABELS_RU,
 )
 
 AGE_CHOICES_EXT = [("", "Не указан")] + list(AgeRatingChoices.choices)

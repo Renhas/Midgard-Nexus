@@ -1,16 +1,13 @@
 from django import template
 
 from apps.vor_archives.artworks.services.progress import get_progress_info
-from apps.vor_archives.constants import WORK_TYPE_ICONS, WORK_TYPE_LABELS
+from apps.vor_archives.constants import (
+    WORK_TYPE_ICONS,
+    WORK_TYPE_LABELS,
+    STATUS_LABELS_RU,
+)
 
 register = template.Library()
-
-STATUS_LABELS_RU = {
-    "planning": "Запланировано",
-    "in_progress": "В процессе",
-    "completed": "Завершено",
-    "dropped": "Брошено",
-}
 
 STATUS_ICONS = {
     "planning": "bi bi-clock-fill",
