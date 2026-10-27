@@ -2,7 +2,7 @@
 
 import pytest
 
-from apps.vor_archives.artworks.services.prefetch import (
+from apps.vor_archives.prefetch import (
     prefetch_user_works,
     prefetch_work_relations,
     prefetch_work_with_user_work,

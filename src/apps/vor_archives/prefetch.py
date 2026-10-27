@@ -2,8 +2,6 @@
 
 from django.db.models import prefetch_related_objects
 
-from apps.vor_archives.registry import WORK_TYPES
-
 
 def prefetch_user_works(user_works):
     """Resolve ``user_work.work`` (GenericForeignKey) for a list of UserWork.
@@ -22,16 +20,13 @@ def prefetch_work_relations(works, with_authors=False):
     Works are grouped by concrete model so that ``prefetch_related_objects``
     does not mix different model types in a single call.
     """
-    by_type: dict[str, list] = {key: [] for key in WORK_TYPES}
+    by_type: dict[str, list] = {}
     for work in works:
         if work is None:
             continue
-        bucket = by_type.get(work._meta.model_name)
-        if bucket is not None:
-            bucket.append(work)
+        type_key = work._meta.model_name
+        by_type.setdefault(type_key, []).append(work)
     for type_key, bucket in by_type.items():
-        if not bucket:
-            continue
         related = ["tags", "genres"]
         if with_authors:
             related.append("authors")

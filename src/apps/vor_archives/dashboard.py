@@ -21,7 +21,7 @@ from .registry import (
     WORK_TYPE_UNITS,
     WORK_TYPES,
 )
-from apps.vor_archives.artworks.services.prefetch import (
+from .prefetch import (
     prefetch_user_works,
     prefetch_work_relations,
 )
