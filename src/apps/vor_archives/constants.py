@@ -72,6 +72,30 @@ STATUS_LABELS_RU = {
     UserWorkStatusChoices.DROPPED: "Брошено",
 }
 
+
+def status_options() -> list[dict[str, str]]:
+    """Return ``[{"value", "label"}]`` pairs for UserWorkStatusChoices in RU."""
+    return [
+        {"value": value, "label": STATUS_LABELS_RU.get(value, label)}
+        for value, label in UserWorkStatusChoices.choices
+    ]
+
+
+def status_choices() -> list[tuple[str, str]]:
+    """Return ``[(value, label)]`` pairs for UserWorkStatusChoices in RU."""
+    return [
+        (value, STATUS_LABELS_RU.get(value, label))
+        for value, label in UserWorkStatusChoices.choices
+    ]
+
+
+def age_rating_options() -> list[dict[str, str]]:
+    """Return ``[{"value", "label"}]`` pairs for AgeRatingChoices."""
+    return [
+        {"value": value, "label": label} for value, label in AgeRatingChoices.choices
+    ]
+
+
 STATUS_SORT_ORDER = {
     UserWorkStatusChoices.PLANNING: 0,
     UserWorkStatusChoices.IN_PROGRESS: 1,

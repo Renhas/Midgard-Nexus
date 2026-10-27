@@ -8,10 +8,9 @@ from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from apps.vor_archives.constants import (
-    AgeRatingChoices,
-    UserWorkStatusChoices,
-    STATUS_LABELS_RU,
     RELATION_TYPE_OPTIONS,
+    age_rating_options,
+    status_options,
 )
 from apps.vor_archives.registry import WORK_MODELS
 from apps.vor_archives.models import UserWork
@@ -127,14 +126,8 @@ def artwork_add(request):
                 "relationSearchUrl": reverse("vor_archives:artworks:relation_search"),
                 "relationTypes": RELATION_TYPE_OPTIONS,
                 "catalogs": all_attr_catalogs(),
-                "ageChoices": [
-                    {"value": value, "label": label}
-                    for value, label in AgeRatingChoices.choices
-                ],
-                "statusChoices": [
-                    {"value": value, "label": STATUS_LABELS_RU.get(value, label)}
-                    for value, label in UserWorkStatusChoices.choices
-                ],
+                "ageChoices": age_rating_options(),
+                "statusChoices": status_options(),
             },
         },
     )

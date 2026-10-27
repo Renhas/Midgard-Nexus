@@ -12,11 +12,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from .constants import (
-    AgeRatingChoices,
-    UserWorkStatusChoices,
-    STATUS_LABELS_RU,
-)
+from .constants import age_rating_options, status_options
 from .dashboard import (
     attrs_payload,
     feed_page,
@@ -64,13 +60,6 @@ def index(request):
     """Главная страница модуля «Библиотека» — страница произведений."""
     module = _module_context()
     collections = get_user_collection_trees(request.user)
-    status_options = [
-        {"value": value, "label": STATUS_LABELS_RU.get(value, label)}
-        for value, label in UserWorkStatusChoices.choices
-    ]
-    age_rating_options = [
-        {"value": value, "label": label} for value, label in AgeRatingChoices.choices
-    ]
     platforms = list(Platform.objects.all())
     tags = list(Tag.objects.all())
     platform_options = [{"value": p.id, "label": p.name} for p in platforms]
@@ -104,8 +93,8 @@ def index(request):
             "module_color": module["color"],
             "active_section": "artworks",
             "collections": collections,
-            "status_options": status_options,
-            "age_rating_options": age_rating_options,
+            "status_options": status_options(),
+            "age_rating_options": age_rating_options(),
             "tags_options": tags_options,
             "platform_options": platform_options,
             "genres_nested": genres_nested,
