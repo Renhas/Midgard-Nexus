@@ -1,6 +1,4 @@
-"""Presentation helpers for work catalogs and prefetching."""
-
-from django.db.models import prefetch_related_objects
+"""Presentation helpers for work catalogs."""
 
 from apps.vor_archives.models import (
     BookGenre,
@@ -11,18 +9,6 @@ from apps.vor_archives.models import (
     Tag,
 )
 from apps.vor_archives.registry import WORK_TYPES
-
-
-def prefetch_work(work, user_work=None):
-    """Prefetch relations for a work and return its type_key."""
-    type_key = work._meta.model_name
-    related = ["authors", "tags", "genres"]
-    if type_key == "game":
-        related.append("platforms")
-    prefetch_related_objects([work], *related)
-    if user_work is not None:
-        prefetch_related_objects([user_work], "owned_platforms")
-    return type_key
 
 
 def chip_payload(items, tip_field="description"):

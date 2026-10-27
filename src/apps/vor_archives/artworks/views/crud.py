@@ -25,7 +25,8 @@ from apps.vor_archives.artworks.services import (
     list_user_works,
     save_work_with_relations,
 )
-from apps.vor_archives.artworks.services.catalog import all_attr_catalogs, prefetch_work
+from apps.vor_archives.artworks.services.catalog import all_attr_catalogs
+from apps.vor_archives.artworks.services.prefetch import prefetch_work_with_user_work
 
 from .utils import (
     parse_ids,
@@ -162,7 +163,7 @@ def artwork_delete(request):
 
 
 def artwork_overlay_response(request, work, user_work=None):
-    type_key = prefetch_work(work, user_work)
+    type_key = prefetch_work_with_user_work(work, user_work)
     work_form_class = get_work_form_class(type_key)
 
     if request.method == "POST":
@@ -186,7 +187,7 @@ def artwork_overlay_response(request, work, user_work=None):
             except ValidationError as error:
                 work_form.add_error(None, error)
             else:
-                prefetch_work(saved, user_work)
+                prefetch_work_with_user_work(saved, user_work)
                 response = render(
                     request,
                     "vor_archives/partials/artwork_overlay.html",

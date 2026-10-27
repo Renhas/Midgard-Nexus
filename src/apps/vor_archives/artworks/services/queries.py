@@ -1,7 +1,6 @@
-from django.db.models import prefetch_related_objects
-
 from apps.vor_archives.registry import WORK_MODELS, WORK_TYPE_ICONS
 from .content_types import ct_for_type
+from .prefetch import prefetch_user_works, prefetch_work_relations
 from .utils import relation_cover_url, is_partial, item_ids
 from apps.vor_archives.constants import STATUS_SORT_ORDER, UserWorkStatusChoices
 from apps.vor_archives.models import UserWork
@@ -59,7 +58,8 @@ def load_filtered_user_works(user, params):
         qs = qs.filter(is_hidden=False)
 
     items = list(qs)
-    _prefetch_work_filters(items)
+    prefetch_user_works(items)
+    prefetch_work_relations([uw.work for uw in items if uw.work], with_authors=False)
     return [
         user_work for user_work in items if _work_matches_filters(user_work, params)
     ]
@@ -134,23 +134,6 @@ def _work_matches_filters(user_work, params):
         if not work_platforms.intersection(params.get("platforms") or []):
             return False
     return True
-
-
-def _prefetch_work_filters(user_works):
-    prefetch_related_objects(user_works, "work")
-    by_type = {"book": [], "film": [], "game": []}
-    for user_work in user_works:
-        work = user_work.work
-        if work is None:
-            continue
-        by_type.get(work._meta.model_name, []).append(work)
-    for type_key, works in by_type.items():
-        if not works:
-            continue
-        related = ["tags", "genres"]
-        if type_key == "game":
-            related.append("platforms")
-        prefetch_related_objects(works, *related)
 
 
 def _iter_work_matches(query, limit, exclude_type=None, exclude_id=None):
