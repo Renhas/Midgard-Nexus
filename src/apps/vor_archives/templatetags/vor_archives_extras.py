@@ -2,12 +2,11 @@ from django import template
 
 from apps.vor_archives.artworks.services.progress import get_progress_info
 from apps.vor_archives.constants import (
-    WORK_TYPE_ICONS,
-    WORK_TYPE_LABELS,
-    STATUS_LABELS_RU,
     FEED_ACTION_ICONS,
     FEED_ACTION_LABELS_RU,
+    STATUS_LABELS_RU,
 )
+from apps.vor_archives.registry import WORK_TYPE_ICONS, WORK_TYPE_LABELS
 
 register = template.Library()
 

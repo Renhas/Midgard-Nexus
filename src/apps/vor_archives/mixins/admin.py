@@ -1,6 +1,6 @@
 from django.contrib.contenttypes.models import ContentType
 
-from apps.vor_archives.constants import WORK_TYPES
+from apps.vor_archives.registry import WORK_TYPES
 
 ALLOWED_CONTENTTYPES = ContentType.objects.filter(
     model__in=WORK_TYPES, app_label="vor_archives"

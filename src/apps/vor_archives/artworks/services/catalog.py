@@ -10,7 +10,7 @@ from apps.vor_archives.models import (
     Platform,
     Tag,
 )
-from apps.vor_archives.constants import WORK_TYPES
+from apps.vor_archives.registry import WORK_TYPES
 
 
 def prefetch_work(work, user_work=None):

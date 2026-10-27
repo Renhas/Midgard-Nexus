@@ -2,11 +2,7 @@ from django.db import transaction
 from django.db.models import Count, Q, prefetch_related_objects
 from django.shortcuts import get_object_or_404
 
-from apps.vor_archives.constants import (
-    WORK_TYPE_ICONS,
-    RELATION_LABELS,
-    WorkRelationTypeChoices,
-)
+from apps.vor_archives.constants import RELATION_LABELS, WorkRelationTypeChoices
 from apps.vor_archives.models import (
     Collection,
     CollectionItem,
@@ -14,7 +10,7 @@ from apps.vor_archives.models import (
     UserWork,
     WorkRelation,
 )
-from apps.vor_archives.registry import get_work_model
+from apps.vor_archives.registry import WORK_TYPE_ICONS, get_work_model
 from .content_types import ct_for, ct_for_type
 from .progress import clamp_progress, clamp_progress_for_work
 from .queries import load_filtered_user_works, sort_user_works

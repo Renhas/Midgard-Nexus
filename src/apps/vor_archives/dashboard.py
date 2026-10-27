@@ -9,14 +9,17 @@ from django.utils import timezone
 
 from .constants import (
     AgeRatingChoices,
-    FilmTypeChoices,
-    UserWorkStatusChoices,
-    WORK_TYPES,
-    WORK_TYPE_ICONS,
-    WORK_TYPE_LABELS_PLURAL,
-    STATUS_LABELS_RU,
     FEED_ACTION_ICONS,
     FEED_ACTION_LABELS_RU,
+    FilmTypeChoices,
+    STATUS_LABELS_RU,
+    UserWorkStatusChoices,
+)
+from .registry import (
+    WORK_TYPE_ICONS,
+    WORK_TYPE_LABELS_PLURAL,
+    WORK_TYPE_UNITS,
+    WORK_TYPES,
 )
 from .models import FeedItem, UserWork
 
@@ -25,18 +28,11 @@ RATING_CHOICES_EXT = [("", "Без оценки")] + [
     (str(value), str(value)) for value in range(1, 11)
 ]
 
-_TYPE_UNITS = {
-    "book": "стр.",
-    "film": "ч.",
-    "game": "ч.",
-}
-
-
 TYPE_META = {
     key: {
         "label": WORK_TYPE_LABELS_PLURAL[key],
         "icon": WORK_TYPE_ICONS[key],
-        "unit": _TYPE_UNITS[key],
+        "unit": WORK_TYPE_UNITS[key],
     }
     for key in WORK_TYPES
 }
