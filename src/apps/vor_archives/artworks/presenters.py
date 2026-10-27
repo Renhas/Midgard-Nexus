@@ -6,8 +6,8 @@ from apps.vor_archives.constants import (
     AgeRatingChoices,
     UserWorkStatusChoices,
     STATUS_LABELS_RU,
+    RELATION_TYPE_OPTIONS,
 )
-from .constants import RELATION_TYPE_OPTIONS
 from .services.catalog import attr_catalog, chip_payload
 from .services.progress import get_progress_info, work_progress
 from .services.works import work_relation_items, work_type_key

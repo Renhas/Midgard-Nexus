@@ -12,6 +12,7 @@ from apps.vor_archives.constants import (
     UserWorkStatusChoices,
     STATUS_LABELS_RU,
     LOGIN_URL,
+    RELATION_TYPE_OPTIONS,
 )
 from apps.vor_archives.registry import WORK_MODELS
 from apps.vor_archives.models import UserWork
@@ -27,7 +28,6 @@ from apps.vor_archives.artworks.services import (
     save_work_with_relations,
 )
 from apps.vor_archives.artworks.services.catalog import all_attr_catalogs, prefetch_work
-from apps.vor_archives.artworks.constants import RELATION_TYPE_OPTIONS
 
 from .utils import (
     parse_ids,
