@@ -1,16 +1,9 @@
 from django import template
 
 from apps.vor_archives.artworks.services.progress import get_progress_info
-from apps.vor_archives.constants import WORK_TYPE_ICONS
+from apps.vor_archives.constants import WORK_TYPE_ICONS, WORK_TYPE_LABELS
 
 register = template.Library()
-
-
-WORK_TYPE_LABELS = {
-    "book": "Книга",
-    "film": "Фильм",
-    "game": "Игра",
-}
 
 STATUS_LABELS_RU = {
     "planning": "Запланировано",

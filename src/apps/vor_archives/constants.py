@@ -49,6 +49,17 @@ WORK_TYPE_ICONS = {
     "game": "icon-gamepad-2",
 }
 
+WORK_TYPE_LABELS = {
+    "book": "Книга",
+    "film": "Фильм",
+    "game": "Игра",
+}
+
+WORK_TYPE_LABELS_PLURAL = {
+    "book": "Книги",
+    "film": "Фильмы",
+    "game": "Игры",
+}
 
 STATUS_LABELS_RU = {
     UserWorkStatusChoices.PLANNING: "Запланировано",

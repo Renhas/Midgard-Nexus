@@ -13,6 +13,7 @@ from .constants import (
     UserWorkStatusChoices,
     WORK_TYPES,
     WORK_TYPE_ICONS,
+    WORK_TYPE_LABELS_PLURAL,
 )
 from .models import FeedItem, UserWork
 from .templatetags.vor_archives_extras import (
@@ -26,10 +27,20 @@ RATING_CHOICES_EXT = [("", "Без оценки")] + [
     (str(value), str(value)) for value in range(1, 11)
 ]
 
+_TYPE_UNITS = {
+    "book": "стр.",
+    "film": "ч.",
+    "game": "ч.",
+}
+
+
 TYPE_META = {
-    "book": {"label": "Книги", "icon": WORK_TYPE_ICONS["book"], "unit": "стр."},
-    "film": {"label": "Фильмы", "icon": WORK_TYPE_ICONS["film"], "unit": "ч."},
-    "game": {"label": "Игры", "icon": WORK_TYPE_ICONS["game"], "unit": "ч."},
+    key: {
+        "label": WORK_TYPE_LABELS_PLURAL[key],
+        "icon": WORK_TYPE_ICONS[key],
+        "unit": _TYPE_UNITS[key],
+    }
+    for key in WORK_TYPES
 }
 
 MONTHS_RU = {
