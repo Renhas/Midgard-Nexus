@@ -13,11 +13,11 @@ from apps.vor_archives.constants import (
     STATUS_LABELS_RU,
     LOGIN_URL,
 )
+from apps.vor_archives.registry import WORK_MODELS
 from apps.vor_archives.models import UserWork
 from apps.vor_archives.artworks.forms import RelationsForm, UserWorkEditForm
 from apps.vor_archives.artworks.presenters import build_overlay_context
 from apps.vor_archives.artworks.services import (
-    WORK_MODELS,
     delete_user_works,
     get_user_collection,
     get_user_work,

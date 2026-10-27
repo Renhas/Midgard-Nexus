@@ -3,7 +3,7 @@
 import pytest
 from django.urls import reverse
 
-from apps.vor_archives.artworks.services.constants import WORK_MODELS
+from apps.vor_archives.registry import WORK_MODELS
 from apps.vor_archives.constants import (
     AgeRatingChoices,
     UserWorkStatusChoices,

@@ -23,8 +23,7 @@ from apps.vor_archives.models import (
     Tag,
     UserWork,
 )
-
-from .services.constants import WORK_MODELS
+from apps.vor_archives.registry import WORK_MODELS
 from .services.quick import QUICK_UPDATE_FIELDS
 
 

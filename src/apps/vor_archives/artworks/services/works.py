@@ -10,7 +10,8 @@ from apps.vor_archives.models import (
     UserWork,
     WorkRelation,
 )
-from .constants import WORK_MODELS, WORK_TYPE_ICONS
+from apps.vor_archives.registry import get_work_model
+from .constants import WORK_TYPE_ICONS
 from .content_types import ct_for, ct_for_type
 from .progress import clamp_progress, clamp_progress_for_work
 from .queries import load_filtered_user_works, sort_user_works
@@ -49,13 +50,6 @@ def list_user_works(user, params):
         keys = collection_scope_keys(collection, include_descendants=True)
         items = [user_work for user_work in items if work_key(user_work) in keys]
     return sort_user_works(items, params)
-
-
-def get_work_model(type_key: str):
-    try:
-        return WORK_MODELS[type_key]
-    except KeyError:
-        raise ValueError(f"Unknown work type: {type_key}")
 
 
 def get_work(type_key: str, work_id: int):

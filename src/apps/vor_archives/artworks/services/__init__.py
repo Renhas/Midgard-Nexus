@@ -1,4 +1,3 @@
-from .constants import WORK_MODELS  ## TODO: Move up!
 from .progress import (
     ProgressMeta,
     clamp_progress,

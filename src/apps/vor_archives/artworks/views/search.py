@@ -5,8 +5,8 @@ from django.urls import reverse
 from django.views.decorators.http import require_GET
 
 from apps.vor_archives.constants import LOGIN_URL
+from apps.vor_archives.registry import WORK_MODELS
 from ..services import (
-    WORK_MODELS,
     search_library_works,
     search_works,
     user_owned_work_ids,
