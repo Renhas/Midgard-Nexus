@@ -4,16 +4,15 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.http import require_GET
 
-from apps.vor_archives.constants import LOGIN_URL
+from apps.vor_archives.registry import WORK_MODELS
 from ..services import (
-    WORK_MODELS,
     search_library_works,
     search_works,
     user_owned_work_ids,
 )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def artwork_library_search(request):
     result = search_library_works(request.user, request.GET.get("q") or "")
@@ -35,7 +34,7 @@ def artwork_library_search(request):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def artwork_search(request):
     type_key = request.GET.get("work_type") or request.GET.get("type") or "book"
@@ -65,7 +64,7 @@ def artwork_search(request):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def artwork_relation_search(request):
     results = search_works(

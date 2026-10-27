@@ -4,12 +4,13 @@ from django.urls import reverse
 
 from apps.vor_archives.constants import (
     AgeRatingChoices,
-    UserWorkStatusChoices,
-    STATUS_LABELS_RU,
+    RELATION_TYPE_OPTIONS,
+    age_rating_options,
+    status_choices,
+    status_options,
 )
-from .constants import RELATION_TYPE_OPTIONS
+from apps.vor_archives.progress import get_progress_info, work_progress
 from .services.catalog import attr_catalog, chip_payload
-from .services.progress import get_progress_info, work_progress
 from .services.works import work_relation_items, work_type_key
 
 
@@ -59,10 +60,7 @@ def build_overlay_context(
         "progress_meta": progress_meta,
         "hide_platforms": type_key != "game" or not owned,
         "owned_platform_ids": owned_platform_ids,
-        "status_choices": [
-            (value, STATUS_LABELS_RU.get(value, label))
-            for value, label in UserWorkStatusChoices.choices
-        ],
+        "status_choices": status_choices(),
         "age_rating_choices": AgeRatingChoices.choices,
         "work_relations": work_relation_items(work),
         "overlay_opts": {
@@ -74,10 +72,7 @@ def build_overlay_context(
             "workId": work.pk,
             "filmType": getattr(work, "film_type", None) or "movie",
             "status": user_work.status if owned else "planning",
-            "statusChoices": [
-                {"value": value, "label": STATUS_LABELS_RU.get(value, label)}
-                for value, label in UserWorkStatusChoices.choices
-            ],
+            "statusChoices": status_options(),
             "attachUrl": reverse("vor_archives:artworks:attach"),
             "rating": (user_work.rating or 0) if owned else 0,
             "isHidden": user_work.is_hidden if owned else False,
@@ -118,9 +113,6 @@ def build_overlay_context(
             "catalog": catalog,
             "relations": work_relation_items(work),
             "relationTypes": RELATION_TYPE_OPTIONS,
-            "ageChoices": [
-                {"value": value, "label": label}
-                for value, label in AgeRatingChoices.choices
-            ],
+            "ageChoices": age_rating_options(),
         },
     }

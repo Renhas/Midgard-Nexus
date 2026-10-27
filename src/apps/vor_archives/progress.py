@@ -1,4 +1,4 @@
-"""Work progress metadata and clamping services."""
+"""Work progress metadata and clamping helpers."""
 
 from decimal import Decimal
 from typing import NamedTuple

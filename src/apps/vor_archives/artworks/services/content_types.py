@@ -2,7 +2,7 @@
 
 from django.contrib.contenttypes.models import ContentType
 
-from .constants import WORK_MODELS
+from apps.vor_archives.registry import WORK_MODELS
 
 
 def ct_for(work):

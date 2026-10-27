@@ -4,7 +4,6 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET, require_POST
 
-from apps.vor_archives.constants import LOGIN_URL
 from apps.vor_archives.artworks.forms import AttachWorkForm, QuickUpdateForm
 from apps.vor_archives.models import UserWork
 from ..services import (
@@ -26,14 +25,14 @@ from .utils import (
 )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_POST
 def artwork_reorder(request):
     reorder_user_works(request.user, parse_ids(request))
     return JsonResponse({"ok": True})
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_POST
 def artwork_attach(request):
     form = AttachWorkForm(request.POST)
@@ -70,7 +69,7 @@ def _attach_already_response(request, work, type_key):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def artwork_delete_preview(request):
     ids = parse_ids(request)
@@ -92,7 +91,7 @@ def artwork_delete_preview(request):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def artwork_preview(request):
     type_key = request.GET.get("type") or request.GET.get("work_type") or "book"
@@ -115,7 +114,7 @@ def artwork_preview(request):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_POST
 def artwork_quick(request, uw_id):
     user_work = get_object_or_404(UserWork, pk=uw_id, user=request.user)

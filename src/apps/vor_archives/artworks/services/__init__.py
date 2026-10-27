@@ -1,12 +1,3 @@
-from .constants import WORK_MODELS  ## TODO: Move up!
-from .progress import (
-    ProgressMeta,
-    clamp_progress,
-    clamp_progress_for_work,
-    get_progress_info,
-    user_work_progress,
-    work_progress,
-)
 from .queries import (
     search_works,
     search_library_works,
@@ -37,6 +28,7 @@ from .collections import (
     get_user_collection,
     get_user_collection_trees,
     reorder_collection_items,
+    list_user_works_in_collection,
     add_user_work_to_collection,
     remove_user_work_from_collection,
     user_work_collection_ids,
@@ -45,3 +37,5 @@ from .quick import (
     PlatformNotRelated,
     quick_update,
 )
+
+from .utils import optional_int

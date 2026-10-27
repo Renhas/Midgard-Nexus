@@ -1,52 +1,20 @@
 from django import template
 
-from apps.vor_archives.artworks.services.progress import get_progress_info
+from apps.vor_archives.progress import get_progress_info
+from apps.vor_archives.constants import (
+    FEED_ACTION_ICONS,
+    FEED_ACTION_LABELS_RU,
+    STATUS_LABELS_RU,
+)
+from apps.vor_archives.registry import WORK_TYPE_ICONS, WORK_TYPE_LABELS
 
 register = template.Library()
-
-
-WORK_TYPE_ICONS = {
-    "book": "icon-book-text",
-    "film": "icon-clapperboard",
-    "game": "icon-gamepad-2",
-}
-
-WORK_TYPE_LABELS = {
-    "book": "Книга",
-    "film": "Фильм",
-    "game": "Игра",
-}
-
-STATUS_LABELS_RU = {
-    "planning": "Запланировано",
-    "in_progress": "В процессе",
-    "completed": "Завершено",
-    "dropped": "Брошено",
-}
 
 STATUS_ICONS = {
     "planning": "bi bi-clock-fill",
     "in_progress": "bi bi-play-circle-fill",
     "completed": "bi bi-check-circle-fill",
     "dropped": "bi bi-x-circle-fill",
-}
-
-FEED_ACTION_LABELS_RU = {
-    "added": "Добавлено",
-    "planning": "Запланировано",
-    "in_progress": "В процессе",
-    "completed": "Завершено",
-    "dropped": "Брошено",
-    "rated": "Оценка",
-}
-
-FEED_ACTION_ICONS = {
-    "added": "bi bi-plus-circle",
-    "planning": "bi bi-clock",
-    "in_progress": "bi bi-play-circle",
-    "completed": "bi bi-check-circle",
-    "dropped": "bi bi-x-circle",
-    "rated": "bi bi-star",
 }
 
 

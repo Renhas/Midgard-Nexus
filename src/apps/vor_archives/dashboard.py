@@ -7,24 +7,38 @@ from django.db.models.functions import TruncDate
 from django.urls import reverse
 from django.utils import timezone
 
-from .constants import AgeRatingChoices, FilmTypeChoices, UserWorkStatusChoices
-from .models import FeedItem, UserWork
-from .templatetags.vor_archives_extras import (
+from .constants import (
+    AgeRatingChoices,
     FEED_ACTION_ICONS,
     FEED_ACTION_LABELS_RU,
+    FilmTypeChoices,
     STATUS_LABELS_RU,
+    UserWorkStatusChoices,
 )
+from .registry import (
+    WORK_TYPE_ICONS,
+    WORK_TYPE_LABELS_PLURAL,
+    WORK_TYPE_UNITS,
+    WORK_TYPES,
+)
+from .prefetch import (
+    prefetch_user_works,
+    prefetch_work_relations,
+)
+from .models import FeedItem, UserWork
 
-WORK_TYPES = ("book", "film", "game")
 AGE_CHOICES_EXT = [("", "Не указан")] + list(AgeRatingChoices.choices)
 RATING_CHOICES_EXT = [("", "Без оценки")] + [
     (str(value), str(value)) for value in range(1, 11)
 ]
 
 TYPE_META = {
-    "book": {"label": "Книги", "icon": "icon-book-text", "unit": "стр."},
-    "film": {"label": "Фильмы", "icon": "icon-clapperboard", "unit": "ч."},
-    "game": {"label": "Игры", "icon": "icon-gamepad-2", "unit": "ч."},
+    key: {
+        "label": WORK_TYPE_LABELS_PLURAL[key],
+        "icon": WORK_TYPE_ICONS[key],
+        "unit": WORK_TYPE_UNITS[key],
+    }
+    for key in WORK_TYPES
 }
 
 MONTHS_RU = {
@@ -90,28 +104,10 @@ def progress_spent(user_work):
 
 def load_user_works(user, with_attrs=False):
     items = list(UserWork.objects.filter(user=user).select_related("work_content_type"))
-    prefetch_related_objects(items, "work")
+    prefetch_user_works(items)
     if with_attrs:
-        _prefetch_work_attrs(items)
+        prefetch_work_relations([uw.work for uw in items if uw.work], with_authors=True)
     return items
-
-
-def _prefetch_work_attrs(user_works):
-    by_type = {key: [] for key in WORK_TYPES}
-    for user_work in user_works:
-        work = user_work.work
-        if work is None:
-            continue
-        bucket = by_type.get(work._meta.model_name)
-        if bucket is not None:
-            bucket.append(work)
-    for type_key, works in by_type.items():
-        if not works:
-            continue
-        related = ["tags", "authors", "genres"]
-        if type_key == "game":
-            related.append("platforms")
-        prefetch_related_objects(works, *related)
 
 
 def _empty_status_matrix():

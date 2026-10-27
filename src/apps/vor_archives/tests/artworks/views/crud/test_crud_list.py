@@ -3,7 +3,7 @@
 import pytest
 from django.urls import reverse
 
-from apps.vor_archives.artworks.services.constants import WORK_MODELS
+from apps.vor_archives.registry import WORK_MODELS
 from apps.vor_archives.constants import (
     AgeRatingChoices,
     UserWorkStatusChoices,
@@ -76,7 +76,8 @@ def test_list_with_collection_id_uses_segments(client_logged_in, user, book):
     assert response.status_code == 200
     assert response.context["collection"] == collection
     assert len(response.context["direct"]) == 1
-    assert response.context["user_works"] == []
+    assert len(response.context["user_works"]) == 1
+    assert response.context["user_works"][0].work_object_id == book.pk
 
 
 def test_list_empty_without_age_rating_param(client_logged_in, user, book):

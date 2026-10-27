@@ -8,8 +8,9 @@ from django.utils import timezone
 from django.urls import reverse
 
 from apps.users.tests.factories import UserFactory
-from apps.vor_archives.constants import UserWorkStatusChoices, AgeRatingChoices
-from apps.vor_archives.templatetags.vor_archives_extras import (
+from apps.vor_archives.constants import (
+    UserWorkStatusChoices,
+    AgeRatingChoices,
     FEED_ACTION_ICONS,
     FEED_ACTION_LABELS_RU,
 )

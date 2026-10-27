@@ -8,26 +8,26 @@ from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from apps.vor_archives.constants import (
-    AgeRatingChoices,
-    UserWorkStatusChoices,
-    STATUS_LABELS_RU,
-    LOGIN_URL,
+    RELATION_TYPE_OPTIONS,
+    age_rating_options,
+    status_options,
 )
+from apps.vor_archives.registry import WORK_MODELS
 from apps.vor_archives.models import UserWork
 from apps.vor_archives.artworks.forms import RelationsForm, UserWorkEditForm
 from apps.vor_archives.artworks.presenters import build_overlay_context
 from apps.vor_archives.artworks.services import (
-    WORK_MODELS,
     delete_user_works,
     get_user_collection,
     get_user_work,
     get_work,
     list_collection_segments,
     list_user_works,
+    list_user_works_in_collection,
     save_work_with_relations,
 )
-from apps.vor_archives.artworks.services.catalog import all_attr_catalogs, prefetch_work
-from apps.vor_archives.artworks.constants import RELATION_TYPE_OPTIONS
+from apps.vor_archives.artworks.services.catalog import all_attr_catalogs
+from apps.vor_archives.prefetch import prefetch_work_with_user_work
 
 from .utils import (
     parse_ids,
@@ -39,7 +39,7 @@ from .utils import (
 )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def artwork_list(request):
     params = artwork_list_params(request)
@@ -51,7 +51,7 @@ def artwork_list(request):
         segments = list_collection_segments(request.user, collection, params)
         direct = segments["direct"]
         nested = segments["nested"]
-        user_works = []
+        user_works = list_user_works_in_collection(request.user, params)
     else:
         user_works = list_user_works(request.user, params)
     return render(
@@ -67,7 +67,7 @@ def artwork_list(request):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_http_methods(["GET", "POST"])
 def artwork_add(request):
     if request.method == "POST":
@@ -128,20 +128,14 @@ def artwork_add(request):
                 "relationSearchUrl": reverse("vor_archives:artworks:relation_search"),
                 "relationTypes": RELATION_TYPE_OPTIONS,
                 "catalogs": all_attr_catalogs(),
-                "ageChoices": [
-                    {"value": value, "label": label}
-                    for value, label in AgeRatingChoices.choices
-                ],
-                "statusChoices": [
-                    {"value": value, "label": STATUS_LABELS_RU.get(value, label)}
-                    for value, label in UserWorkStatusChoices.choices
-                ],
+                "ageChoices": age_rating_options(),
+                "statusChoices": status_options(),
             },
         },
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_http_methods(["GET", "POST"])
 def artwork_detail(request, uw_id):
     user_work = get_object_or_404(UserWork, pk=uw_id, user=request.user)
@@ -151,7 +145,7 @@ def artwork_detail(request, uw_id):
     return artwork_overlay_response(request, work, user_work)
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_http_methods(["GET", "POST"])
 def artwork_work(request, type_key, work_id):
     if type_key not in WORK_MODELS:
@@ -161,7 +155,7 @@ def artwork_work(request, type_key, work_id):
     return artwork_overlay_response(request, work, user_work)
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_POST
 def artwork_delete(request):
     ids = parse_ids(request)
@@ -170,7 +164,7 @@ def artwork_delete(request):
 
 
 def artwork_overlay_response(request, work, user_work=None):
-    type_key = prefetch_work(work, user_work)
+    type_key = prefetch_work_with_user_work(work, user_work)
     work_form_class = get_work_form_class(type_key)
 
     if request.method == "POST":
@@ -194,7 +188,7 @@ def artwork_overlay_response(request, work, user_work=None):
             except ValidationError as error:
                 work_form.add_error(None, error)
             else:
-                prefetch_work(saved, user_work)
+                prefetch_work_with_user_work(saved, user_work)
                 response = render(
                     request,
                     "vor_archives/partials/artwork_overlay.html",

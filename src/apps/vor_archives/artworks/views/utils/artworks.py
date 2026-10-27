@@ -3,7 +3,7 @@ import json
 from django.http import HttpResponse
 
 from apps.vor_archives.artworks.forms import WORK_FORMS, ArtworkListFilterForm
-from apps.vor_archives.artworks.services import work_progress
+from apps.vor_archives.progress import work_progress
 
 
 def progress_meta_for_work(work):

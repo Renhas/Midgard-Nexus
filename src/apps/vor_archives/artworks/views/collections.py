@@ -12,7 +12,6 @@ from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from apps.vor_archives.models import UserWork
-from apps.vor_archives.constants import LOGIN_URL
 from ..services import (
     add_user_work_to_collection,
     collection_tree_payload,
@@ -25,12 +24,12 @@ from ..services import (
     rename_collection,
     reorder_collection_items,
     user_work_collection_ids,
+    optional_int,
 )
+from .utils import parse_ids
 
-from .utils import optional_int, parse_ids
 
-
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def artwork_collections(request, uw_id):
     user_work = get_object_or_404(UserWork, user=request.user, pk=uw_id)
@@ -42,7 +41,7 @@ def artwork_collections(request, uw_id):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def collection_tree(request):
     return render(
@@ -54,7 +53,7 @@ def collection_tree(request):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_http_methods(["GET", "POST"])
 def collection_new(request):
     error = ""
@@ -81,7 +80,7 @@ def collection_new(request):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def collection_edit(request, pk):
     collection = get_user_collection(request.user, pk)
@@ -100,7 +99,7 @@ def collection_edit(request, pk):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_POST
 def collection_update(request, pk):
     name = (request.POST.get("name") or "").strip()
@@ -129,7 +128,7 @@ def collection_update(request, pk):
         )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def collection_delete_preview(request, pk):
     collection = get_user_collection(request.user, pk)
@@ -144,7 +143,7 @@ def collection_delete_preview(request, pk):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_POST
 def collection_delete(request, pk):
     delete_collection(request.user, pk)
@@ -155,7 +154,7 @@ def collection_delete(request, pk):
     return response
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_POST
 def collection_reorder(request):
     collection_id = optional_int(request.POST.get("id"))
@@ -177,7 +176,7 @@ def collection_reorder(request):
     return JsonResponse({"ok": True})
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_POST
 def collection_items(request, pk):
     collection = get_user_collection(request.user, pk)
@@ -209,7 +208,7 @@ def collection_items(request, pk):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_POST
 def collection_items_reorder(request, pk):
     collection = get_user_collection(request.user, pk)
