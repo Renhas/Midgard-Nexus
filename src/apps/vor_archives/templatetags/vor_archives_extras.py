@@ -5,6 +5,8 @@ from apps.vor_archives.constants import (
     WORK_TYPE_ICONS,
     WORK_TYPE_LABELS,
     STATUS_LABELS_RU,
+    FEED_ACTION_ICONS,
+    FEED_ACTION_LABELS_RU,
 )
 
 register = template.Library()
@@ -14,24 +16,6 @@ STATUS_ICONS = {
     "in_progress": "bi bi-play-circle-fill",
     "completed": "bi bi-check-circle-fill",
     "dropped": "bi bi-x-circle-fill",
-}
-
-FEED_ACTION_LABELS_RU = {
-    "added": "Добавлено",
-    "planning": "Запланировано",
-    "in_progress": "В процессе",
-    "completed": "Завершено",
-    "dropped": "Брошено",
-    "rated": "Оценка",
-}
-
-FEED_ACTION_ICONS = {
-    "added": "bi bi-plus-circle",
-    "planning": "bi bi-clock",
-    "in_progress": "bi bi-play-circle",
-    "completed": "bi bi-check-circle",
-    "dropped": "bi bi-x-circle",
-    "rated": "bi bi-star",
 }
 
 

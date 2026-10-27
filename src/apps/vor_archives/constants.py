@@ -88,5 +88,22 @@ RELATION_TYPE_OPTIONS = [
     for rel_type, labels in RELATION_LABELS.items()
 ]
 
+FEED_ACTION_LABELS_RU = {
+    "added": "Добавлено",
+    "planning": "Запланировано",
+    "in_progress": "В процессе",
+    "completed": "Завершено",
+    "dropped": "Брошено",
+    "rated": "Оценка",
+}
+
+FEED_ACTION_ICONS = {
+    "added": "bi bi-plus-circle",
+    "planning": "bi bi-clock",
+    "in_progress": "bi bi-play-circle",
+    "completed": "bi bi-check-circle",
+    "dropped": "bi bi-x-circle",
+    "rated": "bi bi-star",
+}
 
 LOGIN_URL = "users:login"
