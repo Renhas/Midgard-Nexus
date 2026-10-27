@@ -23,6 +23,7 @@ from apps.vor_archives.artworks.services import (
     get_work,
     list_collection_segments,
     list_user_works,
+    list_user_works_in_collection,
     save_work_with_relations,
 )
 from apps.vor_archives.artworks.services.catalog import all_attr_catalogs
@@ -50,7 +51,7 @@ def artwork_list(request):
         segments = list_collection_segments(request.user, collection, params)
         direct = segments["direct"]
         nested = segments["nested"]
-        user_works = []
+        user_works = list_user_works_in_collection(request.user, params)
     else:
         user_works = list_user_works(request.user, params)
     return render(

@@ -156,6 +156,42 @@ def list_collection_segments(user, collection, params):
     }
 
 
+def collection_scope_keys(collection, include_descendants=True):
+    """Return the set of ``work_key`` tuples linked to a collection.
+
+    When ``include_descendants`` is True, items from the collection's
+    descendants are included as well.
+    """
+    qs = CollectionItem.objects.filter(collection=collection)
+    if include_descendants:
+        descendant_ids = collection.get_descendants().values_list("pk", flat=True)
+        qs = CollectionItem.objects.filter(
+            collection_id__in=[collection.pk, *descendant_ids]
+        )
+    return {work_key(item) for item in qs}
+
+
+def list_user_works_in_collection(user, params):
+    """Return UserWork entries from the given collection (with descendants).
+
+    Returns an empty list when ``collection_id`` is missing or does not
+    resolve to a collection owned by the user.
+    """
+    collection_id = params.get("collection_id")
+    if not collection_id:
+        return []
+    collection = Collection.objects.filter(user=user, pk=collection_id).first()
+    if collection is None:
+        return []
+    keys = collection_scope_keys(collection, include_descendants=True)
+    items = [
+        user_work
+        for user_work in load_filtered_user_works(user, params)
+        if work_key(user_work) in keys
+    ]
+    return sort_user_works(items, params)
+
+
 def add_user_work_to_collection(user, collection, user_work):
     if user_work.user_id != user.id or collection.user_id != user.id:
         raise ValidationError("Нельзя изменить чужую коллекцию.")

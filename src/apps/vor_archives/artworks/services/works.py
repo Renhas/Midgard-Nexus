@@ -4,8 +4,6 @@ from django.shortcuts import get_object_or_404
 
 from apps.vor_archives.constants import RELATION_LABELS, WorkRelationTypeChoices
 from apps.vor_archives.models import (
-    Collection,
-    CollectionItem,
     FeedItem,
     UserWork,
     WorkRelation,
@@ -14,7 +12,7 @@ from apps.vor_archives.registry import WORK_TYPE_ICONS, get_work_model
 from .content_types import ct_for, ct_for_type
 from .progress import clamp_progress, clamp_progress_for_work
 from .queries import load_filtered_user_works, sort_user_works
-from .utils import work_key, relation_cover_url
+from .utils import relation_cover_url
 
 
 class AlreadyAttached(Exception):
@@ -25,27 +23,9 @@ class AlreadyAttached(Exception):
         super().__init__("already")
 
 
-## TODO: Move to collections.py once refactor list_user_works
-def collection_scope_keys(collection, include_descendants=True):
-    qs = CollectionItem.objects.filter(collection=collection)
-    if include_descendants:
-        descendant_ids = collection.get_descendants().values_list("pk", flat=True)
-        qs = CollectionItem.objects.filter(
-            collection_id__in=[collection.pk, *descendant_ids]
-        )
-    return {work_key(item) for item in qs}
-
-
-## TODO: Separate to two functions
 def list_user_works(user, params):
+    """Return UserWork entries matching filter params for the artwork list."""
     items = load_filtered_user_works(user, params)
-    collection_id = params.get("collection_id")
-    if collection_id:
-        collection = Collection.objects.filter(user=user, pk=collection_id).first()
-        if collection is None:
-            return []
-        keys = collection_scope_keys(collection, include_descendants=True)
-        items = [user_work for user_work in items if work_key(user_work) in keys]
     return sort_user_works(items, params)
 
 
