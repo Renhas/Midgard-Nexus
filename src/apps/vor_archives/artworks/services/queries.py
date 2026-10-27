@@ -1,10 +1,10 @@
 from django.db.models import prefetch_related_objects
 
 from apps.vor_archives.registry import WORK_MODELS
-from .constants import STATUS_SORT_ORDER, WORK_TYPE_ICONS
+from .constants import STATUS_SORT_ORDER
 from .content_types import ct_for_type
 from .utils import relation_cover_url, is_partial, item_ids
-from apps.vor_archives.constants import UserWorkStatusChoices
+from apps.vor_archives.constants import UserWorkStatusChoices, WORK_TYPE_ICONS
 from apps.vor_archives.models import UserWork
 
 

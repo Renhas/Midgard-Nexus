@@ -43,6 +43,13 @@ class FeedItemActionTypeChoices(models.TextChoices):
 
 WORK_TYPES = ("book", "film", "game")
 
+WORK_TYPE_ICONS = {
+    "book": "icon-book-text",
+    "film": "icon-clapperboard",
+    "game": "icon-gamepad-2",
+}
+
+
 STATUS_LABELS_RU = {
     UserWorkStatusChoices.PLANNING: "Запланировано",
     UserWorkStatusChoices.IN_PROGRESS: "В процессе",

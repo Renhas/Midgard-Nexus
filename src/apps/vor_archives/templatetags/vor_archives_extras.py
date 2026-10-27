@@ -1,15 +1,10 @@
 from django import template
 
 from apps.vor_archives.artworks.services.progress import get_progress_info
+from apps.vor_archives.constants import WORK_TYPE_ICONS
 
 register = template.Library()
 
-
-WORK_TYPE_ICONS = {
-    "book": "icon-book-text",
-    "film": "icon-clapperboard",
-    "game": "icon-gamepad-2",
-}
 
 WORK_TYPE_LABELS = {
     "book": "Книга",

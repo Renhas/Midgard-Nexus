@@ -12,6 +12,7 @@ from .constants import (
     FilmTypeChoices,
     UserWorkStatusChoices,
     WORK_TYPES,
+    WORK_TYPE_ICONS,
 )
 from .models import FeedItem, UserWork
 from .templatetags.vor_archives_extras import (
@@ -26,9 +27,9 @@ RATING_CHOICES_EXT = [("", "Без оценки")] + [
 ]
 
 TYPE_META = {
-    "book": {"label": "Книги", "icon": "icon-book-text", "unit": "стр."},
-    "film": {"label": "Фильмы", "icon": "icon-clapperboard", "unit": "ч."},
-    "game": {"label": "Игры", "icon": "icon-gamepad-2", "unit": "ч."},
+    "book": {"label": "Книги", "icon": WORK_TYPE_ICONS["book"], "unit": "стр."},
+    "film": {"label": "Фильмы", "icon": WORK_TYPE_ICONS["film"], "unit": "ч."},
+    "game": {"label": "Игры", "icon": WORK_TYPE_ICONS["game"], "unit": "ч."},
 }
 
 MONTHS_RU = {

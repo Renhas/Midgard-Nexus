@@ -6,9 +6,3 @@ STATUS_SORT_ORDER = {
     UserWorkStatusChoices.COMPLETED: 2,
     UserWorkStatusChoices.DROPPED: 3,
 }
-
-WORK_TYPE_ICONS = {
-    "book": "icon-book-text",
-    "film": "icon-clapperboard",
-    "game": "icon-gamepad-2",
-}
