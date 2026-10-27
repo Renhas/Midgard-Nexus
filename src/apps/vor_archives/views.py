@@ -115,8 +115,8 @@ def index(request):
                 "collectionNewUrl": reverse("vor_archives:collections:new"),
                 "isStaff": request.user.is_staff,
                 "filterCatalog": {
-                    "status": [item["value"] for item in status_options],
-                    "age_rating": [item["value"] for item in age_rating_options],
+                    "status": [item["value"] for item in status_options()],
+                    "age_rating": [item["value"] for item in age_rating_options()],
                     "tags": [item["value"] for item in tags_options],
                     "genre_book": genre_catalog.get("genre_book", []),
                     "genre_film": genre_catalog.get("genre_film", []),
