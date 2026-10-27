@@ -11,7 +11,6 @@ from apps.vor_archives.constants import (
     AgeRatingChoices,
     UserWorkStatusChoices,
     STATUS_LABELS_RU,
-    LOGIN_URL,
     RELATION_TYPE_OPTIONS,
 )
 from apps.vor_archives.registry import WORK_MODELS
@@ -39,7 +38,7 @@ from .utils import (
 )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def artwork_list(request):
     params = artwork_list_params(request)
@@ -67,7 +66,7 @@ def artwork_list(request):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_http_methods(["GET", "POST"])
 def artwork_add(request):
     if request.method == "POST":
@@ -141,7 +140,7 @@ def artwork_add(request):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_http_methods(["GET", "POST"])
 def artwork_detail(request, uw_id):
     user_work = get_object_or_404(UserWork, pk=uw_id, user=request.user)
@@ -151,7 +150,7 @@ def artwork_detail(request, uw_id):
     return artwork_overlay_response(request, work, user_work)
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_http_methods(["GET", "POST"])
 def artwork_work(request, type_key, work_id):
     if type_key not in WORK_MODELS:
@@ -161,7 +160,7 @@ def artwork_work(request, type_key, work_id):
     return artwork_overlay_response(request, work, user_work)
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_POST
 def artwork_delete(request):
     ids = parse_ids(request)

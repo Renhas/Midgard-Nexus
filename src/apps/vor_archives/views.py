@@ -16,7 +16,6 @@ from .constants import (
     AgeRatingChoices,
     UserWorkStatusChoices,
     STATUS_LABELS_RU,
-    LOGIN_URL,
 )
 from .dashboard import (
     attrs_payload,
@@ -60,7 +59,7 @@ def _module_context():
     return next(m for m in settings.MODULES if m["url_name"] == "vor_archives")
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 def index(request):
     """Главная страница модуля «Библиотека» — страница произведений."""
     module = _module_context()
@@ -140,7 +139,7 @@ def index(request):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 def dashboard(request):
     """Страница дашборда — редирект на вкладку статистики."""
     return redirect("vor_archives:dashboard_tab", tab=DEFAULT_DASH_TAB)
@@ -166,7 +165,7 @@ def _dashboard_shell(request, tab_kind, extra=None):
     return render(request, "vor_archives/dashboard.html", context)
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 def dashboard_tab(request, tab):
     """Оболочка дашборда для выбранной вкладки."""
     if get_dash_tab(tab) is None:
@@ -192,7 +191,7 @@ def dashboard_tab(request, tab):
     return _dashboard_shell(request, tab, extra)
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def dashboard_feed(request):
     try:
@@ -211,7 +210,7 @@ def dashboard_feed(request):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def dashboard_heatmap(request):
     year = parse_heatmap_year(request.GET.get("year"))
@@ -222,13 +221,13 @@ def dashboard_heatmap(request):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 def attributes(request):
     """Страница атрибутов — редирект на первую готовую вкладку."""
     return redirect("vor_archives:attributes_kind", kind=DEFAULT_KIND)
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 def attributes_kind(request, kind):
     """Оболочка страницы атрибутов для выбранной вкладки."""
     tab = get_attr_tab(kind)
@@ -413,7 +412,7 @@ def _attr_mutation_response(
     return response
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def attr_list(request, kind):
     return render(
@@ -423,7 +422,7 @@ def attr_list(request, kind):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def attr_empty(request, kind):
     return render(
@@ -431,7 +430,7 @@ def attr_empty(request, kind):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def attr_detail(request, kind, pk):
     if kind == "genres":
@@ -448,7 +447,7 @@ def attr_detail(request, kind, pk):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def genre_detail(request, type_key, pk):
     if genre_type_meta(type_key) is None:
@@ -463,7 +462,7 @@ def genre_detail(request, type_key, pk):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_http_methods(["GET", "POST"])
 def attr_new(request, kind):
     forbidden = _require_staff(request)
@@ -520,7 +519,7 @@ def attr_new(request, kind):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_http_methods(["GET", "POST"])
 def attr_edit(request, kind, pk):
     forbidden = _require_staff(request)
@@ -554,7 +553,7 @@ def attr_edit(request, kind, pk):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_http_methods(["GET", "POST"])
 def genre_edit(request, type_key, pk):
     forbidden = _require_staff(request)
@@ -631,7 +630,7 @@ def _simple_delete_items(kind, pks):
     return items
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_GET
 def attr_delete_preview(request, kind):
     forbidden = _require_staff(request)
@@ -663,7 +662,7 @@ def attr_delete_preview(request, kind):
     )
 
 
-@login_required(login_url=LOGIN_URL)
+@login_required
 @require_POST
 def attr_delete(request, kind):
     forbidden = _require_staff(request)

@@ -105,5 +105,3 @@ FEED_ACTION_ICONS = {
     "dropped": "bi bi-x-circle",
     "rated": "bi bi-star",
 }
-
-LOGIN_URL = "users:login"

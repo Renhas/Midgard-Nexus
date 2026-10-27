@@ -158,7 +158,7 @@ AUTH_USER_MODEL = "users.User"
 
 # Application modules
 # Authentication settings
-LOGIN_URL = "login"
+LOGIN_URL = "users:login"
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
 
