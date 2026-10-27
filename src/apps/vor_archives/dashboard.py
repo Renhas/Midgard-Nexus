@@ -7,7 +7,12 @@ from django.db.models.functions import TruncDate
 from django.urls import reverse
 from django.utils import timezone
 
-from .constants import AgeRatingChoices, FilmTypeChoices, UserWorkStatusChoices
+from .constants import (
+    AgeRatingChoices,
+    FilmTypeChoices,
+    UserWorkStatusChoices,
+    WORK_TYPES,
+)
 from .models import FeedItem, UserWork
 from .templatetags.vor_archives_extras import (
     FEED_ACTION_ICONS,
@@ -15,7 +20,6 @@ from .templatetags.vor_archives_extras import (
     STATUS_LABELS_RU,
 )
 
-WORK_TYPES = ("book", "film", "game")
 AGE_CHOICES_EXT = [("", "Не указан")] + list(AgeRatingChoices.choices)
 RATING_CHOICES_EXT = [("", "Без оценки")] + [
     (str(value), str(value)) for value in range(1, 11)

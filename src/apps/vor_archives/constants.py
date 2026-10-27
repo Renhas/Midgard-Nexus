@@ -41,6 +41,8 @@ class FeedItemActionTypeChoices(models.TextChoices):
     RATED = ("rated", "Rated")
 
 
+WORK_TYPES = ("book", "film", "game")
+
 STATUS_LABELS_RU = {
     UserWorkStatusChoices.PLANNING: "Запланировано",
     UserWorkStatusChoices.IN_PROGRESS: "В процессе",

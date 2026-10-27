@@ -10,6 +10,7 @@ from apps.vor_archives.models import (
     Platform,
     Tag,
 )
+from apps.vor_archives.constants import WORK_TYPES
 
 
 def prefetch_work(work, user_work=None):
@@ -48,4 +49,4 @@ def attr_catalog(type_key):
 
 
 def all_attr_catalogs():
-    return {key: attr_catalog(key) for key in ["book", "film", "game"]}
+    return {key: attr_catalog(key) for key in WORK_TYPES}
