@@ -354,24 +354,7 @@
 
             {% if owned %}
             <div class="vor-view-cover-controls">
-                <div class="vor-status-dropdown" @click.outside="statusOpen = false">
-                    <button type="button"
-                            class="sidebar-select vor-status-select"
-                            :class="'status-' + status"
-                            @click="statusOpen = !statusOpen">
-                        <span x-text="statusLabel()"></span>
-                    </button>
-                    <div class="vor-status-menu" x-show="statusOpen" x-cloak>
-                        {% for value, label in status_choices %}
-                            <button type="button"
-                                    class="vor-status-option status-{{ value }}"
-                                    :class="{ 'is-current': status === '{{ value }}' }"
-                                    @click="setStatus('{{ value }}')">
-                                {{ label }}
-                            </button>
-                        {% endfor %}
-                    </div>
-                </div>
+                {% include "vor_archives/partials/artworks/widgets/artwork_status_dropdown.html" %}
                 <div class="vor-progress-row">
                     <span class="vor-field-label">Прогресс:</span>
                     <div class="vor-progress"
