@@ -63,13 +63,7 @@
                     <div class="vor-add-info-fields">
                     <div class="vor-add-field">
                         <span class="vor-field-label">Релиз</span>
-                        <div class="vor-date-wrap" @click.outside="closeDatePopup()">
-                            <button type="button" class="vor-date-trigger" @click="toggleDateOpen()">
-                                <span x-text="releaseDate ? formatDate(releaseDate) : 'Выбрать'"></span>
-                                <i class="bi bi-calendar3"></i>
-                            </button>
-                            {% include "vor_archives/partials/common/date_picker.html" %}
-                        </div>
+                        {% include "vor_archives/partials/artworks/widgets/artwork_date_picker.html" with is_add=True %}
                     </div>
                     <div class="vor-add-field">
                         <span class="vor-field-label">Возраст</span>

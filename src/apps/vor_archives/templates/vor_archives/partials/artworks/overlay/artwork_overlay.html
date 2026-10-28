@@ -120,14 +120,7 @@
                         <span class="vor-field-value" x-show="!editing && releaseDate" x-text="formatDate(releaseDate)">
                             {% if work.release_date %}{{ work.release_date|date:'d.m.Y' }}{% endif %}
                         </span>
-                        <div class="vor-date-wrap" x-show="editing" x-cloak @click.outside="closeDatePopup()">
-                            <button type="button" class="vor-date-trigger" @click="toggleDateOpen()">
-                                <span x-text="releaseDate ? formatDate(releaseDate) : 'Выбрать'"></span>
-                                <i class="bi bi-calendar3"></i>
-                            </button>
-                            {% include "vor_archives/partials/common/date_picker.html" %}
-                        </div>
-                        <input type="hidden" name="release_date" :value="releaseDate">
+                        {% include "vor_archives/partials/artworks/widgets/artwork_date_picker.html" with is_add=False %}
                         <div class="vor-link-wrap" x-show="editing || externalLink" @click.outside="linkOpen = false">
                             <button type="button"
                                     class="vor-view-link"
