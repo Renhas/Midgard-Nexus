@@ -249,12 +249,7 @@
 
     <div class="vor-modal-backdrop vor-leave-confirm" x-show="attachOpen" x-cloak>
         <div class="vor-modal" @click.stop>
-            <h3 class="vor-modal-title">Добавить в список</h3>
-            {% include "vor_archives/partials/artworks/attach/attach_user_fields.html" %}
-            <div class="vor-modal-actions vor-modal-actions-center">
-                <button type="button" class="sidebar-btn" @click="attachOpen = false">Назад</button>
-                <button type="button" class="sidebar-btn sidebar-btn-add" :disabled="saving" @click="saveAttach()">Сохранить</button>
-            </div>
+            {% include "vor_archives/partials/artworks/attach/artwork_attach_body.html" with on_back="attachOpen = false" %}
         </div>
     </div>
 
