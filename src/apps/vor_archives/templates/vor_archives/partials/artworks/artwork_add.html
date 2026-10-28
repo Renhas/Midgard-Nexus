@@ -145,10 +145,10 @@
                 <div class="vor-add-side">
                 <section class="vor-overlay-section vor-add-attrs">
                     <h3>Атрибуты</h3>
-                    {% include "vor_archives/partials/attributes/attr_accordion.html" with title="Авторы" kind="authors" %}
-                    {% include "vor_archives/partials/attributes/attr_accordion.html" with title="Жанры" kind="genres" %}
-                    {% include "vor_archives/partials/attributes/attr_accordion.html" with title="Теги" kind="tags" %}
-                    {% include "vor_archives/partials/attributes/attr_accordion.html" with title="Платформы" kind="platforms" show="workType === 'game'" %}
+                    {% include "vor_archives/partials/artworks/widgets/artwork_attr_accordion.html" with title="Авторы" kind="authors" %}
+                    {% include "vor_archives/partials/artworks/widgets/artwork_attr_accordion.html" with title="Жанры" kind="genres" %}
+                    {% include "vor_archives/partials/artworks/widgets/artwork_attr_accordion.html" with title="Теги" kind="tags" %}
+                    {% include "vor_archives/partials/artworks/widgets/artwork_attr_accordion.html" with title="Платформы" kind="platforms" show="workType === 'game'" %}
                 </section>
 
                 {% include "vor_archives/partials/artworks/widgets/relations_panel.html" with is_add=True allow_click_related=False %}
