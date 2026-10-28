@@ -1,0 +1,10 @@
+<label class="vor-switch sidebar-hidden-switch">
+    <input type="checkbox"
+           class="vor-switch-input"
+           x-model="$store.vorArtworks.showHidden"
+           @change="$store.vorArtworks.setShowHidden($store.vorArtworks.showHidden)">
+    <span class="vor-switch-track" aria-hidden="true">
+        <span class="vor-switch-thumb"></span>
+    </span>
+    <span>Показывать скрытое</span>
+</label>

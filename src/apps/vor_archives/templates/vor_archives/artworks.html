@@ -133,50 +133,9 @@
      x-init="$store.vorArtworks.initFromPage(JSON.parse(document.getElementById('vor-artworks-opts').textContent))">
     {# ========== ПРАВАЯ ПАНЕЛЬ — ТИПЫ ============ #}
     {% include "vor_archives/partials/artworks/sidebar/artwork_sidebar_work_types.html" %}
-    <label class="vor-switch sidebar-hidden-switch">
-        <input type="checkbox"
-               class="vor-switch-input"
-               x-model="$store.vorArtworks.showHidden"
-               @change="$store.vorArtworks.setShowHidden($store.vorArtworks.showHidden)">
-        <span class="vor-switch-track" aria-hidden="true">
-            <span class="vor-switch-thumb"></span>
-        </span>
-        <span>Показывать скрытое</span>
-    </label>
+    {% include "vor_archives/partials/artworks/sidebar/artwork_sidebar_hidden_switch.html" %}
     <hr class="sidebar-divider">
-    {# ========== ПРАВАЯ ПАНЕЛЬ — ОТОБРАЖЕНИЕ ============ #}
-    <div class="sidebar-nav-row">
-        <button type="button"
-            class="sidebar-btn sidebar-btn-display"
-            :class="{ 'active': $store.vorArtworks.viewMode === 'list' }"
-            @click="$store.vorArtworks.setViewMode('list')"
-            title="Список">
-            <i class="bi bi-list-ul"></i>
-        </button>
-        <button type="button"
-            class="sidebar-btn sidebar-btn-display"
-            :class="{ 'active': $store.vorArtworks.viewMode === 'grid' }"
-            @click="$store.vorArtworks.setViewMode('grid')"
-            title="Плитки">
-            <i class="bi bi-grid"></i>
-        </button>
-    </div>
-    {# ========== ПРАВАЯ ПАНЕЛЬ — СОРТИРОВКА ============ #}
-    <div class="sidebar-nav-row">
-        <button type="button"
-            class="sidebar-btn sidebar-btn-icon"
-            @click="$store.vorArtworks.toggleSortDir()"
-            title="Изменить направление">
-            <i class="bi" :class="$store.vorArtworks.sortAsc ? 'bi-sort-down-alt' : 'bi-sort-up-alt'"></i>
-        </button>
-        <select class="sidebar-select"
-                :value="$store.vorArtworks.sortField"
-                @change="$store.vorArtworks.setSortField($event.target.value)">
-            {% for field in sort_fields %}
-            <option value="{{ field.value }}">{{ field.label }}</option>
-            {% endfor %}
-        </select>
-    </div>
+    {% include "vor_archives/partials/artworks/sidebar/artwork_sidebar_view_sort.html" %}
     <hr class="sidebar-divider">
     {# ========== ПРАВАЯ ПАНЕЛЬ — ФИЛЬТРЫ ========= #}
     <div class="sidebar-filters">
