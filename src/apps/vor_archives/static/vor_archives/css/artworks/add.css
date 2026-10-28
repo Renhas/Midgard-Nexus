@@ -1,0 +1,489 @@
+/* ============================================
+    VOR Archives — Artwork add
+    ============================================ */
+
+/* --- Search suggestions --- */
+.vor-add-search {
+    position: relative;
+    z-index: 8;
+    flex-shrink: 0;
+    margin-bottom: 1rem;
+}
+
+.vor-add-search .vor-view-title {
+    margin-bottom: 0;
+}
+
+.vor-add-title-wrap {
+    position: relative;
+}
+
+.vor-add-title-wrap .vor-req-star {
+    position: absolute;
+    right: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.35rem;
+    pointer-events: none;
+}
+
+.vor-inline-title.is-invalid,
+.vor-inline-title.is-invalid:focus,
+.vor-inline-number.is-invalid,
+.vor-inline-number.is-invalid:focus {
+    border-color: var(--error);
+    box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.25);
+}
+
+.vor-suggestions {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: 9;
+}
+
+.vor-suggestions-list {
+    list-style: none;
+    margin: 0.25rem 0 0;
+    padding: 0.25rem;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.375rem;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.vor-add-warning {
+    margin-top: 0.4rem;
+    color: var(--error);
+    font-size: 0.8125rem;
+}
+
+.vor-suggestion-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.6rem;
+    border: 0;
+    background: transparent;
+    color: var(--text-primary);
+    text-align: left;
+    border-radius: 0.25rem;
+}
+
+.vor-suggestion-item:hover {
+    background-color: rgba(167, 145, 255, 0.12);
+}
+
+.vor-suggestion-title {
+    flex: 1;
+}
+
+.vor-suggestion-year {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.vor-add-error {
+    position: absolute;
+    z-index: 12;
+    left: 0;
+    top: calc(100% + 6px);
+    padding: 0.45rem 0.8rem;
+    border-radius: 0.375rem;
+    background-color: rgba(239, 68, 68, 0.18);
+    border: 1px solid var(--error);
+    color: var(--error);
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.35;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 0.4rem 0.9rem rgba(0, 0, 0, 0.28);
+}
+
+.vor-add-title-wrap .vor-add-error {
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.vor-add-error.is-under-center {
+    top: calc(100% + 8px);
+    white-space: normal;
+    max-width: calc(100% - 2rem);
+}
+
+.vor-req-star {
+    color: var(--error);
+    margin-left: 0.2rem;
+    font-weight: 700;
+}
+
+/* --- Preview card --- */
+.vor-preview-card {
+    display: flex;
+    gap: 1rem;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.vor-preview-cover {
+    width: 96px;
+    height: 128px;
+    object-fit: cover;
+    border-radius: 0.375rem;
+    flex-shrink: 0;
+}
+
+.vor-preview-cover-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-input);
+    color: var(--text-secondary);
+    font-size: 1.75rem;
+}
+
+.vor-preview-title {
+    font-size: 1.15rem;
+    margin-bottom: 0.25rem;
+}
+
+.vor-preview-meta,
+.vor-preview-desc {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.vor-preview-already {
+    margin-top: 0.75rem;
+    color: var(--accent-vor);
+}
+
+.vor-attach-form {
+    margin-top: 0.85rem;
+}
+
+/* --- Layout shell --- */
+.vor-overlay.is-add .vor-overlay-bar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: start;
+    justify-content: initial;
+}
+
+.vor-overlay.is-add .vor-overlay-bar > .sidebar-btn:first-child {
+    justify-self: start;
+}
+
+.vor-add-bar-spacer {
+    min-width: 0;
+}
+
+.vor-add-types {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.vor-add-type-btn {
+    width: 4rem;
+    height: 4rem;
+    padding: 0;
+    font-size: 1.75rem;
+}
+
+.vor-add-type-btn i {
+    font-size: 1.75rem;
+    line-height: 1;
+}
+
+.vor-overlay.is-add {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    padding-bottom: 0.85rem;
+}
+
+.vor-overlay.is-add .vor-overlay-bar {
+    flex-shrink: 0;
+}
+
+.vor-overlay.is-add .vor-overlay-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.vor-create-form {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.vor-add-hero {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr) 330px;
+    grid-template-rows: minmax(0, 1fr);
+    column-gap: 1.5rem;
+    align-items: stretch;
+}
+
+.vor-add-hero .vor-cover-wrap {
+    align-self: start;
+}
+
+/* --- Columns --- */
+.vor-add-info {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+    overflow: visible;
+    position: relative;
+    z-index: 3;
+}
+
+.vor-add-info > h3 {
+    flex-shrink: 0;
+}
+
+.vor-add-info-fields {
+    flex: 0 0 auto;
+}
+
+.vor-add-desc {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.vor-add-desc .vor-inline-desc {
+    flex: 1 1 auto;
+    min-height: 3.5rem;
+    height: auto;
+    max-height: 100%;
+    resize: none;
+    overflow-y: auto;
+}
+
+.vor-add-info,
+.vor-add-attrs,
+.vor-add-relations,
+.vor-add-side {
+    margin-bottom: 0;
+    min-width: 0;
+}
+
+.vor-add-side {
+    grid-column: 3;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 0;
+    height: 100%;
+}
+
+.vor-add-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.85rem;
+}
+
+.vor-add-section-head h3 {
+    margin-bottom: 0;
+}
+
+.vor-add-section-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.vor-add-attrs {
+    flex: 0 0 auto;
+}
+
+.vor-add-relations {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 8rem;
+    max-height: none;
+    overflow: hidden;
+}
+
+.vor-add-relations .vor-relations-list,
+.vor-add-relations .vor-relation-add {
+    flex: 1;
+    min-height: 0;
+}
+
+.vor-add-attrs .sidebar-accordion + .sidebar-accordion {
+    margin-top: 0.45rem;
+}
+
+.vor-add-attrs .sidebar-accordion-body {
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+/* --- Fields --- */
+.vor-add-field {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.7rem;
+}
+
+.vor-add-field-control {
+    position: relative;
+}
+
+.vor-add-field .vor-field-label {
+    flex: 0 0 7.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.vor-add-field .vor-status-dropdown,
+.vor-add-field .vor-date-wrap,
+.vor-add-link,
+.vor-add-select {
+    flex: 1;
+    min-width: 0;
+}
+
+.vor-add-link {
+    width: 100%;
+}
+
+.vor-add-subtitle {
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.95rem;
+    margin-top: 0.35rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.vor-add-info .vor-view-desc {
+    grid-column: auto;
+    grid-row: auto;
+}
+
+.vor-add-footer {
+    display: flex;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 0.75rem;
+}
+
+.vor-add-save {
+    min-width: min(32rem, 90%);
+    min-height: 3.5rem;
+    padding: 0.7rem 3.2rem;
+    font-size: 1.25rem;
+}
+
+.vor-add-save i {
+    font-size: 1.4rem;
+}
+
+.vor-add-to-list {
+    width: 100%;
+}
+
+.vor-add-attach-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.vor-add-attach-fields .vor-add-field {
+    margin-bottom: 0;
+}
+
+.vor-add-attach-fields .vor-status-dropdown {
+    width: 100%;
+}
+
+/* --- Responsive --- */
+@media (max-width: 900px) {
+    #vor-overlay:has(.is-add) {
+        overflow: auto;
+    }
+
+    .vor-overlay.is-add {
+        height: auto;
+        min-height: 100%;
+        overflow: visible;
+    }
+
+    .vor-overlay.is-add .vor-overlay-bar {
+        grid-template-columns: 1fr;
+        justify-items: start;
+    }
+
+    .vor-add-types {
+        justify-self: center;
+    }
+
+    .vor-add-bar-spacer {
+        display: none;
+    }
+
+    .vor-add-hero {
+        flex: none;
+        height: auto;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+
+    .vor-add-info,
+    .vor-add-side {
+        grid-column: 1;
+        grid-row: auto;
+        height: auto;
+    }
+
+    .vor-add-hero .vor-cover-wrap,
+    .vor-add-hero .vor-view-cover {
+        width: 260px;
+        height: 390px;
+    }
+
+    .vor-add-desc .vor-inline-desc {
+        min-height: 8rem;
+    }
+}
+
+@media (max-width: 1100px) {
+    .vor-add-hero {
+        grid-template-columns: 260px minmax(0, 1fr);
+        grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .vor-add-side {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+}

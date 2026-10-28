@@ -1,6 +1,16 @@
 {% extends "vor_archives/base_vor.html" %}
+{% load static %}
 
 {% block title %}{{ block.super }} - Произведения{% endblock %}
+
+{% block extra_head %}
+    {{ block.super }}
+    {# Page-specific: list, add form, context menu, artwork overlay. #}
+    <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/list.css' %}">
+    <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/add.css' %}">
+    <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/context_menu.css' %}">
+    <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/overlay.css' %}">
+{% endblock %}
 
 {% block left_content %}
 <div class="sidebar-nav">

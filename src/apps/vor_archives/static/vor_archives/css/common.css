@@ -1,0 +1,13 @@
+/* ============================================
+    VOR Archives — Common
+    ============================================ */
+
+html.vor-scroll-lock,
+html.vor-scroll-lock body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html.vor-scroll-lock .center {
+  overflow: hidden;
+}
