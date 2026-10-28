@@ -2,11 +2,7 @@
 
 {% if collection %}
     {% if has_collection_items %}
-        <div id="artwork-list-items" class="artwork-list-items">
-            {% for user_work in direct %}
-                {% include "vor_archives/partials/artworks/list/artwork_row.html" with user_work=user_work %}
-            {% endfor %}
-        </div>
+        {% include "vor_archives/partials/artworks/list/artwork_list_items.html" with items=direct %}
         {% for segment in nested %}
             {% include "vor_archives/partials/artworks/list/artwork_list_segment.html" with segment=segment %}
         {% endfor %}
@@ -14,11 +10,7 @@
         {% include "vor_archives/partials/artworks/list/artwork_list_empty.html" %}
     {% endif %}
 {% elif user_works %}
-    <div id="artwork-list-items" class="artwork-list-items">
-        {% for user_work in user_works %}
-            {% include "vor_archives/partials/artworks/list/artwork_row.html" with user_work=user_work %}
-        {% endfor %}
-    </div>
+    {% include "vor_archives/partials/artworks/list/artwork_list_items.html" with items=user_works %}
 {% else %}
     {% include "vor_archives/partials/artworks/list/artwork_list_empty.html" %}
 {% endif %}
