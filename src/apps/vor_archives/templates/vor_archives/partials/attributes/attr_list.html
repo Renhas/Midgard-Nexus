@@ -17,7 +17,7 @@
                 </button>
                 <div class="attr-group-body" x-show="expanded">
                     {% for item in group.items %}
-                        {% include "vor_archives/partials/attr_list_item.html" with item=item %}
+                        {% include "vor_archives/partials/attributes/attr_list_item.html" with item=item %}
                     {% endfor %}
                 </div>
             </div>
@@ -25,7 +25,7 @@
         {% endfor %}
     {% else %}
         {% for item in items %}
-            {% include "vor_archives/partials/attr_list_item.html" with item=item %}
+            {% include "vor_archives/partials/attributes/attr_list_item.html" with item=item %}
         {% endfor %}
     {% endif %}
     {% if not has_items %}

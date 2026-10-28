@@ -156,7 +156,7 @@
                                 <span x-text="releaseDate ? formatDate(releaseDate) : 'Выбрать'"></span>
                                 <i class="bi bi-calendar3"></i>
                             </button>
-                            {% include "vor_archives/partials/date_picker.html" %}
+                            {% include "vor_archives/partials/common/date_picker.html" %}
                         </div>
                         <input type="hidden" name="release_date" :value="releaseDate">
                         <div class="vor-link-wrap" x-show="editing || externalLink" @click.outside="linkOpen = false">
@@ -228,7 +228,7 @@
                         </div>
                     {% endif %}
                     <div x-show="editing" x-cloak>
-                        {% include "vor_archives/partials/chip_editor.html" with label="Платформы:" kind="platforms" %}
+                        {% include "vor_archives/partials/artworks/widgets/chip_editor.html" with label="Платформы:" kind="platforms" %}
                     </div>
                 {% elif work_type == 'book' %}
                     <div class="vor-view-row vor-view-labeled" x-show="editing || pages">
@@ -279,14 +279,14 @@
                 {% endif %}
 
                 <div class="vor-view-info-group" x-show="!editing">
-                    {% include "vor_archives/partials/chip_row.html" with label="Авторы:" items=work.authors.all tip_field="bio" %}
-                    {% include "vor_archives/partials/chip_row.html" with label="Жанры:" items=work.genres.all tip_field="description" %}
-                    {% include "vor_archives/partials/chip_row.html" with label="Теги:" items=work.tags.all tip_field="description" %}
+                    {% include "vor_archives/partials/artworks/widgets/chip_row.html" with label="Авторы:" items=work.authors.all tip_field="bio" %}
+                    {% include "vor_archives/partials/artworks/widgets/chip_row.html" with label="Жанры:" items=work.genres.all tip_field="description" %}
+                    {% include "vor_archives/partials/artworks/widgets/chip_row.html" with label="Теги:" items=work.tags.all tip_field="description" %}
                 </div>
                 <div class="vor-view-info-group" x-show="editing" x-cloak>
-                    {% include "vor_archives/partials/chip_editor.html" with label="Авторы:" kind="authors" %}
-                    {% include "vor_archives/partials/chip_editor.html" with label="Жанры:" kind="genres" %}
-                    {% include "vor_archives/partials/chip_editor.html" with label="Теги:" kind="tags" %}
+                    {% include "vor_archives/partials/artworks/widgets/chip_editor.html" with label="Авторы:" kind="authors" %}
+                    {% include "vor_archives/partials/artworks/widgets/chip_editor.html" with label="Жанры:" kind="genres" %}
+                    {% include "vor_archives/partials/artworks/widgets/chip_editor.html" with label="Теги:" kind="tags" %}
                 </div>
             </div>
 
@@ -537,7 +537,7 @@
     <div class="vor-modal-backdrop vor-leave-confirm" x-show="attachOpen" x-cloak>
         <div class="vor-modal" @click.stop>
             <h3 class="vor-modal-title">Добавить в список</h3>
-            {% include "vor_archives/partials/attach_user_fields.html" %}
+            {% include "vor_archives/partials/artworks/attach/attach_user_fields.html" %}
             <div class="vor-modal-actions vor-modal-actions-center">
                 <button type="button" class="sidebar-btn" @click="attachOpen = false">Назад</button>
                 <button type="button" class="sidebar-btn sidebar-btn-add" :disabled="saving" @click="saveAttach()">Сохранить</button>

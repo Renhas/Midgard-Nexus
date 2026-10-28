@@ -87,7 +87,7 @@
                                 <span x-text="releaseDate ? formatDate(releaseDate) : 'Выбрать'"></span>
                                 <i class="bi bi-calendar3"></i>
                             </button>
-                            {% include "vor_archives/partials/date_picker.html" %}
+                            {% include "vor_archives/partials/common/date_picker.html" %}
                         </div>
                     </div>
                     <div class="vor-add-field">
@@ -189,10 +189,10 @@
                 <div class="vor-add-side">
                 <section class="vor-overlay-section vor-add-attrs">
                     <h3>Атрибуты</h3>
-                    {% include "vor_archives/partials/attr_accordion.html" with title="Авторы" kind="authors" %}
-                    {% include "vor_archives/partials/attr_accordion.html" with title="Жанры" kind="genres" %}
-                    {% include "vor_archives/partials/attr_accordion.html" with title="Теги" kind="tags" %}
-                    {% include "vor_archives/partials/attr_accordion.html" with title="Платформы" kind="platforms" show="workType === 'game'" %}
+                    {% include "vor_archives/partials/attributes/attr_accordion.html" with title="Авторы" kind="authors" %}
+                    {% include "vor_archives/partials/attributes/attr_accordion.html" with title="Жанры" kind="genres" %}
+                    {% include "vor_archives/partials/attributes/attr_accordion.html" with title="Теги" kind="tags" %}
+                    {% include "vor_archives/partials/attributes/attr_accordion.html" with title="Платформы" kind="platforms" show="workType === 'game'" %}
                 </section>
 
                 <section class="vor-overlay-section vor-add-relations">
@@ -341,7 +341,7 @@
             <template x-if="phase === 'attach'">
                 <div>
                     <h3 class="vor-modal-title">Добавить в список</h3>
-                    {% include "vor_archives/partials/attach_user_fields.html" %}
+                    {% include "vor_archives/partials/artworks/attach/attach_user_fields.html" %}
                     <div class="vor-modal-actions vor-modal-actions-center">
                         <button type="button" class="sidebar-btn" @click="phase = justCreated ? 'choice' : 'form'">Назад</button>
                         <button type="button" class="sidebar-btn sidebar-btn-add" :disabled="saving" @click="saveAttach()">Сохранить</button>

@@ -190,7 +190,7 @@ def dashboard_feed(request):
     items, has_more = feed_page(request.user, offset=offset)
     return render(
         request,
-        "vor_archives/partials/dash_feed_items.html",
+        "vor_archives/partials/dashboard/dash_feed_items.html",
         {
             "feed_items": items,
             "feed_has_more": has_more,
@@ -205,7 +205,7 @@ def dashboard_heatmap(request):
     year = parse_heatmap_year(request.GET.get("year"))
     return render(
         request,
-        "vor_archives/partials/dash_heatmap.html",
+        "vor_archives/partials/dashboard/dash_heatmap.html",
         {"heatmap": heatmap_payload(request.user, year=year)},
     )
 
@@ -406,7 +406,7 @@ def _attr_mutation_response(
 def attr_list(request, kind):
     return render(
         request,
-        "vor_archives/partials/attr_list.html",
+        "vor_archives/partials/attributes/attr_list.html",
         _attr_list_context(request, kind),
     )
 
@@ -415,7 +415,9 @@ def attr_list(request, kind):
 @require_GET
 def attr_empty(request, kind):
     return render(
-        request, "vor_archives/partials/attr_empty.html", _empty_context(kind)
+        request,
+        "vor_archives/partials/attributes/attr_empty.html",
+        _empty_context(kind),
     )
 
 
@@ -431,7 +433,7 @@ def attr_detail(request, kind, pk):
         raise Http404("Атрибут не найден")
     return render(
         request,
-        "vor_archives/partials/attr_detail.html",
+        "vor_archives/partials/attributes/attr_detail.html",
         _simple_item_context(request, kind, obj),
     )
 
@@ -446,7 +448,7 @@ def genre_detail(request, type_key, pk):
         raise Http404("Жанр не найден")
     return render(
         request,
-        "vor_archives/partials/attr_detail.html",
+        "vor_archives/partials/attributes/attr_detail.html",
         _genre_item_context(request, obj, type_key),
     )
 
@@ -468,14 +470,14 @@ def attr_new(request, kind):
                 obj, type_key = form.save()
                 return _attr_mutation_response(
                     request,
-                    "vor_archives/partials/attr_detail.html",
+                    "vor_archives/partials/attributes/attr_detail.html",
                     _genre_item_context(request, obj, type_key),
                 )
         else:
             form = GenreForm(initial_type=initial_type)
         return render(
             request,
-            "vor_archives/partials/attr_form.html",
+            "vor_archives/partials/attributes/attr_form.html",
             _form_context(
                 kind,
                 form,
@@ -492,14 +494,14 @@ def attr_new(request, kind):
             obj = form.save()
             return _attr_mutation_response(
                 request,
-                "vor_archives/partials/attr_detail.html",
+                "vor_archives/partials/attributes/attr_detail.html",
                 _simple_item_context(request, kind, obj),
             )
     else:
         form = AttrForm(kind=kind)
     return render(
         request,
-        "vor_archives/partials/attr_form.html",
+        "vor_archives/partials/attributes/attr_form.html",
         _form_context(
             kind,
             form,
@@ -525,14 +527,14 @@ def attr_edit(request, kind, pk):
             obj = form.save()
             return _attr_mutation_response(
                 request,
-                "vor_archives/partials/attr_detail.html",
+                "vor_archives/partials/attributes/attr_detail.html",
                 _simple_item_context(request, kind, obj),
             )
     else:
         form = AttrForm(kind=kind, instance=obj)
     return render(
         request,
-        "vor_archives/partials/attr_form.html",
+        "vor_archives/partials/attributes/attr_form.html",
         _form_context(
             kind,
             form,
@@ -561,14 +563,14 @@ def genre_edit(request, type_key, pk):
             obj, saved_type = form.save()
             return _attr_mutation_response(
                 request,
-                "vor_archives/partials/attr_detail.html",
+                "vor_archives/partials/attributes/attr_detail.html",
                 _genre_item_context(request, obj, saved_type),
             )
     else:
         form = GenreForm(instance=obj, lock_type=True, initial_type=type_key)
     return render(
         request,
-        "vor_archives/partials/attr_form.html",
+        "vor_archives/partials/attributes/attr_form.html",
         _form_context(
             "genres",
             form,
@@ -638,7 +640,7 @@ def attr_delete_preview(request, kind):
         delete_text = tab["delete_many"].format(count=len(items))
     return render(
         request,
-        "vor_archives/partials/attr_delete_confirm.html",
+        "vor_archives/partials/attributes/attr_delete_confirm.html",
         {
             "kind": kind,
             "tab": tab,
@@ -671,7 +673,7 @@ def attr_delete(request, kind):
             item["obj"].delete()
     return _attr_mutation_response(
         request,
-        "vor_archives/partials/attr_empty.html",
+        "vor_archives/partials/attributes/attr_empty.html",
         _empty_context(kind),
         extra_trigger={"vor:close-attr-modal": True},
     )

@@ -23,7 +23,7 @@
     <div class="sidebar-accordion-body" x-ref="body" x-show="expanded" x-cloak>
         {% if nested %}
             {% for sub in nested %}
-                {% include 'vor_archives/partials/filter_accordion.html' with title=sub.title options=sub.options name=sub.name show_condition=sub.show_condition searchable=True only %}
+                {% include 'vor_archives/partials/artworks/sidebar/filter_accordion.html' with title=sub.title options=sub.options name=sub.name show_condition=sub.show_condition searchable=True only %}
             {% endfor %}
         {% else %}
             {% if searchable %}

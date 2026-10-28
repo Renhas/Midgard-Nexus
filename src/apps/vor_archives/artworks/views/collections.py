@@ -46,7 +46,7 @@ def artwork_collections(request, uw_id):
 def collection_tree(request):
     return render(
         request,
-        "vor_archives/partials/collection_tree.html",
+        "vor_archives/partials/collections/collection_tree.html",
         {
             "collections": get_user_collection_trees(request.user),
         },
@@ -69,7 +69,7 @@ def collection_new(request):
             )
     return _collection_form_response(
         request,
-        "vor_archives/partials/collection_form.html",
+        "vor_archives/partials/collections/collection_form.html",
         {
             "title": "Новая коллекция",
             "submit_label": "Создать",
@@ -86,7 +86,7 @@ def collection_edit(request, pk):
     collection = get_user_collection(request.user, pk)
     return render(
         request,
-        "vor_archives/partials/collection_form.html",
+        "vor_archives/partials/collections/collection_form.html",
         {
             "title": "Переименовать коллекцию",
             "submit_label": "Сохранить",
@@ -115,7 +115,7 @@ def collection_update(request, pk):
         collection = get_user_collection(request.user, pk)
         return render(
             request,
-            "vor_archives/partials/collection_form.html",
+            "vor_archives/partials/collections/collection_form.html",
             {
                 "title": "Переименовать коллекцию",
                 "submit_label": "Сохранить",
@@ -135,7 +135,7 @@ def collection_delete_preview(request, pk):
     child_count = collection.get_descendant_count()
     return render(
         request,
-        "vor_archives/partials/collection_delete_confirm.html",
+        "vor_archives/partials/collections/collection_delete_confirm.html",
         {
             "collection": collection,
             "child_count": child_count,

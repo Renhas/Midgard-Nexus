@@ -17,15 +17,15 @@
                     <div class="attr-readonly">{{ type_label }}</div>
                 </div>
             {% else %}
-                {% include "vor_archives/partials/form_field.html" with field=form.type_key %}
+                {% include "vor_archives/partials/common/form_field.html" with field=form.type_key %}
             {% endif %}
         {% endif %}
-        {% include "vor_archives/partials/form_field.html" with field=form.name %}
+        {% include "vor_archives/partials/common/form_field.html" with field=form.name %}
         {% if has_text %}
             {% if show_type %}
-                {% include "vor_archives/partials/form_field.html" with field=form.description %}
+                {% include "vor_archives/partials/common/form_field.html" with field=form.description %}
             {% else %}
-                {% include "vor_archives/partials/form_field.html" with field=form.text %}
+                {% include "vor_archives/partials/common/form_field.html" with field=form.text %}
             {% endif %}
         {% endif %}
     </div>

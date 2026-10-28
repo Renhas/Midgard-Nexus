@@ -26,7 +26,7 @@ def artwork_library_search(request):
         )
     return render(
         request,
-        "vor_archives/partials/library_search_results.html",
+        "vor_archives/partials/artworks/search/library_search_results.html",
         {
             **result,
             "query": (request.GET.get("q") or "").strip(),
@@ -54,7 +54,7 @@ def artwork_search(request):
         )
     return render(
         request,
-        "vor_archives/partials/work_suggestions.html",
+        "vor_archives/partials/artworks/search/work_suggestions.html",
         {
             "works": works,
             "work_type": type_key,
