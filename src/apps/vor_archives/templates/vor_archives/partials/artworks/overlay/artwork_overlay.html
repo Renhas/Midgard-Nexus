@@ -89,32 +89,7 @@
                         <i class="{{ work|get_model_icon }}"></i>
                         <span>{{ work|work_type_label }}{% if work_type == 'film' %} ({{ work.get_film_type_display }}){% endif %}</span>
                     </span>
-                    <div class="vor-age-wrap" x-show="editing || ageRating" @click.outside="ageOpen = false" @wheel.prevent="editing && onAgeWheel($event)">
-                        <button type="button"
-                                class="vor-age-badge"
-                                :data-age="ageRating"
-                                :disabled="!editing"
-                                :title="ageLabel()"
-                                @click="editing && (ageOpen = !ageOpen)">
-                            <span x-text="ageRating || '—'">{% if work.age_rating %}{{ work.age_rating }}{% endif %}</span>
-                        </button>
-                        <div class="vor-age-menu" x-show="editing && ageOpen" x-cloak>
-                            <button type="button"
-                                    class="vor-age-option"
-                                    data-age=""
-                                    :class="{ 'is-current': !ageRating }"
-                                    @click="setAgeRating('')">—</button>
-                            <template x-for="opt in ageChoices" :key="opt.value">
-                                <button type="button"
-                                        class="vor-age-option"
-                                        :data-age="opt.value"
-                                        :class="{ 'is-current': ageRating === opt.value }"
-                                        @click="setAgeRating(opt.value)"
-                                        x-text="opt.label"></button>
-                            </template>
-                        </div>
-                    </div>
-                    <input type="hidden" name="age_rating" :value="ageRating">
+                    {% include "vor_archives/partials/artworks/widgets/artwork_age_picker.html" with is_add=False %}
                     <span class="vor-release" x-show="editing || releaseDate || externalLink">
                         <span class="vor-field-label" x-show="editing || releaseDate">Релиз:</span>
                         <span class="vor-field-value" x-show="!editing && releaseDate" x-text="formatDate(releaseDate)">

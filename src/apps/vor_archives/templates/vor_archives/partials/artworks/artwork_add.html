@@ -67,26 +67,7 @@
                     </div>
                     <div class="vor-add-field">
                         <span class="vor-field-label">Возраст</span>
-                        <div class="vor-age-wrap" @click.outside="ageOpen = false" @wheel.prevent="onAgeWheel($event)">
-                            <button type="button" class="vor-age-badge" :data-age="ageRating" @click="ageOpen = !ageOpen">
-                                <span x-text="ageRating || '—'"></span>
-                            </button>
-                            <div class="vor-age-menu" x-show="ageOpen" x-cloak>
-                                <button type="button"
-                                        class="vor-age-option"
-                                        data-age=""
-                                        :class="{ 'is-current': !ageRating }"
-                                        @click="setAgeRating('')">—</button>
-                                <template x-for="opt in ageChoices" :key="opt.value">
-                                    <button type="button"
-                                            class="vor-age-option"
-                                            :data-age="opt.value"
-                                            :class="{ 'is-current': ageRating === opt.value }"
-                                            @click="setAgeRating(opt.value)"
-                                            x-text="opt.label"></button>
-                                </template>
-                            </div>
-                        </div>
+                        {% include "vor_archives/partials/artworks/widgets/artwork_age_picker.html" with is_add=True %}
                     </div>
                     <div class="vor-add-field">
                         <span class="vor-field-label">Ссылка</span>
