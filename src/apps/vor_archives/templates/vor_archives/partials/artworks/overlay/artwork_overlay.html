@@ -81,38 +81,7 @@
                required>
 
         <div class="vor-view-hero">
-            <div class="vor-cover-wrap">
-                <img class="vor-view-cover"
-                     x-show="coverPreview"
-                     :src="coverPreview"
-                     :alt="title">
-                <div class="vor-view-cover vor-view-cover-empty" x-show="!coverPreview">
-                    <i class="{{ work|get_model_icon }}" x-show="!editing"></i>
-                    <button type="button"
-                            class="vor-cover-btn vor-cover-btn-upload"
-                            x-show="editing"
-                            x-cloak
-                            title="Загрузить обложку"
-                            @click="$refs.coverInput.click()">
-                        <i class="bi bi-upload"></i>
-                    </button>
-                </div>
-                <div class="vor-cover-actions" x-show="editing && coverPreview" x-cloak>
-                    <button type="button"
-                            class="vor-cover-btn vor-cover-btn-edit"
-                            title="Заменить обложку"
-                            @click="$refs.coverInput.click()">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button type="button"
-                            class="vor-cover-btn vor-cover-btn-clear"
-                            title="Очистить обложку"
-                            @click="clearCover()">
-                        <i class="bi bi-x"></i>
-                    </button>
-                </div>
-                <div class="vor-cover-warning" x-show="coverWarning" x-cloak x-text="coverWarning"></div>
-            </div>
+            {% include "vor_archives/partials/artworks/widgets/artwork_cover_upload.html" with is_add=False %}
 
             <div class="vor-view-info" :class="{ 'is-editing': editing }">
                 <div class="vor-view-row vor-view-topline">
