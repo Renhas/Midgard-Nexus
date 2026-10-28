@@ -11,7 +11,7 @@
             {% include "vor_archives/partials/artworks/list/artwork_list_segment.html" with segment=segment %}
         {% endfor %}
     {% else %}
-        {% include "vor_archives/partials/artworks/list/artwork_list_empty.html" with empty_text="Произведения не найдены" %}
+        {% include "vor_archives/partials/artworks/list/artwork_list_empty.html" %}
     {% endif %}
 {% elif user_works %}
     <div id="artwork-list-items" class="artwork-list-items">
@@ -20,5 +20,5 @@
         {% endfor %}
     </div>
 {% else %}
-    {% include "vor_archives/partials/artworks/list/artwork_list_empty.html" with empty_text="Произведения не найдены" %}
+    {% include "vor_archives/partials/artworks/list/artwork_list_empty.html" %}
 {% endif %}
