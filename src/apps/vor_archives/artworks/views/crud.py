@@ -12,7 +12,7 @@ from apps.vor_archives.constants import (
     age_rating_options,
     status_options,
 )
-from apps.vor_archives.registry import WORK_MODELS
+from apps.vor_archives.registry import WORK_MODELS, WORK_TYPE_REGISTRY
 from apps.vor_archives.models import UserWork
 from apps.vor_archives.artworks.forms import RelationsForm, UserWorkEditForm
 from apps.vor_archives.artworks.presenters import build_overlay_context
@@ -131,6 +131,7 @@ def artwork_add(request):
                 "ageChoices": age_rating_options(),
                 "statusChoices": status_options(),
             },
+            "work_types": WORK_TYPE_REGISTRY.values(),
         },
     )
 

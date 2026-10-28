@@ -132,29 +132,7 @@
      x-data
      x-init="$store.vorArtworks.initFromPage(JSON.parse(document.getElementById('vor-artworks-opts').textContent))">
     {# ========== ПРАВАЯ ПАНЕЛЬ — ТИПЫ ============ #}
-    <div class="sidebar-nav-row">
-        <button type="button"
-            class="sidebar-btn sidebar-btn-type"
-            :class="{ 'active': $store.vorArtworks.workTypes.includes('book') }"
-            @click="$store.vorArtworks.toggleType('book')"
-            title="Книги">
-            <i class="icon-book-text"></i>
-        </button>
-        <button type="button"
-            class="sidebar-btn sidebar-btn-type"
-            :class="{ 'active': $store.vorArtworks.workTypes.includes('film') }"
-            @click="$store.vorArtworks.toggleType('film')"
-            title="Фильмы">
-            <i class="icon-clapperboard"></i>
-        </button>
-        <button type="button"
-            class="sidebar-btn sidebar-btn-type"
-            :class="{ 'active': $store.vorArtworks.workTypes.includes('game') }"
-            @click="$store.vorArtworks.toggleType('game')"
-            title="Игры">
-            <i class="icon-gamepad-2"></i>
-        </button>
-    </div>
+    {% include "vor_archives/partials/artworks/sidebar/artwork_sidebar_work_types.html" %}
     <label class="vor-switch sidebar-hidden-switch">
         <input type="checkbox"
                class="vor-switch-input"

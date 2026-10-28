@@ -1,0 +1,11 @@
+<div class="sidebar-nav-row">
+    {% for wt in work_types %}
+    <button type="button"
+        class="sidebar-btn sidebar-btn-type"
+        :class="{ 'active': $store.vorArtworks.workTypes.includes('{{ wt.key }}') }"
+        @click="$store.vorArtworks.toggleType('{{ wt.key }}')"
+        title="{{ wt.label_plural }}">
+        <i class="{{ wt.icon }}"></i>
+    </button>
+    {% endfor %}
+</div>

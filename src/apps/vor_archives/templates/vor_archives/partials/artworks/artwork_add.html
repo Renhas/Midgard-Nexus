@@ -7,16 +7,16 @@
             <span>Назад</span>
         </button>
         <div class="vor-add-types">
-            <button type="button" class="sidebar-btn vor-add-type-btn" :class="{ active: workType === 'book' }" @click="setType('book')" title="Книга">
-                <i class="icon-book-text"></i>
+            {% for wt in work_types %}
+            <button type="button"
+                class="sidebar-btn vor-add-type-btn"
+                :class="{ active: workType === '{{ wt.key }}' }"
+                @click="setType('{{ wt.key }}')"
+                title="{{ wt.label }}">
+                <i class="{{ wt.icon }}"></i>
             </button>
-            <button type="button" class="sidebar-btn vor-add-type-btn" :class="{ active: workType === 'film' }" @click="setType('film')" title="Фильм">
-                <i class="icon-clapperboard"></i>
-            </button>
-            <button type="button" class="sidebar-btn vor-add-type-btn" :class="{ active: workType === 'game' }" @click="setType('game')" title="Игра">
-                <i class="icon-gamepad-2"></i>
-            </button>
-        </div>
+            {% endfor %}
+      </div>
         <div class="vor-add-bar-spacer" aria-hidden="true"></div>
     </div>
 

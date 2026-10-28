@@ -38,6 +38,7 @@ from .attr_catalog import (
     simple_work_count,
 )
 from .forms import AttrForm, GenreForm
+from .registry import WORK_TYPE_REGISTRY
 from .models import (
     BookGenre,
     FilmGenre,
@@ -105,6 +106,7 @@ def index(request):
                 {"value": "status", "label": "Статус"},
                 {"value": "date_added", "label": "Дата добавления"},
             ],
+            "work_types": WORK_TYPE_REGISTRY.values(),
             "page_opts": {
                 "listUrl": reverse("vor_archives:artworks:list"),
                 "reorderUrl": reverse("vor_archives:artworks:reorder"),
