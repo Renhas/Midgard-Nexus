@@ -153,12 +153,6 @@
     font-weight: 700;
 }
 
-.dash-card-ratio-value {
-    color: var(--text-secondary);
-    font-size: 0.78rem;
-    line-height: 1.2;
-}
-
 .dash-progress-star {
     display: inline-flex;
     align-items: center;
@@ -250,12 +244,6 @@
     gap: 0.55rem 0.75rem;
     min-height: 12rem;
     padding: 0.5rem;
-}
-
-.dash-cloud-tag {
-    color: var(--accent-vor);
-    line-height: 1.15;
-    font-weight: 600;
 }
 
 .dash-attr-list {

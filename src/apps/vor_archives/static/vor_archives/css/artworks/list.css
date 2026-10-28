@@ -438,12 +438,6 @@ body.vor-artworks-list-drag .artwork-tile {
   display: none !important;
 }
 
-.artwork-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
-  gap: 1rem;
-}
-
 .artwork-tile {
   display: flex;
   flex-direction: column;
@@ -533,10 +527,6 @@ body.vor-artworks-list-drag .artwork-tile {
 .artwork-tile-rating i {
   font-size: 0.85rem;
   color: #f5c518;
-}
-
-.artwork-tile-rating:empty {
-  display: none;
 }
 
 .artwork-tile-check {

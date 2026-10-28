@@ -45,21 +45,10 @@
     gap: 0.45rem;
 }
 
-.vor-type-switch {
-    display: flex;
-    gap: 0.35rem;
-}
-
 .vor-overlay-body {
     max-width: 1280px;
     width: 100%;
     margin: 0 auto;
-}
-
-.vor-overlay-columns {
-    display: grid;
-    grid-template-columns: minmax(0, 1.6fr) minmax(260px, 0.9fr);
-    gap: 1.25rem;
 }
 
 .vor-overlay-section {
@@ -77,13 +66,6 @@
     letter-spacing: 0.05em;
     color: var(--text-secondary);
     margin-bottom: 0.85rem;
-}
-
-.vor-overlay-section fieldset {
-    border: 0;
-    padding: 0;
-    margin: 0;
-    min-width: 0;
 }
 
 .vor-overlay-footer {
@@ -114,28 +96,6 @@
     color: var(--text-primary);
     font-weight: 500;
     text-align: right;
-}
-
-.vor-detail-cover {
-    width: 120px;
-    height: auto;
-    border-radius: 0.375rem;
-    margin-bottom: 0.75rem;
-}
-
-.vor-detail-desc {
-    margin-top: 0.75rem;
-    color: var(--text-secondary);
-    white-space: pre-wrap;
-}
-
-.vor-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    color: var(--text-secondary);
-    font-size: 0.8125rem;
-    cursor: pointer;
 }
 
 /* --- View --- */
@@ -485,10 +445,6 @@
 .vor-platform.is-other {
     color: var(--text-secondary);
     opacity: 0.55;
-}
-
-.vor-view-state {
-    gap: 1.25rem;
 }
 
 .vor-progress-row {
@@ -1126,25 +1082,6 @@ a.vor-relation-item:hover {
     padding: 0.75rem 0.25rem;
 }
 
-.vor-edit-fields {
-    margin-top: 1.5rem;
-}
-
-.vor-edit-fields fieldset {
-    border: 0;
-    padding: 0;
-    margin: 0 0 1.25rem;
-}
-
-.vor-edit-fields h3 {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text-secondary);
-    margin-bottom: 0.85rem;
-}
-
-
 /* --- Cover upload --- */
 .vor-cover-file {
     display: none;
@@ -1500,9 +1437,6 @@ a.vor-relation-item:hover {
 
 /* --- Responsive --- */
 @media (max-width: 900px) {
-    .vor-overlay-columns {
-        grid-template-columns: 1fr;
-    }
     .vor-view-hero {
         grid-template-columns: 1fr;
         grid-template-rows: auto;
