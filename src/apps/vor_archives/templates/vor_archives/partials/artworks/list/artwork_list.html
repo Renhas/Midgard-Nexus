@@ -1,13 +1,5 @@
-<div class="artwork-list-header">
-    <div class="artwork-row-check"></div>
-    <div class="artwork-row-type"></div>
-    <div class="artwork-row-title">Название</div>
-    <div class="artwork-row-year">Год</div>
-    <div class="artwork-row-status">Статус</div>
-    <div class="artwork-row-rating">Рейтинг</div>
-    <div class="artwork-row-progress">Прогресс</div>
-    <div class="artwork-row-delete-slot"></div>
-</div>
+{% include "vor_archives/partials/artworks/list/artwork_list_header.html" %}
+
 {% if collection %}
     {% if has_collection_items %}
         <div id="artwork-list-items" class="artwork-list-items">
@@ -16,23 +8,10 @@
             {% endfor %}
         </div>
         {% for segment in nested %}
-            <div class="artwork-list-segment">
-                <button type="button"
-                        class="artwork-list-segment-title"
-                        data-collection-id="{{ segment.collection.pk }}"
-                        data-collection-name="{{ segment.collection.name }}"
-                        @click="$store.vorArtworks.selectCollectionFromEl($el)">
-                    {{ segment.collection.name }}
-                </button>
-                <div class="artwork-list-items artwork-list-items-nested">
-                    {% for user_work in segment.user_works %}
-                        {% include "vor_archives/partials/artworks/list/artwork_row.html" with user_work=user_work %}
-                    {% endfor %}
-                </div>
-            </div>
+            {% include "vor_archives/partials/artworks/list/artwork_list_segment.html" with segment=segment %}
         {% endfor %}
     {% else %}
-        <div class="text-center text-muted py-4">Произведения не найдены</div>
+        {% include "vor_archives/partials/artworks/list/artwork_list_empty.html" with empty_text="Произведения не найдены" %}
     {% endif %}
 {% elif user_works %}
     <div id="artwork-list-items" class="artwork-list-items">
@@ -41,7 +20,5 @@
         {% endfor %}
     </div>
 {% else %}
-    <div class="text-center text-muted py-4">
-        Произведения не найдены
-    </div>
+    {% include "vor_archives/partials/artworks/list/artwork_list_empty.html" with empty_text="Произведения не найдены" %}
 {% endif %}
