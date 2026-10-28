@@ -8,6 +8,11 @@
     <link rel="stylesheet" href="{% static 'vor_archives/css/attributes/attributes.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'vor_archives/js/attributes/attributes.js' %}"></script>
+{% endblock %}
+
 {% block left_content %}
 <div class="sidebar-nav">
     {% for tab in attr_tabs %}

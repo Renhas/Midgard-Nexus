@@ -12,6 +12,16 @@
     <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/overlay.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'vor_archives/js/artworks/store.js' %}"></script>
+    <script src="{% static 'vor_archives/js/artworks/events.js' %}"></script>
+    <script src="{% static 'vor_archives/js/artworks/row_preview.js' %}"></script>
+    <script src="{% static 'vor_archives/js/artworks/overlay.js' %}"></script>
+    <script src="{% static 'vor_archives/js/artworks/add.js' %}"></script>
+    <script src="{% static 'vor_archives/js/artworks/chip.js' %}"></script>
+{% endblock %}
+
 {% block left_content %}
 <div class="sidebar-nav">
     <div class="sidebar-nav-row">
