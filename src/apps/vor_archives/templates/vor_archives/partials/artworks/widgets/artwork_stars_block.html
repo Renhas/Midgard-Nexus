@@ -1,0 +1,17 @@
+<div class="vor-stars" @mouseleave="hoverRating = 0">
+    <template x-for="star in [1,2,3,4,5]" :key="star">
+        <span class="vor-star" :class="starState(star)">
+            <i class="bi bi-star vor-star-empty"></i>
+            <i class="bi bi-star-fill vor-star-fill"></i>
+            <button type="button"
+                    class="vor-star-hit left"
+                    @mouseenter="hoverRating = star * 2 - 1"
+                    @click="setRating(star * 2 - 1)"></button>
+            <button type="button"
+                    class="vor-star-hit right"
+                    @mouseenter="hoverRating = star * 2"
+                    @click="setRating(star * 2)"></button>
+        </span>
+    </template>
+    <span class="vor-rating-number" x-text="ratingLabel()"></span>
+</div>

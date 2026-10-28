@@ -356,23 +356,7 @@
             <div class="vor-view-cover-controls">
                 {% include "vor_archives/partials/artworks/widgets/artwork_status_dropdown.html" %}
                 {% include "vor_archives/partials/artworks/widgets/artwork_progress_block.html" %}
-                <div class="vor-stars" @mouseleave="hoverRating = 0">
-                    {% for star in "12345" %}
-                        <span class="vor-star" :class="starState({{ forloop.counter }})">
-                            <i class="bi bi-star vor-star-empty"></i>
-                            <i class="bi bi-star-fill vor-star-fill"></i>
-                            <button type="button"
-                                    class="vor-star-hit left"
-                                    @mouseenter="hoverRating = {{ forloop.counter }} * 2 - 1"
-                                    @click="setRating({{ forloop.counter }} * 2 - 1)"></button>
-                            <button type="button"
-                                    class="vor-star-hit right"
-                                    @mouseenter="hoverRating = {{ forloop.counter }} * 2"
-                                    @click="setRating({{ forloop.counter }} * 2)"></button>
-                        </span>
-                    {% endfor %}
-                    <span class="vor-rating-number" x-text="ratingLabel()">{% if owned %}{{ user_work.rating|default:'—' }}{% else %}—{% endif %}</span>
-                </div>
+                {% include "vor_archives/partials/artworks/widgets/artwork_stars_block.html" %}
                 <div class="vor-view-meta">
                     <div class="vor-view-meta-row">Добавлено {{ user_work.date_added|date:'d.m.Y' }}</div>
                     <div class="vor-view-meta-row" x-show="lastCompletedDate || timesCompleted > 0" x-cloak>
