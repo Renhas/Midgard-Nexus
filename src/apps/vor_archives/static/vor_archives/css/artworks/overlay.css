@@ -521,25 +521,6 @@
     background-color: rgba(99, 102, 241, 0.15);
 }
 
-.vor-status-select.status-planning,
-.vor-status-option.status-planning {
-    color: var(--text-secondary);
-}
-
-.vor-status-select.status-in_progress,
-.vor-status-option.status-in_progress {
-    color: var(--status-in-progress);
-}
-
-.vor-status-select.status-completed,
-.vor-status-option.status-completed {
-    color: var(--success);
-}
-
-.vor-status-select.status-dropped,
-.vor-status-option.status-dropped {
-    color: var(--error);
-}
 /* --- Progress --- */
 .vor-progress {
     display: inline-flex;

@@ -51,3 +51,17 @@ html.vor-scroll-lock .center {
 .vor-field.has-error .form-select {
     border-color: var(--error);
 }
+
+/* ===== Status colors (shared) ===== */
+.status-planning {
+    color: var(--text-secondary);
+}
+.status-in_progress {
+    color: var(--status-in-progress);
+}
+.status-completed {
+    color: var(--success);
+}
+.status-dropped {
+    color: var(--error);
+}
