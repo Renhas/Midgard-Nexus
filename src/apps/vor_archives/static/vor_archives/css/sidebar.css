@@ -390,7 +390,8 @@ body.vor-collections-dragging .collection-children {
   border-color: var(--accent-hover);
 }
 
-.hidden-checkbox:checked + .custom-checkbox::after {
+.hidden-checkbox:checked + .custom-checkbox::after,
+.custom-checkbox.is-checked::after {
   content: "";
   display: block;
   position: absolute;
@@ -404,7 +405,6 @@ body.vor-collections-dragging .collection-children {
   mask-size: contain;
   mask-repeat: no-repeat;
   mask-position: center;
-  background-color: var(--bg-primary);
 }
 
 /* Фокус (для доступности) */
