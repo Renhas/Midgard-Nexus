@@ -1,0 +1,656 @@
+document.addEventListener("alpine:init", () => {
+    Alpine.data("vorAddOverlay", (opts = {}) => ({
+        workType: opts.workType || "book",
+        title: "",
+        description: "",
+        releaseDate: "",
+        ageRating: "",
+        externalLink: "",
+        pages: "",
+        durationMinutes: "",
+        episodeCount: "",
+        filmType: "movie",
+        coverPreview: "",
+        coverWarning: "",
+        coverFile: null,
+        authors: [],
+        genres: [],
+        tags: [],
+        platforms: [],
+        catalogs: opts.catalogs || {},
+        ageChoices: opts.ageChoices || [],
+        statusChoices: opts.statusChoices || [],
+        saveUrl: opts.saveUrl || "",
+        searchUrl: opts.searchUrl || "",
+        previewUrl: opts.previewUrl || "",
+        attachUrl: opts.attachUrl || "",
+        listUrl: opts.listUrl || "",
+        relationSearchUrl: opts.relationSearchUrl || "",
+        relationTypes: opts.relationTypes || [],
+        relations: [],
+        relAdding: false,
+        relQuery: "",
+        relResults: [],
+        relPick: null,
+        relPickType: "other",
+        relTypeEdit: null,
+        selectedWorkId: null,
+        alreadyOwned: false,
+        createdWorkId: null,
+        createdWorkType: "",
+        justCreated: false,
+        phase: "form",
+        saving: false,
+        errors: {},
+        formError: "",
+        doneMessage: "",
+        dateOpen: false,
+        dateCursor: new Date(),
+        ...window.datePickerApi(),
+        ageOpen: false,
+        status: "planning",
+        statusOpen: false,
+        rating: 0,
+        hoverRating: 0,
+        progress: 0,
+        progressMax: null,
+        progressUnit: "",
+        progressStep: 1,
+        progressEditing: false,
+        progressHover: false,
+        progressDraft: "",
+        searchTimer: null,
+        get catalog() {
+            return this.catalogs[this.workType] || {
+                authors: [],
+                genres: [],
+                tags: [],
+                platforms: [],
+            };
+        },
+        init() {
+            this.dateCursor = new Date();
+        },
+        setType(type) {
+            if (this.workType === type) {
+                return;
+            }
+            this.workType = type;
+            this.genres = [];
+            if (type !== "game") {
+                this.platforms = [];
+            }
+            this.clearSelection();
+            this.refreshSearch();
+        },
+        onTitleInput() {
+            this.clearSelection();
+            this.scheduleSearch();
+        },
+        scheduleSearch() {
+            clearTimeout(this.searchTimer);
+            this.searchTimer = setTimeout(() => this.refreshSearch(), 280);
+        },
+        onSuggestionClick(event) {
+            const button = event.target.closest(".vor-suggestion-item");
+            if (!button) {
+                return;
+            }
+            this.selectWork(button.dataset.workId, button.dataset.previewUrl);
+        },
+        selectWork(id, previewUrl) {
+            this.selectedWorkId = Number(id);
+            this.createdWorkId = Number(id);
+            this.createdWorkType = this.workType;
+            this.justCreated = false;
+            const url = previewUrl || `${this.previewUrl}?type=${this.workType}&work_id=${id}`;
+            htmx.ajax("GET", url, {
+                target: "#add-preview",
+                swap: "innerHTML",
+            });
+            this.clearSuggestions();
+        },
+        onPreviewClick(event) {
+            const button = event.target.closest("[data-attach-preview]");
+            if (!button) {
+                return;
+            }
+            this.startAttachFromPreview(button.closest(".vor-preview-card"));
+        },
+        startAttachFromPreview(card) {
+            if (!card) {
+                return;
+            }
+            const rawMax = card.dataset.progressMax;
+            this.progressMax = rawMax === "" || rawMax == null ? null : Number(rawMax);
+            this.progressUnit = card.dataset.progressUnit || "";
+            this.progressStep = Number(card.dataset.progressStep || 1);
+            this.createdWorkId = this.selectedWorkId;
+            this.createdWorkType = this.workType;
+            this.resetAttachFields();
+            this.phase = "attach";
+        },
+        clearSelection() {
+            this.selectedWorkId = null;
+            this.alreadyOwned = false;
+            if (this.phase === "form") {
+                this.createdWorkId = this.justCreated ? this.createdWorkId : null;
+            }
+            const preview = document.getElementById("add-preview");
+            if (preview) {
+                preview.innerHTML = "";
+            }
+        },
+        clearSuggestions() {
+            const suggestions = document.getElementById("work-suggestions");
+            if (suggestions) {
+                suggestions.innerHTML = "";
+            }
+        },
+        refreshSearch() {
+            const query = String(this.title || "").trim();
+            if (!query || !this.searchUrl) {
+                this.clearSuggestions();
+                return;
+            }
+            const params = new URLSearchParams({
+                work_type: this.workType,
+                q: query,
+            });
+            htmx.ajax("GET", `${this.searchUrl}?${params.toString()}`, {
+                target: "#work-suggestions",
+                swap: "innerHTML",
+            });
+        },
+        filterCatalog(kind, query) {
+            const q = String(query || "").trim().toLowerCase();
+            return (this.catalog[kind] || []).filter((item) => (
+                !q || String(item.name || "").toLowerCase().includes(q)
+            ));
+        },
+        hasAttr(kind, id) {
+            return (this[kind] || []).some((item) => Number(item.id) === Number(id));
+        },
+        toggleAttr(kind, opt) {
+            if (this.hasAttr(kind, opt.id)) {
+                this[kind] = this[kind].filter((item) => Number(item.id) !== Number(opt.id));
+                return;
+            }
+            this[kind] = [...this[kind], opt];
+        },
+        setAgeRating(value) {
+            this.ageRating = value;
+            this.ageOpen = false;
+        },
+        async onCoverSelected(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) {
+                return;
+            }
+            const result = await window.cropCoverFile(file);
+            this.coverFile = result.file;
+            this.coverPreview = URL.createObjectURL(result.file);
+            this.coverWarning = result.cropped
+                ? `Обложка была обрезана для соответствия размера: исходный ${result.srcW}×${result.srcH}, итоговый ${result.outW}×${result.outH}`
+                : "";
+            this.assignCoverInput(result.file);
+        },
+        assignCoverInput(file) {
+            const input = this.$refs.coverInput;
+            if (!input || typeof DataTransfer === "undefined") {
+                return;
+            }
+            const transfer = new DataTransfer();
+            transfer.items.add(file);
+            input.files = transfer.files;
+        },
+        clearCover() {
+            this.coverPreview = "";
+            this.coverFile = null;
+            this.coverWarning = "";
+            if (this.$refs.coverInput) {
+                this.$refs.coverInput.value = "";
+            }
+        },
+        isRequired(name) {
+            if (name === "title") {
+                return true;
+            }
+            if (name === "pages") {
+                return this.workType === "book";
+            }
+            if (name === "duration_minutes") {
+                return this.workType === "film";
+            }
+            if (name === "episode_count") {
+                return this.workType === "film" && this.filmType === "tv_show";
+            }
+            return false;
+        },
+        isEmpty(name) {
+            if (name === "title") {
+                return !String(this.title || "").trim();
+            }
+            if (name === "pages") {
+                return !this.pages;
+            }
+            if (name === "duration_minutes") {
+                return !this.durationMinutes;
+            }
+            if (name === "episode_count") {
+                return !this.episodeCount;
+            }
+            return false;
+        },
+        showRequired(name) {
+            return this.isRequired(name) && this.isEmpty(name);
+        },
+        titleInvalid() {
+            return this.alreadyOwned || this.showRequired("title") || Boolean(this.fieldError("title"));
+        },
+        titleBanner() {
+            if (this.alreadyOwned) {
+                return "Это произведение уже есть в вашем списке";
+            }
+            return this.fieldError("title") || this.fieldError("__all__");
+        },
+        fieldError(name) {
+            if (this.isRequired(name) && !this.isEmpty(name)) {
+                return "";
+            }
+            const items = this.errors[name];
+            if (!items || !items.length) {
+                return "";
+            }
+            return items[0].message || items[0] || "";
+        },
+        validateDraft() {
+            const errors = {};
+            if (this.showRequired("title")) {
+                errors.title = [{ message: "Укажите название" }];
+            }
+            if (this.showRequired("pages")) {
+                errors.pages = [{ message: "Укажите количество страниц" }];
+            }
+            if (this.showRequired("duration_minutes")) {
+                errors.duration_minutes = [{ message: "Укажите длительность" }];
+            }
+            if (this.showRequired("episode_count")) {
+                errors.episode_count = [{ message: "Укажите количество эпизодов" }];
+            }
+            this.errors = errors;
+            this.formError = "";
+            return !Object.keys(errors).length;
+        },
+        appendIds(body, name, items) {
+            (items || []).forEach((item) => body.append(name, String(item.id)));
+        },
+        csrfToken() {
+            return this.$refs.createForm?.querySelector("[name=csrfmiddlewaretoken]")?.value
+                || document.querySelector("[name=csrfmiddlewaretoken]")?.value
+                || window.getCookie("csrftoken");
+        },
+        async saveWork() {
+            if (this.saving || !this.validateDraft()) {
+                return;
+            }
+            if (this.coverFile) {
+                this.assignCoverInput(this.coverFile);
+            }
+            const body = new FormData();
+            body.append("work_type", this.workType);
+            body.append("title", String(this.title || "").trim());
+            body.append("description", this.description || "");
+            body.append("release_date", this.releaseDate || "");
+            body.append("age_rating", this.ageRating || "");
+            body.append("external_link", this.externalLink || "");
+            if (this.workType === "book") {
+                body.append("pages", this.pages);
+            }
+            if (this.workType === "film") {
+                body.append("film_type", this.filmType);
+                body.append("duration_minutes", this.durationMinutes);
+                if (this.filmType === "tv_show") {
+                    body.append("episode_count", this.episodeCount);
+                }
+            }
+            this.appendIds(body, "authors", this.authors);
+            this.appendIds(body, "genres", this.genres);
+            this.appendIds(body, "tags", this.tags);
+            if (this.workType === "game") {
+                this.appendIds(body, "platforms", this.platforms);
+            }
+            if (this.coverFile) {
+                body.append("cover", this.coverFile);
+            }
+            body.append("relations_json", this.relationsJson());
+            this.saving = true;
+            this.formError = "";
+            try {
+                const response = await fetch(this.saveUrl, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": this.csrfToken(),
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                    body,
+                });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok || !data.ok) {
+                    this.errors = data.errors || {};
+                    this.formError = this.fieldError("__all__") || "Не удалось сохранить произведение";
+                    return;
+                }
+                this.createdWorkId = data.work_id;
+                this.createdWorkType = data.work_type || this.workType;
+                this.justCreated = true;
+                this.progressMax = data.progressMax == null ? null : Number(data.progressMax);
+                this.progressUnit = data.progressUnit || "";
+                this.progressStep = Number(data.progressStep || 1);
+                this.resetAttachFields();
+                this.phase = "choice";
+            } catch (error) {
+                this.formError = "Не удалось сохранить произведение";
+            } finally {
+                this.saving = false;
+            }
+        },
+        resetAttachFields() {
+            this.status = "planning";
+            this.statusOpen = false;
+            this.rating = 0;
+            this.hoverRating = 0;
+            this.progress = 0;
+            this.progressEditing = false;
+            this.progressHover = false;
+        },
+        finishCreate(kind) {
+            this.doneMessage = kind === "list"
+                ? "Произведение создано и добавлено в ваш список."
+                : "Произведение успешно сохранено в базу данных.";
+            this.phase = "done";
+            this.refreshList();
+        },
+        async saveAttach() {
+            if (this.saving || !this.createdWorkId || !this.attachUrl) {
+                return;
+            }
+            const body = new URLSearchParams({
+                work_type: this.createdWorkType || this.workType,
+                work_id: String(this.createdWorkId),
+                status: this.status || "planning",
+                rating: this.rating ? String(this.rating) : "",
+                progress: String(this.progress || 0),
+            });
+            this.saving = true;
+            try {
+                const response = await fetch(this.attachUrl, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": this.csrfToken(),
+                        "X-Requested-With": "XMLHttpRequest",
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body,
+                });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok || !data.ok) {
+                    this.formError = "Не удалось добавить произведение в список";
+                    return;
+                }
+                this.doneMessage = this.justCreated
+                    ? "Произведение создано и добавлено в ваш список."
+                    : "Произведение добавлено в ваш список.";
+                this.phase = "done";
+                this.refreshList();
+            } catch (error) {
+                this.formError = "Не удалось добавить произведение в список";
+            } finally {
+                this.saving = false;
+            }
+        },
+        dismissModal() {
+            if (this.phase === "attach" && this.justCreated) {
+                this.phase = "choice";
+                return;
+            }
+            if (this.phase === "attach") {
+                this.phase = "form";
+                return;
+            }
+            if (this.phase === "choice") {
+                this.finishCreate("db");
+            }
+        },
+        goToList() {
+            this.refreshList();
+            window.Alpine?.store("vorArtworks")?.closeOverlay();
+        },
+        resetForm() {
+            this.title = "";
+            this.description = "";
+            this.releaseDate = "";
+            this.ageRating = "";
+            this.externalLink = "";
+            this.pages = "";
+            this.durationMinutes = "";
+            this.episodeCount = "";
+            this.filmType = "movie";
+            this.authors = [];
+            this.genres = [];
+            this.tags = [];
+            this.platforms = [];
+            this.relations = [];
+            this.cancelRelationAdd();
+            this.clearCover();
+            this.clearSelection();
+            this.clearSuggestions();
+            this.createdWorkId = null;
+            this.createdWorkType = "";
+            this.justCreated = false;
+            this.errors = {};
+            this.formError = "";
+            this.alreadyOwned = false;
+            this.doneMessage = "";
+            this.resetAttachFields();
+            this.phase = "form";
+        },
+        refreshList() {
+            window.Alpine?.store("vorArtworks")?.reloadList();
+        },
+        statusLabel() {
+            const found = this.statusChoices.find((item) => item.value === this.status);
+            return found ? found.label : "Запланировано";
+        },
+        setStatus(value) {
+            this.statusOpen = false;
+            this.status = value;
+            if (value === "completed" && this.progressMax != null) {
+                this.progress = this.progressMax;
+            }
+            if (value === "in_progress") {
+                this.progress = 0;
+            }
+        },
+        displayRating() {
+            return this.hoverRating || this.rating || 0;
+        },
+        ratingLabel() {
+            const value = this.displayRating();
+            return value ? String(value) : "—";
+        },
+        starState(star) {
+            const shown = this.displayRating();
+            const fullAt = star * 2;
+            if (shown >= fullAt) {
+                return "is-full";
+            }
+            if (shown === fullAt - 1) {
+                return "is-half";
+            }
+            return "is-empty";
+        },
+        setRating(value) {
+            this.rating = this.rating === value ? 0 : value;
+        },
+        startProgressEdit() {
+            this.progressDraft = this.progressValueLabel();
+            this.progressEditing = true;
+            this.progressHover = true;
+            this.$nextTick(() => this.$refs.progressInput?.focus());
+        },
+        cancelProgressEdit() {
+            this.progressEditing = false;
+            this.progressHover = false;
+        },
+        commitProgress() {
+            if (!this.progressEditing) {
+                return;
+            }
+            this.progressEditing = false;
+            this.progressHover = false;
+            const parsed = Number(String(this.progressDraft).replace(",", "."));
+            if (Number.isNaN(parsed)) {
+                return;
+            }
+            this.progress = this.clampProgress(parsed);
+        },
+        nudgeProgress(direction) {
+            this.progress = this.clampProgress(this.progress + direction * this.progressStep);
+        },
+        progressValueLabel() {
+            const value = Number(this.progress || 0);
+            return value === Math.round(value) ? String(Math.round(value)) : String(Math.round(value * 10) / 10);
+        },
+        progressSuffix() {
+            if (this.progressMax != null) {
+                return `/${this.progressMax} ${this.progressUnit}`.trim();
+            }
+            return this.progressUnit;
+        },
+        progressCh() {
+            if (this.progressMax != null) {
+                return String(Math.floor(this.progressMax)).length;
+            }
+            return 4;
+        },
+        clampProgress(value) {
+            let next = Math.max(0, value);
+            if (this.progressMax != null) {
+                next = Math.min(this.progressMax, next);
+            }
+            return Math.round(next * 10) / 10;
+        },
+        allowedRelationTypes(otherType) {
+            return this.relationTypes.filter((opt) => {
+                if (opt.value === "other") {
+                    return true;
+                }
+                if (opt.value === "adaptation") {
+                    return otherType && otherType !== this.workType;
+                }
+                return otherType === this.workType;
+            });
+        },
+        relationKey(item) {
+            return `${item.id || "new"}-${item.type_key}-${item.work_id}`;
+        },
+        relationLabelFor(type, direction) {
+            const found = this.relationTypes.find((item) => item.value === type);
+            if (type === "sequel") {
+                return direction === "in" ? "Предыстория" : "Продолжение";
+            }
+            if (type === "spin_off") {
+                return direction === "in" ? "Оригинал" : "Спин-офф";
+            }
+            if (type === "adaptation") {
+                return direction === "in" ? "Первоисточник" : "Адаптация";
+            }
+            if (type === "remake") {
+                return direction === "in" ? "Оригинал" : "Ремейк";
+            }
+            return found ? found.label : "Связано";
+        },
+        toggleRelationType(item) {
+            const key = this.relationKey(item);
+            this.relTypeEdit = this.relTypeEdit === key ? null : key;
+        },
+        setRelationType(item, value) {
+            item.relation_type = value;
+            item.label = this.relationLabelFor(value, item.direction || "out");
+            this.relTypeEdit = null;
+        },
+        removeRelation(item) {
+            this.relations = this.relations.filter((rel) => rel !== item);
+        },
+        startRelationAdd() {
+            this.relAdding = true;
+            this.relQuery = "";
+            this.relResults = [];
+            this.relPick = null;
+            this.relPickType = "other";
+        },
+        cancelRelationAdd() {
+            this.relAdding = false;
+            this.relPick = null;
+            this.relQuery = "";
+            this.relResults = [];
+        },
+        searchRelatedWorks() {
+            const query = String(this.relQuery || "").trim();
+            if (!query || !this.relationSearchUrl) {
+                this.relResults = [];
+                return;
+            }
+            const params = new URLSearchParams({
+                q: query,
+                exclude_type: this.workType,
+                exclude_id: String(this.workId || ""),
+            });
+            fetch(`${this.relationSearchUrl}?${params.toString()}`, {
+                headers: { "X-Requested-With": "XMLHttpRequest" },
+            })
+                .then((response) => (response.ok ? response.json() : { results: [] }))
+                .then((data) => {
+                    const taken = new Set(
+                        this.relations.map((item) => `${item.type_key}-${item.work_id}`)
+                    );
+                    this.relResults = (data.results || []).filter(
+                        (item) => !taken.has(`${item.type_key}-${item.work_id}`)
+                    );
+                });
+        },
+        commitRelationAdd() {
+            if (!this.relPick) {
+                return;
+            }
+            const allowed = this.allowedRelationTypes(this.relPick.type_key).map((item) => item.value);
+            const type = allowed.includes(this.relPickType) ? this.relPickType : allowed[0];
+            this.relations = [
+                ...this.relations,
+                {
+                    id: null,
+                    title: this.relPick.title,
+                    cover_url: this.relPick.cover_url,
+                    icon: this.relPick.icon,
+                    type_key: this.relPick.type_key,
+                    work_id: this.relPick.work_id,
+                    relation_type: type,
+                    direction: "out",
+                    label: this.relationLabelFor(type, "out"),
+                },
+            ];
+            this.cancelRelationAdd();
+        },
+        relationsJson() {
+            return JSON.stringify(
+                this.relations.map((item) => ({
+                    id: item.id || null,
+                    relation_type: item.relation_type,
+                    type_key: item.type_key,
+                    work_id: item.work_id,
+                }))
+            );
+        },
+    }));
+});
