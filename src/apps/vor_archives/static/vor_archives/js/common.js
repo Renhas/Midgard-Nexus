@@ -467,4 +467,54 @@
             "X-Requested-With": "XMLHttpRequest"
         };
     };
+
+    window.getCollectionUrl = function (baseUrl, id, rest = "") {
+        const base = String(baseUrl || "").replace(/tree\/?$/, "");
+        return `${base}${id}/${rest}`;
+    };
+
+    window.getCollectionPathFromTree = function (id) {
+        const item = document.querySelector(`.collection-item[data-collection-id="${id}"]`);
+        const path = [];
+        let node = item?.closest(".collection-tree-node");
+        while (node) {
+            const row = node.querySelector(":scope > .collection-item");
+            if (row?.dataset.collectionId) {
+                path.unshift({
+                    id: Number(row.dataset.collectionId),
+                    name: row.dataset.collectionName || "",
+                });
+            }
+            node = node.parentElement?.closest(".collection-tree-node") || null;
+        }
+        return path;
+    };
+
+    window.getCollectionNode = function (id) {
+        return document.querySelector(`.collection-tree-node[data-collection-id="${id}"]`);
+    };
+
+    window.getCollectionSiblings = function (node) {
+        const parent = node?.parentElement;
+        if (!parent) {
+            return [];
+        }
+        return [...parent.querySelectorAll(":scope > .collection-tree-node")];
+    };
+
+    window.flattenCollectionTree = function (nodes, level = 0) {
+        const out = [];
+        (nodes || []).forEach((node) => {
+            out.push({
+                id: node.id,
+                name: node.name,
+                in_collection: Boolean(node.in_collection),
+                level,
+            });
+            if (node.children?.length) {
+                out.push(...window.flattenCollectionTree(node.children, level + 1));
+            }
+        });
+        return out;
+    };
 })();

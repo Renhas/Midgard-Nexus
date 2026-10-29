@@ -265,8 +265,7 @@ document.addEventListener("alpine:init", () => {
             return this.sortField === "custom" && !this.deleteMode;
         },
         collectionUrl(id, rest = "") {
-            const base = String(this.collectionTreeUrl || "").replace(/tree\/?$/, "");
-            return `${base}${id}/${rest}`;
+            return window.getCollectionUrl(this.collectionTreeUrl, id, rest);
         },
         csrfHeaders() {
             return window.getCsrfHeaders();
@@ -413,22 +412,7 @@ document.addEventListener("alpine:init", () => {
             this.applyCollectionTreeState();
         },
         collectionPathFromTree(id) {
-            const item = document.querySelector(
-                `.collection-item[data-collection-id="${id}"]`,
-            );
-            const path = [];
-            let node = item?.closest(".collection-tree-node");
-            while (node) {
-                const row = node.querySelector(":scope > .collection-item");
-                if (row?.dataset.collectionId) {
-                    path.unshift({
-                        id: Number(row.dataset.collectionId),
-                        name: row.dataset.collectionName || "",
-                    });
-                }
-                node = node.parentElement?.closest(".collection-tree-node") || null;
-            }
-            return path;
+            return window.getCollectionPathFromTree(id);
         },
         refreshCollectionPath() {
             if (!this.collectionId) {
@@ -523,14 +507,10 @@ document.addEventListener("alpine:init", () => {
             });
         },
         collectionNode(id) {
-            return document.querySelector(`.collection-tree-node[data-collection-id="${id}"]`);
+            return window.getCollectionNode(id);
         },
         collectionSiblings(node) {
-            const parent = node?.parentElement;
-            if (!parent) {
-                return [];
-            }
-            return [...parent.querySelectorAll(":scope > .collection-tree-node")];
+            return window.getCollectionSiblings(node);
         },
         postCollectionMove(node) {
             const parentEl = node?.parentElement;
@@ -882,19 +862,7 @@ document.addEventListener("alpine:init", () => {
             this.postCollectionMove(node);
         },
         flattenCollectionTree(nodes, level = 0) {
-            const out = [];
-            (nodes || []).forEach((node) => {
-                out.push({
-                    id: node.id,
-                    name: node.name,
-                    in_collection: Boolean(node.in_collection),
-                    level,
-                });
-                if (node.children?.length) {
-                    out.push(...this.flattenCollectionTree(node.children, level + 1));
-                }
-            });
-            return out;
+            return window.flattenCollectionTree(nodes, level);
         },
         loadArtworkCollections() {
             if (!this.menu.uwId || !this.listUrl) {
