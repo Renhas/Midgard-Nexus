@@ -1,0 +1,14 @@
+<div class="artwork-list-segment">
+    <button type="button"
+            class="artwork-list-segment-title"
+            data-collection-id="{{ segment.collection.pk }}"
+            data-collection-name="{{ segment.collection.name }}"
+            @click="$store.vorArtworks.selectCollectionFromEl($el)">
+        {{ segment.collection.name }}
+    </button>
+    <div class="artwork-list-items artwork-list-items-nested">
+        {% for user_work in segment.user_works %}
+            {% include "vor_archives/partials/artworks/list/artwork_row.html" with user_work=user_work %}
+        {% endfor %}
+    </div>
+</div>

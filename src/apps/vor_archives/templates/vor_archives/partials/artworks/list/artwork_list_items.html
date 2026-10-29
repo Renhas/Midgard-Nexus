@@ -1,0 +1,5 @@
+<div id="artwork-list-items" class="artwork-list-items">
+    {% for user_work in items %}
+        {% include "vor_archives/partials/artworks/list/artwork_row.html" with user_work=user_work %}
+    {% endfor %}
+</div>

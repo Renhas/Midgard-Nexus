@@ -1,79 +1,30 @@
 {% extends "vor_archives/base_vor.html" %}
+{% load static %}
 
 {% block title %}{{ block.super }} - Произведения{% endblock %}
 
+{% block extra_head %}
+    {{ block.super }}
+    {# Page-specific: list, add form, context menu, artwork overlay. #}
+    <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/list.css' %}">
+    <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/add.css' %}">
+    <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/context_menu.css' %}">
+    <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/overlay.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'vor_archives/js/artworks/helpers.js' %}"></script>
+    <script src="{% static 'vor_archives/js/artworks/store.js' %}"></script>
+    <script src="{% static 'vor_archives/js/artworks/events.js' %}"></script>
+    <script src="{% static 'vor_archives/js/artworks/row_preview.js' %}"></script>
+    <script src="{% static 'vor_archives/js/artworks/overlay.js' %}"></script>
+    <script src="{% static 'vor_archives/js/artworks/add.js' %}"></script>
+    <script src="{% static 'vor_archives/js/artworks/chip.js' %}"></script>
+{% endblock %}
+
 {% block left_content %}
-<div class="sidebar-nav">
-    <div class="sidebar-nav-row">
-        <button type="button"
-                class="sidebar-btn sidebar-btn-primary"
-                title="Медиатека"
-                :class="{ 'active': !$store.vorArtworks.collectionId }"
-                @click="$store.vorArtworks.selectLibrary()">
-            <i class="bi bi-collection"></i>
-            <span>Медиатека</span>
-        </button>
-        <button type="button"
-                class="sidebar-btn sidebar-btn-icon"
-                title="Поиск"
-                @click="$store.vorArtworks.openSearch()">
-            <i class="bi bi-search"></i>
-        </button>
-    </div>
-    <div class="sidebar-nav-row">
-        <button type="button"
-                class="sidebar-btn sidebar-btn-add"
-                title="Добавить"
-                x-show="!$store.vorArtworks.deleteMode"
-                hx-get="{% url 'vor_archives:artworks:add' %}"
-                hx-target="#vor-overlay"
-                hx-swap="innerHTML">
-            <i class="bi bi-plus-circle"></i>
-        </button>
-        <button type="button"
-                class="sidebar-btn sidebar-btn-add"
-                title="Отменить"
-                x-show="$store.vorArtworks.deleteMode"
-                x-cloak
-                @click="$store.vorArtworks.exitDeleteMode()">
-            <i class="bi bi-x-circle"></i>
-        </button>
-        <button type="button"
-                class="sidebar-btn sidebar-btn-delete"
-                title="Удалить"
-                x-show="!$store.vorArtworks.deleteMode"
-                @click="$store.vorArtworks.enterDeleteMode()">
-            <i class="bi bi-trash"></i>
-        </button>
-        <button type="button"
-                class="sidebar-btn sidebar-btn-delete"
-                title="Подтвердить"
-                x-show="$store.vorArtworks.deleteMode"
-                x-cloak
-                :disabled="!$store.vorArtworks.selectedIds.length"
-                @click="$store.vorArtworks.openPreview()">
-            <i class="bi bi-check-lg"></i>
-        </button>
-    </div>
-    <hr class="sidebar-divider">
-    <div class="sidebar-collections">
-        <div class="sidebar-collections-header">
-            <span>Коллекции</span>
-        </div>
-        <div id="sidebar-collections-list" class="sidebar-collections-list">
-            {% include "vor_archives/partials/collection_tree.html" %}
-        </div>
-        <button type="button"
-                class="sidebar-btn sidebar-btn-add sidebar-btn-full"
-                title="Добавить коллекцию"
-                hx-get="{% url 'vor_archives:collections:new' %}"
-                hx-target="#vor-modal"
-                hx-swap="innerHTML">
-            <i class="bi bi-plus-circle"></i>
-            <span>Добавить коллекцию</span>
-        </button>
-    </div>
-</div>
+{% include "vor_archives/partials/artworks/sidebar/artwork_sidebar_left.html" %}
 {% endblock %}
 
 {% block vor_content %}
@@ -112,73 +63,10 @@
      x-data
      x-init="$store.vorArtworks.initFromPage(JSON.parse(document.getElementById('vor-artworks-opts').textContent))">
     {# ========== ПРАВАЯ ПАНЕЛЬ — ТИПЫ ============ #}
-    <div class="sidebar-nav-row">
-        <button type="button"
-            class="sidebar-btn sidebar-btn-type"
-            :class="{ 'active': $store.vorArtworks.workTypes.includes('book') }"
-            @click="$store.vorArtworks.toggleType('book')"
-            title="Книги">
-            <i class="icon-book-text"></i>
-        </button>
-        <button type="button"
-            class="sidebar-btn sidebar-btn-type"
-            :class="{ 'active': $store.vorArtworks.workTypes.includes('film') }"
-            @click="$store.vorArtworks.toggleType('film')"
-            title="Фильмы">
-            <i class="icon-clapperboard"></i>
-        </button>
-        <button type="button"
-            class="sidebar-btn sidebar-btn-type"
-            :class="{ 'active': $store.vorArtworks.workTypes.includes('game') }"
-            @click="$store.vorArtworks.toggleType('game')"
-            title="Игры">
-            <i class="icon-gamepad-2"></i>
-        </button>
-    </div>
-    <label class="vor-switch sidebar-hidden-switch">
-        <input type="checkbox"
-               class="vor-switch-input"
-               x-model="$store.vorArtworks.showHidden"
-               @change="$store.vorArtworks.setShowHidden($store.vorArtworks.showHidden)">
-        <span class="vor-switch-track" aria-hidden="true">
-            <span class="vor-switch-thumb"></span>
-        </span>
-        <span>Показывать скрытое</span>
-    </label>
+    {% include "vor_archives/partials/artworks/sidebar/artwork_sidebar_work_types.html" %}
+    {% include "vor_archives/partials/artworks/sidebar/artwork_sidebar_hidden_switch.html" %}
     <hr class="sidebar-divider">
-    {# ========== ПРАВАЯ ПАНЕЛЬ — ОТОБРАЖЕНИЕ ============ #}
-    <div class="sidebar-nav-row">
-        <button type="button"
-            class="sidebar-btn sidebar-btn-display"
-            :class="{ 'active': $store.vorArtworks.viewMode === 'list' }"
-            @click="$store.vorArtworks.setViewMode('list')"
-            title="Список">
-            <i class="bi bi-list-ul"></i>
-        </button>
-        <button type="button"
-            class="sidebar-btn sidebar-btn-display"
-            :class="{ 'active': $store.vorArtworks.viewMode === 'grid' }"
-            @click="$store.vorArtworks.setViewMode('grid')"
-            title="Плитки">
-            <i class="bi bi-grid"></i>
-        </button>
-    </div>
-    {# ========== ПРАВАЯ ПАНЕЛЬ — СОРТИРОВКА ============ #}
-    <div class="sidebar-nav-row">
-        <button type="button"
-            class="sidebar-btn sidebar-btn-icon"
-            @click="$store.vorArtworks.toggleSortDir()"
-            title="Изменить направление">
-            <i class="bi" :class="$store.vorArtworks.sortAsc ? 'bi-sort-down-alt' : 'bi-sort-up-alt'"></i>
-        </button>
-        <select class="sidebar-select"
-                :value="$store.vorArtworks.sortField"
-                @change="$store.vorArtworks.setSortField($event.target.value)">
-            {% for field in sort_fields %}
-            <option value="{{ field.value }}">{{ field.label }}</option>
-            {% endfor %}
-        </select>
-    </div>
+    {% include "vor_archives/partials/artworks/sidebar/artwork_sidebar_view_sort.html" %}
     <hr class="sidebar-divider">
     {# ========== ПРАВАЯ ПАНЕЛЬ — ФИЛЬТРЫ ========= #}
     <div class="sidebar-filters">
@@ -193,11 +81,11 @@
                 <i class="bi bi-arrow-counterclockwise"></i>
             </button>
         </div>
-        {% include 'vor_archives/partials/filter_accordion.html' with title='Статус' options=status_options name='status' %}
-        {% include 'vor_archives/partials/filter_accordion.html' with title='Возрастной рейтинг' options=age_rating_options name='age_rating' %}
-        {% include 'vor_archives/partials/filter_accordion.html' with title='Теги' options=tags_options name='tags' searchable=True %}
-        {% include 'vor_archives/partials/filter_accordion.html' with title='Жанры' nested=genres_nested %}
-        {% include 'vor_archives/partials/filter_accordion.html' with title='Платформы' options=platform_options name='platform' show_condition="$store.vorArtworks.workTypes.includes('game')" searchable=True %}
+        {% include 'vor_archives/partials/artworks/sidebar/filter_accordion.html' with title='Статус' options=status_options name='status' %}
+        {% include 'vor_archives/partials/artworks/sidebar/filter_accordion.html' with title='Возрастной рейтинг' options=age_rating_options name='age_rating' %}
+        {% include 'vor_archives/partials/artworks/sidebar/filter_accordion.html' with title='Теги' options=tags_options name='tags' searchable=True %}
+        {% include 'vor_archives/partials/artworks/sidebar/filter_accordion.html' with title='Жанры' nested=genres_nested %}
+        {% include 'vor_archives/partials/artworks/sidebar/filter_accordion.html' with title='Платформы' options=platform_options name='platform' show_condition="$store.vorArtworks.workTypes.includes('game')" searchable=True %}
     </div>
 </div>
 {% endblock %}
@@ -207,24 +95,7 @@
 <div id="vor-overlay"></div>
 <div id="vor-modal"
      data-vor-delete-preview="{% url 'vor_archives:artworks:delete_preview' %}"></div>
-<div class="vor-search-backdrop"
-     x-show="$store.vorArtworks.searchOpen"
-     x-cloak
-     @click.self="$store.vorArtworks.closeSearch()">
-    <div class="vor-search-panel"
-         :class="{ 'has-query': String($store.vorArtworks.searchQuery || '').trim() }">
-        <div class="vor-search-field">
-            <i class="bi bi-search"></i>
-            <input id="vor-library-search-input"
-                   type="text"
-                   x-model="$store.vorArtworks.searchQuery"
-                   @input="$store.vorArtworks.onSearchInput()"
-                   placeholder="Поиск"
-                   autocomplete="off">
-        </div>
-        <div id="vor-library-search-results" x-data></div>
-    </div>
-</div>
+{% include "vor_archives/partials/artworks/search/artwork_library_search.html" %}
 <div x-data="{ visible: false }"
     @collection-update.window="visible = true; setTimeout(() => visible = false, 3000)"
     :class="{ 'd-none': !visible }"
@@ -233,133 +104,5 @@
     <i class="bi bi-arrow-clockwise"></i>
     <span>Коллекция обновлена</span>
 </div>
-<div id="vor-context-menu"
-     class="vor-context-menu"
-     x-data
-     x-show="$store.vorArtworks.menu.open"
-     x-cloak
-     :class="{ 'has-flyout': $store.vorArtworks.menu.flyout }"
-     :style="`left: ${$store.vorArtworks.menu.x}px; top: ${$store.vorArtworks.menu.y}px`"
-     @contextmenu.prevent
-     @wheel.stop
-     @scroll.stop>
-    <template x-if="$store.vorArtworks.menu.kind === 'collection'">
-        <div>
-            <button type="button" class="vor-context-item" @click="$store.vorArtworks.menuRenameCollection()">
-                <i class="bi bi-pencil"></i>
-                <span>Переименовать</span>
-            </button>
-            <button type="button"
-                    class="vor-context-item"
-                    :class="{ 'is-disabled': !$store.vorArtworks.menu.canNudgeUp }"
-                    :disabled="!$store.vorArtworks.menu.canNudgeUp"
-                    @click="$store.vorArtworks.nudgeCollection(-1)">
-                <i class="bi bi-arrow-up"></i>
-                <span>Вверх</span>
-            </button>
-            <button type="button"
-                    class="vor-context-item"
-                    :class="{ 'is-disabled': !$store.vorArtworks.menu.canNudgeDown }"
-                    :disabled="!$store.vorArtworks.menu.canNudgeDown"
-                    @click="$store.vorArtworks.nudgeCollection(1)">
-                <i class="bi bi-arrow-down"></i>
-                <span>Вниз</span>
-            </button>
-            <button type="button"
-                    class="vor-context-item"
-                    :class="{ 'is-disabled': !$store.vorArtworks.menu.canLevelUp }"
-                    :disabled="!$store.vorArtworks.menu.canLevelUp"
-                    @click="$store.vorArtworks.shiftCollectionLevel(-1)">
-                <i class="bi bi-box-arrow-up-left"></i>
-                <span>Уровень вверх</span>
-            </button>
-            <button type="button"
-                    class="vor-context-item"
-                    :class="{ 'is-disabled': !$store.vorArtworks.menu.canLevelDown }"
-                    :disabled="!$store.vorArtworks.menu.canLevelDown"
-                    @click="$store.vorArtworks.shiftCollectionLevel(1)">
-                <i class="bi bi-box-arrow-in-down-right"></i>
-                <span>Уровень вниз</span>
-            </button>
-            <button type="button" class="vor-context-item is-danger" @click="$store.vorArtworks.menuDeleteCollection()">
-                <i class="bi bi-trash"></i>
-                <span>Удалить</span>
-            </button>
-        </div>
-    </template>
-    <template x-if="$store.vorArtworks.menu.kind === 'artwork'">
-        <div>
-            <button type="button" class="vor-context-item" @click="$store.vorArtworks.menuEditArtwork()">
-                <i class="bi bi-pencil"></i>
-                <span>Редактировать</span>
-            </button>
-            <button type="button"
-                    class="vor-context-item"
-                    :class="{ 'is-disabled': !$store.vorArtworks.menu.canNudgeUp }"
-                    :disabled="!$store.vorArtworks.menu.canNudgeUp"
-                    @click="$store.vorArtworks.nudgeArtwork(-1)">
-                <i class="bi bi-arrow-up"></i>
-                <span>Вверх</span>
-            </button>
-            <button type="button"
-                    class="vor-context-item"
-                    :class="{ 'is-disabled': !$store.vorArtworks.menu.canNudgeDown }"
-                    :disabled="!$store.vorArtworks.menu.canNudgeDown"
-                    @click="$store.vorArtworks.nudgeArtwork(1)">
-                <i class="bi bi-arrow-down"></i>
-                <span>Вниз</span>
-            </button>
-            <button type="button"
-                    class="vor-context-item has-submenu"
-                    @mouseenter="$store.vorArtworks.openCollectionFlyout()"
-                    @mouseleave="$store.vorArtworks.scheduleCloseFlyout()"
-                    @click.stop="$store.vorArtworks.toggleCollectionFlyout()">
-                <span>
-                    <i class="bi bi-folder"></i>
-                    <span>Коллекции</span>
-                </span>
-                <i class="bi bi-chevron-right"></i>
-            </button>
-            <button type="button"
-                    class="vor-context-item"
-                    x-show="$store.vorArtworks.menu.canRemoveFromCollection"
-                    @click="$store.vorArtworks.removeFromCurrentCollection()">
-                <i class="bi bi-folder-minus"></i>
-                <span>Убрать из коллекции</span>
-            </button>
-            <button type="button" class="vor-context-item is-danger" @click="$store.vorArtworks.menuDeleteArtwork()">
-                <i class="bi bi-trash"></i>
-                <span>Удалить</span>
-            </button>
-        </div>
-    </template>
-    <div class="vor-context-flyout"
-         x-show="$store.vorArtworks.menu.flyout && $store.vorArtworks.menu.kind === 'artwork'"
-         x-cloak
-         :style="`left: ${$store.vorArtworks.menu.flyoutX}px; top: ${$store.vorArtworks.menu.flyoutY}px`"
-         @mouseenter="$store.vorArtworks.cancelCloseFlyout()"
-         @mouseleave="$store.vorArtworks.scheduleCloseFlyout()"
-         @mousedown.stop
-         @click.stop
-         @wheel.stop
-         @scroll.stop>
-        <div class="vor-context-flyout-empty" x-show="$store.vorArtworks.menu.membershipLoading">
-            Загрузка…
-        </div>
-        <div class="vor-context-flyout-empty"
-             x-show="!$store.vorArtworks.menu.membershipLoading && !$store.vorArtworks.menu.membership.length">
-            Нет коллекций
-        </div>
-        <template x-for="item in $store.vorArtworks.menu.membership" :key="'member-' + item.id">
-            <button type="button"
-                    class="vor-context-item"
-                    :class="{ 'is-checked': item.in_collection }"
-                    :style="`padding-left: ${0.65 + item.level * 0.85}rem`"
-                    @click.stop="$store.vorArtworks.toggleWorkCollection(item)">
-                <i class="bi" :class="item.in_collection ? 'bi-check-square' : 'bi-square'"></i>
-                <span x-text="item.name"></span>
-            </button>
-        </template>
-    </div>
-</div>
+{% include "vor_archives/partials/artworks/artwork_context_menu.html" %}
 {% endblock %}

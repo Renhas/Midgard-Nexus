@@ -1,12 +1,32 @@
 {% extends "vor_archives/base_vor.html" %}
+{% load static %}
 
 {% block title %}{{ block.super }} - Дашборд{% endblock %}
+
+{% block extra_head %}
+    {{ block.super }}
+    {# Feed items open artwork overlay, so the overlay styles are required here. #}
+    <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/overlay.css' %}">
+    <link rel="stylesheet" href="{% static 'vor_archives/css/dashboard/dashboard.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    {# Feed items open artwork overlay; overlay uses vorArtworks store and chip overflow. #}
+    <script src="{% static 'vor_archives/js/artworks/helpers.js' %}"></script>
+    <script src="{% static 'vor_archives/js/artworks/store.js' %}"></script>
+    <script src="{% static 'vor_archives/js/artworks/events.js' %}"></script>
+    <script src="{% static 'vor_archives/js/artworks/overlay.js' %}"></script>
+    <script src="{% static 'vor_archives/js/artworks/chip.js' %}"></script>
+    <script src="{% static 'vor_archives/js/dashboard/charts.js' %}"></script>
+    <script src="{% static 'vor_archives/js/dashboard/dashboard.js' %}"></script>
+{% endblock %}
 
 {% block left_content %}
 <div class="sidebar-nav">
     {% for tab in dash_tabs %}
         <a href="{% url 'vor_archives:dashboard_tab' tab.kind %}"
-           class="sidebar-btn sidebar-btn-full attr-tab{% if tab.kind == dash_kind %} active{% endif %}"
+           class="sidebar-btn sidebar-btn-full sidebar-btn-tab{% if tab.kind == dash_kind %} active{% endif %}"
            title="{{ tab.label }}">
             <i class="{{ tab.icon }}"></i>
             <span>{{ tab.label }}</span>
@@ -17,11 +37,11 @@
 
 {% block vor_content %}
     {% if dash_kind == "stats" %}
-        {% include "vor_archives/partials/dash_stats.html" %}
+        {% include "vor_archives/partials/dashboard/dash_stats.html" %}
     {% elif dash_kind == "attrs" %}
-        {% include "vor_archives/partials/dash_attrs.html" %}
+        {% include "vor_archives/partials/dashboard/dash_attrs.html" %}
     {% elif dash_kind == "activity" %}
-        {% include "vor_archives/partials/dash_activity.html" %}
+        {% include "vor_archives/partials/dashboard/dash_activity.html" %}
     {% endif %}
 {% endblock %}
 

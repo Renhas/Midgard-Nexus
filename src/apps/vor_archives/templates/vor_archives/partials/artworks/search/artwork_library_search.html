@@ -1,0 +1,18 @@
+<div class="vor-search-backdrop"
+     x-show="$store.vorArtworks.searchOpen"
+     x-cloak
+     @click.self="$store.vorArtworks.closeSearch()">
+    <div class="vor-search-panel"
+         :class="{ 'has-query': String($store.vorArtworks.searchQuery || '').trim() }">
+        <div class="vor-search-field">
+            <i class="bi bi-search"></i>
+            <input id="vor-library-search-input"
+                   type="text"
+                   x-model="$store.vorArtworks.searchQuery"
+                   @input="$store.vorArtworks.onSearchInput()"
+                   placeholder="Поиск"
+                   autocomplete="off">
+        </div>
+        <div id="vor-library-search-results" x-data></div>
+    </div>
+</div>

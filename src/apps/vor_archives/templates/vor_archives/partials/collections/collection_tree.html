@@ -1,0 +1,5 @@
+<div id="collection-tree-root" class="collection-tree-root" data-parent-id="">
+    {% for collection in collections %}
+        {% include "vor_archives/partials/collections/collection_tree_item.html" with collection=collection %}
+    {% endfor %}
+</div>

@@ -12,7 +12,7 @@ from apps.vor_archives.constants import (
     age_rating_options,
     status_options,
 )
-from apps.vor_archives.registry import WORK_MODELS
+from apps.vor_archives.registry import WORK_MODELS, WORK_TYPE_REGISTRY
 from apps.vor_archives.models import UserWork
 from apps.vor_archives.artworks.forms import RelationsForm, UserWorkEditForm
 from apps.vor_archives.artworks.presenters import build_overlay_context
@@ -56,7 +56,7 @@ def artwork_list(request):
         user_works = list_user_works(request.user, params)
     return render(
         request,
-        "vor_archives/partials/artwork_list.html",
+        "vor_archives/partials/artworks/list/artwork_list.html",
         {
             "collection": collection,
             "user_works": user_works,
@@ -116,7 +116,7 @@ def artwork_add(request):
 
     return render(
         request,
-        "vor_archives/partials/artwork_add.html",
+        "vor_archives/partials/artworks/artwork_add.html",
         {
             "add_opts": {
                 "workType": "book",
@@ -131,6 +131,7 @@ def artwork_add(request):
                 "ageChoices": age_rating_options(),
                 "statusChoices": status_options(),
             },
+            "work_types": WORK_TYPE_REGISTRY.values(),
         },
     )
 
@@ -191,7 +192,7 @@ def artwork_overlay_response(request, work, user_work=None):
                 prefetch_work_with_user_work(saved, user_work)
                 response = render(
                     request,
-                    "vor_archives/partials/artwork_overlay.html",
+                    "vor_archives/partials/artworks/overlay/artwork_overlay.html",
                     build_overlay_context(
                         request,
                         saved,
@@ -207,7 +208,7 @@ def artwork_overlay_response(request, work, user_work=None):
 
         return render(
             request,
-            "vor_archives/partials/artwork_overlay.html",
+            "vor_archives/partials/artworks/overlay/artwork_overlay.html",
             build_overlay_context(
                 request,
                 work,
@@ -226,7 +227,7 @@ def artwork_overlay_response(request, work, user_work=None):
     )
     return render(
         request,
-        "vor_archives/partials/artwork_overlay.html",
+        "vor_archives/partials/artworks/overlay/artwork_overlay.html",
         build_overlay_context(
             request,
             work,

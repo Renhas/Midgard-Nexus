@@ -1,0 +1,26 @@
+<div class="vor-progress-row">
+    <span class="vor-field-label">Прогресс:</span>
+    <div class="vor-progress"
+         :class="{ 'is-editing': progressEditing }"
+         :style="{ '--progress-ch': progressCh() + 'ch' }">
+        <span class="vor-progress-text">
+            <span class="vor-progress-value"
+                  x-show="!progressEditing"
+                  :class="{ 'is-hot': progressHover || progressEditing }"
+                  @mouseenter="progressHover = true"
+                  @mouseleave="progressHover = false"
+                  @click="startProgressEdit()"
+                  x-text="progressValueLabel()"></span>
+            <input class="vor-progress-input"
+                   x-show="progressEditing"
+                   x-ref="progressInput"
+                   x-model="progressDraft"
+                   @keydown.enter.prevent="commitProgress()"
+                   @keydown.escape.prevent="cancelProgressEdit()"
+                   @blur="commitProgress()">
+            <span class="vor-progress-suffix" x-text="progressSuffix()"></span>
+        </span>
+        <button type="button" class="vor-progress-btn vor-progress-btn-plus" @click="nudgeProgress(1)" title="Увеличить">+</button>
+        <button type="button" class="vor-progress-btn" @click="nudgeProgress(-1)" title="Уменьшить">−</button>
+    </div>
+</div>

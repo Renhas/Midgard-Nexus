@@ -57,7 +57,7 @@ def _attach_already_response(request, work, type_key):
     meta = progress_meta_for_work(work)
     return render(
         request,
-        "vor_archives/partials/work_preview_card.html",
+        "vor_archives/partials/common/work_preview_card.html",
         {
             "work": work,
             "work_type": type_key,
@@ -82,7 +82,7 @@ def artwork_delete_preview(request):
     orphans = orphan_works(user_works)
     return render(
         request,
-        "vor_archives/partials/delete_confirm.html",
+        "vor_archives/partials/artworks/list/delete_confirm.html",
         {
             "ids": [uw.pk for uw in user_works],
             "count": len(user_works),
@@ -102,7 +102,7 @@ def artwork_preview(request):
     meta = progress_meta_for_work(work)
     return render(
         request,
-        "vor_archives/partials/work_preview_card.html",
+        "vor_archives/partials/common/work_preview_card.html",
         {
             "work": work,
             "work_type": type_key,

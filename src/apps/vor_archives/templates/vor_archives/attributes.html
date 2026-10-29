@@ -1,12 +1,23 @@
 {% extends "vor_archives/base_vor.html" %}
+{% load static %}
 
 {% block title %}{{ block.super }} - Аттрибуты{% endblock %}
+
+{% block extra_head %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'vor_archives/css/attributes/attributes.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'vor_archives/js/attributes/attributes.js' %}"></script>
+{% endblock %}
 
 {% block left_content %}
 <div class="sidebar-nav">
     {% for tab in attr_tabs %}
         <a href="{% url 'vor_archives:attributes_kind' tab.kind %}"
-           class="sidebar-btn sidebar-btn-full attr-tab{% if tab.kind == attr_kind %} active{% endif %}"
+           class="sidebar-btn sidebar-btn-full sidebar-btn-tab{% if tab.kind == attr_kind %} active{% endif %}"
            title="{{ tab.label }}">
             <i class="{{ tab.icon }}"></i>
             <span>{{ tab.label }}</span>
@@ -80,7 +91,7 @@
         </div>
         <div class="attr-detail-pane">
             <div id="attr-detail" class="attr-detail">
-                {% include "vor_archives/partials/attr_empty.html" %}
+                {% include "vor_archives/partials/attributes/attr_empty.html" %}
             </div>
         </div>
     </div>

@@ -1,0 +1,225 @@
+/* ============================================
+    VOR Archives — Modals
+    ============================================ */
+
+/* --- Collection form --- */
+.vor-modal-input {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  background: var(--bg-input, transparent);
+  color: var(--text-primary);
+}
+
+.vor-modal-input:focus {
+  outline: none;
+  border-color: var(--accent-vor);
+}
+
+.vor-modal-error {
+  color: var(--action-delete);
+  font-size: 0.875rem;
+  margin-bottom: 0.65rem;
+}
+
+/* --- Backdrop and shell --- */
+.vor-modal-actions-center {
+  justify-content: center;
+}
+
+.vor-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  top: var(--header-height);
+  z-index: 1025;
+  background-color: rgba(11, 17, 32, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.vor-modal {
+  width: min(480px, 100%);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 1.25rem 1.35rem;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.4);
+}
+
+.vor-modal-title {
+  font-size: 1.1rem;
+  margin-bottom: 0.65rem;
+}
+
+.vor-modal-text {
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.vor-modal-warning {
+  border: 1px solid var(--action-delete);
+  background-color: rgba(239, 68, 68, 0.08);
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+
+.vor-orphan-list {
+  max-height: 160px;
+  overflow-y: auto;
+  margin: 0.5rem 0 0;
+  padding-left: 1.15rem;
+}
+
+.vor-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* --- Library search --- */
+.vor-search-backdrop {
+  position: fixed;
+  inset: 0;
+  top: var(--header-height);
+  z-index: 1030;
+  background-color: rgba(11, 17, 32, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.vor-search-panel {
+  width: min(560px, 100%);
+  transition: transform 0.2s ease, margin 0.2s ease;
+}
+
+.vor-search-panel.has-query {
+  align-self: flex-start;
+  margin-top: 12vh;
+}
+
+.vor-search-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.vor-search-field i {
+  position: absolute;
+  left: 1rem;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.vor-search-field input {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  text-align: center;
+  font-size: 1rem;
+}
+
+.vor-search-field input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.55;
+}
+
+.vor-search-field input:focus {
+  outline: none;
+  border-color: var(--accent-hover);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.vor-search-segment {
+  margin-top: 0.85rem;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.75rem;
+}
+
+.vor-search-segment-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin: 0 0 0.45rem;
+}
+
+.vor-search-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-height: 42vh;
+  overflow-y: auto;
+}
+
+.vor-search-result {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.vor-search-result-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  text-align: left;
+  border-radius: 0.375rem;
+  cursor: pointer;
+}
+
+.vor-search-result-main:hover {
+  background-color: rgba(167, 145, 255, 0.12);
+}
+
+.vor-search-cover {
+  width: 28px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 0.2rem;
+  flex-shrink: 0;
+}
+
+.vor-search-cover-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-input);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.vor-search-result-title {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vor-search-empty {
+  margin-top: 0.85rem;
+  text-align: center;
+  color: var(--text-secondary);
+}

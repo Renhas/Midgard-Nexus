@@ -1,0 +1,45 @@
+{% load vor_archives_extras %}
+<div class="artwork-row"
+     hx-get="{% url 'vor_archives:artworks:detail' user_work.pk %}"
+     hx-target="#vor-overlay"
+     hx-swap="innerHTML"
+     @contextmenu.prevent="$store.vorArtworks.openArtworkMenu($event, $el.closest('.artwork-item'))">
+    <div class="artwork-row-check">
+        <span class="custom-checkbox"></span>
+    </div>
+    <div class="artwork-row-type">
+        <i class="{{ user_work|get_work_type_icon }}"></i>
+    </div>
+    <div class="artwork-row-title">
+        {{ user_work.work.title }}
+    </div>
+    <div class="artwork-row-year">
+        {% if user_work.work.release_date %}
+            {{ user_work.work.release_date|date:'Y' }}
+        {% endif %}
+    </div>
+    <div class="artwork-row-status status-{{ user_work.status }}">
+        {{ user_work.get_status_display }}
+    </div>
+    <div class="artwork-row-rating">
+        {% if user_work.rating %}
+            {{ user_work.rating }}
+        {% else %}
+            —
+        {% endif %}
+    </div>
+    <div class="artwork-row-progress">
+        {{ user_work|format_progress }}
+    </div>
+</div>
+<div class="artwork-row-delete-slot">
+    <button type="button"
+            class="sidebar-btn sidebar-btn-delete sidebar-btn-icon artwork-row-delete"
+            title="Удалить"
+            @click.stop
+            hx-get="{% url 'vor_archives:artworks:delete_preview' %}?ids={{ user_work.pk }}"
+            hx-target="#vor-modal"
+            hx-swap="innerHTML">
+        <i class="bi bi-trash"></i>
+    </button>
+</div>
