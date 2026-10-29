@@ -14,54 +14,57 @@ html.vor-scroll-lock .center {
 
 /* --- Form fields (shared across modules) --- */
 .vor-field {
-    margin-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 
 .vor-field .vor-field-label {
-    display: block;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.3rem;
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.3rem;
 }
 
 .vor-field .form-control,
 .vor-field .form-select {
-    background-color: var(--bg-input);
-    border-color: var(--border);
-    color: var(--text-primary);
+  background-color: var(--bg-input);
+  border-color: var(--border);
+  color: var(--text-primary);
 }
 
 .vor-field .form-control:focus,
 .vor-field .form-select:focus {
-    background-color: var(--bg-input);
-    border-color: var(--accent-hover);
-    color: var(--text-primary);
-    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+  background-color: var(--bg-input);
+  border-color: var(--accent-hover);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
 }
 
 .vor-field-errors,
 .vor-field-errors ul {
-    color: var(--error);
-    font-size: 0.8rem;
-    margin: 0.25rem 0 0;
-    padding-left: 1rem;
+  color: var(--error);
+  font-size: 0.8rem;
+  margin: 0.25rem 0 0;
+  padding-left: 1rem;
 }
 
 .vor-field.has-error .form-control,
 .vor-field.has-error .form-select {
-    border-color: var(--error);
+  border-color: var(--error);
 }
 
 /* ===== Status colors (shared) ===== */
 .status-planning {
-    color: var(--text-secondary);
+  color: var(--text-secondary);
 }
+
 .status-in_progress {
-    color: var(--status-in-progress);
+  color: var(--status-in-progress);
 }
+
 .status-completed {
-    color: var(--success);
+  color: var(--success);
 }
+
 .status-dropped {
-    color: var(--error);
+  color: var(--error);
 }
