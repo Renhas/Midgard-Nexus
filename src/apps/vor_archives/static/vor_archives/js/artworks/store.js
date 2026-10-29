@@ -269,12 +269,7 @@ document.addEventListener("alpine:init", () => {
             return `${base}${id}/${rest}`;
         },
         csrfHeaders() {
-            const token = document.querySelector("[name=csrfmiddlewaretoken]")?.value
-                || window.getCookie("csrftoken");
-            return {
-                "X-CSRFToken": token || "",
-                "X-Requested-With": "XMLHttpRequest",
-            };
+            return window.getCsrfHeaders();
         },
         destroySortables(list) {
             (list || []).forEach((sortable) => {

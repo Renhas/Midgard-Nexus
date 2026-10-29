@@ -286,9 +286,7 @@ document.addEventListener("alpine:init", () => {
             (items || []).forEach((item) => body.append(name, String(item.id)));
         },
         csrfToken() {
-            return this.$refs.createForm?.querySelector("[name=csrfmiddlewaretoken]")?.value
-                || document.querySelector("[name=csrfmiddlewaretoken]")?.value
-                || window.getCookie("csrftoken");
+            return window.getCsrfToken();
         },
         async saveWork() {
             if (this.saving || !this.validateDraft()) {

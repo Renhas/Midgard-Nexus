@@ -455,4 +455,16 @@
         event.stopImmediatePropagation();
         window.Alpine?.store("vorArtworks")?.openSearch();
     }, true);
+    window.getCsrfToken = function () {
+        return document.querySelector("[name=csrfmiddlewaretoken]")?.value
+            || window.getCookie("csrftoken")
+            || "";
+    };
+
+    window.getCsrfHeaders = function () {
+        return {
+            "X-CSRFToken": window.getCsrfToken(),
+            "X-Requested-With": "XMLHttpRequest"
+        };
+    };
 })();

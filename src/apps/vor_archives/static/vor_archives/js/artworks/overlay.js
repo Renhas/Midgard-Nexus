@@ -583,7 +583,7 @@ document.addEventListener("alpine:init", () => {
             if (!this.quickUrl || this.attachOpen) {
                 return;
             }
-            const token = document.querySelector("[name=csrfmiddlewaretoken]")?.value;
+            const token = window.getCsrfToken();
             const body = new URLSearchParams({ field, value: String(value) });
             fetch(this.quickUrl, {
                 method: "POST",
@@ -613,8 +613,7 @@ document.addEventListener("alpine:init", () => {
             this.attachOpen = true;
         },
         csrfToken() {
-            return document.querySelector("[name=csrfmiddlewaretoken]")?.value
-                || window.getCookie("csrftoken");
+            return window.getCsrfToken();
         },
         async saveAttach() {
             if (this.saving || !this.attachUrl || !this.workId) {
