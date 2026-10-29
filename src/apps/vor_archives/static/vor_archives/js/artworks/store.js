@@ -280,6 +280,25 @@ document.addEventListener("alpine:init", () => {
                 }
             });
         },
+        setArtworkDragState(active) {
+            this._artworkDragging = active;
+            if (active) {
+                const dragViewClass = this.viewMode === "grid"
+                    ? "vor-artworks-grid-drag"
+                    : "vor-artworks-list-drag";
+                document.body.classList.add(dragViewClass, "vor-artworks-dragging");
+            } else {
+                document.body.classList.remove(
+                    "vor-artworks-grid-drag",
+                    "vor-artworks-list-drag",
+                    "vor-artworks-dragging"
+                );
+            }
+        },
+        setCollectionDragState(active) {
+            this.collectionDragging = active;
+            document.body.classList.toggle("vor-collections-dragging", active);
+        },
         syncSortable() {
             this.destroySortables(this._sortables);
             this._sortables = [];
@@ -290,9 +309,6 @@ document.addEventListener("alpine:init", () => {
             if (!this.canDrag() || typeof Sortable === "undefined") {
                 return;
             }
-            const dragViewClass = this.viewMode === "grid"
-                ? "vor-artworks-grid-drag"
-                : "vor-artworks-list-drag";
             const bindArtworkSortable = (container, allowSort) => {
                 this._sortables.push(Sortable.create(container, {
                     group: {
@@ -312,19 +328,13 @@ document.addEventListener("alpine:init", () => {
                     filter: ".artwork-row-delete, .artwork-tile-delete, .artwork-row-check, .artwork-tile-check",
                     preventOnFilter: true,
                     onStart: () => {
-                        this._artworkDragging = true;
+                        this.setArtworkDragState(true);
                         this.closeMenu();
                         window.getSelection?.().removeAllRanges();
-                        document.body.classList.add(dragViewClass, "vor-artworks-dragging");
                     },
                     onEnd: (evt) => {
-                        this._artworkDragging = false;
+                        this.setArtworkDragState(false);
                         this.clearCollectionDropTargets();
-                        document.body.classList.remove(
-                            "vor-artworks-grid-drag",
-                            "vor-artworks-list-drag",
-                            "vor-artworks-dragging",
-                        );
                         const point = evt.originalEvent;
                         const collectionId = this.collectionIdAtPoint(
                             point?.clientX,
@@ -589,25 +599,23 @@ document.addEventListener("alpine:init", () => {
                         return true;
                     },
                     onStart: (evt) => {
-                        this.collectionDragging = true;
+                        this.setCollectionDragState(true);
                         this._pendingNestId = "";
                         this._dragCollectionId = evt.item?.dataset?.collectionId || "";
                         if (evt.item) {
                             evt.item.style.pointerEvents = "none";
                         }
                         this.closeMenu();
-                        document.body.classList.add("vor-collections-dragging");
                     },
                     onEnd: (evt) => {
                         if (evt.item) {
                             evt.item.style.pointerEvents = "";
                         }
-                        this.collectionDragging = false;
+                        this.setCollectionDragState(false);
                         this._collectionJustDragged = true;
                         window.setTimeout(() => {
                             this._collectionJustDragged = false;
                         }, 80);
-                        document.body.classList.remove("vor-collections-dragging");
                         const pendingId = this._pendingNestId;
                         this.clearCollectionDropTargets();
                         this._pendingNestId = "";
