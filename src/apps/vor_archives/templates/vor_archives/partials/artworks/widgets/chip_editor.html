@@ -1,45 +1,31 @@
 <div class="vor-view-row vor-view-labeled vor-view-attrs" x-show="editing || {{ kind }}.length" x-cloak>
-    <span class="vor-field-label">{{ label }}</span>
-    <div class="vor-chip-list is-editing">
-        <template x-for="item in {{ kind }}" :key="item.id">
-            <span class="vor-chip" @mouseenter="placeChipTip($el, item.tip)">
-                <span x-text="item.name"></span>
-                <button type="button"
-                        class="vor-chip-remove"
-                        title="Отвязать"
-                        @click.stop="removeChip('{{ kind }}', item.id)">
-                    <i class="bi bi-x"></i>
-                </button>
-                <span class="vor-chip-tip" x-show="item.tip" x-text="item.tip"></span>
-            </span>
-        </template>
-        <div class="vor-chip-picker-wrap" @click.outside="pickerKind === '{{ kind }}' && closePicker()">
+  <span class="vor-field-label">{{ label }}</span>
+  <div class="vor-chip-list is-editing">
+    <template x-for="item in {{ kind }}" :key="item.id">
+      <span class="vor-chip" @mouseenter="placeChipTip($el, item.tip)">
+        <span x-text="item.name"></span>
+        <button type="button" class="vor-chip-remove" title="Отвязать" @click.stop="removeChip('{{ kind }}', item.id)">
+          <i class="bi bi-x"></i>
+        </button>
+        <span class="vor-chip-tip" x-show="item.tip" x-text="item.tip"></span>
+      </span>
+    </template>
+    <div class="vor-chip-picker-wrap" @click.outside="pickerKind === '{{ kind }}' && closePicker()">
+      <button type="button" class="vor-chip vor-chip-add" title="Добавить" @click="togglePicker('{{ kind }}')">
+        <i class="bi bi-plus"></i>
+      </button>
+      <div class="vor-chip-picker" x-show="pickerKind === '{{ kind }}'" x-cloak>
+        <input class="vor-chip-picker-search" type="text" placeholder="Поиск" x-model="pickerQuery" @click.stop>
+        <div class="vor-chip-picker-list">
+          <template x-for="opt in pickerOptions('{{ kind }}')" :key="opt.id">
             <button type="button"
-                    class="vor-chip vor-chip-add"
-                    title="Добавить"
-                    @click="togglePicker('{{ kind }}')">
-                <i class="bi bi-plus"></i>
-            </button>
-            <div class="vor-chip-picker"
-                 x-show="pickerKind === '{{ kind }}'"
-                 x-cloak>
-                <input class="vor-chip-picker-search"
-                       type="text"
-                       placeholder="Поиск"
-                       x-model="pickerQuery"
-                       @click.stop>
-                <div class="vor-chip-picker-list">
-                    <template x-for="opt in pickerOptions('{{ kind }}')" :key="opt.id">
-                        <button type="button"
-                                class="vor-chip-picker-item"
-                                @click="addPickerItem('{{ kind }}', opt)"
-                                x-text="opt.name"></button>
-                    </template>
-                    <div class="vor-chip-picker-empty" x-show="!pickerOptions('{{ kind }}').length">
-                        Ничего не найдено
-                    </div>
-                </div>
-            </div>
+                    class="vor-chip-picker-item"
+                    @click="addPickerItem('{{ kind }}', opt)"
+                    x-text="opt.name"></button>
+          </template>
+          <div class="vor-chip-picker-empty" x-show="!pickerOptions('{{ kind }}').length">Ничего не найдено</div>
         </div>
+      </div>
     </div>
+  </div>
 </div>

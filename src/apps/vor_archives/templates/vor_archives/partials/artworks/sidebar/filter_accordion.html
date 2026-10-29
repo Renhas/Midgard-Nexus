@@ -1,5 +1,4 @@
 {% load static %}
-
 <div class="sidebar-accordion"
      x-data="{
         expanded: false,
@@ -15,50 +14,47 @@
         }
      }"
      {% if show_condition %}x-show="{{ show_condition }}"{% endif %}>
-    <button type="button" class="sidebar-btn sidebar-btn-full sidebar-btn-accordion"
-            @click="expanded = !expanded">
-        <span>{{ title }}</span>
-        <i class="bi bi-chevron-right" x-bind:class="{ 'bi-rotate-90': expanded }"></i>
-    </button>
-    <div class="sidebar-accordion-body" x-ref="body" x-show="expanded" x-cloak>
-        {% if nested %}
-            {% for sub in nested %}
-                {% include 'vor_archives/partials/artworks/sidebar/filter_accordion.html' with title=sub.title options=sub.options name=sub.name show_condition=sub.show_condition searchable=True only %}
-            {% endfor %}
-        {% else %}
-            {% if searchable %}
-                <div class="sidebar-accordion-search-row">
-                    <input class="vor-chip-picker-search sidebar-accordion-search"
-                           type="text"
-                           placeholder="Поиск"
-                           x-model="query"
-                           @click.stop>
-                    <button type="button"
-                            class="sidebar-btn sidebar-btn-icon"
-                            title="Снять все"
-                            @click.stop="$store.vorArtworks.clearFilter('{{ name }}')">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
-                </div>
-            {% endif %}
-            {% for option in options %}
-                <label class="sidebar-filter-item"
-                       {% if searchable %}data-label="{{ option.label }}" x-show="match($el.dataset.label)"{% endif %}>
-                    <input type="checkbox"
-                           name="{{ name }}"
-                           value="{{ option.value }}"
-                           class="hidden-checkbox"
-                           :checked="$store.vorArtworks.isFilterOn('{{ name }}', '{{ option.value }}')"
-                           @change="$store.vorArtworks.toggleFilter('{{ name }}', '{{ option.value }}')">
-                    <span class="custom-checkbox"></span>
-                    {{ option.label }}
-                </label>
-            {% endfor %}
-            {% if searchable %}
-                <div class="vor-chip-picker-empty" x-show="query.trim() && !matchedCount()" x-cloak>
-                    Ничего не найдено
-                </div>
-            {% endif %}
-        {% endif %}
-    </div>
+  <button type="button" class="sidebar-btn sidebar-btn-full sidebar-btn-accordion" @click="expanded = !expanded">
+    <span>{{ title }}</span>
+    <i class="bi bi-chevron-right" x-bind:class="{ 'bi-rotate-90': expanded }"></i>
+  </button>
+  <div class="sidebar-accordion-body" x-ref="body" x-show="expanded" x-cloak>
+    {% if nested %}
+      {% for sub in nested %}
+        {% include "vor_archives/partials/artworks/sidebar/filter_accordion.html" with title=sub.title options=sub.options name=sub.name show_condition=sub.show_condition searchable=True only %}
+      {% endfor %}
+    {% else %}
+      {% if searchable %}
+        <div class="sidebar-accordion-search-row">
+          <input class="vor-chip-picker-search sidebar-accordion-search"
+                 type="text"
+                 placeholder="Поиск"
+                 x-model="query"
+                 @click.stop>
+          <button type="button"
+                  class="sidebar-btn sidebar-btn-icon"
+                  title="Снять все"
+                  @click.stop="$store.vorArtworks.clearFilter('{{ name }}')">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      {% endif %}
+      {% for option in options %}
+        <label class="sidebar-filter-item"
+               {% if searchable %}data-label="{{ option.label }}" x-show="match($el.dataset.label)"{% endif %}>
+          <input type="checkbox"
+                 name="{{ name }}"
+                 value="{{ option.value }}"
+                 class="hidden-checkbox"
+                 :checked="$store.vorArtworks.isFilterOn('{{ name }}', '{{ option.value }}')"
+                 @change="$store.vorArtworks.toggleFilter('{{ name }}', '{{ option.value }}')">
+          <span class="custom-checkbox"></span>
+          {{ option.label }}
+        </label>
+      {% endfor %}
+      {% if searchable %}
+        <div class="vor-chip-picker-empty" x-show="query.trim() && !matchedCount()" x-cloak>Ничего не найдено</div>
+      {% endif %}
+    {% endif %}
+  </div>
 </div>

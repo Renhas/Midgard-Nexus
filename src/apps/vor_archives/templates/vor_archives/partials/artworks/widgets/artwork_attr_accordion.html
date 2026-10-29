@@ -1,23 +1,23 @@
 <div class="sidebar-accordion" {% if show %}x-show="{{ show }}"{% endif %} x-data="{ expanded: false, query: '' }">
-    <button type="button" class="sidebar-btn sidebar-btn-full sidebar-btn-accordion" @click="expanded = !expanded">
-        <span>{{ title }}</span>
-        <i class="bi bi-chevron-right" :class="{ 'bi-rotate-90': expanded }"></i>
-    </button>
-    <div class="sidebar-accordion-body" x-show="expanded" x-cloak>
-        <input class="vor-chip-picker-search sidebar-accordion-search"
-               type="text"
-               placeholder="Поиск"
-               x-model="query"
-               @click.stop>
-        <template x-for="opt in filterCatalog('{{ kind }}', query)" :key="'{{ kind }}'+opt.id">
-            <label class="sidebar-filter-item" @click.prevent="toggleAttr('{{ kind }}', opt)">
-                <input class="hidden-checkbox" type="checkbox" :checked="hasAttr('{{ kind }}', opt.id)">
-                <span class="custom-checkbox"></span>
-                <span x-text="opt.name"></span>
-            </label>
-        </template>
-        <div class="vor-chip-picker-empty" x-show="query.trim() && !filterCatalog('{{ kind }}', query).length" x-cloak>
-            Ничего не найдено
-        </div>
+  <button type="button" class="sidebar-btn sidebar-btn-full sidebar-btn-accordion" @click="expanded = !expanded">
+    <span>{{ title }}</span>
+    <i class="bi bi-chevron-right" :class="{ 'bi-rotate-90': expanded }"></i>
+  </button>
+  <div class="sidebar-accordion-body" x-show="expanded" x-cloak>
+    <input class="vor-chip-picker-search sidebar-accordion-search"
+           type="text"
+           placeholder="Поиск"
+           x-model="query"
+           @click.stop>
+    <template x-for="opt in filterCatalog('{{ kind }}', query)" :key="'{{ kind }}'+opt.id">
+      <label class="sidebar-filter-item" @click.prevent="toggleAttr('{{ kind }}', opt)">
+        <input class="hidden-checkbox" type="checkbox" :checked="hasAttr('{{ kind }}', opt.id)">
+        <span class="custom-checkbox"></span>
+        <span x-text="opt.name"></span>
+      </label>
+    </template>
+    <div class="vor-chip-picker-empty" x-show="query.trim() && !filterCatalog('{{ kind }}', query).length" x-cloak>
+      Ничего не найдено
     </div>
+  </div>
 </div>

@@ -1,57 +1,57 @@
 {% if owned %}
-<section class="vor-search-segment">
+  <section class="vor-search-segment">
     <h3 class="vor-search-segment-title">Ваши произведения</h3>
     <ul class="vor-search-results">
-        {% for item in owned %}
-            <li class="vor-search-result">
-                <button type="button"
-                        class="vor-search-result-main"
-                        @click="$store.vorArtworks.openWork('{{ item.detail_url }}')">
-                    <i class="{{ item.icon }}"></i>
-                    {% if item.cover_url %}
-                        <img class="vor-search-cover" src="{{ item.cover_url }}" alt="">
-                    {% else %}
-                        <div class="vor-search-cover vor-search-cover-empty">
-                            <i class="{{ item.icon }}"></i>
-                        </div>
-                    {% endif %}
-                    <span class="vor-search-result-title">{{ item.title }}</span>
-                </button>
-            </li>
-        {% endfor %}
+      {% for item in owned %}
+        <li class="vor-search-result">
+          <button type="button"
+                  class="vor-search-result-main"
+                  @click="$store.vorArtworks.openWork('{{ item.detail_url }}')">
+            <i class="{{ item.icon }}"></i>
+            {% if item.cover_url %}
+              <img class="vor-search-cover" src="{{ item.cover_url }}" alt="">
+            {% else %}
+              <div class="vor-search-cover vor-search-cover-empty">
+                <i class="{{ item.icon }}"></i>
+              </div>
+            {% endif %}
+            <span class="vor-search-result-title">{{ item.title }}</span>
+          </button>
+        </li>
+      {% endfor %}
     </ul>
-</section>
+  </section>
 {% endif %}
 {% if other %}
-<section class="vor-search-segment">
+  <section class="vor-search-segment">
     <h3 class="vor-search-segment-title">Новые для вас</h3>
     <ul class="vor-search-results">
-        {% for item in other %}
-            <li class="vor-search-result">
-                <button type="button"
-                        class="vor-search-result-main"
-                        @click="$store.vorArtworks.openWork('{{ item.detail_url }}')">
-                    <i class="{{ item.icon }}"></i>
-                    {% if item.cover_url %}
-                        <img class="vor-search-cover" src="{{ item.cover_url }}" alt="">
-                    {% else %}
-                        <div class="vor-search-cover vor-search-cover-empty">
-                            <i class="{{ item.icon }}"></i>
-                        </div>
-                    {% endif %}
-                    <span class="vor-search-result-title">{{ item.title }}</span>
-                </button>
-                <button type="button"
-                        class="sidebar-btn sidebar-btn-add sidebar-btn-icon"
-                        title="Добавить"
-                        @click.stop="$store.vorArtworks.attachFromSearch('{{ item.type_key }}', {{ item.work_id }})">
-                    <i class="bi bi-plus-lg"></i>
-                </button>
-            </li>
-        {% endfor %}
+      {% for item in other %}
+        <li class="vor-search-result">
+          <button type="button"
+                  class="vor-search-result-main"
+                  @click="$store.vorArtworks.openWork('{{ item.detail_url }}')">
+            <i class="{{ item.icon }}"></i>
+            {% if item.cover_url %}
+              <img class="vor-search-cover" src="{{ item.cover_url }}" alt="">
+            {% else %}
+              <div class="vor-search-cover vor-search-cover-empty">
+                <i class="{{ item.icon }}"></i>
+              </div>
+            {% endif %}
+            <span class="vor-search-result-title">{{ item.title }}</span>
+          </button>
+          <button type="button"
+                  class="sidebar-btn sidebar-btn-add sidebar-btn-icon"
+                  title="Добавить"
+                  @click.stop="$store.vorArtworks.attachFromSearch('{{ item.type_key }}', {{ item.work_id }})">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        </li>
+      {% endfor %}
     </ul>
-</section>
+  </section>
 {% endif %}
 {% if query and not owned and not other %}
-    <div class="vor-search-empty">Ничего не найдено</div>
+  <div class="vor-search-empty">Ничего не найдено</div>
 {% endif %}

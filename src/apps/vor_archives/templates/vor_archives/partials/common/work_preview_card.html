@@ -3,30 +3,26 @@
      data-progress-max="{{ progress_max|default_if_none:'' }}"
      data-progress-unit="{{ progress_unit }}"
      data-progress-step="{{ progress_step }}">
-    {% if work.cover %}
-        <img class="vor-preview-cover" src="{{ work.cover.url }}" alt="{{ work.title }}">
-    {% else %}
-        <div class="vor-preview-cover vor-preview-cover-empty">
-            <i class="{{ work|get_model_icon }}"></i>
-        </div>
-    {% endif %}
-    <div class="vor-preview-body">
-        <h3 class="vor-preview-title">{{ work.title }}</h3>
-        <p class="vor-preview-meta">
-            {% if work.release_date %}{{ work.release_date|date:'Y' }}{% endif %}
-            {% if work.age_rating %} · {{ work.get_age_rating_display }}{% endif %}
-        </p>
-        {% if work.description %}
-            <p class="vor-preview-desc">{{ work.description|truncatewords:40 }}</p>
-        {% endif %}
-        {% if already %}
-            <p class="vor-preview-already">Уже в вашем списке</p>
-        {% else %}
-            <button type="button"
-                    class="sidebar-btn sidebar-btn-add"
-                    data-attach-preview>
-                Добавить в список
-            </button>
-        {% endif %}
+  {% if work.cover %}
+    <img class="vor-preview-cover" src="{{ work.cover.url }}" alt="{{ work.title }}">
+  {% else %}
+    <div class="vor-preview-cover vor-preview-cover-empty">
+      <i class="{{ work|get_model_icon }}"></i>
     </div>
+  {% endif %}
+  <div class="vor-preview-body">
+    <h3 class="vor-preview-title">{{ work.title }}</h3>
+    <p class="vor-preview-meta">
+      {% if work.release_date %}{{ work.release_date|date:'Y' }}{% endif %}
+      {% if work.age_rating %}· {{ work.get_age_rating_display }}{% endif %}
+    </p>
+    {% if work.description %}
+      <p class="vor-preview-desc">{{ work.description|truncatewords:40 }}</p>
+    {% endif %}
+    {% if already %}
+      <p class="vor-preview-already">Уже в вашем списке</p>
+    {% else %}
+      <button type="button" class="sidebar-btn sidebar-btn-add" data-attach-preview>Добавить в список</button>
+    {% endif %}
+  </div>
 </div>

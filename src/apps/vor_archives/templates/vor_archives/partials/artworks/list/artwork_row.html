@@ -8,8 +8,6 @@
      data-preview-desc="{{ user_work.work.description|default:'' }}"
      data-preview-cover="{% if user_work.work.cover %}{{ user_work.work.cover.url }}{% endif %}"
      data-preview-icon="{{ user_work|get_work_type_icon }}">
-
-    {% include "vor_archives/partials/artworks/list/artwork_row_body.html" with user_work=user_work %}
-    {% include "vor_archives/partials/artworks/list/artwork_tile_body.html" with user_work=user_work %}
-
+  {% include "vor_archives/partials/artworks/list/artwork_row_body.html" with user_work=user_work %}
+  {% include "vor_archives/partials/artworks/list/artwork_tile_body.html" with user_work=user_work %}
 </div>

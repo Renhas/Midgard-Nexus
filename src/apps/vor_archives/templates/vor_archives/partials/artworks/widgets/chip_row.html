@@ -1,46 +1,41 @@
 {% if items %}
-    <div class="vor-view-row vor-view-labeled vor-view-attrs">
-        <span class="vor-field-label">{{ label }}</span>
-        <div class="vor-chip-list" x-data="vorChipOverflow()" :class="{ 'is-open': popupOpen }">
+  <div class="vor-view-row vor-view-labeled vor-view-attrs">
+    <span class="vor-field-label">{{ label }}</span>
+    <div class="vor-chip-list" x-data="vorChipOverflow()" :class="{ 'is-open': popupOpen }">
+      {% for item in items %}
+        <span class="vor-chip" data-chip @mouseenter="placeTip($el)">
+          {{ item.name }}
+          {% if tip_field == "bio" and item.bio %}
+            <span class="vor-chip-tip">{{ item.bio }}</span>
+          {% elif tip_field != "bio" and item.description %}
+            <span class="vor-chip-tip">{{ item.description }}</span>
+          {% endif %}
+        </span>
+      {% endfor %}
+      <div class="vor-chip-more-wrap"
+           x-ref="moreWrap"
+           x-show="hiddenCount > 0"
+           x-cloak
+           @click.outside="popupOpen = false">
+        <button type="button"
+                class="vor-chip vor-chip-more"
+                x-ref="more"
+                @click="togglePopup()">+<span x-text="hiddenCount"></span></button>
+        <div class="vor-chip-popup" x-ref="popup" x-show="popupOpen" x-cloak>
+          <div class="vor-chip-popup-body">
             {% for item in items %}
-                <span class="vor-chip" data-chip @mouseenter="placeTip($el)">
-                    {{ item.name }}
-                    {% if tip_field == "bio" and item.bio %}
-                        <span class="vor-chip-tip">{{ item.bio }}</span>
-                    {% elif tip_field != "bio" and item.description %}
-                        <span class="vor-chip-tip">{{ item.description }}</span>
-                    {% endif %}
-                </span>
+              <span class="vor-chip" x-show="{{ forloop.counter0 }} >= visibleCount" @mouseenter="placeTip($el)">
+                {{ item.name }}
+                {% if tip_field == "bio" and item.bio %}
+                  <span class="vor-chip-tip">{{ item.bio }}</span>
+                {% elif tip_field != "bio" and item.description %}
+                  <span class="vor-chip-tip">{{ item.description }}</span>
+                {% endif %}
+              </span>
             {% endfor %}
-            <div class="vor-chip-more-wrap"
-                 x-ref="moreWrap"
-                 x-show="hiddenCount > 0"
-                 x-cloak
-                 @click.outside="popupOpen = false">
-                <button type="button"
-                        class="vor-chip vor-chip-more"
-                        x-ref="more"
-                        @click="togglePopup()">+<span x-text="hiddenCount"></span></button>
-                <div class="vor-chip-popup"
-                     x-ref="popup"
-                     x-show="popupOpen"
-                     x-cloak>
-                    <div class="vor-chip-popup-body">
-                        {% for item in items %}
-                            <span class="vor-chip"
-                                  x-show="{{ forloop.counter0 }} >= visibleCount"
-                                  @mouseenter="placeTip($el)">
-                                {{ item.name }}
-                                {% if tip_field == "bio" and item.bio %}
-                                    <span class="vor-chip-tip">{{ item.bio }}</span>
-                                {% elif tip_field != "bio" and item.description %}
-                                    <span class="vor-chip-tip">{{ item.description }}</span>
-                                {% endif %}
-                            </span>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 {% endif %}

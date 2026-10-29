@@ -1,10 +1,10 @@
 <div class="vor-date-wrap" {% if not is_add %}x-show="editing" x-cloak{% endif %} @click.outside="closeDatePopup()">
-    <button type="button" class="vor-date-trigger" @click="toggleDateOpen()">
-        <span x-text="releaseDate ? formatDate(releaseDate) : 'Выбрать'"></span>
-        <i class="bi bi-calendar3"></i>
-    </button>
-    {% include "vor_archives/partials/common/date_picker.html" %}
+  <button type="button" class="vor-date-trigger" @click="toggleDateOpen()">
+    <span x-text="releaseDate ? formatDate(releaseDate) : 'Выбрать'"></span>
+    <i class="bi bi-calendar3"></i>
+  </button>
+  {% include "vor_archives/partials/common/date_picker.html" %}
 </div>
 {% if not is_add %}
-    <input type="hidden" name="release_date" :value="releaseDate">
+  <input type="hidden" name="release_date" :value="releaseDate">
 {% endif %}

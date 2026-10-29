@@ -1,67 +1,62 @@
 {% extends "vor_archives/base_vor.html" %}
 {% load static %}
-
 {% block title %}{{ block.super }} - Произведения{% endblock %}
-
 {% block extra_head %}
-    {{ block.super }}
-    {# Page-specific: list, add form, context menu, artwork overlay. #}
-    <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/list.css' %}">
-    <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/add.css' %}">
-    <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/context_menu.css' %}">
-    <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/overlay.css' %}">
+  {{ block.super }}
+  {# Page-specific: list, add form, context menu, artwork overlay. #}
+  <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/list.css' %}">
+  <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/add.css' %}">
+  <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/context_menu.css' %}">
+  <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/overlay.css' %}">
 {% endblock %}
-
 {% block extra_js %}
-    {{ block.super }}
-    <script src="{% static 'vor_archives/js/artworks/helpers.js' %}"></script>
-    <script src="{% static 'vor_archives/js/artworks/store.js' %}"></script>
-    <script src="{% static 'vor_archives/js/artworks/events.js' %}"></script>
-    <script src="{% static 'vor_archives/js/artworks/row_preview.js' %}"></script>
-    <script src="{% static 'vor_archives/js/artworks/overlay.js' %}"></script>
-    <script src="{% static 'vor_archives/js/artworks/add.js' %}"></script>
-    <script src="{% static 'vor_archives/js/artworks/chip.js' %}"></script>
+  {{ block.super }}
+  <script src="{% static 'vor_archives/js/artworks/helpers.js' %}"></script>
+  <script src="{% static 'vor_archives/js/artworks/store.js' %}"></script>
+  <script src="{% static 'vor_archives/js/artworks/events.js' %}"></script>
+  <script src="{% static 'vor_archives/js/artworks/row_preview.js' %}"></script>
+  <script src="{% static 'vor_archives/js/artworks/overlay.js' %}"></script>
+  <script src="{% static 'vor_archives/js/artworks/add.js' %}"></script>
+  <script src="{% static 'vor_archives/js/artworks/chip.js' %}"></script>
 {% endblock %}
-
 {% block left_content %}
-{% include "vor_archives/partials/artworks/sidebar/artwork_sidebar_left.html" %}
+  {% include "vor_archives/partials/artworks/sidebar/artwork_sidebar_left.html" %}
 {% endblock %}
-
 {% block vor_content %}
-<div class="artwork-library-title" x-data>
+  <div class="artwork-library-title" x-data>
     <span x-show="!$store.vorArtworks.collectionId">Медиатека</span>
     <nav class="artwork-library-path" x-show="$store.vorArtworks.collectionId" x-cloak>
-        <template x-for="(part, index) in ($store.vorArtworks.collectionPath || [])" :key="'crumb-' + part.id">
-            <span class="artwork-library-path-item">
-                <span class="artwork-library-path-sep" x-text="index > 0 ? '/' : ''"></span>
-                <button type="button"
-                        class="artwork-library-path-link"
-                        :class="{ 'is-current': index === $store.vorArtworks.collectionPath.length - 1 }"
-                        :disabled="index === $store.vorArtworks.collectionPath.length - 1"
-                        x-text="part.name"
-                        @click="index < $store.vorArtworks.collectionPath.length - 1 && $store.vorArtworks.selectCollection(part.id, part.name)"></button>
-            </span>
-        </template>
+      <template x-for="(part, index) in ($store.vorArtworks.collectionPath || [])" :key="'crumb-' + part.id">
+        <span class="artwork-library-path-item">
+          <span class="artwork-library-path-sep" x-text="index > 0 ? '/' : ''"></span>
+          <button type="button"
+                  class="artwork-library-path-link"
+                  :class="{ 'is-current': index === $store.vorArtworks.collectionPath.length - 1 }"
+                  :disabled="index === $store.vorArtworks.collectionPath.length - 1"
+                  x-text="part.name"
+                  @click="index < $store.vorArtworks.collectionPath.length - 1 && $store.vorArtworks.selectCollection(part.id, part.name)">
+          </button>
+        </span>
+      </template>
     </nav>
-</div>
-<div id="artwork-list"
-     class="artwork-list"
-     :class="{
+  </div>
+  <div id="artwork-list"
+       class="artwork-list"
+       :class="{
         'is-grid': $store.vorArtworks.viewMode === 'grid',
         'is-sortable': $store.vorArtworks.canDrag(),
         'is-delete-mode': $store.vorArtworks.deleteMode
      }">
     <div id="artwork-list-body">
-        <div class="text-center text-muted py-4">Загрузка…</div>
+      <div class="text-center text-muted py-4">Загрузка…</div>
     </div>
-</div>
+  </div>
 {% endblock %}
-
 {% block right_content %}
-{{ page_opts|json_script:"vor-artworks-opts" }}
-<div class="sidebar-nav"
-     x-data
-     x-init="$store.vorArtworks.initFromPage(JSON.parse(document.getElementById('vor-artworks-opts').textContent))">
+  {{ page_opts|json_script:"vor-artworks-opts" }}
+  <div class="sidebar-nav"
+       x-data
+       x-init="$store.vorArtworks.initFromPage(JSON.parse(document.getElementById('vor-artworks-opts').textContent))">
     {# ========== ПРАВАЯ ПАНЕЛЬ — ТИПЫ ============ #}
     {% include "vor_archives/partials/artworks/sidebar/artwork_sidebar_work_types.html" %}
     {% include "vor_archives/partials/artworks/sidebar/artwork_sidebar_hidden_switch.html" %}
@@ -70,39 +65,35 @@
     <hr class="sidebar-divider">
     {# ========== ПРАВАЯ ПАНЕЛЬ — ФИЛЬТРЫ ========= #}
     <div class="sidebar-filters">
-        <div class="sidebar-filters-title-row">
-            <h6 class="sidebar-filters-title text-uppercase text-muted small fw-semibold text-center">
-                Фильтры
-            </h6>
-            <button type="button"
-                    class="sidebar-btn sidebar-btn-icon"
-                    title="Сбросить фильтры"
-                    @click="$store.vorArtworks.resetFilters()">
-                <i class="bi bi-arrow-counterclockwise"></i>
-            </button>
-        </div>
-        {% include 'vor_archives/partials/artworks/sidebar/filter_accordion.html' with title='Статус' options=status_options name='status' %}
-        {% include 'vor_archives/partials/artworks/sidebar/filter_accordion.html' with title='Возрастной рейтинг' options=age_rating_options name='age_rating' %}
-        {% include 'vor_archives/partials/artworks/sidebar/filter_accordion.html' with title='Теги' options=tags_options name='tags' searchable=True %}
-        {% include 'vor_archives/partials/artworks/sidebar/filter_accordion.html' with title='Жанры' nested=genres_nested %}
-        {% include 'vor_archives/partials/artworks/sidebar/filter_accordion.html' with title='Платформы' options=platform_options name='platform' show_condition="$store.vorArtworks.workTypes.includes('game')" searchable=True %}
+      <div class="sidebar-filters-title-row">
+        <h6 class="sidebar-filters-title text-uppercase text-muted small fw-semibold text-center">Фильтры</h6>
+        <button type="button"
+                class="sidebar-btn sidebar-btn-icon"
+                title="Сбросить фильтры"
+                @click="$store.vorArtworks.resetFilters()">
+          <i class="bi bi-arrow-counterclockwise"></i>
+        </button>
+      </div>
+      {% include "vor_archives/partials/artworks/sidebar/filter_accordion.html" with title="Статус" options=status_options name="status" %}
+      {% include "vor_archives/partials/artworks/sidebar/filter_accordion.html" with title="Возрастной рейтинг" options=age_rating_options name="age_rating" %}
+      {% include "vor_archives/partials/artworks/sidebar/filter_accordion.html" with title="Теги" options=tags_options name="tags" searchable=True %}
+      {% include "vor_archives/partials/artworks/sidebar/filter_accordion.html" with title="Жанры" nested=genres_nested %}
+      {% include "vor_archives/partials/artworks/sidebar/filter_accordion.html" with title="Платформы" options=platform_options name="platform" show_condition="$store.vorArtworks.workTypes.includes('game')" searchable=True %}
     </div>
-</div>
+  </div>
 {% endblock %}
-
 {% block page_notifications %}
-{% csrf_token %}
-<div id="vor-overlay"></div>
-<div id="vor-modal"
-     data-vor-delete-preview="{% url 'vor_archives:artworks:delete_preview' %}"></div>
-{% include "vor_archives/partials/artworks/search/artwork_library_search.html" %}
-<div x-data="{ visible: false }"
-    @collection-update.window="visible = true; setTimeout(() => visible = false, 3000)"
-    :class="{ 'd-none': !visible }"
-    x-cloak
-    class="custom-toast">
+  {% csrf_token %}
+  <div id="vor-overlay"></div>
+  <div id="vor-modal" data-vor-delete-preview="{% url 'vor_archives:artworks:delete_preview' %}"></div>
+  {% include "vor_archives/partials/artworks/search/artwork_library_search.html" %}
+  <div x-data="{ visible: false }"
+       @collection-update.window="visible = true; setTimeout(() => visible = false, 3000)"
+       :class="{ 'd-none': !visible }"
+       x-cloak
+       class="custom-toast">
     <i class="bi bi-arrow-clockwise"></i>
     <span>Коллекция обновлена</span>
-</div>
-{% include "vor_archives/partials/artworks/artwork_context_menu.html" %}
+  </div>
+  {% include "vor_archives/partials/artworks/artwork_context_menu.html" %}
 {% endblock %}
