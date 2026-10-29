@@ -1,30 +1,23 @@
 <div class="vor-modal-backdrop" x-data @click.self="$store.vorArtworks.closeModal()">
-    <div class="vor-modal" @click.stop>
-        <h3 class="vor-modal-title">{{ title }}</h3>
-        {% if error %}
-            <p class="vor-modal-error">{{ error }}</p>
-        {% endif %}
-        <form class="vor-modal-form"
-              hx-post="{{ action_url }}"
-              hx-target="#vor-modal"
-              hx-swap="innerHTML">
-            {% csrf_token %}
-            <input class="vor-modal-input"
-                   type="text"
-                   name="name"
-                   value="{{ name }}"
-                   placeholder="Название"
-                   maxlength="255"
-                   autocomplete="off"
-                   autofocus>
-            <div class="vor-modal-actions">
-                <button type="button" class="sidebar-btn" @click="$store.vorArtworks.closeModal()">
-                    Отмена
-                </button>
-                <button type="submit" class="sidebar-btn sidebar-btn-primary">
-                    {{ submit_label }}
-                </button>
-            </div>
-        </form>
-    </div>
+  <div class="vor-modal" @click.stop>
+    <h3 class="vor-modal-title">{{ title }}</h3>
+    {% if error %}
+      <p class="vor-modal-error">{{ error }}</p>
+    {% endif %}
+    <form class="vor-modal-form" hx-post="{{ action_url }}" hx-target="#vor-modal" hx-swap="innerHTML">
+      {% csrf_token %}
+      <input class="vor-modal-input"
+             type="text"
+             name="name"
+             value="{{ name }}"
+             placeholder="Название"
+             maxlength="255"
+             autocomplete="off"
+             autofocus>
+      <div class="vor-modal-actions">
+        <button type="button" class="sidebar-btn" @click="$store.vorArtworks.closeModal()">Отмена</button>
+        <button type="submit" class="sidebar-btn sidebar-btn-primary">{{ submit_label }}</button>
+      </div>
+    </form>
+  </div>
 </div>

@@ -1,35 +1,35 @@
 {% for item in feed_items %}
-<article class="dash-feed-item">
+  <article class="dash-feed-item">
     <i class="{{ item.icon }} dash-feed-icon"></i>
     <div class="dash-feed-body">
-        <div class="dash-feed-text">
-            <span>{{ item.label }}</span>
-            {% if item.detail_url %}
-                <a href="{{ item.detail_url }}"
-                   class="dash-feed-link"
-                   hx-get="{{ item.detail_url }}"
-                   hx-target="#vor-overlay"
-                   hx-swap="innerHTML">{{ item.work_title }}</a>
-            {% elif item.work_title %}
-                <span class="dash-feed-title">{{ item.work_title }}</span>
-            {% endif %}
-        </div>
-        <time class="dash-feed-time" datetime="{{ item.timestamp|date:'c' }}">
-            {{ item.timestamp|date:"d.m.Y H:i" }}
-        </time>
+      <div class="dash-feed-text">
+        <span>{{ item.label }}</span>
+        {% if item.detail_url %}
+          <a href="{{ item.detail_url }}"
+             class="dash-feed-link"
+             hx-get="{{ item.detail_url }}"
+             hx-target="#vor-overlay"
+             hx-swap="innerHTML">{{ item.work_title }}</a>
+        {% elif item.work_title %}
+          <span class="dash-feed-title">{{ item.work_title }}</span>
+        {% endif %}
+      </div>
+      <time class="dash-feed-time" datetime="{{ item.timestamp|date:'c' }}">
+        {{ item.timestamp|date:"d.m.Y H:i" }}
+      </time>
     </div>
-</article>
+  </article>
 {% empty %}
-    {% if not feed_next_offset %}
+  {% if not feed_next_offset %}
     <p class="dash-empty">История пока пуста</p>
-    {% endif %}
+  {% endif %}
 {% endfor %}
 {% if feed_has_more %}
-<div id="dash-feed-more"
-     hx-get="{% url 'vor_archives:dashboard_feed' %}?offset={{ feed_next_offset }}"
-     hx-trigger="intersect once, click"
-     hx-target="this"
-     hx-swap="outerHTML">
+  <div id="dash-feed-more"
+       hx-get="{% url 'vor_archives:dashboard_feed' %}?offset={{ feed_next_offset }}"
+       hx-trigger="intersect once, click"
+       hx-target="this"
+       hx-swap="outerHTML">
     <button type="button" class="sidebar-btn dash-feed-more-btn">Ещё</button>
-</div>
+  </div>
 {% endif %}

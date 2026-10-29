@@ -1,16 +1,15 @@
 {% include "vor_archives/partials/artworks/list/artwork_list_header.html" %}
-
 {% if collection %}
-    {% if has_collection_items %}
-        {% include "vor_archives/partials/artworks/list/artwork_list_items.html" with items=direct %}
-        {% for segment in nested %}
-            {% include "vor_archives/partials/artworks/list/artwork_list_segment.html" with segment=segment %}
-        {% endfor %}
-    {% else %}
-        {% include "vor_archives/partials/artworks/list/artwork_list_empty.html" %}
-    {% endif %}
-{% elif user_works %}
-    {% include "vor_archives/partials/artworks/list/artwork_list_items.html" with items=user_works %}
-{% else %}
+  {% if has_collection_items %}
+    {% include "vor_archives/partials/artworks/list/artwork_list_items.html" with items=direct %}
+    {% for segment in nested %}
+      {% include "vor_archives/partials/artworks/list/artwork_list_segment.html" with segment=segment %}
+    {% endfor %}
+  {% else %}
     {% include "vor_archives/partials/artworks/list/artwork_list_empty.html" %}
+  {% endif %}
+{% elif user_works %}
+  {% include "vor_archives/partials/artworks/list/artwork_list_items.html" with items=user_works %}
+{% else %}
+  {% include "vor_archives/partials/artworks/list/artwork_list_empty.html" %}
 {% endif %}

@@ -1,15 +1,18 @@
-<div class="vor-modal-backdrop vor-leave-confirm" x-show="leaveConfirmOpen" x-cloak @click.self="leaveConfirmOpen = false">
-    <div class="vor-modal" @click.stop>
-        <h3 class="vor-modal-title">Несохранённые изменения</h3>
-        <p class="vor-modal-text">При переходе будут потеряны изменения в полях:</p>
-        <ul class="vor-leave-list">
-            <template x-for="field in leaveChanges" :key="field">
-                <li x-text="field"></li>
-            </template>
-        </ul>
-        <div class="vor-modal-actions">
-            <button type="button" class="sidebar-btn" @click="leaveConfirmOpen = false">Остаться</button>
-            <button type="button" class="sidebar-btn sidebar-btn-delete" @click="confirmLeave()">Уйти</button>
-        </div>
+<div class="vor-modal-backdrop vor-leave-confirm"
+     x-show="leaveConfirmOpen"
+     x-cloak
+     @click.self="leaveConfirmOpen = false">
+  <div class="vor-modal" @click.stop>
+    <h3 class="vor-modal-title">Несохранённые изменения</h3>
+    <p class="vor-modal-text">При переходе будут потеряны изменения в полях:</p>
+    <ul class="vor-leave-list">
+      <template x-for="field in leaveChanges" :key="field">
+        <li x-text="field"></li>
+      </template>
+    </ul>
+    <div class="vor-modal-actions">
+      <button type="button" class="sidebar-btn" @click="leaveConfirmOpen = false">Остаться</button>
+      <button type="button" class="sidebar-btn sidebar-btn-delete" @click="confirmLeave()">Уйти</button>
     </div>
+  </div>
 </div>

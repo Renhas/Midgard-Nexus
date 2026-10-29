@@ -1,31 +1,31 @@
 <div class="attr-card" x-init="$store.vorAttributes.select('{{ item.key }}')">
-    <div class="attr-card-header">
-        <h3 class="attr-card-title">{{ item.name }}</h3>
-        {% if item.type_label %}
-            <span class="attr-card-type">{{ item.type_label }}</span>
-        {% endif %}
-    </div>
-    {% if item.has_text %}
-        <div class="attr-card-desc">{% if item.description %}{{ item.description|linebreaksbr }}{% else %}<span class="text-muted">{{ item.empty_text }}</span>{% endif %}</div>
+  <div class="attr-card-header">
+    <h3 class="attr-card-title">{{ item.name }}</h3>
+    {% if item.type_label %}
+      <span class="attr-card-type">{{ item.type_label }}</span>
     {% endif %}
-    {% if is_staff %}
+  </div>
+  {% if item.has_text %}
+    <div class="attr-card-desc">{% if item.description %}{{ item.description|linebreaksbr }}{% else %}<span class="text-muted">{{ item.empty_text }}</span>{% endif %}</div>
+  {% endif %}
+  {% if is_staff %}
     <div class="attr-detail-actions">
-        <button type="button"
-                class="sidebar-btn"
-                hx-get="{{ item.edit_url }}"
-                hx-target="#attr-detail"
-                hx-swap="innerHTML">
-            <i class="bi bi-pencil"></i>
-            <span>Редактировать</span>
-        </button>
-        <button type="button"
-                class="sidebar-btn sidebar-btn-delete"
-                hx-get="{% url 'vor_archives:attr_delete_preview' kind %}?ids={{ item.key }}"
-                hx-target="#vor-modal"
-                hx-swap="innerHTML">
-            <i class="bi bi-trash"></i>
-            <span>Удалить</span>
-        </button>
+      <button type="button"
+              class="sidebar-btn"
+              hx-get="{{ item.edit_url }}"
+              hx-target="#attr-detail"
+              hx-swap="innerHTML">
+        <i class="bi bi-pencil"></i>
+        <span>Редактировать</span>
+      </button>
+      <button type="button"
+              class="sidebar-btn sidebar-btn-delete"
+              hx-get="{% url 'vor_archives:attr_delete_preview' kind %}?ids={{ item.key }}"
+              hx-target="#vor-modal"
+              hx-swap="innerHTML">
+        <i class="bi bi-trash"></i>
+        <span>Удалить</span>
+      </button>
     </div>
-    {% endif %}
+  {% endif %}
 </div>

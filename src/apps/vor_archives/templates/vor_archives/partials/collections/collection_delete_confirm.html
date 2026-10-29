@@ -1,26 +1,20 @@
 <div class="vor-modal-backdrop" x-data @click.self="$store.vorArtworks.closeModal()">
-    <div class="vor-modal" @click.stop>
-        <h3 class="vor-modal-title">Удалить коллекцию</h3>
-        <p class="vor-modal-text">
-            Коллекция «{{ collection.name }}» будет удалена.
-        </p>
-        {% if child_count %}
-            <div class="vor-modal-warning">
-                Вместе с ней будут удалены вложенные коллекции ({{ child_count }}).
-                Произведения останутся в медиатеке.
-            </div>
-        {% endif %}
-        <form class="vor-modal-actions"
-              hx-post="{% url 'vor_archives:collections:delete' collection.pk %}"
-              hx-target="#vor-modal"
-              hx-swap="innerHTML">
-            {% csrf_token %}
-            <button type="button" class="sidebar-btn" @click="$store.vorArtworks.closeModal()">
-                Отмена
-            </button>
-            <button type="submit" class="sidebar-btn sidebar-btn-delete">
-                Удалить
-            </button>
-        </form>
-    </div>
+  <div class="vor-modal" @click.stop>
+    <h3 class="vor-modal-title">Удалить коллекцию</h3>
+    <p class="vor-modal-text">Коллекция «{{ collection.name }}» будет удалена.</p>
+    {% if child_count %}
+      <div class="vor-modal-warning">
+        Вместе с ней будут удалены вложенные коллекции ({{ child_count }}).
+        Произведения останутся в медиатеке.
+      </div>
+    {% endif %}
+    <form class="vor-modal-actions"
+          hx-post="{% url 'vor_archives:collections:delete' collection.pk %}"
+          hx-target="#vor-modal"
+          hx-swap="innerHTML">
+      {% csrf_token %}
+      <button type="button" class="sidebar-btn" @click="$store.vorArtworks.closeModal()">Отмена</button>
+      <button type="submit" class="sidebar-btn sidebar-btn-delete">Удалить</button>
+    </form>
+  </div>
 </div>
