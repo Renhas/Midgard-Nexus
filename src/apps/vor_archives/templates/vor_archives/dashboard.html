@@ -13,6 +13,7 @@
 {% block extra_js %}
     {{ block.super }}
     {# Feed items open artwork overlay; overlay uses vorArtworks store and chip overflow. #}
+    <script src="{% static 'vor_archives/js/artworks/helpers.js' %}"></script>
     <script src="{% static 'vor_archives/js/artworks/store.js' %}"></script>
     <script src="{% static 'vor_archives/js/artworks/events.js' %}"></script>
     <script src="{% static 'vor_archives/js/artworks/overlay.js' %}"></script>

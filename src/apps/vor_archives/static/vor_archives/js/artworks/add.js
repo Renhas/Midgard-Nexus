@@ -60,6 +60,7 @@ document.addEventListener("alpine:init", () => {
         progressHover: false,
         progressDraft: "",
         searchTimer: null,
+        ...window.getCoverHelpers(),
         get catalog() {
             return this.catalogs[this.workType] || {
                 authors: [],
@@ -181,36 +182,6 @@ document.addEventListener("alpine:init", () => {
         setAgeRating(value) {
             this.ageRating = value;
             this.ageOpen = false;
-        },
-        async onCoverSelected(event) {
-            const file = event.target.files && event.target.files[0];
-            if (!file) {
-                return;
-            }
-            const result = await window.cropCoverFile(file);
-            this.coverFile = result.file;
-            this.coverPreview = URL.createObjectURL(result.file);
-            this.coverWarning = result.cropped
-                ? `Обложка была обрезана для соответствия размера: исходный ${result.srcW}×${result.srcH}, итоговый ${result.outW}×${result.outH}`
-                : "";
-            this.assignCoverInput(result.file);
-        },
-        assignCoverInput(file) {
-            const input = this.$refs.coverInput;
-            if (!input || typeof DataTransfer === "undefined") {
-                return;
-            }
-            const transfer = new DataTransfer();
-            transfer.items.add(file);
-            input.files = transfer.files;
-        },
-        clearCover() {
-            this.coverPreview = "";
-            this.coverFile = null;
-            this.coverWarning = "";
-            if (this.$refs.coverInput) {
-                this.$refs.coverInput.value = "";
-            }
         },
         isRequired(name) {
             if (name === "title") {

@@ -70,6 +70,7 @@ document.addEventListener("alpine:init", () => {
         quickUrl: opts.quickUrl || "",
         listUrl: opts.listUrl || "",
         attachUrl: opts.attachUrl || "",
+        ...window.getCoverHelpers(),
         init() {
             this.dateCursor = this.releaseDate ? new Date(`${this.releaseDate}T00:00:00`) : new Date();
             this.snapshot = this.serializeDraft();
@@ -290,38 +291,6 @@ document.addEventListener("alpine:init", () => {
             const rect = el.getBoundingClientRect();
             tipEl.style.left = `${rect.left}px`;
             tipEl.style.top = `${rect.bottom + 6}px`;
-        },
-        async onCoverSelected(event) {
-            const file = event.target.files && event.target.files[0];
-            if (!file) {
-                return;
-            }
-            const result = await window.cropCoverFile(file);
-            this.coverFile = result.file;
-            this.coverCleared = false;
-            this.coverPreview = URL.createObjectURL(result.file);
-            this.coverWarning = result.cropped
-                ? `Обложка была обрезана для соответствия размера: исходный ${result.srcW}×${result.srcH}, итоговый ${result.outW}×${result.outH}`
-                : "";
-            this.assignCoverInput(result.file);
-        },
-        assignCoverInput(file) {
-            const input = this.$refs.coverInput;
-            if (!input || typeof DataTransfer === "undefined") {
-                return;
-            }
-            const transfer = new DataTransfer();
-            transfer.items.add(file);
-            input.files = transfer.files;
-        },
-        clearCover() {
-            this.coverPreview = "";
-            this.coverFile = null;
-            this.coverCleared = true;
-            this.coverWarning = "";
-            if (this.$refs.coverInput) {
-                this.$refs.coverInput.value = "";
-            }
         },
         allowedRelationTypes(otherType) {
             return this.relationTypes.filter((opt) => {
