@@ -64,6 +64,8 @@ document.addEventListener("alpine:init", () => {
         ...window.getStatusHelpers(),
         ...window.getRatingHelpers(),
         ...window.getProgressHelpers(),
+        ...window.getRelationsHelpers(),
+        ...window.getAttachHelpers(),
         get catalog() {
             return this.catalogs[this.workType] || {
                 authors: [],
@@ -327,59 +329,10 @@ document.addEventListener("alpine:init", () => {
                 this.saving = false;
             }
         },
-        resetAttachFields() {
-            this.status = "planning";
-            this.statusOpen = false;
-            this.rating = 0;
-            this.hoverRating = 0;
-            this.progress = 0;
-            this.progressEditing = false;
-            this.progressHover = false;
-        },
-        finishCreate(kind) {
-            this.doneMessage = kind === "list"
-                ? "Произведение создано и добавлено в ваш список."
-                : "Произведение успешно сохранено в базу данных.";
+        finishCreate() {
+            this.doneMessage = "Произведение успешно сохранено в базу данных.";
             this.phase = "done";
             this.refreshList();
-        },
-        async saveAttach() {
-            if (this.saving || !this.createdWorkId || !this.attachUrl) {
-                return;
-            }
-            const body = new URLSearchParams({
-                work_type: this.createdWorkType || this.workType,
-                work_id: String(this.createdWorkId),
-                status: this.status || "planning",
-                rating: this.rating ? String(this.rating) : "",
-                progress: String(this.progress || 0),
-            });
-            this.saving = true;
-            try {
-                const response = await fetch(this.attachUrl, {
-                    method: "POST",
-                    headers: {
-                        "X-CSRFToken": this.csrfToken(),
-                        "X-Requested-With": "XMLHttpRequest",
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                    body,
-                });
-                const data = await response.json().catch(() => ({}));
-                if (!response.ok || !data.ok) {
-                    this.formError = "Не удалось добавить произведение в список";
-                    return;
-                }
-                this.doneMessage = this.justCreated
-                    ? "Произведение создано и добавлено в ваш список."
-                    : "Произведение добавлено в ваш список.";
-                this.phase = "done";
-                this.refreshList();
-            } catch (error) {
-                this.formError = "Не удалось добавить произведение в список";
-            } finally {
-                this.saving = false;
-            }
         },
         dismissModal() {
             if (this.phase === "attach" && this.justCreated) {
@@ -391,7 +344,7 @@ document.addEventListener("alpine:init", () => {
                 return;
             }
             if (this.phase === "choice") {
-                this.finishCreate("db");
+                this.finishCreate();
             }
         },
         goToList() {
@@ -430,116 +383,15 @@ document.addEventListener("alpine:init", () => {
         refreshList() {
             window.Alpine?.store("vorArtworks")?.reloadList();
         },
-        allowedRelationTypes(otherType) {
-            return this.relationTypes.filter((opt) => {
-                if (opt.value === "other") {
-                    return true;
-                }
-                if (opt.value === "adaptation") {
-                    return otherType && otherType !== this.workType;
-                }
-                return otherType === this.workType;
-            });
+        onAttachSuccess() {
+            this.doneMessage = this.justCreated
+                ? "Произведение создано и добавлено в ваш список."
+                : "Произведение добавлено в ваш список.";
+            this.phase = "done";
+            this.refreshList();
         },
-        relationKey(item) {
-            return `${item.id || "new"}-${item.type_key}-${item.work_id}`;
-        },
-        relationLabelFor(type, direction) {
-            const found = this.relationTypes.find((item) => item.value === type);
-            if (type === "sequel") {
-                return direction === "in" ? "Предыстория" : "Продолжение";
-            }
-            if (type === "spin_off") {
-                return direction === "in" ? "Оригинал" : "Спин-офф";
-            }
-            if (type === "adaptation") {
-                return direction === "in" ? "Первоисточник" : "Адаптация";
-            }
-            if (type === "remake") {
-                return direction === "in" ? "Оригинал" : "Ремейк";
-            }
-            return found ? found.label : "Связано";
-        },
-        toggleRelationType(item) {
-            const key = this.relationKey(item);
-            this.relTypeEdit = this.relTypeEdit === key ? null : key;
-        },
-        setRelationType(item, value) {
-            item.relation_type = value;
-            item.label = this.relationLabelFor(value, item.direction || "out");
-            this.relTypeEdit = null;
-        },
-        removeRelation(item) {
-            this.relations = this.relations.filter((rel) => rel !== item);
-        },
-        startRelationAdd() {
-            this.relAdding = true;
-            this.relQuery = "";
-            this.relResults = [];
-            this.relPick = null;
-            this.relPickType = "other";
-        },
-        cancelRelationAdd() {
-            this.relAdding = false;
-            this.relPick = null;
-            this.relQuery = "";
-            this.relResults = [];
-        },
-        searchRelatedWorks() {
-            const query = String(this.relQuery || "").trim();
-            if (!query || !this.relationSearchUrl) {
-                this.relResults = [];
-                return;
-            }
-            const params = new URLSearchParams({
-                q: query,
-                exclude_type: this.workType,
-                exclude_id: String(this.workId || ""),
-            });
-            fetch(`${this.relationSearchUrl}?${params.toString()}`, {
-                headers: { "X-Requested-With": "XMLHttpRequest" },
-            })
-                .then((response) => (response.ok ? response.json() : { results: [] }))
-                .then((data) => {
-                    const taken = new Set(
-                        this.relations.map((item) => `${item.type_key}-${item.work_id}`)
-                    );
-                    this.relResults = (data.results || []).filter(
-                        (item) => !taken.has(`${item.type_key}-${item.work_id}`)
-                    );
-                });
-        },
-        commitRelationAdd() {
-            if (!this.relPick) {
-                return;
-            }
-            const allowed = this.allowedRelationTypes(this.relPick.type_key).map((item) => item.value);
-            const type = allowed.includes(this.relPickType) ? this.relPickType : allowed[0];
-            this.relations = [
-                ...this.relations,
-                {
-                    id: null,
-                    title: this.relPick.title,
-                    cover_url: this.relPick.cover_url,
-                    icon: this.relPick.icon,
-                    type_key: this.relPick.type_key,
-                    work_id: this.relPick.work_id,
-                    relation_type: type,
-                    direction: "out",
-                    label: this.relationLabelFor(type, "out"),
-                },
-            ];
-            this.cancelRelationAdd();
-        },
-        relationsJson() {
-            return JSON.stringify(
-                this.relations.map((item) => ({
-                    id: item.id || null,
-                    relation_type: item.relation_type,
-                    type_key: item.type_key,
-                    work_id: item.work_id,
-                }))
-            );
+        onAttachError() {
+            this.formError = "Не удалось добавить произведение в список";
         },
     }));
 });

@@ -144,4 +144,159 @@
             }
         };
     };
+
+    window.getRelationsHelpers = function () {
+        return {
+            allowedRelationTypes(otherType) {
+                return this.relationTypes.filter((opt) => {
+                    if (opt.value === "other") return true;
+                    if (opt.value === "adaptation") return otherType && otherType !== this.workType;
+                    return otherType === this.workType;
+                });
+            },
+            relationKey(item) {
+                return `${item.id || "new"}-${item.type_key}-${item.work_id}`;
+            },
+            relationLabelFor(type, direction) {
+                const found = this.relationTypes.find((item) => item.value === type);
+                if (type === "sequel") return direction === "in" ? "Предыстория" : "Продолжение";
+                if (type === "spin_off") return direction === "in" ? "Оригинал" : "Спин-офф";
+                if (type === "adaptation") return direction === "in" ? "Первоисточник" : "Адаптация";
+                if (type === "remake") return direction === "in" ? "Оригинал" : "Ремейк";
+                return found ? found.label : "Связано";
+            },
+            toggleRelationType(item) {
+                const key = this.relationKey(item);
+                this.relTypeEdit = this.relTypeEdit === key ? null : key;
+            },
+            setRelationType(item, value) {
+                item.relation_type = value;
+                item.label = this.relationLabelFor(value, item.direction || "out");
+                this.relTypeEdit = null;
+            },
+            removeRelation(item) {
+                this.relations = this.relations.filter((rel) => rel !== item);
+            },
+            startRelationAdd() {
+                this.relAdding = true;
+                this.relQuery = "";
+                this.relResults = [];
+                this.relPick = null;
+                this.relPickType = "other";
+            },
+            cancelRelationAdd() {
+                this.relAdding = false;
+                this.relPick = null;
+                this.relQuery = "";
+                this.relResults = [];
+            },
+            searchRelatedWorks() {
+                const query = String(this.relQuery || "").trim();
+                if (!query || !this.relationSearchUrl) {
+                    this.relResults = [];
+                    return;
+                }
+                // Fallback на createdWorkId для контекста добавления
+                const wId = this.workId || this.createdWorkId || "";
+                const params = new URLSearchParams({
+                    q: query,
+                    exclude_type: this.workType,
+                    exclude_id: String(wId),
+                });
+                fetch(`${this.relationSearchUrl}?${params.toString()}`, {
+                    headers: { "X-Requested-With": "XMLHttpRequest" },
+                })
+                    .then((response) => (response.ok ? response.json() : { results: [] }))
+                    .then((data) => {
+                        const taken = new Set(
+                            this.relations.map((item) => `${item.type_key}-${item.work_id}`)
+                        );
+                        this.relResults = (data.results || []).filter(
+                            (item) => !taken.has(`${item.type_key}-${item.work_id}`)
+                        );
+                    });
+            },
+            commitRelationAdd() {
+                if (!this.relPick) return;
+                const allowed = this.allowedRelationTypes(this.relPick.type_key).map((item) => item.value);
+                const type = allowed.includes(this.relPickType) ? this.relPickType : allowed[0];
+                this.relations = [
+                    ...this.relations,
+                    {
+                        id: null,
+                        title: this.relPick.title,
+                        cover_url: this.relPick.cover_url,
+                        icon: this.relPick.icon,
+                        type_key: this.relPick.type_key,
+                        work_id: this.relPick.work_id,
+                        relation_type: type,
+                        direction: "out",
+                        label: this.relationLabelFor(type, "out"),
+                    },
+                ];
+                this.cancelRelationAdd();
+            },
+            relationsJson() {
+                return JSON.stringify(
+                    this.relations.map((item) => ({
+                        id: item.id || null,
+                        relation_type: item.relation_type,
+                        type_key: item.type_key,
+                        work_id: item.work_id,
+                    }))
+                );
+            }
+        };
+    };
+
+    window.getAttachHelpers = function () {
+        return {
+            resetAttachFields() {
+                this.status = "planning";
+                this.statusOpen = false;
+                this.rating = 0;
+                this.hoverRating = 0;
+                this.progress = 0;
+                this.progressEditing = false;
+                this.progressHover = false;
+            },
+            async saveAttach() {
+                if (this.saving || !this.attachUrl) return;
+
+                // Fallback на createdWorkId для контекста добавления
+                const wId = this.workId || this.createdWorkId;
+                if (!wId) return;
+
+                const body = new URLSearchParams({
+                    work_type: this.createdWorkType || this.workType, // Приоритет для add.js
+                    work_id: String(wId),
+                    status: this.status || "planning",
+                    rating: this.rating ? String(this.rating) : "",
+                    progress: String(this.progress || 0),
+                });
+
+                this.saving = true;
+                try {
+                    const response = await fetch(this.attachUrl, {
+                        method: "POST",
+                        headers: {
+                            ...window.getCsrfHeaders(),
+                            "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body,
+                    });
+                    const data = await response.json().catch(() => ({}));
+                    if (!response.ok || !data.ok) {
+                        if (typeof this.onAttachError === "function") this.onAttachError();
+                        return;
+                    }
+                    if (typeof this.onAttachSuccess === "function") this.onAttachSuccess();
+                } catch (error) {
+                    if (typeof this.onAttachError === "function") this.onAttachError();
+                } finally {
+                    this.saving = false;
+                }
+            }
+        };
+    };
 })();
