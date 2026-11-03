@@ -1,6 +1,6 @@
 (function () {
   /* ============================================
-     Base: composition + lifecycle + cross-cutting
+     Composition: filters + collections + drag + menu + search + delete
      ============================================ */
   document.addEventListener("alpine:init", () => {
     Alpine.store("vorArtworks", {
@@ -18,18 +18,18 @@
         if (this._booted) return;
         this._booted = true;
 
-        // filtersMixin
+        // filters
         this.listUrl = opts.listUrl || "";
         this.filterCatalog = { ...this.filterCatalog, ...(opts.filterCatalog || {}) };
 
-        // collectionsMixin
+        // collections
         this.collectionTreeUrl = opts.collectionTreeUrl || "";
         this.collectionReorderUrl = opts.collectionReorderUrl || "";
 
-        // dragMixin
+        // drag
         this.reorderUrl = opts.reorderUrl || "";
 
-        // searchAndDeleteMixin
+        // search
         this.searchUrl = opts.searchUrl || "";
         this.attachUrl = opts.attachUrl || "";
 
