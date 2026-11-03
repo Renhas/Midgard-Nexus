@@ -302,24 +302,20 @@
     collectionSiblings(node) {
       return window.getCollectionSiblings(node);
     },
-    postCollectionMove(node) {
+    async postCollectionMove(node) {
       const parentEl = node?.parentElement;
-      if (!node || !parentEl || !this.collectionReorderUrl) {
-        return;
+      if (!node || !parentEl || !this.collectionReorderUrl) return;
+      try {
+        await VorApi.moveCollection(this.collectionReorderUrl, {
+          id: node.dataset.collectionId || "",
+          parent_id: parentEl.dataset.parentId || "",
+          sibling_ids: this.collectionSiblings(node)
+            .map((sibling) => sibling.dataset.collectionId)
+            .filter(Boolean),
+        });
+      } finally {
+        this.reloadCollectionTree();
       }
-      const body = new URLSearchParams();
-      body.set("id", node.dataset.collectionId || "");
-      body.set("parent_id", parentEl.dataset.parentId || "");
-      this.collectionSiblings(node).forEach((sibling) => {
-        if (sibling.dataset.collectionId) {
-          body.append("sibling_ids", sibling.dataset.collectionId);
-        }
-      });
-      fetch(this.collectionReorderUrl, {
-        method: "POST",
-        headers: this.csrfHeaders(),
-        body,
-      }).finally(() => this.reloadCollectionTree());
     },
     syncCollectionSortable() {
       this.destroySortables(this._collectionSortables);
@@ -494,28 +490,15 @@
       this.postCollectionMove(item);
       return true;
     },
-    addWorkToCollection(collectionId, uwId) {
-      if (!collectionId || !uwId) {
-        return;
-      }
-      const body = new URLSearchParams();
-      body.set("uw_id", uwId);
-      body.set("action", "add");
-      fetch(this.collectionUrl(collectionId, "items/"), {
-        method: "POST",
-        headers: this.csrfHeaders(),
-        body,
-      }).then((response) => response.json()).then((data) => {
-        if (!data?.ok) {
-          return;
-        }
-        if (data.changed) {
-          window.dispatchEvent(new Event("collection-update"));
-        }
-        if (this.collectionId) {
-          this.reloadList();
-        }
-      });
+    async addWorkToCollection(collectionId, uwId) {
+      if (!collectionId || !uwId) return;
+      const data = await VorApi.addWorkToCollection(
+        this.collectionUrl(collectionId, "items/"),
+        uwId,
+      );
+      if (!data?.ok) return;
+      if (data.changed) window.dispatchEvent(new Event("collection-update"));
+      if (this.collectionId) this.reloadList();
     },
     flattenCollectionTree(nodes, level = 0) {
       return window.flattenCollectionTree(nodes, level);
@@ -646,30 +629,18 @@
       }
       evt.from.insertBefore(evt.item, siblings[evt.oldIndex]);
     },
-    saveOrder() {
+    async saveOrder() {
       const container = document.getElementById("artwork-list-items");
-      if (!container) {
-        return;
-      }
+      if (!container) return;
       const ids = [...container.querySelectorAll(":scope > .artwork-item")]
         .map((el) => el.dataset.uwId)
         .filter(Boolean);
-      if (!this.sortAsc) {
-        ids.reverse();
-      }
-      const body = new URLSearchParams();
-      ids.forEach((id) => body.append("ids", id));
+      if (!this.sortAsc) ids.reverse();
       const url = this.collectionId
         ? this.collectionUrl(this.collectionId, "items/reorder/")
         : this.reorderUrl;
-      if (!url) {
-        return;
-      }
-      fetch(url, {
-        method: "POST",
-        headers: this.csrfHeaders(),
-        body,
-      });
+      if (!url) return;
+      await VorApi.saveWorkOrder(url, ids);
     },
   };
 
@@ -823,19 +794,12 @@
       parentNode.after(node);
       this.postCollectionMove(node);
     },
-    loadArtworkCollections() {
-      if (!this.menu.uwId || !this.listUrl) {
-        return;
-      }
+    async loadArtworkCollections() {
+      if (!this.menu.uwId || !this.listUrl) return;
       this.menu.membershipLoading = true;
-      fetch(`${this.listUrl}${this.menu.uwId}/collections/`, {
-        headers: { "X-Requested-With": "XMLHttpRequest" },
-      }).then((response) => response.json()).then((data) => {
-        this.menu.membership = this.flattenCollectionTree(data.tree || []);
-        this.menu.membershipLoading = false;
-      }).catch(() => {
-        this.menu.membershipLoading = false;
-      });
+      const data = await VorApi.listArtworkCollections(this.listUrl, this.menu.uwId);
+      this.menu.membership = this.flattenCollectionTree(data?.tree || []);
+      this.menu.membershipLoading = false;
     },
     openCollectionFlyout() {
       this.cancelCloseFlyout();
@@ -871,48 +835,31 @@
         this._flyoutTimer = null;
       }
     },
-    removeFromCurrentCollection() {
+    async removeFromCurrentCollection() {
       const collectionId = this.collectionId;
       const uwId = this.menu.uwId;
       this.closeMenu();
-      if (!collectionId || !uwId) {
-        return;
-      }
-      const body = new URLSearchParams();
-      body.set("uw_id", String(uwId));
-      body.set("action", "remove");
-      fetch(this.collectionUrl(collectionId, "items/"), {
-        method: "POST",
-        headers: this.csrfHeaders(),
-        body,
-      }).then((response) => response.json()).then((data) => {
-        if (!data?.ok) {
-          return;
-        }
-        window.dispatchEvent(new Event("collection-update"));
-        this.reloadList();
-      });
+      if (!collectionId || !uwId) return;
+      const data = await VorApi.removeWorkFromCollection(
+        this.collectionUrl(collectionId, "items/"),
+        uwId,
+      );
+      if (!data?.ok) return;
+      window.dispatchEvent(new Event("collection-update"));
+      this.reloadList();
     },
-    toggleWorkCollection(item) {
-      if (!item || !this.menu.uwId) {
-        return;
-      }
+    async toggleWorkCollection(item) {
+      if (!item || !this.menu.uwId) return;
       const adding = !item.in_collection;
-      const body = new URLSearchParams();
-      body.set("uw_id", String(this.menu.uwId));
-      body.set("action", adding ? "add" : "remove");
-      fetch(this.collectionUrl(item.id, "items/"), {
-        method: "POST",
-        headers: this.csrfHeaders(),
-        body,
-      }).then((response) => response.json()).then((data) => {
-        if (!data?.ok) {
-          return;
-        }
-        item.in_collection = adding;
-        window.dispatchEvent(new Event("collection-update"));
-        this.reloadList();
-      });
+      const data = await VorApi.toggleWorkCollection(
+        this.collectionUrl(item.id, "items/"),
+        this.menu.uwId,
+        adding,
+      );
+      if (!data?.ok) return;
+      item.in_collection = adding;
+      window.dispatchEvent(new Event("collection-update"));
+      this.reloadList();
     },
     menuRenameCollection() {
       const id = this.menu.collectionId;
@@ -1033,30 +980,13 @@
         swap: "innerHTML",
       });
     },
-    attachFromSearch(typeKey, workId) {
-      const token = document.querySelector("[name=csrfmiddlewaretoken]")?.value
-        || window.getCookie("csrftoken");
-      const body = new URLSearchParams({
-        work_type: typeKey,
-        work_id: String(workId),
-        status: "planning",
-      });
-      fetch(this.attachUrl, {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": token || "",
-          "X-Requested-With": "XMLHttpRequest",
-        },
-        body,
-      })
-        .then((response) => (response.ok ? response.json() : null))
-        .then((data) => {
-          if (!data?.ok) {
-            return;
-          }
-          this.reloadList();
-          this.runSearch();
-        });
+    async attachFromSearch(typeKey, workId) {
+      const data = await VorApi.attachWorkFromSearch(
+        this.attachUrl, typeKey, workId,
+      );
+      if (!data?.ok) return;
+      this.reloadList();
+      this.runSearch();
     },
     openWork(url) {
       this.closeSearch();
@@ -1151,7 +1081,6 @@
         this.syncCollectionSortable();
         this.applyCollectionTreeState();
       },
-      csrfHeaders() { return window.getCsrfHeaders(); },
       closeOverlay() {
         if (this._closingOverlay) {
           return;
