@@ -347,25 +347,11 @@ document.addEventListener("alpine:init", () => {
         this.ownedPlatformIds = data.owned_platform_ids.map(Number);
       }
     },
-    saveField(field, value) {
-      if (!this.quickUrl || this.attachOpen) {
-        return;
-      }
-      const token = window.getCsrfToken();
-      const body = new URLSearchParams({ field, value: String(value) });
-      fetch(this.quickUrl, {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": token || "",
-          "X-Requested-With": "XMLHttpRequest",
-        },
-        body,
-      })
-        .then((response) => (response.ok ? response.json() : null))
-        .then((data) => {
-          this.applyQuickResult(data);
-          this.refreshList();
-        });
+    async saveField(field, value) {
+      if (!this.quickUrl || this.attachOpen) return;
+      const data = await VorApi.quickUpdate(this.quickUrl, field, value);
+      this.applyQuickResult(data);
+      this.refreshList();
     },
     refreshList() {
       window.Alpine?.store("vorArtworks")?.reloadList();
@@ -379,9 +365,6 @@ document.addEventListener("alpine:init", () => {
       this.progressEditing = false;
       this.progressHover = false;
       this.attachOpen = true;
-    },
-    csrfToken() {
-      return window.getCsrfToken();
     },
     onAttachSuccess() {
       this.attachOpen = false;
