@@ -261,9 +261,6 @@ document.addEventListener("alpine:init", () => {
     appendIds(body, name, items) {
       (items || []).forEach((item) => body.append(name, String(item.id)));
     },
-    csrfToken() {
-      return window.getCsrfToken();
-    },
     async saveWork() {
       if (this.saving || !this.validateDraft()) {
         return;
@@ -301,17 +298,9 @@ document.addEventListener("alpine:init", () => {
       this.saving = true;
       this.formError = "";
       try {
-        const response = await fetch(this.saveUrl, {
-          method: "POST",
-          headers: {
-            "X-CSRFToken": this.csrfToken(),
-            "X-Requested-With": "XMLHttpRequest",
-          },
-          body,
-        });
-        const data = await response.json().catch(() => ({}));
-        if (!response.ok || !data.ok) {
-          this.errors = data.errors || {};
+        const data = await VorApi.saveWork(this.saveUrl, body);
+        if (!data || !data.ok) {
+          this.errors = (data && data.errors) || {};
           this.formError = this.fieldError("__all__") || "Не удалось сохранить произведение";
           return;
         }
@@ -323,8 +312,6 @@ document.addEventListener("alpine:init", () => {
         this.progressStep = Number(data.progressStep || 1);
         this.resetAttachFields();
         this.phase = "choice";
-      } catch (error) {
-        this.formError = "Не удалось сохранить произведение";
       } finally {
         this.saving = false;
       }
