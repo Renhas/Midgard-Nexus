@@ -92,6 +92,9 @@ class WorkBaseForm(StyledModelForm):
             "authors": forms.SelectMultiple(attrs={"size": 4}),
             "tags": forms.SelectMultiple(attrs={"size": 4}),
         }
+        error_messages = {
+            "title": {"required": "Укажите название"},
+        }
 
 
 class BookForm(WorkBaseForm):
@@ -106,6 +109,10 @@ class BookForm(WorkBaseForm):
         widgets = {
             **WorkBaseForm.Meta.widgets,
             "genres": forms.SelectMultiple(attrs={"size": 4}),
+        }
+        error_messages = {
+            **WorkBaseForm.Meta.error_messages,
+            "pages": {"required": "Укажите количество страниц"},
         }
 
 
@@ -130,12 +137,19 @@ class FilmForm(WorkBaseForm):
             "film_type": forms.Select(attrs={"x-model": "filmType"}),
             "genres": forms.SelectMultiple(attrs={"size": 4}),
         }
+        error_messages = {
+            **WorkBaseForm.Meta.error_messages,
+            "duration_minutes": {"required": "Укажите длительность"},
+        }
 
-    def clean(self):
-        cleaned = super().clean()
-        if cleaned.get("film_type") == FilmTypeChoices.MOVIE:
-            cleaned["episode_count"] = None
-        return cleaned
+    def clean_episode_count(self):
+        value = self.cleaned_data.get("episode_count")
+        film_type = self.cleaned_data.get("film_type")
+        if film_type == FilmTypeChoices.MOVIE:
+            return None
+        if film_type == FilmTypeChoices.TV_SHOW and not value:
+            raise forms.ValidationError("Укажите количество эпизодов")
+        return value
 
 
 class GameForm(WorkBaseForm):
@@ -162,10 +176,20 @@ class UserWorkEditForm(StyledModelForm):
         widgets = {"owned_platforms": forms.SelectMultiple(attrs={"size": 4})}
 
 
+def required_field_names(form_class):
+    """Names of fields that are required on a pristine work form."""
+    return [name for name, field in form_class.base_fields.items() if field.required]
+
+
 WORK_FORMS = {
     "book": BookForm,
     "film": FilmForm,
     "game": GameForm,
+}
+
+WORK_REQUIRED_FIELDS = {
+    type_key: required_field_names(form_class)
+    for type_key, form_class in WORK_FORMS.items()
 }
 
 
