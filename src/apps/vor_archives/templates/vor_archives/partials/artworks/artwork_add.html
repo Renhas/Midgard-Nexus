@@ -1,7 +1,7 @@
 {{ add_opts|json_script:"vor-add-opts" }}
 <div class="vor-overlay is-add" x-data="vorAddOverlay(JSON.parse(document.getElementById('vor-add-opts').textContent))">
   <div class="vor-overlay-bar">
-    <button type="button" class="sidebar-btn" @click="$store.vorArtworks.closeOverlay()">
+    <button type="button" class="sidebar-btn" @click="window.closeOverlay()">
       <i class="bi bi-arrow-left"></i>
       <span>Назад</span>
     </button>
@@ -21,11 +21,11 @@
   <div class="vor-overlay-body">
     <div class="vor-add-search">
       <div class="vor-add-title-wrap"
-           :class="{ 'is-invalid': titleInvalid() }"
+           :class="{ 'is-invalid': fieldInvalid('title') }"
            :title="showRequired('title') ? 'Обязательное поле' : ''">
         <input id="add-title-input"
                class="vor-view-title vor-inline-title"
-               :class="{ 'is-invalid': titleInvalid() }"
+               :class="{ 'is-invalid': fieldInvalid('title') }"
                type="text"
                x-model="title"
                @input="onTitleInput()"
@@ -33,7 +33,7 @@
                autocomplete="off"
                maxlength="255">
         <span class="vor-req-star" x-show="showRequired('title')" x-cloak>*</span>
-        <div class="vor-add-error is-under-center" x-show="titleBanner()" x-cloak x-text="titleBanner()"></div>
+        <div class="vor-add-error is-under-center" x-show="fieldError('title')" x-cloak x-text="fieldError('title')"></div>
       </div>
       <div id="work-suggestions" class="vor-suggestions" @click="onSuggestionClick($event)"></div>
     </div>
@@ -72,7 +72,7 @@
       x-cloak>*</span></span>
               <div class="vor-add-field-control">
                 <input class="vor-inline-number"
-                       :class="{ 'is-invalid': showRequired('pages') || fieldError('pages') }"
+                       :class="{ 'is-invalid': fieldInvalid('pages') }"
                        type="number"
                        min="1"
                        x-model="pages"
@@ -99,7 +99,7 @@
               <div class="vor-add-field-control">
                 <span class="vor-inline-number-wrap">
                   <input class="vor-inline-number"
-                         :class="{ 'is-invalid': showRequired('duration_minutes') || fieldError('duration_minutes') }"
+                         :class="{ 'is-invalid': fieldInvalid('duration_minutes') }"
                          type="number"
                          min="1"
                          x-model="durationMinutes"
@@ -122,7 +122,7 @@
       x-cloak>*</span></span>
               <div class="vor-add-field-control">
                 <input class="vor-inline-number"
-                       :class="{ 'is-invalid': showRequired('episode_count') || fieldError('episode_count') }"
+                       :class="{ 'is-invalid': fieldInvalid('episode_count') }"
                        type="number"
                        min="1"
                        x-model="episodeCount"

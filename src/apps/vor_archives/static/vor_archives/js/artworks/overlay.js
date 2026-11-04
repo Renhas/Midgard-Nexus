@@ -68,7 +68,10 @@ document.addEventListener("alpine:init", () => {
     counterHover: false,
     counterDraft: "",
     quickUrl: opts.quickUrl || "",
+    _quickSeq: 0,
+    serverQuickState: null,
     listUrl: opts.listUrl || "",
+    workUrl: opts.workUrl || "",
     attachUrl: opts.attachUrl || "",
     ...window.getCoverHelpers(),
     ...window.getStatusHelpers(),
@@ -79,6 +82,30 @@ document.addEventListener("alpine:init", () => {
     init() {
       this.dateCursor = this.releaseDate ? new Date(`${this.releaseDate}T00:00:00`) : new Date();
       this.snapshot = this.serializeDraft();
+      this.serverQuickState = this.captureQuickState();
+    },
+    captureQuickState() {
+      return {
+        status: this.status,
+        rating: this.rating,
+        progress: this.progress,
+        isHidden: this.isHidden,
+        timesCompleted: this.timesCompleted,
+        ownedPlatformIds: [...this.ownedPlatformIds],
+        lastCompletedDate: this.lastCompletedDate,
+      };
+    },
+    restoreQuickState(snap) {
+      if (!snap) {
+        return;
+      }
+      this.status = snap.status;
+      this.rating = snap.rating;
+      this.progress = snap.progress;
+      this.isHidden = snap.isHidden;
+      this.timesCompleted = snap.timesCompleted;
+      this.ownedPlatformIds = snap.ownedPlatformIds;
+      this.lastCompletedDate = snap.lastCompletedDate;
     },
     startEdit() {
       this.editing = true;
@@ -289,7 +316,7 @@ document.addEventListener("alpine:init", () => {
     },
     openRelated(item) {
       this.leaveOr(() => {
-        htmx.ajax("GET", `/library/artworks/${item.type_key}/${item.work_id}/`, {
+        htmx.ajax("GET", item.url, {
           target: "#vor-overlay",
           swap: "innerHTML",
         });
@@ -347,28 +374,21 @@ document.addEventListener("alpine:init", () => {
         this.ownedPlatformIds = data.owned_platform_ids.map(Number);
       }
     },
-    saveField(field, value) {
-      if (!this.quickUrl || this.attachOpen) {
+    async saveField(field, value) {
+      if (!this.quickUrl || this.attachOpen) return;
+      const seq = ++this._quickSeq;
+      const data = await VorApi.quickUpdate(this.quickUrl, field, value);
+      if (seq !== this._quickSeq) return;
+      if (!data || typeof data !== "object") {
+        this.restoreQuickState(this.serverQuickState);
         return;
       }
-      const token = window.getCsrfToken();
-      const body = new URLSearchParams({ field, value: String(value) });
-      fetch(this.quickUrl, {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": token || "",
-          "X-Requested-With": "XMLHttpRequest",
-        },
-        body,
-      })
-        .then((response) => (response.ok ? response.json() : null))
-        .then((data) => {
-          this.applyQuickResult(data);
-          this.refreshList();
-        });
+      this.applyQuickResult(data);
+      this.serverQuickState = this.captureQuickState();
+      this.refreshList();
     },
     refreshList() {
-      window.Alpine?.store("vorArtworks")?.reloadList();
+      document.body.dispatchEvent(new CustomEvent("vor:reload-list"));
     },
     startAttach() {
       this.status = "planning";
@@ -380,13 +400,10 @@ document.addEventListener("alpine:init", () => {
       this.progressHover = false;
       this.attachOpen = true;
     },
-    csrfToken() {
-      return window.getCsrfToken();
-    },
     onAttachSuccess() {
       this.attachOpen = false;
       this.refreshList();
-      htmx.ajax("GET", `/library/artworks/${this.workType}/${this.workId}/`, {
+      htmx.ajax("GET", this.workUrl, {
         target: "#vor-overlay",
         swap: "innerHTML",
       });

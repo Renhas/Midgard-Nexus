@@ -2,9 +2,7 @@
 {{ overlay_opts|json_script:"vor-detail-opts" }}
 <div class="vor-overlay" x-data="vorDetailOverlay(JSON.parse(document.getElementById('vor-detail-opts').textContent))">
   <div class="vor-overlay-bar">
-    <button type="button"
-            class="sidebar-btn"
-            @click="leaveOr($store.vorArtworks.closeOverlay.bind($store.vorArtworks))">
+    <button type="button" class="sidebar-btn" @click="leaveOr(() => window.closeOverlay())">
       <i class="bi bi-arrow-left"></i>
       <span>Назад</span>
     </button>

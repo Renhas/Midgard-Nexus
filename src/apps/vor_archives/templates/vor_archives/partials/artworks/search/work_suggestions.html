@@ -1,5 +1,5 @@
 {% load vor_archives_extras %}
-<div hidden x-init="alreadyOwned = {{ already_owned|yesno:'true,false' }}"></div>
+<div hidden x-init="onSuggestionsLoaded({{ already_owned|yesno:'true,false' }})"></div>
 {% if works %}
   <ul class="vor-suggestions-list">
     {% for work in works %}

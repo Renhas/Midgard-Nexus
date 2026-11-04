@@ -320,6 +320,38 @@
     return true;
   };
 
+  let _closingOverlay = false;
+
+  window.closeOverlay = function () {
+    if (_closingOverlay) {
+      return;
+    }
+    const data = window.overlayAlpine();
+    if (data?.editing && data.dirtyChanges().length) {
+      data.tryLeave(window.closeOverlay);
+      return;
+    }
+    _closingOverlay = true;
+    queueMicrotask(() => {
+      _closingOverlay = false;
+    });
+    if (history.state && history.state.vorOverlay) {
+      history.back();
+      return;
+    }
+    const el = document.getElementById("vor-overlay");
+    if (el) {
+      el.innerHTML = "";
+    }
+  };
+
+  window.closeModal = function () {
+    const el = document.getElementById("vor-modal");
+    if (el) {
+      el.innerHTML = "";
+    }
+  };
+
   window.isSamePageLink = function (anchor) {
     if (!anchor?.href || anchor.target && anchor.target !== "_self") {
       return false;
@@ -414,19 +446,6 @@
     if (el?.id === "vor-library-search-results") {
       window.Alpine?.initTree?.(el);
     }
-    if (el?.id === "artwork-list-body" || el?.id === "artwork-list") {
-      window.Alpine?.initTree?.(el);
-      window.Alpine?.store("vorArtworks")?.applyListState();
-    }
-    if (el?.id === "sidebar-collections-list") {
-      window.Alpine?.destroyTree?.(el);
-      window.Alpine?.initTree?.(el);
-      const store = window.Alpine?.store("vorArtworks");
-      store?.pruneExpandedCollections();
-      store?.applyCollectionTreeState();
-      store?.syncCollectionSortable();
-      store?.refreshCollectionPath();
-    }
     if (el?.id === "vor-modal") {
       window.Alpine?.initTree?.(el);
     }
@@ -468,8 +487,7 @@
     };
   };
 
-  window.getCollectionUrl = function (baseUrl, id, rest = "") {
-    const base = String(baseUrl || "").replace(/tree\/?$/, "");
+  window.getCollectionUrl = function (base, id, rest = "") {
     return `${base}${id}/${rest}`;
   };
 

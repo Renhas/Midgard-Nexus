@@ -14,7 +14,11 @@ from apps.vor_archives.constants import (
 )
 from apps.vor_archives.registry import WORK_MODELS, WORK_TYPE_REGISTRY
 from apps.vor_archives.models import UserWork
-from apps.vor_archives.artworks.forms import RelationsForm, UserWorkEditForm
+from apps.vor_archives.artworks.forms import (
+    WORK_REQUIRED_FIELDS,
+    RelationsForm,
+    UserWorkEditForm,
+)
 from apps.vor_archives.artworks.presenters import build_overlay_context
 from apps.vor_archives.artworks.services import (
     delete_user_works,
@@ -130,6 +134,7 @@ def artwork_add(request):
                 "catalogs": all_attr_catalogs(),
                 "ageChoices": age_rating_options(),
                 "statusChoices": status_options(),
+                "requiredFields": WORK_REQUIRED_FIELDS,
             },
             "work_types": WORK_TYPE_REGISTRY.values(),
         },

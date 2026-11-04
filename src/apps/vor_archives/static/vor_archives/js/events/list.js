@@ -1,50 +1,20 @@
 (function () {
   document.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter") {
+      return;
+    }
     const store = window.Alpine?.store("vorArtworks");
-    if (!store) {
+    if (!store?.deleteMode || !store.selectedIds.length) {
       return;
     }
-    if (event.key === "Escape") {
-      if (store.menu?.open) {
-        store.closeMenu();
-        return;
-      }
-      if (store.searchOpen) {
-        store.closeSearch();
-        return;
-      }
-      if (window.hasContent("vor-modal")) {
-        store.closeModal();
-        return;
-      }
-      const overlay = window.overlayAlpine();
-      if (overlay?.attachOpen) {
-        overlay.attachOpen = false;
-        return;
-      }
-      if (overlay?.phase && overlay.phase !== "form") {
-        overlay.dismissModal();
-        return;
-      }
-      if (window.hasContent("vor-overlay")) {
-        store.closeOverlay();
-        return;
-      }
-      if (store.deleteMode) {
-        store.exitDeleteMode();
-      }
+    if (["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)) {
       return;
     }
-    if (event.key === "Enter" && store.deleteMode && store.selectedIds.length) {
-      if (["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)) {
-        return;
-      }
-      if (window.hasContent("vor-modal") || window.hasContent("vor-overlay")) {
-        return;
-      }
-      event.preventDefault();
-      store.openPreview();
+    if (window.hasContent("vor-modal") || window.hasContent("vor-overlay")) {
+      return;
     }
+    event.preventDefault();
+    store.openPreview();
   });
 
   document.addEventListener(
@@ -68,26 +38,12 @@
     true
   );
 
-  document.body.addEventListener("vor:close-overlay", () => {
-    const store = window.Alpine?.store("vorArtworks");
-    if (!store) {
-      return;
-    }
-    store.closeOverlay();
-    store.closeModal();
-    store.exitDeleteMode();
-  });
-
   document.body.addEventListener("vor:reload-list", () => {
     window.Alpine?.store("vorArtworks")?.reloadList();
   });
 
   document.body.addEventListener("vor:reload-tree", () => {
     window.Alpine?.store("vorArtworks")?.reloadCollectionTree();
-  });
-
-  document.body.addEventListener("vor:close-modal", () => {
-    window.Alpine?.store("vorArtworks")?.closeModal();
   });
 
   document.body.addEventListener("vor:collection-deleted", (event) => {
@@ -173,4 +129,26 @@
     }
     window.Alpine?.store("vorArtworks")?.closeMenu();
   }, true);
+
+  document.body.addEventListener("htmx:afterSwap", (event) => {
+    const el = event.detail.elt;
+    const isList = el?.id === "artwork-list-body" || el?.id === "artwork-list";
+    const isTree = el?.id === "sidebar-collections-list";
+    if (!isList && !isTree) return;
+    const store = window.Alpine?.store("vorArtworks");
+    if (!store) return;
+
+    if (isList) {
+      window.Alpine?.initTree?.(el);
+      store.applyListState();
+    }
+    if (isTree) {
+      window.Alpine?.destroyTree?.(el);
+      window.Alpine?.initTree?.(el);
+      store.pruneExpandedCollections();
+      store.applyCollectionTreeState();
+      store.syncCollectionSortable();
+      store.refreshCollectionPath();
+    }
+  });
 })();

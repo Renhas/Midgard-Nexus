@@ -190,31 +190,24 @@
         this.relQuery = "";
         this.relResults = [];
       },
-      searchRelatedWorks() {
+      async searchRelatedWorks() {
         const query = String(this.relQuery || "").trim();
         if (!query || !this.relationSearchUrl) {
           this.relResults = [];
           return;
         }
-        // Fallback на createdWorkId для контекста добавления
         const wId = this.workId || this.createdWorkId || "";
-        const params = new URLSearchParams({
+        const data = await VorApi.searchRelatedWorks(this.relationSearchUrl, {
           q: query,
           exclude_type: this.workType,
           exclude_id: String(wId),
         });
-        fetch(`${this.relationSearchUrl}?${params.toString()}`, {
-          headers: { "X-Requested-With": "XMLHttpRequest" },
-        })
-          .then((response) => (response.ok ? response.json() : { results: [] }))
-          .then((data) => {
-            const taken = new Set(
-              this.relations.map((item) => `${item.type_key}-${item.work_id}`)
-            );
-            this.relResults = (data.results || []).filter(
-              (item) => !taken.has(`${item.type_key}-${item.work_id}`)
-            );
-          });
+        const taken = new Set(
+          this.relations.map((item) => `${item.type_key}-${item.work_id}`)
+        );
+        this.relResults = (data?.results || []).filter(
+          (item) => !taken.has(`${item.type_key}-${item.work_id}`)
+        );
       },
       commitRelationAdd() {
         if (!this.relPick) return;
@@ -262,37 +255,22 @@
       },
       async saveAttach() {
         if (this.saving || !this.attachUrl) return;
-
-        // Fallback на createdWorkId для контекста добавления
         const wId = this.workId || this.createdWorkId;
         if (!wId) return;
-
-        const body = new URLSearchParams({
-          work_type: this.createdWorkType || this.workType, // Приоритет для add.js
-          work_id: String(wId),
-          status: this.status || "planning",
-          rating: this.rating ? String(this.rating) : "",
-          progress: String(this.progress || 0),
-        });
-
         this.saving = true;
         try {
-          const response = await fetch(this.attachUrl, {
-            method: "POST",
-            headers: {
-              ...window.getCsrfHeaders(),
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body,
+          const data = await VorApi.attachWork(this.attachUrl, {
+            work_type: this.createdWorkType || this.workType,
+            work_id: wId,
+            status: this.status || "planning",
+            rating: this.rating || "",
+            progress: this.progress || 0,
           });
-          const data = await response.json().catch(() => ({}));
-          if (!response.ok || !data.ok) {
+          if (!data || !data.ok) {
             if (typeof this.onAttachError === "function") this.onAttachError();
             return;
           }
           if (typeof this.onAttachSuccess === "function") this.onAttachSuccess();
-        } catch (error) {
-          if (typeof this.onAttachError === "function") this.onAttachError();
         } finally {
           this.saving = false;
         }

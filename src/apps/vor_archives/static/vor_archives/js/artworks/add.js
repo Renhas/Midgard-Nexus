@@ -1,4 +1,11 @@
 document.addEventListener("alpine:init", () => {
+  const FIELD_TO_STATE = {
+    title: { key: "title", trim: true },
+    pages: { key: "pages" },
+    duration_minutes: { key: "durationMinutes" },
+    episode_count: { key: "episodeCount" },
+  };
+
   Alpine.data("vorAddOverlay", (opts = {}) => ({
     workType: opts.workType || "book",
     title: "",
@@ -20,6 +27,7 @@ document.addEventListener("alpine:init", () => {
     catalogs: opts.catalogs || {},
     ageChoices: opts.ageChoices || [],
     statusChoices: opts.statusChoices || [],
+    requiredFieldsByType: opts.requiredFields || {},
     saveUrl: opts.saveUrl || "",
     searchUrl: opts.searchUrl || "",
     previewUrl: opts.previewUrl || "",
@@ -35,7 +43,6 @@ document.addEventListener("alpine:init", () => {
     relPickType: "other",
     relTypeEdit: null,
     selectedWorkId: null,
-    alreadyOwned: false,
     createdWorkId: null,
     createdWorkType: "",
     justCreated: false,
@@ -90,6 +97,11 @@ document.addEventListener("alpine:init", () => {
       this.refreshSearch();
     },
     onTitleInput() {
+      const currentTitleErrors = this.errors.title || [];
+      if (currentTitleErrors.length === 1 && currentTitleErrors[0]?.persistent) {
+        const { title, ...rest } = this.errors;
+        this.errors = rest;
+      }
       this.clearSelection();
       this.scheduleSearch();
     },
@@ -138,7 +150,6 @@ document.addEventListener("alpine:init", () => {
     },
     clearSelection() {
       this.selectedWorkId = null;
-      this.alreadyOwned = false;
       if (this.phase === "form") {
         this.createdWorkId = this.justCreated ? this.createdWorkId : null;
       }
@@ -188,84 +199,70 @@ document.addEventListener("alpine:init", () => {
       this.ageRating = value;
       this.ageOpen = false;
     },
+    requiredFields() {
+      const base = this.requiredFieldsByType[this.workType] || [];
+      const extras = (this.workType === "film" && this.filmType === "tv_show")
+        ? ["episode_count"]
+        : [];
+      return [...base, ...extras];
+    },
     isRequired(name) {
-      if (name === "title") {
-        return true;
-      }
-      if (name === "pages") {
-        return this.workType === "book";
-      }
-      if (name === "duration_minutes") {
-        return this.workType === "film";
-      }
-      if (name === "episode_count") {
-        return this.workType === "film" && this.filmType === "tv_show";
-      }
-      return false;
+      return this.requiredFields().includes(name);
     },
     isEmpty(name) {
-      if (name === "title") {
-        return !String(this.title || "").trim();
+      const spec = FIELD_TO_STATE[name];
+      if (!spec) {
+        return false;
       }
-      if (name === "pages") {
-        return !this.pages;
+      const value = this[spec.key];
+      if (spec.trim) {
+        return !String(value || "").trim();
       }
-      if (name === "duration_minutes") {
-        return !this.durationMinutes;
-      }
-      if (name === "episode_count") {
-        return !this.episodeCount;
-      }
-      return false;
+      return value === "" || value == null;
     },
     showRequired(name) {
       return this.isRequired(name) && this.isEmpty(name);
     },
-    titleInvalid() {
-      return this.alreadyOwned || this.showRequired("title") || Boolean(this.fieldError("title"));
-    },
-    titleBanner() {
-      if (this.alreadyOwned) {
-        return "Это произведение уже есть в вашем списке";
-      }
-      return this.fieldError("title") || this.fieldError("__all__");
+    fieldInvalid(name) {
+      return this.showRequired(name) || Boolean(this.fieldError(name));
     },
     fieldError(name) {
-      if (this.isRequired(name) && !this.isEmpty(name)) {
-        return "";
-      }
       const items = this.errors[name];
       if (!items || !items.length) {
         return "";
       }
-      return items[0].message || items[0] || "";
+      const item = items[0];
+      if (item.persistent) {
+        return item.message || item || "";
+      }
+      if (this.isRequired(name) && !this.isEmpty(name)) {
+        return "";
+      }
+      return item.message || item || "";
     },
-    validateDraft() {
-      const errors = {};
-      if (this.showRequired("title")) {
-        errors.title = [{ message: "Укажите название" }];
+    formBanner() {
+      return this.fieldError("__all__") || this.formError || "";
+    },
+    onSuggestionsLoaded(owned) {
+      const alreadyOwnedMessage = "Это произведение уже есть в вашем списке";
+      if (owned) {
+        this.errors = {
+          ...this.errors,
+          title: [{ message: alreadyOwnedMessage, persistent: true }],
+        };
+        return;
       }
-      if (this.showRequired("pages")) {
-        errors.pages = [{ message: "Укажите количество страниц" }];
+      const currentTitleErrors = this.errors.title || [];
+      if (currentTitleErrors.length === 1 && currentTitleErrors[0]?.persistent) {
+        const { title, ...rest } = this.errors;
+        this.errors = rest;
       }
-      if (this.showRequired("duration_minutes")) {
-        errors.duration_minutes = [{ message: "Укажите длительность" }];
-      }
-      if (this.showRequired("episode_count")) {
-        errors.episode_count = [{ message: "Укажите количество эпизодов" }];
-      }
-      this.errors = errors;
-      this.formError = "";
-      return !Object.keys(errors).length;
     },
     appendIds(body, name, items) {
       (items || []).forEach((item) => body.append(name, String(item.id)));
     },
-    csrfToken() {
-      return window.getCsrfToken();
-    },
     async saveWork() {
-      if (this.saving || !this.validateDraft()) {
+      if (this.saving) {
         return;
       }
       if (this.coverFile) {
@@ -300,19 +297,14 @@ document.addEventListener("alpine:init", () => {
       body.append("relations_json", this.relationsJson());
       this.saving = true;
       this.formError = "";
+      this.errors = {};
       try {
-        const response = await fetch(this.saveUrl, {
-          method: "POST",
-          headers: {
-            "X-CSRFToken": this.csrfToken(),
-            "X-Requested-With": "XMLHttpRequest",
-          },
-          body,
-        });
-        const data = await response.json().catch(() => ({}));
-        if (!response.ok || !data.ok) {
-          this.errors = data.errors || {};
-          this.formError = this.fieldError("__all__") || "Не удалось сохранить произведение";
+        const data = await VorApi.saveWork(this.saveUrl, body);
+        if (!data || !data.ok) {
+          this.errors = (data && data.errors) || {};
+          if (!data || !Object.keys(this.errors).length) {
+            this.formError = "Не удалось сохранить произведение";
+          }
           return;
         }
         this.createdWorkId = data.work_id;
@@ -349,7 +341,7 @@ document.addEventListener("alpine:init", () => {
     },
     goToList() {
       this.refreshList();
-      window.Alpine?.store("vorArtworks")?.closeOverlay();
+      window.closeOverlay();
     },
     resetForm() {
       this.title = "";
@@ -375,13 +367,12 @@ document.addEventListener("alpine:init", () => {
       this.justCreated = false;
       this.errors = {};
       this.formError = "";
-      this.alreadyOwned = false;
       this.doneMessage = "";
       this.resetAttachFields();
       this.phase = "form";
     },
     refreshList() {
-      window.Alpine?.store("vorArtworks")?.reloadList();
+      document.body.dispatchEvent(new CustomEvent("vor:reload-list"));
     },
     onAttachSuccess() {
       this.doneMessage = this.justCreated
