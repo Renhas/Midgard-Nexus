@@ -1,50 +1,20 @@
 (function () {
   document.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter") {
+      return;
+    }
     const store = window.Alpine?.store("vorArtworks");
-    if (!store) {
+    if (!store?.deleteMode || !store.selectedIds.length) {
       return;
     }
-    if (event.key === "Escape") {
-      if (store.menu?.open) {
-        store.closeMenu();
-        return;
-      }
-      if (store.searchOpen) {
-        store.closeSearch();
-        return;
-      }
-      if (window.hasContent("vor-modal")) {
-        store.closeModal();
-        return;
-      }
-      const overlay = window.overlayAlpine();
-      if (overlay?.attachOpen) {
-        overlay.attachOpen = false;
-        return;
-      }
-      if (overlay?.phase && overlay.phase !== "form") {
-        overlay.dismissModal();
-        return;
-      }
-      if (window.hasContent("vor-overlay")) {
-        window.closeOverlay();
-        return;
-      }
-      if (store.deleteMode) {
-        store.exitDeleteMode();
-      }
+    if (["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)) {
       return;
     }
-    if (event.key === "Enter" && store.deleteMode && store.selectedIds.length) {
-      if (["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)) {
-        return;
-      }
-      if (window.hasContent("vor-modal") || window.hasContent("vor-overlay")) {
-        return;
-      }
-      event.preventDefault();
-      store.openPreview();
+    if (window.hasContent("vor-modal") || window.hasContent("vor-overlay")) {
+      return;
     }
+    event.preventDefault();
+    store.openPreview();
   });
 
   document.addEventListener(
@@ -68,22 +38,12 @@
     true
   );
 
-  document.body.addEventListener("vor:close-overlay", () => {
-    window.closeOverlay();
-    window.closeModal();
-    window.Alpine?.store("vorArtWorks")?.exitDeleteMode?.();
-  });
-
   document.body.addEventListener("vor:reload-list", () => {
     window.Alpine?.store("vorArtworks")?.reloadList();
   });
 
   document.body.addEventListener("vor:reload-tree", () => {
     window.Alpine?.store("vorArtworks")?.reloadCollectionTree();
-  });
-
-  document.body.addEventListener("vor:close-modal", () => {
-    window.closeModal();
   });
 
   document.body.addEventListener("vor:collection-deleted", (event) => {
