@@ -320,6 +320,38 @@
     return true;
   };
 
+  let _closingOverlay = false;
+
+  window.closeOverlay = function () {
+    if (_closingOverlay) {
+      return;
+    }
+    const data = window.overlayAlpine();
+    if (data?.editing && data.dirtyChanges().length) {
+      data.tryLeave(window.closeOverlay);
+      return;
+    }
+    _closingOverlay = true;
+    queueMicrotask(() => {
+      _closingOverlay = false;
+    });
+    if (history.state && history.state.vorOverlay) {
+      history.back();
+      return;
+    }
+    const el = document.getElementById("vor-overlay");
+    if (el) {
+      el.innerHTML = "";
+    }
+  };
+
+  window.closeModal = function () {
+    const el = document.getElementById("vor-modal");
+    if (el) {
+      el.innerHTML = "";
+    }
+  };
+
   window.isSamePageLink = function (anchor) {
     if (!anchor?.href || anchor.target && anchor.target !== "_self") {
       return false;

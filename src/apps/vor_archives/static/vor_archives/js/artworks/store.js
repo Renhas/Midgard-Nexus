@@ -46,34 +46,6 @@
         this.syncCollectionSortable();
         this.applyCollectionTreeState();
       },
-      closeOverlay() {
-        if (this._closingOverlay) {
-          return;
-        }
-        const data = window.overlayAlpine();
-        if (data?.editing && data.dirtyChanges().length) {
-          data.tryLeave(() => this.closeOverlay());
-          return;
-        }
-        this._closingOverlay = true;
-        queueMicrotask(() => {
-          this._closingOverlay = false;
-        });
-        if (history.state && history.state.vorOverlay) {
-          history.back();
-          return;
-        }
-        const el = document.getElementById("vor-overlay");
-        if (el) {
-          el.innerHTML = "";
-        }
-      },
-      closeModal() {
-        const el = document.getElementById("vor-modal");
-        if (el) {
-          el.innerHTML = "";
-        }
-      },
     });
   });
 })();

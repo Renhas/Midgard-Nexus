@@ -341,7 +341,7 @@ document.addEventListener("alpine:init", () => {
     },
     goToList() {
       this.refreshList();
-      window.Alpine?.store("vorArtworks")?.closeOverlay();
+      window.closeOverlay();
     },
     resetForm() {
       this.title = "";

@@ -27,7 +27,7 @@
         return;
       }
       if (window.hasContent("vor-overlay")) {
-        store.closeOverlay();
+        window.closeOverlay();
         return;
       }
       if (store.deleteMode) {
@@ -69,13 +69,9 @@
   );
 
   document.body.addEventListener("vor:close-overlay", () => {
-    const store = window.Alpine?.store("vorArtworks");
-    if (!store) {
-      return;
-    }
-    store.closeOverlay();
-    store.closeModal();
-    store.exitDeleteMode();
+    window.closeOverlay();
+    window.closeModal();
+    window.Alpine?.store("vorArtWorks")?.exitDeleteMode?.();
   });
 
   document.body.addEventListener("vor:reload-list", () => {
@@ -87,7 +83,7 @@
   });
 
   document.body.addEventListener("vor:close-modal", () => {
-    window.Alpine?.store("vorArtworks")?.closeModal();
+    window.closeModal();
   });
 
   document.body.addEventListener("vor:collection-deleted", (event) => {
