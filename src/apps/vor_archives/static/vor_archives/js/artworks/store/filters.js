@@ -157,6 +157,7 @@
         return;
       }
       this.closeMenu();
+      this._reloadSeq = (this._reloadSeq || 0) + 1;
       htmx.ajax("GET", `${this.listUrl}?${this.listQuery().toString()}`, {
         target: "#artwork-list-body",
         swap: "innerHTML",
@@ -173,4 +174,22 @@
       this.syncSortable();
     },
   };
+
+  document.body.addEventListener("htmx:beforeRequest", (event) => {
+    if (event.detail.target?.id !== "artwork-list-body") return;
+    const store = window.Alpine?.store("vorArtWorks");
+    if (!store) return;
+    event.detail.xhr.__vorSeq = store._reloadSeq;
+  });
+
+  document.body.addEventListener("htmx:beforeSwap", (event) => {
+    if (event.detail.target?.id !== "artwork-list-body") return;
+    const store = window.Alpine?.store("vorArtWorks");
+    if (!store) return;
+    const requestSeq = event.detail.xhr.__vorSeq;
+    if (requestSeq != null && Number(requestSeq) !== store._reloadSeq) {
+      event.detail.shouldSwap = false;
+      event.detail.isError = false;
+    }
+  });
 })();
