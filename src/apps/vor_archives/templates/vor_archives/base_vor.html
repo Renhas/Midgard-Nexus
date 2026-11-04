@@ -10,8 +10,8 @@
 {% endblock %}
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'vor_archives/js/common.js' %}"></script>
-  <script src="{% static 'vor_archives/js/events/shell.js' %}"></script>
+  <script type="module" src="{% static 'vor_archives/js/common.js' %}"></script>
+  <script type="module" src="{% static 'vor_archives/js/events/shell.js' %}"></script>
 {% endblock %}
 {% block header_center %}
   <div class="btn-group btn-group-sm" role="group">

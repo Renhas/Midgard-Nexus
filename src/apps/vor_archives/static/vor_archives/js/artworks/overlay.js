@@ -1,5 +1,11 @@
+import { htmx } from "@lib/htmx";
+import { getAlpine } from "@lib/alpine";
+import { datePickerApi, closeOverlay as closeOverlayImpl } from "../common.js";
+import { getCoverHelpers, getStatusHelpers, getRatingHelpers, getProgressHelpers, getRelationsHelpers, getAttachHelpers } from "./helpers.js";
+import { VorApi } from "./api.js";
+
 document.addEventListener("alpine:init", () => {
-  Alpine.data("vorDetailOverlay", (opts = {}) => ({
+  getAlpine().data("vorDetailOverlay", (opts = {}) => ({
     editing: Boolean(opts.editing),
     globalEdit: Boolean(opts.globalEdit),
     workType: opts.workType || "",
@@ -33,7 +39,7 @@ document.addEventListener("alpine:init", () => {
     ageOpen: false,
     dateOpen: false,
     dateCursor: null,
-    ...window.datePickerApi(),
+    ...datePickerApi(),
     linkOpen: false,
     relAdding: false,
     relQuery: "",
@@ -73,16 +79,19 @@ document.addEventListener("alpine:init", () => {
     listUrl: opts.listUrl || "",
     workUrl: opts.workUrl || "",
     attachUrl: opts.attachUrl || "",
-    ...window.getCoverHelpers(),
-    ...window.getStatusHelpers(),
-    ...window.getRatingHelpers(),
-    ...window.getProgressHelpers(),
-    ...window.getRelationsHelpers(),
-    ...window.getAttachHelpers(),
+    ...getCoverHelpers(),
+    ...getStatusHelpers(),
+    ...getRatingHelpers(),
+    ...getProgressHelpers(),
+    ...getRelationsHelpers(),
+    ...getAttachHelpers(),
     init() {
       this.dateCursor = this.releaseDate ? new Date(`${this.releaseDate}T00:00:00`) : new Date();
       this.snapshot = this.serializeDraft();
       this.serverQuickState = this.captureQuickState();
+    },
+    closeOverlay() {
+      return closeOverlayImpl();
     },
     captureQuickState() {
       return {
