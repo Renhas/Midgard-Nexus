@@ -24,7 +24,7 @@ export function syncPageScrollLock() {
 export function overlayAlpine() {
   const el = document.querySelector("#vor-overlay .vor-overlay");
   const alpine = getAlpine();
-  return el &&  alpine ? alpine.$data(el) : null;
+  return el && alpine ? alpine.$data(el) : null;
 };
 
 export function cropCoverFile(file) {
@@ -392,7 +392,8 @@ export function mergeFilterSelection(allIds, savedSelected, savedKnown) {
   });
 };
 
-document.addEventListener("popstate", (event) => {
+// popstate is a window-only event and does not bubble; must stay on window.
+window.addEventListener("popstate", (event) => {
   const overlayUrl = event.state && event.state.vorOverlay;
   if (overlayUrl) {
     restoreOverlay(overlayUrl);
