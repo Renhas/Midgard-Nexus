@@ -190,7 +190,7 @@ def test_detail_with_relations(client_logged_in, user, book):
         reverse("vor_archives:artworks:detail", args=[uw.pk])
     )
     assert response.status_code == 200
-    relations = response.context["work_relations"]
+    relations = response.context["overlay_opts"]["relations"]
     assert len(relations) == 1
     assert relations[0]["direction"] == "out"
     assert relations[0]["work_id"] == other.pk

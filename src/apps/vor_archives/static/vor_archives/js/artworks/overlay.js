@@ -69,6 +69,7 @@ document.addEventListener("alpine:init", () => {
     counterDraft: "",
     quickUrl: opts.quickUrl || "",
     listUrl: opts.listUrl || "",
+    workUrl: opts.workUrl || "",
     attachUrl: opts.attachUrl || "",
     ...window.getCoverHelpers(),
     ...window.getStatusHelpers(),
@@ -289,7 +290,7 @@ document.addEventListener("alpine:init", () => {
     },
     openRelated(item) {
       this.leaveOr(() => {
-        htmx.ajax("GET", `/library/artworks/${item.type_key}/${item.work_id}/`, {
+        htmx.ajax("GET", item.url, {
           target: "#vor-overlay",
           swap: "innerHTML",
         });
@@ -369,7 +370,7 @@ document.addEventListener("alpine:init", () => {
     onAttachSuccess() {
       this.attachOpen = false;
       this.refreshList();
-      htmx.ajax("GET", `/library/artworks/${this.workType}/${this.workId}/`, {
+      htmx.ajax("GET", this.workUrl, {
         target: "#vor-overlay",
         swap: "innerHTML",
       });

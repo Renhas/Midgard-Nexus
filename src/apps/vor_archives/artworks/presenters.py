@@ -14,6 +14,17 @@ from .services.catalog import attr_catalog, chip_payload
 from .services.works import work_relation_items, work_type_key
 
 
+def _work_url(type_key, work_id):
+    return reverse("vor_archives:artworks:work", args=[type_key, work_id])
+
+
+def _relations_with_urls(work):
+    items = work_relation_items(work)
+    for item in items:
+        item["url"] = _work_url(item["type_key"], item["work_id"])
+    return items
+
+
 def build_overlay_context(
     request,
     work,
@@ -62,7 +73,6 @@ def build_overlay_context(
         "owned_platform_ids": owned_platform_ids,
         "status_choices": status_choices(),
         "age_rating_choices": AgeRatingChoices.choices,
-        "work_relations": work_relation_items(work),
         "overlay_opts": {
             "editing": editing,
             "globalEdit": global_edit,
@@ -92,6 +102,7 @@ def build_overlay_context(
                 else ""
             ),
             "listUrl": reverse("vor_archives:artworks:list"),
+            "workUrl": _work_url(type_key, work.pk),
             "saveUrl": save_url,
             "relationSearchUrl": reverse("vor_archives:artworks:relation_search"),
             "title": work.title,
@@ -111,7 +122,7 @@ def build_overlay_context(
             else [],
             "ownedPlatformIds": owned_platform_ids,
             "catalog": catalog,
-            "relations": work_relation_items(work),
+            "relations": _relations_with_urls(work),
             "relationTypes": RELATION_TYPE_OPTIONS,
             "ageChoices": age_rating_options(),
         },
