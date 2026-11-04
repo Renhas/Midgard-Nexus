@@ -446,19 +446,6 @@
     if (el?.id === "vor-library-search-results") {
       window.Alpine?.initTree?.(el);
     }
-    if (el?.id === "artwork-list-body" || el?.id === "artwork-list") {
-      window.Alpine?.initTree?.(el);
-      window.Alpine?.store("vorArtworks")?.applyListState();
-    }
-    if (el?.id === "sidebar-collections-list") {
-      window.Alpine?.destroyTree?.(el);
-      window.Alpine?.initTree?.(el);
-      const store = window.Alpine?.store("vorArtworks");
-      store?.pruneExpandedCollections();
-      store?.applyCollectionTreeState();
-      store?.syncCollectionSortable();
-      store?.refreshCollectionPath();
-    }
     if (el?.id === "vor-modal") {
       window.Alpine?.initTree?.(el);
     }

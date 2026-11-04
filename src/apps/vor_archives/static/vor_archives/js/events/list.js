@@ -129,4 +129,26 @@
     }
     window.Alpine?.store("vorArtworks")?.closeMenu();
   }, true);
+
+  document.body.addEventListener("htmx:afterSwap", (event) => {
+    const el = event.detail.elt;
+    const isList = el?.id === "artwork-list-body" || el?.id === "artwork-list";
+    const isTree = el?.id === "sidebar-collections-list";
+    if (!isList && !isTree) return;
+    const store = window.Alpine?.store("vorArtworks");
+    if (!store) return;
+
+    if (isList) {
+      window.Alpine?.initTree?.(el);
+      store.applyListState();
+    }
+    if (isTree) {
+      window.Alpine?.destroyTree?.(el);
+      window.Alpine?.initTree?.(el);
+      store.pruneExpandedCollections();
+      store.applyCollectionTreeState();
+      store.syncCollectionSortable();
+      store.refreshCollectionPath();
+    }
+  });
 })();
