@@ -9,17 +9,9 @@
 {% endblock %}
 {% block extra_js %}
   {{ block.super }}
-  {# Feed items open artwork overlay; overlay uses vorArtworks store and chip overflow. #}
+  {# Feed items open artwork overlay; overlay uses vorArtworks api, helpers and chip overflow. #}
   <script src="{% static 'vor_archives/js/artworks/api.js' %}"></script>
   <script src="{% static 'vor_archives/js/artworks/helpers.js' %}"></script>
-  <script src="{% static 'vor_archives/js/artworks/store/filters.js' %}"></script>
-  <script src="{% static 'vor_archives/js/artworks/store/collections.js' %}"></script>
-  <script src="{% static 'vor_archives/js/artworks/store/drag.js' %}"></script>
-  <script src="{% static 'vor_archives/js/artworks/store/menu.js' %}"></script>
-  <script src="{% static 'vor_archives/js/artworks/store/search.js' %}"></script>
-  <script src="{% static 'vor_archives/js/artworks/store/delete.js' %}"></script>
-  <script src="{% static 'vor_archives/js/artworks/store.js' %}"></script>
-  <script src="{% static 'vor_archives/js/artworks/events.js' %}"></script>
   <script src="{% static 'vor_archives/js/artworks/overlay.js' %}"></script>
   <script src="{% static 'vor_archives/js/artworks/chip.js' %}"></script>
   <script src="{% static 'vor_archives/js/dashboard/charts.js' %}"></script>
