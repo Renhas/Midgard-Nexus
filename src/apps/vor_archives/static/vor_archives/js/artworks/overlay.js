@@ -388,7 +388,7 @@ document.addEventListener("alpine:init", () => {
       this.refreshList();
     },
     refreshList() {
-      window.Alpine?.store("vorArtworks")?.reloadList();
+      document.body.dispatchEvent(new CustomEvent("vor:reload-list"));
     },
     startAttach() {
       this.status = "planning";

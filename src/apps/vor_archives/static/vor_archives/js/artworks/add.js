@@ -372,7 +372,7 @@ document.addEventListener("alpine:init", () => {
       this.phase = "form";
     },
     refreshList() {
-      window.Alpine?.store("vorArtworks")?.reloadList();
+      document.body.dispatchEvent(new CustomEvent("vor:reload-list"));
     },
     onAttachSuccess() {
       this.doneMessage = this.justCreated
