@@ -68,6 +68,8 @@ document.addEventListener("alpine:init", () => {
     counterHover: false,
     counterDraft: "",
     quickUrl: opts.quickUrl || "",
+    _quickSeq: 0,
+    serverQuickState: null,
     listUrl: opts.listUrl || "",
     workUrl: opts.workUrl || "",
     attachUrl: opts.attachUrl || "",
@@ -80,6 +82,30 @@ document.addEventListener("alpine:init", () => {
     init() {
       this.dateCursor = this.releaseDate ? new Date(`${this.releaseDate}T00:00:00`) : new Date();
       this.snapshot = this.serializeDraft();
+      this.serverQuickState = this.captureQuickState();
+    },
+    captureQuickState() {
+      return {
+        status: this.status,
+        rating: this.rating,
+        progress: this.progress,
+        isHidden: this.isHidden,
+        timesCompleted: this.timesCompleted,
+        ownedPlatformIds: [...this.ownedPlatformIds],
+        lastCompletedDate: this.lastCompletedDate,
+      };
+    },
+    restoreQuickState(snap) {
+      if (!snap) {
+        return;
+      }
+      this.status = snap.status;
+      this.rating = snap.rating;
+      this.progress = snap.progress;
+      this.isHidden = snap.isHidden;
+      this.timesCompleted = snap.timesCompleted;
+      this.ownedPlatformIds = snap.ownedPlatformIds;
+      this.lastCompletedDate = snap.lastCompletedDate;
     },
     startEdit() {
       this.editing = true;
@@ -350,8 +376,15 @@ document.addEventListener("alpine:init", () => {
     },
     async saveField(field, value) {
       if (!this.quickUrl || this.attachOpen) return;
+      const seq = ++this._quickSeq;
       const data = await VorApi.quickUpdate(this.quickUrl, field, value);
+      if (seq !== this._quickSeq) return;
+      if (!data || typeof data !== "object") {
+        this.restoreQuickState(this.serverQuickState);
+        return;
+      }
       this.applyQuickResult(data);
+      this.serverQuickState = this.captureQuickState();
       this.refreshList();
     },
     refreshList() {
