@@ -1,10 +1,18 @@
 from django.urls import path
+from django.views.generic import RedirectView
 
 from . import views
 
 app_name = "collections"
 
 urlpatterns = [
+    path(
+        "",
+        RedirectView.as_view(
+            pattern_name="vor_archives:collections:tree", permanent=False
+        ),
+        name="index",
+    ),
     path("tree/", views.collection_tree, name="tree"),
     path("new/", views.collection_new, name="new"),
     path("reorder/", views.collection_reorder, name="reorder"),

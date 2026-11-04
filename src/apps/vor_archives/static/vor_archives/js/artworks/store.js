@@ -23,6 +23,7 @@
         this.filterCatalog = { ...this.filterCatalog, ...(opts.filterCatalog || {}) };
 
         // collections
+        this.collectionBaseUrl = opts.collectionBaseUrl || "";
         this.collectionTreeUrl = opts.collectionTreeUrl || "";
         this.collectionReorderUrl = opts.collectionReorderUrl || "";
 

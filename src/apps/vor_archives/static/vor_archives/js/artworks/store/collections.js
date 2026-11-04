@@ -15,7 +15,7 @@
     _dragCollectionId: "",
 
     collectionUrl(id, rest = "") {
-      return window.getCollectionUrl(this.collectionTreeUrl, id, rest);
+      return window.getCollectionUrl(this.collectionBaseUrl, id, rest);
     },
     selectLibrary() {
       this.collectionId = null;

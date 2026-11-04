@@ -112,6 +112,7 @@ def index(request):
                 "reorderUrl": reverse("vor_archives:artworks:reorder"),
                 "searchUrl": reverse("vor_archives:artworks:library_search"),
                 "attachUrl": reverse("vor_archives:artworks:attach"),
+                "collectionBaseUrl": reverse("vor_archives:collections:index"),
                 "collectionTreeUrl": reverse("vor_archives:collections:tree"),
                 "collectionReorderUrl": reverse("vor_archives:collections:reorder"),
                 "collectionNewUrl": reverse("vor_archives:collections:new"),

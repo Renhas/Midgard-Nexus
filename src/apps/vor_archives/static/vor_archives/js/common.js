@@ -468,8 +468,7 @@
     };
   };
 
-  window.getCollectionUrl = function (baseUrl, id, rest = "") {
-    const base = String(baseUrl || "").replace(/tree\/?$/, "");
+  window.getCollectionUrl = function (base, id, rest = "") {
     return `${base}${id}/${rest}`;
   };
 
