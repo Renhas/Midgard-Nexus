@@ -1,11 +1,14 @@
+import { getAlpine } from "@lib/alpine";
+
 document.addEventListener("alpine:init", () => {
-  Alpine.data("vorChipOverflow", () => ({
+  getAlpine().data("vorChipOverflow", () => ({
     hiddenCount: 0,
     visibleCount: 0,
     popupOpen: false,
     overlayData() {
       const root = this.$el.closest(".vor-overlay");
-      return root && window.Alpine ? Alpine.$data(root) : null;
+      const alpine = getAlpine();
+      return root && alpine ? alpine.$data(root) : null;
     },
     canTogglePlatform() {
       return Boolean(this.overlayData()?.canTogglePlatform());

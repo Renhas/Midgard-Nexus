@@ -85,6 +85,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "config.context_processors.modules",
                 "config.context_processors.app_version",
+                "config.context_processors.importmap",
             ],
         },
     },

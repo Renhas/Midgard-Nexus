@@ -1,7 +1,7 @@
 {{ add_opts|json_script:"vor-add-opts" }}
 <div class="vor-overlay is-add" x-data="vorAddOverlay(JSON.parse(document.getElementById('vor-add-opts').textContent))">
   <div class="vor-overlay-bar">
-    <button type="button" class="sidebar-btn" @click="window.closeOverlay()">
+    <button type="button" class="sidebar-btn" @click="closeOverlay()">
       <i class="bi bi-arrow-left"></i>
       <span>Назад</span>
     </button>

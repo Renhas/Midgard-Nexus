@@ -1,3 +1,9 @@
+import { htmx } from "@lib/htmx";
+import { getAlpine } from "@lib/alpine";
+import { datePickerApi, closeOverlay as closeOverlayImpl } from "@vor/common";
+import { getCoverHelpers, getStatusHelpers, getRatingHelpers, getProgressHelpers, getRelationsHelpers, getAttachHelpers } from "@vor/artworks/helpers";
+import { VorApi } from "@vor/artworks/api";
+
 document.addEventListener("alpine:init", () => {
   const FIELD_TO_STATE = {
     title: { key: "title", trim: true },
@@ -6,7 +12,7 @@ document.addEventListener("alpine:init", () => {
     episode_count: { key: "episodeCount" },
   };
 
-  Alpine.data("vorAddOverlay", (opts = {}) => ({
+  getAlpine().data("vorAddOverlay", (opts = {}) => ({
     workType: opts.workType || "book",
     title: "",
     description: "",
@@ -53,7 +59,7 @@ document.addEventListener("alpine:init", () => {
     doneMessage: "",
     dateOpen: false,
     dateCursor: new Date(),
-    ...window.datePickerApi(),
+    ...datePickerApi(),
     ageOpen: false,
     status: "planning",
     statusOpen: false,
@@ -67,12 +73,12 @@ document.addEventListener("alpine:init", () => {
     progressHover: false,
     progressDraft: "",
     searchTimer: null,
-    ...window.getCoverHelpers(),
-    ...window.getStatusHelpers(),
-    ...window.getRatingHelpers(),
-    ...window.getProgressHelpers(),
-    ...window.getRelationsHelpers(),
-    ...window.getAttachHelpers(),
+    ...getCoverHelpers(),
+    ...getStatusHelpers(),
+    ...getRatingHelpers(),
+    ...getProgressHelpers(),
+    ...getRelationsHelpers(),
+    ...getAttachHelpers(),
     get catalog() {
       return this.catalogs[this.workType] || {
         authors: [],
@@ -83,6 +89,9 @@ document.addEventListener("alpine:init", () => {
     },
     init() {
       this.dateCursor = new Date();
+    },
+    closeOverlay() {
+      return closeOverlayImpl();
     },
     setType(type) {
       if (this.workType === type) {
@@ -341,7 +350,7 @@ document.addEventListener("alpine:init", () => {
     },
     goToList() {
       this.refreshList();
-      window.closeOverlay();
+      this.closeOverlay();
     },
     resetForm() {
       this.title = "";

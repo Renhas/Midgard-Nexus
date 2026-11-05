@@ -1,4 +1,4 @@
-<div class="vor-modal-backdrop" x-data @click.self="$store.vorArtworks.closeModal()">
+<div class="vor-modal-backdrop" x-data @click.self="$dispatch('vor:close-modal')">
   <div class="vor-modal" @click.stop>
     <h3 class="vor-modal-title">Удалить коллекцию</h3>
     <p class="vor-modal-text">Коллекция «{{ collection.name }}» будет удалена.</p>
@@ -13,7 +13,7 @@
           hx-target="#vor-modal"
           hx-swap="innerHTML">
       {% csrf_token %}
-      <button type="button" class="sidebar-btn" @click="$store.vorArtworks.closeModal()">Отмена</button>
+      <button type="button" class="sidebar-btn" @click="$dispatch('vor:close-modal')">Отмена</button>
       <button type="submit" class="sidebar-btn sidebar-btn-delete">Удалить</button>
     </form>
   </div>

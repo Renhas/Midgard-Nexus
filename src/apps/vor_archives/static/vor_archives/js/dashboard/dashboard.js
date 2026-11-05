@@ -1,5 +1,9 @@
+import { Chart } from "@lib/chart";
+import { getAlpine } from "@lib/alpine";
+import { DASH_CHART_COLORS, MIN_SIZE_PX, MAX_SIZE_PX, centerTextPlugin, readJsonScript, formatDashPercent } from "@vor/dashboard/charts";
+
 document.addEventListener("alpine:init", () => {
-  Alpine.data("vorDashStats", () => ({
+  getAlpine().data("vorDashStats", () => ({
     workTypes: ["book", "film", "game"],
     pieCharts: { types: null, statuses: null, age: null, rating: null },
     barCharts: { rating: null },
@@ -13,7 +17,7 @@ document.addEventListener("alpine:init", () => {
     ratingChoices: {},
 
     init() {
-      const data = window.readJsonScript("dash-stats-opts");
+      const data = readJsonScript("dash-stats-opts");
       this.statusMatrix = data.status_matrix || {};
       this.ageMatrix = data.age_matrix || {};
       this.ratingMatrix = data.rating_matrix || {};
@@ -130,7 +134,7 @@ document.addEventListener("alpine:init", () => {
       return Number(number).toFixed(1).toLocaleString("ru-RU");
     },
     _renderPie(key, canvas, items, { centerText = null } = {}) {
-      if (!canvas || !window.Chart) return;
+      if (!canvas || !Chart) return;
       Chart.getChart(canvas)?.destroy();
       this.pieCharts[key] = null;
       if (!items.length) return;
@@ -142,7 +146,7 @@ document.addEventListener("alpine:init", () => {
           datasets: [{
             data: items.map(i => i.count),
             backgroundColor: items.map(
-              (_, index) => window.DASH_CHART_COLORS[index % window.DASH_CHART_COLORS.length]
+              (_, index) => DASH_CHART_COLORS[index % DASH_CHART_COLORS.length]
             ),
             borderColor: "#1A233A",
             borderWidth: 2,
@@ -164,11 +168,11 @@ document.addEventListener("alpine:init", () => {
               : undefined,
           },
         },
-        plugins: [window.centerTextPlugin]
+        plugins: [centerTextPlugin]
       });
     },
     _renderBar(key, canvas, items) {
-      if (!canvas || !window.Chart) return;
+      if (!canvas || !Chart) return;
       Chart.getChart(canvas)?.destroy();
       this.barCharts[key] = null;
       if (!items.length) return;
@@ -180,7 +184,7 @@ document.addEventListener("alpine:init", () => {
           datasets: [{
             data: items.map(i => i.count),
             backgroundColor: items.map(
-              (_, index) => window.DASH_CHART_COLORS[index % window.DASH_CHART_COLORS.length]
+              (_, index) => DASH_CHART_COLORS[index % DASH_CHART_COLORS.length]
             ),
             borderRadius: 4,
             borderSkipped: false,
@@ -266,7 +270,7 @@ document.addEventListener("alpine:init", () => {
     },
   }));
 
-  Alpine.data("vorDashAttrs", () => {
+  getAlpine().data("vorDashAttrs", () => {
     const barCharts = Object.create(null);
     const cloudCharts = Object.create(null);
     return {
@@ -276,7 +280,7 @@ document.addEventListener("alpine:init", () => {
       totalWorks: 0,
       histTopN: 12,
       init() {
-        const data = window.readJsonScript("dash-attrs-opts");
+        const data = readJsonScript("dash-attrs-opts");
         this.attrs = data.attrs || {};
         this.totalWorks = data.total;
         this.histTopN = data.histTopN || 12;
@@ -311,8 +315,8 @@ document.addEventListener("alpine:init", () => {
         const max = Math.max(...counts);
 
         return items.map(item => {
-          const size = min === max ? (window.MIN_SIZE_PX + window.MAX_SIZE_PX) / 2
-            : window.MIN_SIZE_PX + ((item.count - min) / (max - min)) * (window.MAX_SIZE_PX - window.MIN_SIZE_PX);
+          const size = min === max ? (MIN_SIZE_PX + MAX_SIZE_PX) / 2
+            : MIN_SIZE_PX + ((item.count - min) / (max - min)) * (MAX_SIZE_PX - MIN_SIZE_PX);
 
           return {
             label: item.name,
@@ -325,7 +329,7 @@ document.addEventListener("alpine:init", () => {
         const total = this.attrTotals[attrKey];
         return total ? (count / total).toFixed(1) : 0;
       },
-      formatPercent: window.formatDashPercent,
+      formatPercent: formatDashPercent,
       setAttrView(view) {
         if (view === this.attrView) return;
         this.attrView = view;
@@ -371,7 +375,7 @@ document.addEventListener("alpine:init", () => {
           labels: items.map(i => i.label),
           data: items.map(i => i.count),
           bgColor: items.map(
-            (_, index) => window.DASH_CHART_COLORS[index % window.DASH_CHART_COLORS.length]
+            (_, index) => DASH_CHART_COLORS[index % DASH_CHART_COLORS.length]
           ),
         }
       },
@@ -380,11 +384,11 @@ document.addEventListener("alpine:init", () => {
           labels: items.map(i => i.label),
           data: items.map(i => i.size),
           counts: items.map(i => i.count),
-          color: window.DASH_CHART_COLORS[0],
+          color: DASH_CHART_COLORS[0],
         }
       },
       _renderBar(key, canvas, items) {
-        if (!canvas || !window.Chart) return;
+        if (!canvas || !Chart) return;
         const { labels, data, bgColor } = this._formBarData(items);
         if (barCharts[key]) {
           const chart = barCharts[key];
@@ -446,7 +450,7 @@ document.addEventListener("alpine:init", () => {
         });
       },
       _renderCloud(key, canvas, items) {
-        if (!canvas || !window.Chart) return;
+        if (!canvas || !Chart) return;
         const { labels, data, counts, color } = this._formCloudData(items);
         if (cloudCharts[key]) {
           const chart = cloudCharts[key];

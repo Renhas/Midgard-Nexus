@@ -1,4 +1,4 @@
-<div class="vor-modal-backdrop" @click.self="$store.vorArtworks.closeModal()">
+<div class="vor-modal-backdrop" @click.self="$dispatch('vor:close-modal')">
   <div class="vor-modal" @click.stop>
     <h3 class="vor-modal-title">Подтверждение удаления</h3>
     <p class="vor-modal-text">
@@ -23,7 +23,7 @@
       {% for id in ids %}
         <input type="hidden" name="ids" value="{{ id }}">
       {% endfor %}
-      <button type="button" class="sidebar-btn" @click="$store.vorArtworks.closeModal()">Отмена</button>
+      <button type="button" class="sidebar-btn" @click="$dispatch('vor:close-modal')">Отмена</button>
       <button type="submit" class="sidebar-btn sidebar-btn-delete">Удалить</button>
     </form>
   </div>

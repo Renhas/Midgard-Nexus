@@ -1,51 +1,57 @@
-(function () {
-  /* ============================================
-     Composition: filters + collections + drag + menu + search + delete
-     ============================================ */
-  document.addEventListener("alpine:init", () => {
-    Alpine.store("vorArtworks", {
-      isStaff: false,
-      _booted: false,
+/* ============================================
+   Composition: filters + collections + drag + menu + search + delete
+   ============================================ */
+import { getAlpine } from "@lib/alpine";
+import { filtersMixin } from "@vor/artworks/store/filters";
+import { collectionsMixin } from "@vor/artworks/store/collections";
+import { dragMixin } from "@vor/artworks/store/drag";
+import { menuMixin } from "@vor/artworks/store/menu";
+import { searchMixin } from "@vor/artworks/store/search";
+import { deleteMixin } from "@vor/artworks/store/delete";
 
-      ...window.VorMixin.filters,
-      ...window.VorMixin.collections,
-      ...window.VorMixin.drag,
-      ...window.VorMixin.menu,
-      ...window.VorMixin.search,
-      ...window.VorMixin.delete,
+document.addEventListener("alpine:init", () => {
+  getAlpine().store("vorArtworks", {
+    isStaff: false,
+    _booted: false,
 
-      initFromPage(opts) {
-        if (this._booted) return;
-        this._booted = true;
+    ...filtersMixin,
+    ...collectionsMixin,
+    ...dragMixin,
+    ...menuMixin,
+    ...searchMixin,
+    ...deleteMixin,
 
-        // filters
-        this.listUrl = opts.listUrl || "";
-        this.filterCatalog = { ...this.filterCatalog, ...(opts.filterCatalog || {}) };
+    initFromPage(opts) {
+      if (this._booted) return;
+      this._booted = true;
 
-        // collections
-        this.collectionBaseUrl = opts.collectionBaseUrl || "";
-        this.collectionTreeUrl = opts.collectionTreeUrl || "";
-        this.collectionReorderUrl = opts.collectionReorderUrl || "";
+      // filters
+      this.listUrl = opts.listUrl || "";
+      this.filterCatalog = { ...this.filterCatalog, ...(opts.filterCatalog || {}) };
 
-        // drag
-        this.reorderUrl = opts.reorderUrl || "";
+      // collections
+      this.collectionBaseUrl = opts.collectionBaseUrl || "";
+      this.collectionTreeUrl = opts.collectionTreeUrl || "";
+      this.collectionReorderUrl = opts.collectionReorderUrl || "";
 
-        // search
-        this.searchUrl = opts.searchUrl || "";
-        this.attachUrl = opts.attachUrl || "";
+      // drag
+      this.reorderUrl = opts.reorderUrl || "";
 
-        // base
-        this.isStaff = Boolean(opts.isStaff);
+      // search
+      this.searchUrl = opts.searchUrl || "";
+      this.attachUrl = opts.attachUrl || "";
 
-        // bootstrap (порядок важен: сначала данные, потом рендер)
-        this.resetFilters(false);
-        this.restoreSidebar();
-        this.persistSidebar();
-        this.applyListState();
-        this.reloadList();
-        this.syncCollectionSortable();
-        this.applyCollectionTreeState();
-      },
-    });
+      // base
+      this.isStaff = Boolean(opts.isStaff);
+
+      // bootstrap (порядок важен: сначала данные, потом рендер)
+      this.resetFilters(false);
+      this.restoreSidebar();
+      this.persistSidebar();
+      this.applyListState();
+      this.reloadList();
+      this.syncCollectionSortable();
+      this.applyCollectionTreeState();
+    },
   });
-})();
+});
