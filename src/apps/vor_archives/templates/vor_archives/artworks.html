@@ -11,20 +11,7 @@
 {% endblock %}
 {% block extra_js %}
   {{ block.super }}
-  <script type="module" src="{% static 'vor_archives/js/artworks/api.js' %}"></script>
-  <script type="module" src="{% static 'vor_archives/js/artworks/helpers.js' %}"></script>
-  <script type="module" src="{% static 'vor_archives/js/artworks/store/filters.js' %}"></script>
-  <script type="module" src="{% static 'vor_archives/js/artworks/store/collections.js' %}"></script>
-  <script type="module" src="{% static 'vor_archives/js/artworks/store/drag.js' %}"></script>
-  <script type="module" src="{% static 'vor_archives/js/artworks/store/menu.js' %}"></script>
-  <script type="module" src="{% static 'vor_archives/js/artworks/store/search.js' %}"></script>
-  <script type="module" src="{% static 'vor_archives/js/artworks/store/delete.js' %}"></script>
-  <script type="module" src="{% static 'vor_archives/js/artworks/store.js' %}"></script>
-  <script type="module" src="{% static 'vor_archives/js/events/list.js' %}"></script>
-  <script type="module" src="{% static 'vor_archives/js/artworks/row_preview.js' %}"></script>
-  <script type="module" src="{% static 'vor_archives/js/artworks/overlay.js' %}"></script>
-  <script type="module" src="{% static 'vor_archives/js/artworks/add.js' %}"></script>
-  <script type="module" src="{% static 'vor_archives/js/artworks/chip.js' %}"></script>
+  <script type="module" src="{% static 'vor_archives/js/pages/artworks.js' %}"></script>
 {% endblock %}
 {% block left_content %}
   {% include "vor_archives/partials/artworks/sidebar/artwork_sidebar_left.html" %}
