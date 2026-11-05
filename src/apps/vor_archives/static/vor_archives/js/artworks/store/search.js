@@ -1,6 +1,6 @@
 import { htmx } from "@lib/htmx";
-import { VorApi } from "../api.js";
-import { syncPageScrollLock } from "../../common.js";
+import { VorApi } from "@vor/artworks/api";
+import { syncPageScrollLock } from "@vor/common";
 
 export const searchMixin =  {
   searchUrl: "",

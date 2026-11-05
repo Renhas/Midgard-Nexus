@@ -1,6 +1,6 @@
 import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
-import { ALL_WORK_TYPES, FILTER_KEYS, SIDEBAR_STORAGE_KEY, mergeFilterSelection } from "../../common.js";
+import { ALL_WORK_TYPES, FILTER_KEYS, SIDEBAR_STORAGE_KEY, mergeFilterSelection } from "@vor/common";
 
 export const filtersMixin = {
   workTypes: [...ALL_WORK_TYPES],

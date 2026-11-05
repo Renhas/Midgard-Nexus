@@ -1,6 +1,6 @@
 import { Chart } from "@lib/chart";
 import { getAlpine } from "@lib/alpine";
-import { DASH_CHART_COLORS, MIN_SIZE_PX, MAX_SIZE_PX, centerTextPlugin, readJsonScript, formatDashPercent } from "./charts.js";
+import { DASH_CHART_COLORS, MIN_SIZE_PX, MAX_SIZE_PX, centerTextPlugin, readJsonScript, formatDashPercent } from "@vor/dashboard/charts";
 
 document.addEventListener("alpine:init", () => {
   getAlpine().data("vorDashStats", () => ({

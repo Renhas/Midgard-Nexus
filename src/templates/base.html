@@ -14,14 +14,15 @@
     <link rel="stylesheet" href="{% static 'vendor/lucide/css/lucide.min.css' %}">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
-    <!-- Module import map for vendor ESM wrappers (src/static/js/lib/*). -->
+    <!-- Module import map. Source of truth: config/importmap.py.
+         URLs are rendered via config.context_processors.importmap through
+         Django's static(), so in production with ManifestStaticFilesStorage
+         they become content-hashed. -->
     <script type="importmap">
     {
       "imports": {
-        "@lib/htmx": "{% static 'js/lib/htmx.js' %}",
-        "@lib/alpine": "{% static 'js/lib/alpine.js' %}",
-        "@lib/sortable": "{% static 'js/lib/sortable.js' %}",
-        "@lib/chart": "{% static 'js/lib/chart.js' %}"
+        {% for specifier, url in importmap_items.items %}"{{ specifier }}": "{{ url }}"{% if not forloop.last %},{% endif %}
+        {% endfor %}
       }
     }
     </script>

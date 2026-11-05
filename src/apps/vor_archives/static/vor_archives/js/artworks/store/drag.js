@@ -1,5 +1,5 @@
 import { Sortable } from "@lib/sortable";
-import { VorApi } from "../api.js";
+import { VorApi } from "@vor/artworks/api";
 
 export const dragMixin = {
   reorderUrl: "",

@@ -1,8 +1,8 @@
 import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
-import { datePickerApi, closeOverlay as closeOverlayImpl } from "../common.js";
-import { getCoverHelpers, getStatusHelpers, getRatingHelpers, getProgressHelpers, getRelationsHelpers, getAttachHelpers } from "./helpers.js";
-import { VorApi } from "./api.js";
+import { datePickerApi, closeOverlay as closeOverlayImpl } from "@vor/common";
+import { getCoverHelpers, getStatusHelpers, getRatingHelpers, getProgressHelpers, getRelationsHelpers, getAttachHelpers } from "@vor/artworks/helpers";
+import { VorApi } from "@vor/artworks/api";
 
 document.addEventListener("alpine:init", () => {
   const FIELD_TO_STATE = {

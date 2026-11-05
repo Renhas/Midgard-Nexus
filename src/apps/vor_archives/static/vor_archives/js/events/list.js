@@ -1,5 +1,5 @@
 import { getAlpine } from "@lib/alpine";
-import { hasContent } from "../common.js";
+import { hasContent } from "@vor/common";
 
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Enter") {

@@ -2,12 +2,12 @@
    Composition: filters + collections + drag + menu + search + delete
    ============================================ */
 import { getAlpine } from "@lib/alpine";
-import { filtersMixin } from "./store/filters.js";
-import { collectionsMixin } from "./store/collections.js";
-import { dragMixin } from "./store/drag.js";
-import { menuMixin } from "./store/menu.js";
-import { searchMixin } from "./store/search.js";
-import { deleteMixin } from "./store/delete.js";
+import { filtersMixin } from "@vor/artworks/store/filters";
+import { collectionsMixin } from "@vor/artworks/store/collections";
+import { dragMixin } from "@vor/artworks/store/drag";
+import { menuMixin } from "@vor/artworks/store/menu";
+import { searchMixin } from "@vor/artworks/store/search";
+import { deleteMixin } from "@vor/artworks/store/delete";
 
 document.addEventListener("alpine:init", () => {
   getAlpine().store("vorArtworks", {

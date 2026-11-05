@@ -7,7 +7,7 @@
  * Контракт: методы никогда не бросают исключений. При сетевой ошибке
  * или не-JSON ответе возвращают null. Caller проверяет data?.ok.
  */
-import { getCsrfHeaders } from "../common.js";
+import { getCsrfHeaders } from "@vor/common";
 
 async function requestJson(url, options = {}) {
   try {

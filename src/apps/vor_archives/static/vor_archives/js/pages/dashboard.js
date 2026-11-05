@@ -1,4 +1,4 @@
 // Page entry point for /vor/dashboard/.
-import "../artworks/overlay.js";
-import "../artworks/chip.js";
-import "../dashboard/dashboard.js";
+import "@vor/artworks/overlay";
+import "@vor/artworks/chip";
+import "@vor/dashboard/dashboard";

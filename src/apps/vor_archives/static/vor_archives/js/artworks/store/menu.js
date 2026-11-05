@@ -1,5 +1,5 @@
 import { htmx } from "@lib/htmx";
-import { VorApi } from "../api.js";
+import { VorApi } from "@vor/artworks/api";
 
 export const menuMixin = {
   menu: {

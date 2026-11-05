@@ -1,5 +1,5 @@
-import { VorApi } from "./api.js";
-import { cropCoverFile } from "../common.js";
+import { VorApi } from "@vor/artworks/api";
+import { cropCoverFile } from "@vor/common";
 
 export function getCoverHelpers() {
   return {

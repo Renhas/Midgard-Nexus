@@ -1,7 +1,7 @@
 import { htmx } from "@lib/htmx";
 import { Sortable } from "@lib/sortable";
-import { VorApi } from "../api.js";
-import { getCollectionUrl, getCollectionPathFromTree, getCollectionNode, getCollectionSiblings, flattenCollectionTree } from "../../common.js";
+import { VorApi } from "@vor/artworks/api";
+import { getCollectionUrl, getCollectionPathFromTree, getCollectionNode, getCollectionSiblings, flattenCollectionTree } from "@vor/common";
 
 export const collectionsMixin = {
   collectionTreeUrl: "",
