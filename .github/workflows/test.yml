@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  pytest:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     services:
@@ -50,4 +50,74 @@ jobs:
         run: pip install -r requirements/test.txt
 
       - name: Run tests
-        run: pytest
+        run: >
+          pytest
+          --cov=apps.vor_archives
+          --cov-report=term-missing:skip-covered
+          --ignore=src/tests/e2e
+          src/
+
+  playwright:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: midgard
+          POSTGRES_USER: midgard
+          POSTGRES_PASSWORD: midgard
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U midgard -d midgard"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DB_NAME: midgard
+      DB_USER: midgard
+      DB_PASSWORD: midgard
+      DB_HOST: localhost
+      DB_PORT: 5432
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements/playwright.txt
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('requirements/playwright.txt') }}
+
+      - name: Install Playwright browsers
+        run: playwright install --with-deps chromium
+
+      - name: Run e2e
+        run: pytest src/tests/e2e
+
+  vitest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test
