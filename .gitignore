@@ -226,3 +226,6 @@ src/static/vendor/
 src/apps/vor_archives/management/commands/seed_data/covers/*
 !src/apps/vor_archives/management/commands/seed_data/covers/.gitkeep
 !src/static/js/lib/
+
+# Frontend
+node_modules/

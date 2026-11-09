@@ -82,6 +82,15 @@ services:
       pytest
       src/tests/e2e
 
+  vitest:
+    build:
+      context: .
+      dockerfile: ./docker/vitest/Dockerfile
+    profiles: ["tools"]
+    volumes:
+      - /app/node_modules
+    command: npm run test
+
 volumes:
   postgres_data:
   static_volume:

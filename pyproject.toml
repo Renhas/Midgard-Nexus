@@ -1,5 +1,5 @@
 [tool.codespell]
-skip = "*.min.js,*.min.css,src/static/vendor,*/migrations/*,.venv,htmlcov,.git"
+skip = "*.min.js,*.min.css,src/static/vendor,*/migrations/*,.venv,htmlcov,.git,package-lock.json"
 ignore-words-list = "vor"
 
 [tool.pytest.ini_options]
