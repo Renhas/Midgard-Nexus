@@ -59,7 +59,28 @@ services:
       --cov=apps.vor_archives
       --cov-report=term-missing:skip-covered
       --cov-report=html:htmlcov
+      --ignore=src/tests/e2e
       src/
+
+  playwright:
+    build:
+      context: .
+      dockerfile: ./docker/web/Dockerfile
+      target: playwright
+    profiles: ["tools"]
+    volumes:
+      - ./src:/app/src
+    env_file:
+      - ./.env
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+    command: >
+      pytest
+      src/tests/e2e
 
 volumes:
   postgres_data:

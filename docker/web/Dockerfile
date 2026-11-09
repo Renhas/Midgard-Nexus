@@ -34,12 +34,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 
-FROM testable AS test
-
-ENV DJANGO_SETTINGS_MODULE=config.settings.test
+FROM testable AS test-deps
 
 COPY requirements/base.txt requirements/test.txt requirements/
 RUN pip install -r requirements/test.txt
+
+
+FROM test-deps AS playwright-deps
+
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
+COPY requirements/playwright.txt requirements/
+RUN pip install -r requirements/playwright.txt && \
+    playwright install --with-deps chromium && \
+    chown -R django:django /ms-playwright
+
+
+FROM test-deps AS test
+
+ENV DJANGO_SETTINGS_MODULE=config.settings.test
 
 COPY . .
 
@@ -49,6 +62,20 @@ RUN mkdir -p /app/src/static/vendor && \
 
 ENTRYPOINT ["gosu", "django"]
 CMD ["pytest"]
+
+
+FROM playwright-deps AS playwright
+
+ENV DJANGO_SETTINGS_MODULE=config.settings.test
+
+COPY . .
+
+RUN mkdir -p /app/src/static/vendor && \
+    /app/download_static.sh && \
+    chown -R django:django /app
+
+ENTRYPOINT ["gosu", "django"]
+CMD ["pytest", "src/tests/e2e"]
 
 
 FROM testable AS development
