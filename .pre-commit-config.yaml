@@ -12,7 +12,8 @@ repos:
           (?x)^(
             .*\.min\.(js|css)|
             .*/migrations/.*|
-            .*/static/vendor/.*
+            .*/static/vendor/.*|
+            package-lock\.json
           )$
   - repo: https://github.com/djlint/djLint
     rev: v1.47.1

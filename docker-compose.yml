@@ -37,19 +37,59 @@ services:
       timeout: 5s
       retries: 5
 
-  cov:
-    extends:
-      service: web
+  pytest:
+    build:
+      context: .
+      dockerfile: ./docker/web/Dockerfile
+      target: test
     profiles: ["tools"]
     volumes:
       - ./src:/app/src
       - ./htmlcov:/app/htmlcov
+    env_file:
+      - ./.env
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
     command: >
       pytest
       --cov=apps.vor_archives
       --cov-report=term-missing:skip-covered
       --cov-report=html:htmlcov
-      src/apps/vor_archives/
+      --ignore=src/tests/e2e
+      src/
+
+  playwright:
+    build:
+      context: .
+      dockerfile: ./docker/web/Dockerfile
+      target: playwright
+    profiles: ["tools"]
+    volumes:
+      - ./src:/app/src
+    env_file:
+      - ./.env
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+    command: >
+      pytest
+      src/tests/e2e
+
+  vitest:
+    build:
+      context: .
+      dockerfile: ./docker/vitest/Dockerfile
+    profiles: ["tools"]
+    volumes:
+      - /app/node_modules
+    command: npm run test
 
 volumes:
   postgres_data:

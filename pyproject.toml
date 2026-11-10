@@ -1,5 +1,5 @@
 [tool.codespell]
-skip = "*.min.js,*.min.css,src/static/vendor,*/migrations/*,.venv,htmlcov,.git"
+skip = "*.min.js,*.min.css,src/static/vendor,*/migrations/*,.venv,htmlcov,.git,package-lock.json"
 ignore-words-list = "vor"
 
 [tool.pytest.ini_options]
@@ -8,6 +8,9 @@ pythonpath = ["src"]
 testpaths = ["src"]
 python_files = ["test_*.py"]
 addopts = "-q --strict-markers --ds=config.settings.test"
+markers = [
+    "smoke: smoke tests that verify the app boots and responds",
+]
 
 [tool.coverage.run]
 omit = [
