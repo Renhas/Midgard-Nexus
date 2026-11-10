@@ -1,5 +1,22 @@
 import { VorApi } from "@vor/artworks/api";
 import { cropCoverFile } from "@vor/shared/cover";
+import {
+  displayRating as pureDisplayRating,
+  ratingLabel as pureRatingLabel,
+  starState as pureStarState,
+} from "@vor/artworks/pure/rating";
+import {
+  progressValueLabel as pureProgressValueLabel,
+  progressSuffix as pureProgressSuffix,
+  progressCh as pureProgressCh,
+  clampProgress as pureClampProgress,
+  parseProgressDraft as pureParseProgressDraft,
+} from "@vor/artworks/pure/progress";
+import {
+  allowedRelationTypes as pureAllowedRelationTypes,
+  relationKey as pureRelationKey,
+  relationLabelFor as pureRelationLabelFor,
+} from "@vor/artworks/pure/relations";
 
 export function getCoverHelpers() {
   return {
@@ -41,6 +58,7 @@ export function getCoverHelpers() {
     }
   };
 };
+
 export function getStatusHelpers() {
   return {
     statusLabel() {
@@ -67,18 +85,13 @@ export function getStatusHelpers() {
 export function getRatingHelpers() {
   return {
     displayRating() {
-      return this.hoverRating || this.rating || 0;
+      return pureDisplayRating(this.rating, this.hoverRating);
     },
     ratingLabel() {
-      const value = this.displayRating();
-      return value ? String(value) : "—";
+      return pureRatingLabel(this.displayRating());
     },
     starState(star) {
-      const shown = this.displayRating();
-      const fullAt = star * 2;
-      if (shown >= fullAt) return "is-full";
-      if (shown === fullAt - 1) return "is-half";
-      return "is-empty";
+      return pureStarState(this.displayRating(), star);
     },
     setRating(value) {
       this.rating = this.rating === value ? 0 : value;
@@ -92,20 +105,13 @@ export function getRatingHelpers() {
 export function getProgressHelpers() {
   return {
     progressValueLabel() {
-      const value = Number(this.progress || 0);
-      return value === Math.round(value) ? String(Math.round(value)) : String(Math.round(value * 10) / 10);
+      return pureProgressValueLabel(this.progress);
     },
     progressSuffix() {
-      if (this.progressMax != null) {
-        return `/${this.progressMax} ${this.progressUnit}`.trim();
-      }
-      return this.progressUnit;
+      return pureProgressSuffix(this.progressMax, this.progressUnit);
     },
     progressCh() {
-      if (this.progressMax != null) {
-        return String(Math.floor(this.progressMax)).length;
-      }
-      return 4;
+      return pureProgressCh(this.progressMax);
     },
     startProgressEdit() {
       this.progressDraft = this.progressValueLabel();
@@ -121,15 +127,15 @@ export function getProgressHelpers() {
       if (!this.progressEditing) return;
       this.progressEditing = false;
       this.progressHover = false;
-      const parsed = Number(String(this.progressDraft).replace(",", "."));
-      if (Number.isNaN(parsed)) return;
+      const parsed = pureParseProgressDraft(this.progressDraft);
+      if (parsed == null) return;
       this.applyProgress(parsed);
     },
     nudgeProgress(direction) {
       this.applyProgress(this.progress + direction * this.progressStep);
     },
     applyProgress(value) {
-      this.progress = this.clampProgress(value);
+      this.progress = pureClampProgress(value, this.progressMax);
       if (this.progressMax != null && this.progress >= this.progressMax) {
         this.status = "completed";
       }
@@ -138,11 +144,7 @@ export function getProgressHelpers() {
       }
     },
     clampProgress(value) {
-      let next = Math.max(0, value);
-      if (this.progressMax != null) {
-        next = Math.min(this.progressMax, next);
-      }
-      return Math.round(next * 10) / 10;
+      return pureClampProgress(value, this.progressMax);
     }
   };
 };
@@ -150,22 +152,13 @@ export function getProgressHelpers() {
 export function getRelationsHelpers() {
   return {
     allowedRelationTypes(otherType) {
-      return this.relationTypes.filter((opt) => {
-        if (opt.value === "other") return true;
-        if (opt.value === "adaptation") return otherType && otherType !== this.workType;
-        return otherType === this.workType;
-      });
+      return pureAllowedRelationTypes(this.relationTypes, otherType, this.workType);
     },
     relationKey(item) {
-      return `${item.id || "new"}-${item.type_key}-${item.work_id}`;
+      return pureRelationKey(item);
     },
     relationLabelFor(type, direction) {
-      const found = this.relationTypes.find((item) => item.value === type);
-      if (type === "sequel") return direction === "in" ? "Предыстория" : "Продолжение";
-      if (type === "spin_off") return direction === "in" ? "Оригинал" : "Спин-офф";
-      if (type === "adaptation") return direction === "in" ? "Первоисточник" : "Адаптация";
-      if (type === "remake") return direction === "in" ? "Оригинал" : "Ремейк";
-      return found ? found.label : "Связано";
+      return pureRelationLabelFor(this.relationTypes, type, direction);
     },
     toggleRelationType(item) {
       const key = this.relationKey(item);
