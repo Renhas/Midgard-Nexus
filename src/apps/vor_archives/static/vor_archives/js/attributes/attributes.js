@@ -1,6 +1,6 @@
 import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
-import { hasContent } from "@vor/common";
+import { hasContent } from "@vor/shared/dom";
 
 document.addEventListener("alpine:init", () => {
   getAlpine().store("vorAttributes", {

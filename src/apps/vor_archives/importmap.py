@@ -14,6 +14,9 @@ _SHARED_IMPORTMAP_PATHS = {
     "@vor/shared/pure/cookies": "vor_archives/js/shared/pure/cookies.js",
     "@vor/shared/pure/urls": "vor_archives/js/shared/pure/urls.js",
     "@vor/shared/pure/wheel": "vor_archives/js/shared/pure/wheel.js",
+    "@vor/shared/csrf": "vor_archives/js/shared/csrf.js",
+    "@vor/shared/cover": "vor_archives/js/shared/cover.js",
+    "@vor/shared/dom": "vor_archives/js/shared/dom.js",
 }
 
 _PAGE_IMPORTMAP_MODULES = [
