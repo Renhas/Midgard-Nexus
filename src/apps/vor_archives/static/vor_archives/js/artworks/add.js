@@ -1,7 +1,7 @@
 import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
 import { closeOverlay as closeOverlayImpl } from "@vor/shared/overlay_lifecycle";
-import { datePickerApi } from "@vor/artworks/datepicker";
+import { getDatePickerMixin } from "@vor/artworks/mixins/datepicker";
 import { getCoverMixin, getStatusMixin, getRatingMixin, getProgressMixin, getRelationsMixin, getAttachMixin } from "@vor/artworks/overlay_mixins";
 import { VorApi } from "@vor/artworks/api";
 
@@ -58,9 +58,7 @@ document.addEventListener("alpine:init", () => {
     errors: {},
     formError: "",
     doneMessage: "",
-    dateOpen: false,
-    dateCursor: new Date(),
-    ...datePickerApi(),
+    ...getDatePickerMixin({ dateCursor: new Date() }),
     ageOpen: false,
     status: "planning",
     statusOpen: false,
@@ -87,9 +85,6 @@ document.addEventListener("alpine:init", () => {
         tags: [],
         platforms: [],
       };
-    },
-    init() {
-      this.dateCursor = new Date();
     },
     closeOverlay() {
       return closeOverlayImpl();

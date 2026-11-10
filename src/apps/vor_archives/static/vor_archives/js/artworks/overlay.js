@@ -1,7 +1,7 @@
 import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
 import { closeOverlay as closeOverlayImpl } from "@vor/shared/overlay_lifecycle";
-import { datePickerApi } from "@vor/artworks/datepicker";
+import { getDatePickerMixin } from "@vor/artworks/mixins/datepicker";
 import { getCoverMixin, getStatusMixin, getRatingMixin, getProgressMixin, getRelationsMixin, getAttachMixin } from "@vor/artworks/overlay_mixins";
 import { VorApi } from "@vor/artworks/api";
 
@@ -38,9 +38,9 @@ document.addEventListener("alpine:init", () => {
     pickerQuery: "",
     pickerSelected: {},
     ageOpen: false,
-    dateOpen: false,
-    dateCursor: null,
-    ...datePickerApi(),
+    ...getDatePickerMixin({
+      dateCursor: opts.releaseDate ? new Date(`${opts.releaseDate}T00:00:00`) : new Date(),
+    }),
     linkOpen: false,
     relAdding: false,
     relQuery: "",
@@ -87,7 +87,6 @@ document.addEventListener("alpine:init", () => {
     ...getRelationsMixin(),
     ...getAttachMixin(),
     init() {
-      this.dateCursor = this.releaseDate ? new Date(`${this.releaseDate}T00:00:00`) : new Date();
       this.snapshot = this.serializeDraft();
       this.serverQuickState = this.captureQuickState();
     },

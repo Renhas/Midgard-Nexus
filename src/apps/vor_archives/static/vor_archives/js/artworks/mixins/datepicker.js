@@ -8,8 +8,10 @@ import {
 } from "@vor/artworks/pure/dates";
 import { wheelDirection } from "@vor/shared/pure/wheel";
 
-export function datePickerApi() {
+export function getDatePickerMixin({ dateCursor = null } = {}) {
   return {
+    dateOpen: false,
+    dateCursor,
     dateView: "days",
     formatDate(iso) {
       if (!iso) {
