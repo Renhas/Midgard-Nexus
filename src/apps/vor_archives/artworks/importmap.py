@@ -4,7 +4,7 @@ from config.importmap import build_importmap
 
 _OWN_IMPORTMAP_PATHS = {
     "@vor/artworks/api": "vor_archives/js/artworks/api.js",
-    "@vor/artworks/helpers": "vor_archives/js/artworks/helpers.js",
+    "@vor/artworks/overlay_mixins": "vor_archives/js/artworks/overlay_mixins.js",
     "@vor/artworks/store": "vor_archives/js/artworks/store.js",
     "@vor/artworks/store/filters": "vor_archives/js/artworks/store/filters.js",
     "@vor/artworks/store/collections": "vor_archives/js/artworks/store/collections.js",

@@ -2,7 +2,7 @@ import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
 import { closeOverlay as closeOverlayImpl } from "@vor/shared/overlay";
 import { datePickerApi } from "@vor/artworks/datepicker";
-import { getCoverHelpers, getStatusHelpers, getRatingHelpers, getProgressHelpers, getRelationsHelpers, getAttachHelpers } from "@vor/artworks/helpers";
+import { getCoverHelpers, getStatusHelpers, getRatingHelpers, getProgressHelpers, getRelationsHelpers, getAttachHelpers } from "@vor/artworks/overlay_mixins";
 import { VorApi } from "@vor/artworks/api";
 
 document.addEventListener("alpine:init", () => {
