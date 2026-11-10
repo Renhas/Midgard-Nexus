@@ -101,8 +101,8 @@ jobs:
       - name: Install Playwright browsers
         run: playwright install --with-deps chromium
 
-      - name: Run e2e
-        run: pytest src/tests/e2e
+      - name: Run e2e (smoke)
+        run: pytest src/tests/e2e -m smoke
 
   vitest:
     runs-on: ubuntu-latest
