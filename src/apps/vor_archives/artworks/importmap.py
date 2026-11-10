@@ -23,6 +23,7 @@ _OWN_IMPORTMAP_PATHS = {
     "@vor/artworks/pure/progress": "vor_archives/js/artworks/pure/progress.js",
     "@vor/artworks/pure/rating": "vor_archives/js/artworks/pure/rating.js",
     "@vor/artworks/pure/relations": "vor_archives/js/artworks/pure/relations.js",
+    "@vor/artworks/datepicker": "vor_archives/js/artworks/datepicker.js",
 }
 
 # When artworks gets its own nested importmap modules (e.g. store/),
