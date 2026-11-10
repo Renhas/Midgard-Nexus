@@ -26,6 +26,12 @@ _OWN_IMPORTMAP_PATHS = {
     "@vor/artworks/datepicker": "vor_archives/js/artworks/datepicker.js",
     "@vor/artworks/pure/chip_fit": "vor_archives/js/artworks/pure/chip_fit.js",
     "@vor/artworks/pure/popover": "vor_archives/js/artworks/pure/popover.js",
+    "@vor/artworks/mixins/attach": "vor_archives/js/artworks/mixins/attach.js",
+    "@vor/artworks/mixins/cover": "vor_archives/js/artworks/mixins/cover.js",
+    "@vor/artworks/mixins/progress": "vor_archives/js/artworks/mixins/progress.js",
+    "@vor/artworks/mixins/rating": "vor_archives/js/artworks/mixins/rating.js",
+    "@vor/artworks/mixins/relations": "vor_archives/js/artworks/mixins/relations.js",
+    "@vor/artworks/mixins/status": "vor_archives/js/artworks/mixins/status.js",
 }
 
 # When artworks gets its own nested importmap modules (e.g. store/),
