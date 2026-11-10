@@ -706,6 +706,10 @@
   opacity: 0.7;
 }
 
+.vor-chip.is-chip-hidden {
+  display: none;
+}
+
 .vor-chip-more-wrap {
   position: relative;
   flex-shrink: 0;

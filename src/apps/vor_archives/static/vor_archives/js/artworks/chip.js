@@ -51,7 +51,7 @@ document.addEventListener("alpine:init", () => {
       const chips = [...root.querySelectorAll("[data-chip]")];
       const more = this.$refs.more;
       chips.forEach((chip) => {
-        chip.style.display = "";
+        chip.classList.remove("is-chip-hidden");
       });
       const available = root.clientWidth;
       if (available <= 0) {
@@ -67,7 +67,7 @@ document.addEventListener("alpine:init", () => {
       const moreWidth = this.measureMoreWidth(this.$refs.moreWrap, more);
       const result = computeVisibleChipCount({ chipWidths, available, gap, moreWidth });
       chips.forEach((chip, index) => {
-        chip.style.display = index < result.visibleCount ? "" : "none";
+        chip.classList.toggle("is-chip-hidden", index >= result.visibleCount);
       });
       this.visibleCount = result.visibleCount;
       this.hiddenCount = result.hiddenCount;
