@@ -19,6 +19,8 @@ _SHARED_IMPORTMAP_PATHS = {
     "@vor/shared/dom": "vor_archives/js/shared/dom.js",
     "@vor/shared/dom_tree": "vor_archives/js/shared/dom_tree.js",
     "@vor/shared/overlay": "vor_archives/js/shared/overlay.js",
+    "@vor/shared/scroll_lock": "vor_archives/js/shared/scroll_lock.js",
+    "@vor/shared/modal": "vor_archives/js/shared/modal.js",
 }
 
 _PAGE_IMPORTMAP_MODULES = [
