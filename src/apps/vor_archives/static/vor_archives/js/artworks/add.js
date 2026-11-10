@@ -2,7 +2,7 @@ import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
 import { closeOverlay as closeOverlayImpl } from "@vor/shared/overlay";
 import { datePickerApi } from "@vor/artworks/datepicker";
-import { getCoverHelpers, getStatusHelpers, getRatingHelpers, getProgressHelpers, getRelationsHelpers, getAttachHelpers } from "@vor/artworks/overlay_mixins";
+import { getCoverMixin, getStatusMixin, getRatingMixin, getProgressMixin, getRelationsMixin, getAttachMixin } from "@vor/artworks/overlay_mixins";
 import { VorApi } from "@vor/artworks/api";
 
 document.addEventListener("alpine:init", () => {
@@ -74,12 +74,12 @@ document.addEventListener("alpine:init", () => {
     progressHover: false,
     progressDraft: "",
     searchTimer: null,
-    ...getCoverHelpers(),
-    ...getStatusHelpers(),
-    ...getRatingHelpers(),
-    ...getProgressHelpers(),
-    ...getRelationsHelpers(),
-    ...getAttachHelpers(),
+    ...getCoverMixin(),
+    ...getStatusMixin(),
+    ...getRatingMixin(),
+    ...getProgressMixin(),
+    ...getRelationsMixin(),
+    ...getAttachMixin(),
     get catalog() {
       return this.catalogs[this.workType] || {
         authors: [],

@@ -18,7 +18,7 @@ import {
   relationLabelFor as pureRelationLabelFor,
 } from "@vor/artworks/pure/relations";
 
-export function getCoverHelpers() {
+export function getCoverMixin() {
   return {
     async onCoverSelected(event) {
       const file = event.target.files && event.target.files[0];
@@ -59,7 +59,7 @@ export function getCoverHelpers() {
   };
 };
 
-export function getStatusHelpers() {
+export function getStatusMixin() {
   return {
     statusLabel() {
       const found = this.statusChoices.find((item) => item.value === this.status);
@@ -82,7 +82,7 @@ export function getStatusHelpers() {
   };
 };
 
-export function getRatingHelpers() {
+export function getRatingMixin() {
   return {
     displayRating() {
       return pureDisplayRating(this.rating, this.hoverRating);
@@ -102,7 +102,7 @@ export function getRatingHelpers() {
   };
 };
 
-export function getProgressHelpers() {
+export function getProgressMixin() {
   return {
     progressValueLabel() {
       return pureProgressValueLabel(this.progress);
@@ -149,7 +149,7 @@ export function getProgressHelpers() {
   };
 };
 
-export function getRelationsHelpers() {
+export function getRelationsMixin() {
   return {
     allowedRelationTypes(otherType) {
       return pureAllowedRelationTypes(this.relationTypes, otherType, this.workType);
@@ -237,7 +237,7 @@ export function getRelationsHelpers() {
   };
 };
 
-export function getAttachHelpers() {
+export function getAttachMixin() {
   return {
     resetAttachFields() {
       this.status = "planning";
