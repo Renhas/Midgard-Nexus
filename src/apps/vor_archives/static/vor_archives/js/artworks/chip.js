@@ -1,6 +1,18 @@
 import { getAlpine } from "@lib/alpine";
 import { allChipsFit, computeVisibleChipCount } from "@vor/artworks/pure/chip_fit";
 
+function tempReveal(el, readWidth) {
+  const prevDisplay = el.style.display;
+  el.style.display = "inline-flex";
+  el.style.visibility = "hidden";
+  el.style.position = "absolute";
+  const width = readWidth();
+  el.style.display = prevDisplay;
+  el.style.visibility = "";
+  el.style.position = "";
+  return width;
+}
+
 document.addEventListener("alpine:init", () => {
   getAlpine().data("vorChipOverflow", () => ({
     hiddenCount: 0,
@@ -63,23 +75,13 @@ document.addEventListener("alpine:init", () => {
     measureMoreWidth(moreWrap, more) {
       let moreWidth = 48;
       if (moreWrap) {
-        const prevDisplay = moreWrap.style.display;
-        moreWrap.style.display = "inline-flex";
-        moreWrap.style.visibility = "hidden";
-        moreWrap.style.position = "absolute";
-        moreWidth = (more && more.offsetWidth) || moreWrap.offsetWidth || moreWidth;
-        moreWrap.style.display = prevDisplay;
-        moreWrap.style.visibility = "";
-        moreWrap.style.position = "";
-      } else if (more) {
-        const prevDisplay = more.style.display;
-        more.style.display = "inline-flex";
-        more.style.visibility = "hidden";
-        more.style.position = "absolute";
-        moreWidth = more.offsetWidth || moreWidth;
-        more.style.display = prevDisplay;
-        more.style.visibility = "";
-        more.style.position = "";
+        return tempReveal(
+          moreWrap,
+          () => (more && more.offsetWidth) || moreWrap.offsetWidth,
+        ) || moreWidth;
+      }
+      if (more) {
+        return tempReveal(more, () => more.offsetWidth) || moreWidth;
       }
       return moreWidth;
     },
