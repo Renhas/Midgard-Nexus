@@ -41,14 +41,37 @@ def test_signup_page_renders(live_server, page: Page):
 
 
 def test_library_renders_seeded_works(live_server, authenticated_page, user_work):
+    console_errors: list[str] = []
+    failed_requests: list[str] = []
+    page_errors: list[str] = []
+
+    def _on_console(msg):
+        if msg.type == "error":
+            console_errors.append(msg.text)
+
+    authenticated_page.on("console", _on_console)
+    authenticated_page.on("pageerror", lambda exc: page_errors.append(str(exc)))
+    authenticated_page.on(
+        "requestfailed",
+        lambda req: failed_requests.append(f"{req.method} {req.url}: {req.failure}"),
+    )
+
     authenticated_page.goto(f"{live_server.url}/library/")
     expect(authenticated_page).to_have_title(re.compile("Произведения"))
-    # The list is fetched client-side: Alpine boots, the store issues an
-    # HTMX request and replaces the server-rendered placeholder. Wait
-    # for that swap explicitly, so slow CI runners don't race the fetch
-    # and the failure message points at JS/HTMX, not at missing data.
     list_body = authenticated_page.locator("#artwork-list-body")
-    expect(list_body.get_by_text("Загрузка…")).to_be_hidden(timeout=20_000)
+    try:
+        expect(list_body.get_by_text("Загрузка…")).to_be_hidden(timeout=20_000)
+    except AssertionError as exc:
+        alpine_ok = authenticated_page.evaluate("typeof window.Alpine !== 'undefined'")
+        htmx_ok = authenticated_page.evaluate("typeof window.htmx !== 'undefined'")
+        raise AssertionError(
+            "library list did not finish loading in time.\n"
+            f"Alpine loaded: {alpine_ok}\n"
+            f"HTMX loaded: {htmx_ok}\n"
+            f"console errors: {console_errors or 'none'}\n"
+            f"page errors: {page_errors or 'none'}\n"
+            f"failed requests: {failed_requests or 'none'}"
+        ) from exc
     expect(authenticated_page.get_by_text(user_work.work.title).first).to_be_visible()
 
 
