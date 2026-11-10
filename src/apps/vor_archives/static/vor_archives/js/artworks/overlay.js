@@ -1,7 +1,8 @@
 import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
-import { datePickerApi, closeOverlay as closeOverlayImpl } from "@vor/common";
-import { getCoverHelpers, getStatusHelpers, getRatingHelpers, getProgressHelpers, getRelationsHelpers, getAttachHelpers } from "@vor/artworks/helpers";
+import { closeOverlay as closeOverlayImpl } from "@vor/shared/overlay_lifecycle";
+import { datePickerApi } from "@vor/artworks/datepicker";
+import { getCoverMixin, getStatusMixin, getRatingMixin, getProgressMixin, getRelationsMixin, getAttachMixin } from "@vor/artworks/overlay_mixins";
 import { VorApi } from "@vor/artworks/api";
 
 document.addEventListener("alpine:init", () => {
@@ -79,12 +80,12 @@ document.addEventListener("alpine:init", () => {
     listUrl: opts.listUrl || "",
     workUrl: opts.workUrl || "",
     attachUrl: opts.attachUrl || "",
-    ...getCoverHelpers(),
-    ...getStatusHelpers(),
-    ...getRatingHelpers(),
-    ...getProgressHelpers(),
-    ...getRelationsHelpers(),
-    ...getAttachHelpers(),
+    ...getCoverMixin(),
+    ...getStatusMixin(),
+    ...getRatingMixin(),
+    ...getProgressMixin(),
+    ...getRelationsMixin(),
+    ...getAttachMixin(),
     init() {
       this.dateCursor = this.releaseDate ? new Date(`${this.releaseDate}T00:00:00`) : new Date();
       this.snapshot = this.serializeDraft();

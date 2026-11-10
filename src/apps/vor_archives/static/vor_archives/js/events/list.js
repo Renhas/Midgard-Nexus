@@ -1,5 +1,5 @@
 import { getAlpine } from "@lib/alpine";
-import { hasContent } from "@vor/common";
+import { hasContent } from "@vor/shared/dom";
 
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Enter") {
@@ -153,3 +153,24 @@ document.body.addEventListener("htmx:afterSwap", (event) => {
     store.refreshCollectionPath();
   }
 });
+
+document.body.addEventListener("htmx:afterSwap", (event) => {
+  if (event.detail.elt?.id === "vor-library-search-results") {
+    getAlpine()?.initTree?.(event.detail.elt);
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (!(event.ctrlKey || event.metaKey) || event.code !== "KeyF") {
+    return;
+  }
+  if (!document.getElementById("vor-artworks-opts")) {
+    return;
+  }
+  if (hasContent("vor-overlay")) {
+    return;
+  }
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  getAlpine()?.store("vorArtworks")?.openSearch();
+}, true);

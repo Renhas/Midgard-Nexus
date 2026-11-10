@@ -1,6 +1,12 @@
 import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
-import { ALL_WORK_TYPES, FILTER_KEYS, SIDEBAR_STORAGE_KEY, mergeFilterSelection } from "@vor/common";
+import { mergeFilterSelection } from "@vor/artworks/pure/filter_selection";
+
+const ALL_WORK_TYPES = ["book", "film", "game"];
+const FILTER_KEYS = [
+  "status", "age_rating", "tags", "genre_book", "genre_film", "genre_game", "platform",
+];
+const SIDEBAR_STORAGE_KEY = "vor.artworks.sidebar";
 
 export const filtersMixin = {
   workTypes: [...ALL_WORK_TYPES],

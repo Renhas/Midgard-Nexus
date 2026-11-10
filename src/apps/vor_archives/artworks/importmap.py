@@ -4,7 +4,7 @@ from config.importmap import build_importmap
 
 _OWN_IMPORTMAP_PATHS = {
     "@vor/artworks/api": "vor_archives/js/artworks/api.js",
-    "@vor/artworks/helpers": "vor_archives/js/artworks/helpers.js",
+    "@vor/artworks/overlay_mixins": "vor_archives/js/artworks/overlay_mixins.js",
     "@vor/artworks/store": "vor_archives/js/artworks/store.js",
     "@vor/artworks/store/filters": "vor_archives/js/artworks/store/filters.js",
     "@vor/artworks/store/collections": "vor_archives/js/artworks/store/collections.js",
@@ -16,6 +16,14 @@ _OWN_IMPORTMAP_PATHS = {
     "@vor/artworks/add": "vor_archives/js/artworks/add.js",
     "@vor/artworks/chip": "vor_archives/js/artworks/chip.js",
     "@vor/artworks/row_preview": "vor_archives/js/artworks/row_preview.js",
+    "@vor/artworks/pure/collection_tree": "vor_archives/js/artworks/pure/collection_tree.js",
+    "@vor/artworks/pure/collection_urls": "vor_archives/js/artworks/pure/collection_urls.js",
+    "@vor/artworks/pure/dates": "vor_archives/js/artworks/pure/dates.js",
+    "@vor/artworks/pure/filter_selection": "vor_archives/js/artworks/pure/filter_selection.js",
+    "@vor/artworks/pure/progress": "vor_archives/js/artworks/pure/progress.js",
+    "@vor/artworks/pure/rating": "vor_archives/js/artworks/pure/rating.js",
+    "@vor/artworks/pure/relations": "vor_archives/js/artworks/pure/relations.js",
+    "@vor/artworks/datepicker": "vor_archives/js/artworks/datepicker.js",
 }
 
 # When artworks gets its own nested importmap modules (e.g. store/),
