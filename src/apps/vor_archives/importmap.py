@@ -18,6 +18,7 @@ _SHARED_IMPORTMAP_PATHS = {
     "@vor/shared/cover": "vor_archives/js/shared/cover.js",
     "@vor/shared/dom": "vor_archives/js/shared/dom.js",
     "@vor/artworks/datepicker": "vor_archives/js/artworks/datepicker.js",
+    "@vor/shared/dom_tree": "vor_archives/js/shared/dom_tree.js",
 }
 
 _PAGE_IMPORTMAP_MODULES = [
