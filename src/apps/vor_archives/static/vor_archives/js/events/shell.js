@@ -1,6 +1,7 @@
 import { getAlpine } from "@lib/alpine";
-import { closeOverlay, closeModal, overlayAlpine } from "@vor/common";
+import { closeModal } from "@vor/common";
 import { hasContent } from "@vor/shared/dom";
+import { closeOverlay, overlayAlpine } from "@vor/shared/overlay";
 
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") {

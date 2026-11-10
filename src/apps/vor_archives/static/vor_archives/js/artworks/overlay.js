@@ -1,6 +1,6 @@
 import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
-import { closeOverlay as closeOverlayImpl } from "@vor/common";
+import { closeOverlay as closeOverlayImpl } from "@vor/shared/overlay";
 import { datePickerApi } from "@vor/artworks/datepicker";
 import { getCoverHelpers, getStatusHelpers, getRatingHelpers, getProgressHelpers, getRelationsHelpers, getAttachHelpers } from "@vor/artworks/helpers";
 import { VorApi } from "@vor/artworks/api";
