@@ -1,4 +1,5 @@
 import { getAlpine } from "@lib/alpine";
+import { allChipsFit, computeVisibleChipCount } from "@vor/artworks/pure/chip_fit";
 
 document.addEventListener("alpine:init", () => {
   getAlpine().data("vorChipOverflow", () => ({
@@ -45,17 +46,22 @@ document.addEventListener("alpine:init", () => {
         return;
       }
       const gap = parseFloat(getComputedStyle(root).columnGap || getComputedStyle(root).gap) || 6.4;
-      let total = 0;
-      chips.forEach((chip, index) => {
-        total += chip.offsetWidth + (index ? gap : 0);
-      });
-      if (total <= available) {
+      const chipWidths = chips.map((chip) => chip.offsetWidth);
+      if (allChipsFit(chipWidths, available, gap)) {
         this.visibleCount = chips.length;
         this.hiddenCount = 0;
         return;
       }
+      const moreWidth = this.measureMoreWidth(this.$refs.moreWrap, more);
+      const result = computeVisibleChipCount({ chipWidths, available, gap, moreWidth });
+      chips.forEach((chip, index) => {
+        chip.style.display = index < result.visibleCount ? "" : "none";
+      });
+      this.visibleCount = result.visibleCount;
+      this.hiddenCount = result.hiddenCount;
+    },
+    measureMoreWidth(moreWrap, more) {
       let moreWidth = 48;
-      const moreWrap = this.$refs.moreWrap;
       if (moreWrap) {
         const prevDisplay = moreWrap.style.display;
         moreWrap.style.display = "inline-flex";
@@ -75,22 +81,7 @@ document.addEventListener("alpine:init", () => {
         more.style.visibility = "";
         more.style.position = "";
       }
-      let used = 0;
-      let visible = 0;
-      for (let i = 0; i < chips.length; i += 1) {
-        const next = used + (i ? gap : 0) + chips[i].offsetWidth;
-        if (next + gap + moreWidth <= available) {
-          used = next;
-          visible = i + 1;
-        } else {
-          break;
-        }
-      }
-      chips.forEach((chip, index) => {
-        chip.style.display = index < visible ? "" : "none";
-      });
-      this.visibleCount = visible;
-      this.hiddenCount = chips.length - visible;
+      return moreWidth;
     },
     placeTip(chip) {
       const tip = chip.querySelector(".vor-chip-tip");
