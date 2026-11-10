@@ -17,7 +17,7 @@ _SHARED_IMPORTMAP_PATHS = {
     "@vor/shared/cover": "vor_archives/js/shared/cover.js",
     "@vor/shared/dom": "vor_archives/js/shared/dom.js",
     "@vor/shared/dom_tree": "vor_archives/js/shared/dom_tree.js",
-    "@vor/shared/overlay": "vor_archives/js/shared/overlay.js",
+    "@vor/shared/overlay_lifecycle": "vor_archives/js/shared/overlay_lifecycle.js",
     "@vor/shared/scroll_lock": "vor_archives/js/shared/scroll_lock.js",
     "@vor/shared/modal": "vor_archives/js/shared/modal.js",
 }
