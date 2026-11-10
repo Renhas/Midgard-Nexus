@@ -101,6 +101,11 @@ jobs:
       - name: Install Playwright browsers
         run: playwright install --with-deps chromium
 
+      - name: Download vendor static
+        run: |
+          sed -i 's/\r$//' docker/web/download_static.sh
+          bash docker/web/download_static.sh
+
       - name: Run e2e (smoke)
         run: pytest src/tests/e2e -m smoke
 
