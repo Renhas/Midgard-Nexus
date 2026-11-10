@@ -519,3 +519,10 @@ document.addEventListener("alpine:init", () => {
     }
   });
 });
+
+document.body.addEventListener("htmx:afterSwap", (event) => {
+  const el = event.detail.elt;
+  if (el?.id === "dash-heatmap" || el?.id === "dash-feed-more") {
+    getAlpine()?.initTree?.(el);
+  }
+});

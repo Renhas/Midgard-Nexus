@@ -9,7 +9,6 @@ per-page urlconf, if any.
 from config.importmap import build_importmap
 
 _SHARED_IMPORTMAP_PATHS = {
-    "@vor/common": "vor_archives/js/common.js",
     "@vor/events/list": "vor_archives/js/events/list.js",
     "@vor/shared/pure/cookies": "vor_archives/js/shared/pure/cookies.js",
     "@vor/shared/pure/urls": "vor_archives/js/shared/pure/urls.js",
