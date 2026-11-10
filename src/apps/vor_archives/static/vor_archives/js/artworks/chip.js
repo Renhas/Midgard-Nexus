@@ -1,5 +1,6 @@
 import { getAlpine } from "@lib/alpine";
 import { allChipsFit, computeVisibleChipCount } from "@vor/artworks/pure/chip_fit";
+import { computeTipLayout, computePopupLayout } from "@vor/artworks/pure/popover";
 
 function tempReveal(el, readWidth) {
   const prevDisplay = el.style.display;
@@ -90,28 +91,22 @@ document.addEventListener("alpine:init", () => {
       if (!tip) {
         return;
       }
-      const pad = 8;
       const chipRect = chip.getBoundingClientRect();
-      tip.style.position = "fixed";
-      tip.style.left = `${chipRect.right + 6}px`;
-      tip.style.top = `${chipRect.top + chipRect.height / 2}px`;
-      tip.style.right = "auto";
-      tip.style.bottom = "auto";
-      tip.style.transform = "translateY(-50%)";
+      tip.style.setProperty("--tip-left", `${chipRect.right + 6}px`);
+      tip.style.setProperty("--tip-top", `${chipRect.top + chipRect.height / 2}px`);
+      tip.style.setProperty("--tip-shift-y", "0px");
       this.$nextTick(() => {
-        let rect = tip.getBoundingClientRect();
-        if (rect.right > window.innerWidth - pad) {
-          tip.style.left = `${Math.max(pad, chipRect.left - rect.width - 6)}px`;
-          rect = tip.getBoundingClientRect();
-        }
-        let shiftY = 0;
-        if (rect.bottom > window.innerHeight - pad) {
-          shiftY = window.innerHeight - pad - rect.bottom;
-        }
-        if (rect.top + shiftY < pad) {
-          shiftY = pad - rect.top;
-        }
-        tip.style.transform = `translateY(calc(-50% + ${shiftY}px))`;
+        const tipRect = tip.getBoundingClientRect();
+        const layout = computeTipLayout({
+          chipRect,
+          tipSize: { width: tipRect.width, height: tipRect.height },
+          viewportWidth: window.innerWidth,
+          viewportHeight: window.innerHeight,
+          pad: 8,
+        });
+        tip.style.setProperty("--tip-left", `${layout.left}px`);
+        tip.style.setProperty("--tip-top", `${layout.top}px`);
+        tip.style.setProperty("--tip-shift-y", `${layout.shiftY}px`);
       });
     },
     placePopup() {
@@ -119,19 +114,19 @@ document.addEventListener("alpine:init", () => {
       if (!popup) {
         return;
       }
-      popup.style.top = "calc(100% + 4px)";
-      popup.style.left = "0";
-      popup.style.right = "auto";
-      popup.style.bottom = "auto";
-      const pad = 8;
+      popup.classList.remove("is-flipped-h", "is-flipped-v");
       const rect = popup.getBoundingClientRect();
-      if (rect.right > window.innerWidth - pad) {
-        popup.style.left = "auto";
-        popup.style.right = "0";
+      const layout = computePopupLayout({
+        popupRect: rect,
+        viewportWidth: window.innerWidth,
+        viewportHeight: window.innerHeight,
+        pad: 8,
+      });
+      if (layout.flipH) {
+        popup.classList.add("is-flipped-h");
       }
-      if (rect.bottom > window.innerHeight - pad) {
-        popup.style.top = "auto";
-        popup.style.bottom = "calc(100% + 4px)";
+      if (layout.flipV) {
+        popup.classList.add("is-flipped-v");
       }
     },
   }));

@@ -733,6 +733,16 @@
   overflow: visible;
 }
 
+.vor-chip-popup.is-flipped-h {
+  left: auto;
+  right: 0;
+}
+
+.vor-chip-popup.is-flipped-v {
+  top: auto;
+  bottom: calc(100% + 4px);
+}
+
 .vor-chip-popup-body {
   display: flex;
   flex-wrap: wrap;
@@ -745,8 +755,8 @@
 .vor-chip-tip {
   display: none;
   position: fixed;
-  left: 0;
-  top: 0;
+  left: var(--tip-left, 0);
+  top: var(--tip-top, 0);
   width: max-content;
   max-width: 240px;
   padding: 0.45rem 0.6rem;
@@ -759,6 +769,7 @@
   z-index: 40;
   white-space: pre-wrap;
   pointer-events: none;
+  transform: translateY(calc(-50% + var(--tip-shift-y, 0px)));
 }
 
 .vor-chip:hover .vor-chip-tip {
