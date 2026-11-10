@@ -43,9 +43,13 @@ def test_signup_page_renders(live_server, page: Page):
 def test_library_renders_seeded_works(live_server, authenticated_page, user_work):
     authenticated_page.goto(f"{live_server.url}/library/")
     expect(authenticated_page).to_have_title(re.compile("Произведения"))
-    expect(authenticated_page.get_by_text(user_work.work.title).first).to_be_visible(
-        timeout=10_000
-    )
+    # The list is fetched client-side: Alpine boots, the store issues an
+    # HTMX request and replaces the server-rendered placeholder. Wait
+    # for that swap explicitly, so slow CI runners don't race the fetch
+    # and the failure message points at JS/HTMX, not at missing data.
+    list_body = authenticated_page.locator("#artwork-list-body")
+    expect(list_body.get_by_text("Загрузка…")).to_be_hidden(timeout=20_000)
+    expect(authenticated_page.get_by_text(user_work.work.title).first).to_be_visible()
 
 
 def test_artwork_overlay_renders(live_server, authenticated_page, user_work):
