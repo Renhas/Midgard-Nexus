@@ -7,7 +7,6 @@ _PAGE_PATHS = {
     "@vor/artworks/api": "vor_archives/js/artworks/api.js",
     "@vor/artworks/chip": "vor_archives/js/artworks/chip.js",
     "@vor/artworks/overlay": "vor_archives/js/artworks/overlay.js",
-    "@vor/artworks/overlay_mixins": "vor_archives/js/artworks/overlay_mixins.js",
     "@vor/artworks/row_preview": "vor_archives/js/artworks/row_preview.js",
     "@vor/artworks/store": "vor_archives/js/artworks/store.js",
     "@vor/artworks/store/collections": "vor_archives/js/artworks/store/collections.js",
