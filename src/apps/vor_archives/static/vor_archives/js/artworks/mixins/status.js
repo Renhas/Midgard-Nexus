@@ -1,5 +1,11 @@
-export function getStatusMixin() {
+export function getStatusMixin({
+  status = "planning",
+  choices = [],
+} = {}) {
   return {
+    status,
+    statusChoices: choices,
+    statusOpen: false,
     statusLabel() {
       const found = this.statusChoices.find((item) => item.value === this.status);
       return found ? found.label : (this.status || "planning");
