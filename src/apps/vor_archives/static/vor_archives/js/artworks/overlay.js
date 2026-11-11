@@ -3,6 +3,7 @@ import { getAlpine } from "@lib/alpine";
 import { closeOverlay as closeOverlayImpl } from "@vor/shared/overlay_lifecycle";
 import { getDatePickerMixin } from "@vor/artworks/mixins/datepicker";
 import { getCoverMixin, getStatusMixin, getRatingMixin, getProgressMixin, getRelationsMixin, getAttachMixin } from "@vor/artworks/overlay_mixins";
+import { getAgePickerMixin } from "@vor/artworks/mixins/age_picker";
 import { VorApi } from "@vor/artworks/api";
 
 document.addEventListener("alpine:init", () => {
@@ -15,7 +16,6 @@ document.addEventListener("alpine:init", () => {
     title: opts.title || "",
     description: opts.description || "",
     releaseDate: opts.releaseDate || "",
-    ageRating: opts.ageRating || "",
     externalLink: opts.externalLink || "",
     pages: opts.pages == null ? "" : opts.pages,
     durationMinutes: opts.durationMinutes == null ? "" : opts.durationMinutes,
@@ -25,13 +25,11 @@ document.addEventListener("alpine:init", () => {
     tags: opts.tags || [],
     platforms: opts.platforms || [],
     catalog: opts.catalog || {},
-    ageChoices: opts.ageChoices || [],
     saveUrl: opts.saveUrl || "",
     relationSearchUrl: opts.relationSearchUrl || "",
     pickerKind: null,
     pickerQuery: "",
     pickerSelected: {},
-    ageOpen: false,
     ...getDatePickerMixin({
       dateCursor: opts.releaseDate ? new Date(`${opts.releaseDate}T00:00:00`) : new Date(),
     }),
@@ -73,6 +71,10 @@ document.addEventListener("alpine:init", () => {
       this.snapshot = this.serializeDraft();
       this.serverQuickState = this.captureQuickState();
     },
+    ...getAgePickerMixin({
+      ageRating: opts.ageRating || "",
+      ageChoices: opts.ageChoices,
+    }),
     closeOverlay() {
       return closeOverlayImpl();
     },
@@ -216,14 +218,6 @@ document.addEventListener("alpine:init", () => {
     },
     platformIds() {
       return this.platforms.map((item) => item.id);
-    },
-    ageLabel() {
-      const found = this.ageChoices.find((item) => item.value === this.ageRating);
-      return found ? found.label : "Возрастной рейтинг";
-    },
-    setAgeRating(value) {
-      this.ageRating = value;
-      this.ageOpen = false;
     },
     openLinkEditor() {
       this.linkOpen = !this.linkOpen;

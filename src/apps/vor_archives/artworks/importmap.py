@@ -32,6 +32,7 @@ _OWN_IMPORTMAP_PATHS = {
     "@vor/artworks/mixins/relations": "vor_archives/js/artworks/mixins/relations.js",
     "@vor/artworks/mixins/status": "vor_archives/js/artworks/mixins/status.js",
     "@vor/artworks/mixins/datepicker": "vor_archives/js/artworks/mixins/datepicker.js",
+    "@vor/artworks/mixins/age_picker": "vor_archives/js/artworks/mixins/age_picker.js",
 }
 
 # When artworks gets its own nested importmap modules (e.g. store/),

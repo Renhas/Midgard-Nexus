@@ -128,16 +128,6 @@ export function getDatePickerMixin({ dateCursor = null } = {}) {
       }
       this[field] = next < min ? "" : next;
     },
-    onAgeWheel(event) {
-      const direction = wheelDirection(event.deltaY);
-      if (!direction) {
-        return;
-      }
-      const options = [""].concat((this.ageChoices || []).map((item) => item.value));
-      const index = Math.max(0, options.indexOf(this.ageRating || ""));
-      const next = Math.max(0, Math.min(options.length - 1, index + direction));
-      this.ageRating = options[next];
-    },
     onFilmTypeWheel(event) {
       const direction = wheelDirection(event.deltaY);
       if (!direction) {

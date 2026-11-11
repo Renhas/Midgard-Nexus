@@ -3,6 +3,7 @@ import { getAlpine } from "@lib/alpine";
 import { closeOverlay as closeOverlayImpl } from "@vor/shared/overlay_lifecycle";
 import { getDatePickerMixin } from "@vor/artworks/mixins/datepicker";
 import { getCoverMixin, getStatusMixin, getRatingMixin, getProgressMixin, getRelationsMixin, getAttachMixin } from "@vor/artworks/overlay_mixins";
+import { getAgePickerMixin } from "@vor/artworks/mixins/age_picker";
 import { VorApi } from "@vor/artworks/api";
 
 document.addEventListener("alpine:init", () => {
@@ -18,7 +19,6 @@ document.addEventListener("alpine:init", () => {
     title: "",
     description: "",
     releaseDate: "",
-    ageRating: "",
     externalLink: "",
     pages: "",
     durationMinutes: "",
@@ -29,7 +29,6 @@ document.addEventListener("alpine:init", () => {
     tags: [],
     platforms: [],
     catalogs: opts.catalogs || {},
-    ageChoices: opts.ageChoices || [],
     requiredFieldsByType: opts.requiredFields || {},
     saveUrl: opts.saveUrl || "",
     searchUrl: opts.searchUrl || "",
@@ -46,7 +45,6 @@ document.addEventListener("alpine:init", () => {
     formError: "",
     doneMessage: "",
     ...getDatePickerMixin({ dateCursor: new Date() }),
-    ageOpen: false,
     searchTimer: null,
     ...getCoverMixin(),
     ...getStatusMixin({ choices: opts.statusChoices }),
@@ -54,6 +52,7 @@ document.addEventListener("alpine:init", () => {
     ...getProgressMixin(),
     ...getRelationsMixin({ relationTypes: opts.relationTypes }),
     ...getAttachMixin({ attachUrl: opts.attachUrl }),
+    ...getAgePickerMixin({ ageChoices: opts.ageChoices }),
     get catalog() {
       return this.catalogs[this.workType] || {
         authors: [],
@@ -175,10 +174,6 @@ document.addEventListener("alpine:init", () => {
         return;
       }
       this[kind] = [...this[kind], opt];
-    },
-    setAgeRating(value) {
-      this.ageRating = value;
-      this.ageOpen = false;
     },
     requiredFields() {
       const base = this.requiredFieldsByType[this.workType] || [];
