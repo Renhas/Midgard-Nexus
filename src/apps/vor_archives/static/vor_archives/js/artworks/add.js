@@ -4,6 +4,8 @@ import { closeOverlay as closeOverlayImpl } from "@vor/shared/overlay_lifecycle"
 import { getDatePickerMixin } from "@vor/artworks/mixins/datepicker";
 import { getCoverMixin, getStatusMixin, getRatingMixin, getProgressMixin, getRelationsMixin, getAttachMixin } from "@vor/artworks/overlay_mixins";
 import { getAgePickerMixin } from "@vor/artworks/mixins/age_picker";
+import { getNumberWheelMixin } from "@vor/artworks/mixins/number_wheel";
+import { wheelDirection } from "@vor/shared/pure/wheel";
 import { VorApi } from "@vor/artworks/api";
 
 document.addEventListener("alpine:init", () => {
@@ -53,6 +55,7 @@ document.addEventListener("alpine:init", () => {
     ...getRelationsMixin({ relationTypes: opts.relationTypes }),
     ...getAttachMixin({ attachUrl: opts.attachUrl }),
     ...getAgePickerMixin({ ageChoices: opts.ageChoices }),
+    ...getNumberWheelMixin(),
     get catalog() {
       return this.catalogs[this.workType] || {
         authors: [],
@@ -359,6 +362,16 @@ document.addEventListener("alpine:init", () => {
     },
     onAttachError() {
       this.formError = "Не удалось добавить произведение в список";
+    },
+    onFilmTypeWheel(event) {
+      const direction = wheelDirection(event.deltaY);
+      if (!direction) {
+        return;
+      }
+      const options = ["movie", "tv_show"];
+      const index = Math.max(0, options.indexOf(this.filmType || "movie"));
+      const next = Math.max(0, Math.min(options.length - 1, index + direction));
+      this.filmType = options[next];
     },
   }));
 });
