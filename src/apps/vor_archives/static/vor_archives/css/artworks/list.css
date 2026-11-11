@@ -106,6 +106,17 @@
   border-color: var(--accent-hover);
 }
 
+.artwork-row:focus,
+.artwork-tile:focus {
+  outline: none;
+}
+
+.artwork-row:focus-visible,
+.artwork-tile:focus-visible {
+  outline: 2px solid var(--accent-hover);
+  outline-offset: 2px;
+}
+
 .artwork-row-type {
   display: inline-flex;
   align-items: center;
@@ -219,7 +230,8 @@
   opacity: 0;
 }
 
-.artwork-item:hover .artwork-row-delete {
+.artwork-item:hover .artwork-row-delete,
+.artwork-item:focus-within .artwork-row-delete {
   opacity: 1;
 }
 
@@ -515,7 +527,8 @@ body.vor-artworks-list-drag .artwork-tile {
   border-color: var(--action-delete);
 }
 
-.artwork-tile:hover .artwork-tile-delete {
+.artwork-tile:hover .artwork-tile-delete,
+.artwork-tile:focus-within .artwork-tile-delete {
   opacity: 1;
 }
 

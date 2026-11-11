@@ -1,9 +1,12 @@
 {% load vor_archives_extras %}
 <div class="artwork-tile"
+     role="button"
+     tabindex="0"
+     aria-label="{{ user_work.work.title }}"
      hx-get="{% url 'vor_archives:artworks:detail' user_work.pk %}"
      hx-target="#vor-overlay"
      hx-swap="innerHTML"
-     @contextmenu.prevent="$store.vorArtworks.openArtworkMenu($event, $el.closest('.artwork-item'))">
+     hx-trigger="click, keyup[key=='Enter']">
   <div class="artwork-tile-cover">
     {% if user_work.work.cover %}
       <img class="artwork-tile-image" src="{{ user_work.work.cover.url }}" alt="{{ user_work.work.title }}">
@@ -29,6 +32,7 @@
     </div>
     <button type="button"
             class="sidebar-btn sidebar-btn-delete sidebar-btn-icon artwork-tile-delete"
+            tabindex="-1"
             title="Удалить"
             @click.stop
             hx-get="{% url 'vor_archives:artworks:delete_preview' %}?ids={{ user_work.pk }}"
