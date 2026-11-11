@@ -1,13 +1,16 @@
 <div class="collection-tree-node" data-collection-id="{{ collection.pk }}">
   <div class="collection-item" data-collection-id="{{ collection.pk }}" data-collection-name="{{ collection.name }}">
-    <button type="button" class="collection-toggle" title="Свернуть/Развернуть">
+    <button type="button"
+            class="collection-toggle"
+            title="Свернуть/Развернуть"
+            {% if not collection.get_children %}tabindex="-1" aria-hidden="true"{% endif %}>
       {% if collection.get_children %}
         <i class="bi bi-chevron-right"></i>
       {% else %}
         <span class="collection-toggle-placeholder"></span>
       {% endif %}
     </button>
-    <span class="collection-item-name">{{ collection.name }}</span>
+    <button type="button" class="collection-item-name">{{ collection.name }}</button>
   </div>
   <div class="collection-children" data-parent-id="{{ collection.pk }}">
     {% for child in collection.get_children %}
