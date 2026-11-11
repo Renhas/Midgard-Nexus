@@ -20,7 +20,7 @@ export function serializeDraft(source) {
 }
 
 export function parseDraft(json) {
-  if (!json) {
+  if (typeof json !== "string" || !json) {
     return {};
   }
   try {

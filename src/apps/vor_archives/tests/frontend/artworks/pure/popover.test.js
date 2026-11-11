@@ -81,6 +81,18 @@ describe("computeTipLayout", () => {
     expect(layout.left).toBe(156);
     expect(layout.shiftY).toBe(0);
   });
+  it("flips horizontally and shifts vertically in the top-right corner", () => {
+    const layout = computeTipLayout({
+      chipRect: rect({ left: 850, top: 780 }),
+      tipSize: { width: 200, height: 100 },
+      viewportWidth: 1000,
+      viewportHeight: 800,
+      pad: 8,
+    });
+    expect(layout.left).toBe(644);
+    expect(layout.top).toBe(790);
+    expect(layout.shiftY).toBe(-48);
+  });
 });
 
 describe("computePopupLayout", () => {

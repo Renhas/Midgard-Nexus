@@ -67,6 +67,15 @@ describe("parseDraft", () => {
     const source = makeSource();
     expect(parseDraft(serializeDraft(source)).title).toBe("T");
   });
+  it("returns {} for non-string truthy input", () => {
+    expect(parseDraft(123)).toEqual({});
+    expect(parseDraft({ a: 1 })).toEqual({});
+    expect(parseDraft([])).toEqual({});
+  });
+  it("returns {} for falsy input", () => {
+    expect(parseDraft(0)).toEqual({});
+    expect(parseDraft(false)).toEqual({});
+  });
 });
 
 describe("dirtyChanges", () => {
