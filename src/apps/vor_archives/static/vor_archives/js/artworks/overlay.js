@@ -5,6 +5,7 @@ import { getDatePickerMixin } from "@vor/artworks/mixins/datepicker";
 import { getCoverMixin, getStatusMixin, getRatingMixin, getProgressMixin, getRelationsMixin, getAttachMixin } from "@vor/artworks/overlay_mixins";
 import { getAgePickerMixin } from "@vor/artworks/mixins/age_picker";
 import { getNumberWheelMixin } from "@vor/artworks/mixins/number_wheel";
+import { getAttributeMixin } from "@vor/artworks/mixins/attributes";
 import { VorApi } from "@vor/artworks/api";
 
 document.addEventListener("alpine:init", () => {
@@ -25,12 +26,8 @@ document.addEventListener("alpine:init", () => {
     genres: opts.genres || [],
     tags: opts.tags || [],
     platforms: opts.platforms || [],
-    catalog: opts.catalog || {},
     saveUrl: opts.saveUrl || "",
     relationSearchUrl: opts.relationSearchUrl || "",
-    pickerKind: null,
-    pickerQuery: "",
-    pickerSelected: {},
     ...getDatePickerMixin({
       dateCursor: opts.releaseDate ? new Date(`${opts.releaseDate}T00:00:00`) : new Date(),
     }),
@@ -77,6 +74,7 @@ document.addEventListener("alpine:init", () => {
       ageChoices: opts.ageChoices,
     }),
     ...getNumberWheelMixin(),
+    ...getAttributeMixin({ catalogs: { [opts.workType]: opts.catalog || {} } }),
     closeOverlay() {
       return closeOverlayImpl();
     },
@@ -232,39 +230,6 @@ document.addEventListener("alpine:init", () => {
           }
         });
       }
-    },
-    removeChip(kind, id) {
-      this[kind] = this[kind].filter((item) => item.id !== id);
-    },
-    togglePicker(kind) {
-      if (this.pickerKind === kind) {
-        this.closePicker();
-        return;
-      }
-      this.pickerKind = kind;
-      this.pickerQuery = "";
-      this.pickerSelected = {};
-    },
-    closePicker() {
-      this.pickerKind = null;
-      this.pickerQuery = "";
-      this.pickerSelected = {};
-    },
-    pickerOptions(kind) {
-      const selected = new Set((this[kind] || []).map((item) => item.id));
-      const query = String(this.pickerQuery || "").trim().toLowerCase();
-      return (this.catalog[kind] || []).filter((item) => {
-        if (selected.has(item.id)) {
-          return false;
-        }
-        return !query || item.name.toLowerCase().includes(query);
-      });
-    },
-    addPickerItem(kind, opt) {
-      if (this[kind].some((item) => item.id === opt.id)) {
-        return;
-      }
-      this[kind] = [...this[kind], opt];
     },
     isPlatformOwned(id) {
       return this.ownedPlatformIds.map(Number).includes(Number(id));

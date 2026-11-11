@@ -5,6 +5,7 @@ import { getDatePickerMixin } from "@vor/artworks/mixins/datepicker";
 import { getCoverMixin, getStatusMixin, getRatingMixin, getProgressMixin, getRelationsMixin, getAttachMixin } from "@vor/artworks/overlay_mixins";
 import { getAgePickerMixin } from "@vor/artworks/mixins/age_picker";
 import { getNumberWheelMixin } from "@vor/artworks/mixins/number_wheel";
+import { getAttributeMixin } from "@vor/artworks/mixins/attributes";
 import { wheelDirection } from "@vor/shared/pure/wheel";
 import { VorApi } from "@vor/artworks/api";
 
@@ -30,7 +31,6 @@ document.addEventListener("alpine:init", () => {
     genres: [],
     tags: [],
     platforms: [],
-    catalogs: opts.catalogs || {},
     requiredFieldsByType: opts.requiredFields || {},
     saveUrl: opts.saveUrl || "",
     searchUrl: opts.searchUrl || "",
@@ -56,14 +56,7 @@ document.addEventListener("alpine:init", () => {
     ...getAttachMixin({ attachUrl: opts.attachUrl }),
     ...getAgePickerMixin({ ageChoices: opts.ageChoices }),
     ...getNumberWheelMixin(),
-    get catalog() {
-      return this.catalogs[this.workType] || {
-        authors: [],
-        genres: [],
-        tags: [],
-        platforms: [],
-      };
-    },
+    ...getAttributeMixin({ catalogs: opts.catalogs }),
     closeOverlay() {
       return closeOverlayImpl();
     },
@@ -161,22 +154,6 @@ document.addEventListener("alpine:init", () => {
         target: "#work-suggestions",
         swap: "innerHTML",
       });
-    },
-    filterCatalog(kind, query) {
-      const q = String(query || "").trim().toLowerCase();
-      return (this.catalog[kind] || []).filter((item) => (
-        !q || String(item.name || "").toLowerCase().includes(q)
-      ));
-    },
-    hasAttr(kind, id) {
-      return (this[kind] || []).some((item) => Number(item.id) === Number(id));
-    },
-    toggleAttr(kind, opt) {
-      if (this.hasAttr(kind, opt.id)) {
-        this[kind] = this[kind].filter((item) => Number(item.id) !== Number(opt.id));
-        return;
-      }
-      this[kind] = [...this[kind], opt];
     },
     requiredFields() {
       const base = this.requiredFieldsByType[this.workType] || [];
