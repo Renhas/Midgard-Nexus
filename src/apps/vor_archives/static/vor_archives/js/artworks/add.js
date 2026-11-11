@@ -37,7 +37,7 @@ document.addEventListener("alpine:init", () => {
     ...getStatusMixin({ choices: opts.statusChoices }),
     ...getRatingMixin(),
     ...getProgressMixin(),
-    ...getRelationsMixin({ relationTypes: opts.relationTypes }),
+    ...getRelationsMixin({ relationTypes: opts.relationTypes, isAdd: true }),
     ...getAttachMixin({ attachUrl: opts.attachUrl }),
     ...getWorkFieldsMixin({ workType: opts.workType || "book" }),
     ...getAgePickerMixin({ ageChoices: opts.ageChoices }),

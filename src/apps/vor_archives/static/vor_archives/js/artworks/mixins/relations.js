@@ -8,16 +8,21 @@ import {
 export function getRelationsMixin({
   relations = [],
   relationTypes = [],
+  isAdd = false,
 } = {}) {
   return {
     relations,
     relationTypes,
+    isAdd: Boolean(isAdd),
     relAdding: false,
     relQuery: "",
     relResults: [],
     relPick: null,
     relPickType: "other",
     relTypeEdit: null,
+    relationsEditable() {
+      return this.isAdd || this.editing === true;
+    },
     allowedRelationTypes(otherType) {
       return pureAllowedRelationTypes(this.relationTypes, otherType, this.workType);
     },

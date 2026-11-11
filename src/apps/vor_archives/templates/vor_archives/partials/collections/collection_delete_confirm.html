@@ -8,10 +8,7 @@
         Произведения останутся в медиатеке.
       </div>
     {% endif %}
-    <form class="vor-modal-actions"
-          hx-post="{% url 'vor_archives:collections:delete' collection.pk %}"
-          hx-target="#vor-modal"
-          hx-swap="innerHTML">
+    <form class="vor-modal-actions" hx-post="{% url 'vor_archives:collections:delete' collection.pk %}" hx-swap="none">
       {% csrf_token %}
       <button type="button" class="sidebar-btn" @click="$dispatch('vor:close-modal')">Отмена</button>
       <button type="submit" class="sidebar-btn sidebar-btn-delete">Удалить</button>

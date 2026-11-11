@@ -31,13 +31,22 @@
       {% endif %}
     </div>
   </div>
-  <form class="vor-overlay-body"
-        x-ref="editForm"
-        {% if owned %} hx-post="{% url 'vor_archives:artworks:detail' user_work.pk %}" {% else %} hx-post="{% url 'vor_archives:artworks:work' work_type work.pk %}" {% endif %}
-        hx-target="#vor-overlay"
-        hx-swap="innerHTML"
-        hx-encoding="multipart/form-data"
-        @submit="prepareSubmit($event)">
+  {% if is_staff %}
+    {% if owned %}
+      {% url 'vor_archives:artworks:detail' user_work.pk as form_action %}
+    {% else %}
+      {% url 'vor_archives:artworks:work' work_type work.pk as form_action %}
+    {% endif %}
+    <form class="vor-overlay-body"
+          x-ref="editForm"
+          hx-post="{{ form_action }}"
+          hx-target="#vor-overlay"
+          hx-swap="innerHTML"
+          hx-encoding="multipart/form-data"
+          @submit="prepareSubmit($event)">
+  {% else %}
+    <form class="vor-overlay-body" x-ref="editForm" @submit.prevent>
+  {% endif %}
     {% csrf_token %}
     <input type="hidden" name="global_edit" value="1">
     <input type="hidden" name="cover_clear" :value="coverCleared ? '1' : ''">
@@ -180,10 +189,13 @@
             <div class="vor-view-meta-row" x-show="lastCompletedDate || timesCompleted > 0" x-cloak>
               Завершено <span x-text="lastCompletedDate">{{ user_work.last_completed_date|date:'d.m.Y' }}</span>
               <span class="vor-view-counter"
+                    role="button"
+                    tabindex="0"
                     :class="{ 'is-hot': counterHover || counterEditing }"
                     @mouseenter="counterHover = true"
                     @mouseleave="counterHover = false"
-                    @click="startCounterEdit()">
+                    @click="startCounterEdit()"
+                    @keydown.enter.prevent="startCounterEdit()">
                 <span x-show="!counterEditing" x-text="timesCompleted">{{ user_work.times_completed }}</span>
                 <input class="vor-view-counter-input"
                        x-show="counterEditing"

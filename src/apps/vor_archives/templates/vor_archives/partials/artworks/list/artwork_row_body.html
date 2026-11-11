@@ -1,9 +1,12 @@
 {% load vor_archives_extras %}
 <div class="artwork-row"
+     role="button"
+     tabindex="0"
+     aria-label="{{ user_work.work.title }}"
      hx-get="{% url 'vor_archives:artworks:detail' user_work.pk %}"
      hx-target="#vor-overlay"
      hx-swap="innerHTML"
-     @contextmenu.prevent="$store.vorArtworks.openArtworkMenu($event, $el.closest('.artwork-item'))">
+     hx-trigger="click, keyup[key=='Enter']">
   <div class="artwork-row-check">
     <span class="custom-checkbox"></span>
   </div>
@@ -29,6 +32,7 @@
 <div class="artwork-row-delete-slot">
   <button type="button"
           class="sidebar-btn sidebar-btn-delete sidebar-btn-icon artwork-row-delete"
+          tabindex="-1"
           title="Удалить"
           @click.stop
           hx-get="{% url 'vor_archives:artworks:delete_preview' %}?ids={{ user_work.pk }}"
