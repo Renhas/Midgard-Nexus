@@ -6,12 +6,33 @@ import { getCoverMixin, getStatusMixin, getRatingMixin, getProgressMixin, getRel
 import { getAgePickerMixin } from "@vor/artworks/mixins/age_picker";
 import { getNumberWheelMixin } from "@vor/artworks/mixins/number_wheel";
 import { getAttributeMixin } from "@vor/artworks/mixins/attributes";
+import { serializeDraft, parseDraft, dirtyChanges as dirtyChangesPure } from "@vor/artworks/pure/draft";
+import {
+  captureQuickState as captureQuickStatePure,
+  restoreQuickState as restoreQuickStatePure,
+  applyQuickResult as applyQuickResultPure,
+} from "@vor/artworks/pure/quick_state";
 import { VorApi } from "@vor/artworks/api";
+
+const DRAFT_FIELD_LABELS = {
+  title: "Название",
+  description: "Описание",
+  releaseDate: "Дата релиза",
+  ageRating: "Возрастной рейтинг",
+  externalLink: "Ссылка",
+  pages: "Страницы",
+  durationMinutes: "Длительность",
+  episodeCount: "Эпизоды",
+  authors: "Авторы",
+  genres: "Жанры",
+  tags: "Теги",
+  platforms: "Платформы",
+  relations: "Связи",
+};
 
 document.addEventListener("alpine:init", () => {
   getAlpine().data("vorDetailOverlay", (opts = {}) => ({
     editing: Boolean(opts.editing),
-    globalEdit: Boolean(opts.globalEdit),
     workType: opts.workType || "",
     workId: opts.workId || null,
     filmType: opts.filmType || "movie",
@@ -66,8 +87,8 @@ document.addEventListener("alpine:init", () => {
     }),
     ...getAttachMixin({ attachUrl: opts.attachUrl }),
     init() {
-      this.snapshot = this.serializeDraft();
-      this.serverQuickState = this.captureQuickState();
+      this.snapshot = serializeDraft(this);
+      this.serverQuickState = captureQuickStatePure(this);
     },
     ...getAgePickerMixin({
       ageRating: opts.ageRating || "",
@@ -76,39 +97,16 @@ document.addEventListener("alpine:init", () => {
     ...getNumberWheelMixin(),
     ...getAttributeMixin({ catalogs: { [opts.workType]: opts.catalog || {} } }),
     ...getOverlayLifecycleMixin(),
-    captureQuickState() {
-      return {
-        status: this.status,
-        rating: this.rating,
-        progress: this.progress,
-        isHidden: this.isHidden,
-        timesCompleted: this.timesCompleted,
-        ownedPlatformIds: [...this.ownedPlatformIds],
-        lastCompletedDate: this.lastCompletedDate,
-      };
-    },
-    restoreQuickState(snap) {
-      if (!snap) {
-        return;
-      }
-      this.status = snap.status;
-      this.rating = snap.rating;
-      this.progress = snap.progress;
-      this.isHidden = snap.isHidden;
-      this.timesCompleted = snap.timesCompleted;
-      this.ownedPlatformIds = snap.ownedPlatformIds;
-      this.lastCompletedDate = snap.lastCompletedDate;
-    },
     startEdit() {
       this.editing = true;
       this.coverWarning = "";
-      this.snapshot = this.serializeDraft();
+      this.snapshot = serializeDraft(this);
     },
     cancelEdit() {
       this.leaveOr(() => this.revertEdit());
     },
     revertEdit() {
-      const data = JSON.parse(this.snapshot || "{}");
+      const data = parseDraft(this.snapshot);
       this.title = data.title || "";
       this.description = data.description || "";
       this.releaseDate = data.releaseDate || "";
@@ -130,57 +128,18 @@ document.addEventListener("alpine:init", () => {
       this.editing = false;
       this.leaveConfirmOpen = false;
     },
-    serializeDraft() {
-      return JSON.stringify({
-        title: this.title,
-        description: this.description,
-        releaseDate: this.releaseDate,
-        ageRating: this.ageRating,
-        externalLink: this.externalLink,
-        pages: this.pages,
-        durationMinutes: this.durationMinutes,
-        episodeCount: this.episodeCount,
-        authors: this.authors,
-        genres: this.genres,
-        tags: this.tags,
-        platforms: this.platforms,
-        relations: this.relations,
-        coverPreview: this.coverPreview,
-        coverCleared: this.coverCleared,
-        coverName: this.coverFile?.name || "",
-      });
-    },
     dirtyChanges() {
       if (!this.editing) {
         return [];
       }
-      const labels = {
-        title: "Название",
-        description: "Описание",
-        releaseDate: "Дата релиза",
-        ageRating: "Возрастной рейтинг",
-        externalLink: "Ссылка",
-        pages: "Страницы",
-        durationMinutes: "Длительность",
-        episodeCount: "Эпизоды",
-        authors: "Авторы",
-        genres: "Жанры",
-        tags: "Теги",
-        platforms: "Платформы",
-        relations: "Связи",
-      };
-      const before = JSON.parse(this.snapshot || "{}");
-      const after = JSON.parse(this.serializeDraft());
-      const changes = [];
-      Object.keys(labels).forEach((key) => {
-        if (JSON.stringify(before[key] ?? "") !== JSON.stringify(after[key] ?? "")) {
-          changes.push(labels[key]);
-        }
-      });
-      if (this.coverFile || this.coverCleared) {
-        changes.push("Обложка");
-      }
-      return changes;
+      const before = parseDraft(this.snapshot);
+      const after = parseDraft(serializeDraft(this));
+      return dirtyChangesPure(
+        before,
+        after,
+        DRAFT_FIELD_LABELS,
+        Boolean(this.coverFile || this.coverCleared),
+      );
     },
     tryLeave(proceed) {
       const changes = this.dirtyChanges();
@@ -305,47 +264,21 @@ document.addEventListener("alpine:init", () => {
       this.timesCompleted = Math.max(0, parsed);
       this.saveField("times_completed", this.timesCompleted);
     },
-    applyQuickResult(data) {
-      if (!data || typeof data !== "object") {
-        return;
-      }
-      if (data.status) {
-        this.status = data.status;
-      }
-      if (data.progress != null) {
-        this.progress = Number(data.progress);
-      }
-      if (data.times_completed != null) {
-        this.timesCompleted = Number(data.times_completed);
-      }
-      if (Object.prototype.hasOwnProperty.call(data, "last_completed_date")) {
-        this.lastCompletedDate = data.last_completed_date || "";
-      }
-      if (Array.isArray(data.owned_platform_ids)) {
-        this.ownedPlatformIds = data.owned_platform_ids.map(Number);
-      }
-    },
     async saveField(field, value) {
       if (!this.quickUrl || this.attachOpen) return;
       const seq = ++this._quickSeq;
       const data = await VorApi.quickUpdate(this.quickUrl, field, value);
       if (seq !== this._quickSeq) return;
       if (!data || typeof data !== "object") {
-        this.restoreQuickState(this.serverQuickState);
+        restoreQuickStatePure(this, this.serverQuickState);
         return;
       }
-      this.applyQuickResult(data);
-      this.serverQuickState = this.captureQuickState();
+      applyQuickResultPure(this, data);
+      this.serverQuickState = captureQuickStatePure(this);
       this.refreshList();
     },
     startAttach() {
-      this.status = "planning";
-      this.statusOpen = false;
-      this.rating = 0;
-      this.hoverRating = 0;
-      this.progress = 0;
-      this.progressEditing = false;
-      this.progressHover = false;
+      this.resetAttachFields();
       this.attachOpen = true;
     },
     onAttachSuccess() {

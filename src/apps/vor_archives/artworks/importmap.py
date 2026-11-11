@@ -27,6 +27,8 @@ _OWN_IMPORTMAP_PATHS = {
     "@vor/artworks/pure/popover": "vor_archives/js/artworks/pure/popover.js",
     "@vor/artworks/pure/catalogs": "vor_archives/js/artworks/pure/catalogs.js",
     "@vor/artworks/pure/form_state": "vor_archives/js/artworks/pure/form_state.js",
+    "@vor/artworks/pure/draft": "vor_archives/js/artworks/pure/draft.js",
+    "@vor/artworks/pure/quick_state": "vor_archives/js/artworks/pure/quick_state.js",
     "@vor/artworks/mixins/attach": "vor_archives/js/artworks/mixins/attach.js",
     "@vor/artworks/mixins/cover": "vor_archives/js/artworks/mixins/cover.js",
     "@vor/artworks/mixins/progress": "vor_archives/js/artworks/mixins/progress.js",
