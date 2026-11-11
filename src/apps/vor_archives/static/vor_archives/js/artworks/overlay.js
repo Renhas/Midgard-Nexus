@@ -47,7 +47,6 @@ document.addEventListener("alpine:init", () => {
     genres: opts.genres || [],
     tags: opts.tags || [],
     platforms: opts.platforms || [],
-    saveUrl: opts.saveUrl || "",
     relationSearchUrl: opts.relationSearchUrl || "",
     ...getDatePickerMixin({
       dateCursor: opts.releaseDate ? new Date(`${opts.releaseDate}T00:00:00`) : new Date(),
@@ -70,7 +69,6 @@ document.addEventListener("alpine:init", () => {
     quickUrl: opts.quickUrl || "",
     _quickSeq: 0,
     serverQuickState: null,
-    listUrl: opts.listUrl || "",
     workUrl: opts.workUrl || "",
     ...getCoverMixin({ coverPreview: opts.coverUrl || "" }),
     ...getStatusMixin({ status: opts.status || "planning", choices: opts.statusChoices }),

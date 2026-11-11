@@ -29,7 +29,6 @@ document.addEventListener("alpine:init", () => {
     saveUrl: opts.saveUrl || "",
     searchUrl: opts.searchUrl || "",
     previewUrl: opts.previewUrl || "",
-    listUrl: opts.listUrl || "",
     relationSearchUrl: opts.relationSearchUrl || "",
     selectedWorkId: null,
     createdWorkId: null,
