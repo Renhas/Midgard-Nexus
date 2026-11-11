@@ -1,5 +1,6 @@
 {% extends "vor_archives/base_vor.html" %}
 {% load static %}
+{% load vor_archives_extras %}
 {% block title %}{{ block.super }} - Произведения{% endblock %}
 {% block extra_head %}
   {{ block.super }}
@@ -68,11 +69,9 @@
           <i class="bi bi-arrow-counterclockwise"></i>
         </button>
       </div>
-      {% include "vor_archives/partials/artworks/sidebar/filter_accordion.html" with title="Статус" options=status_options name="status" %}
-      {% include "vor_archives/partials/artworks/sidebar/filter_accordion.html" with title="Возрастной рейтинг" options=age_rating_options name="age_rating" %}
-      {% include "vor_archives/partials/artworks/sidebar/filter_accordion.html" with title="Теги" options=tags_options name="tags" searchable=True %}
-      {% include "vor_archives/partials/artworks/sidebar/filter_accordion.html" with title="Жанры" nested=genres_nested %}
-      {% include "vor_archives/partials/artworks/sidebar/filter_accordion.html" with title="Платформы" options=platform_options name="platform" show_condition="$store.vorArtworks.workTypes.includes('game')" searchable=True %}
+      {% for section in filter_sections %}
+        {% render_filter_accordion section %}
+      {% endfor %}
     </div>
   </div>
 {% endblock %}

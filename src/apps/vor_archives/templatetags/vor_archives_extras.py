@@ -75,3 +75,15 @@ def feed_action_icon(item):
     if not item:
         return "bi bi-circle"
     return FEED_ACTION_ICONS.get(item.action_type, "bi bi-circle")
+
+
+@register.inclusion_tag("vor_archives/partials/artworks/sidebar/filter_accordion.html")
+def render_filter_accordion(section):
+    return {
+        "title": section.get("title"),
+        "options": section.get("options"),
+        "name": section.get("name"),
+        "nested": section.get("nested"),
+        "searchable": section.get("searchable", False),
+        "show_condition": section.get("show_condition"),
+    }

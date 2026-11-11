@@ -85,6 +85,24 @@ def index(request):
                 }
             )
 
+    filter_sections = [
+        {"title": "Статус", "options": status_options(), "name": "status"},
+        {
+            "title": "Возрастной рейтинг",
+            "options": age_rating_options(),
+            "name": "age_rating",
+        },
+        {"title": "Теги", "options": tags_options, "name": "tags", "searchable": True},
+        {"title": "Жанры", "nested": genres_nested},
+        {
+            "title": "Платформы",
+            "options": platform_options,
+            "name": "platform",
+            "show_condition": "$store.vorArtworks.workTypes.includes('game')",
+            "searchable": True,
+        },
+    ]
+
     return render(
         request,
         "vor_archives/artworks.html",
@@ -94,11 +112,7 @@ def index(request):
             "module_color": module["color"],
             "active_section": "artworks",
             "collections": collections,
-            "status_options": status_options(),
-            "age_rating_options": age_rating_options(),
-            "tags_options": tags_options,
-            "platform_options": platform_options,
-            "genres_nested": genres_nested,
+            "filter_sections": filter_sections,
             "sort_fields": [
                 {"value": "custom", "label": "Свой порядок"},
                 {"value": "title", "label": "Название"},
