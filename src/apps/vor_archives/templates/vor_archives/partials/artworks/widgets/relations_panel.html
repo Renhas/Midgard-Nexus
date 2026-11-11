@@ -1,67 +1,35 @@
-{% if not is_add %}
-  <aside class="vor-view-relations">
-    <div class="vor-relations-head">
-      <div class="vor-relations-head-side">
-        <button type="button"
-                class="sidebar-btn sidebar-btn-icon vor-relations-head-btn"
-                x-show="editing && relAdding"
-                x-cloak
-                title="Назад"
-                @click="cancelRelationAdd()">
-          <i class="bi bi-arrow-left"></i>
-        </button>
-      </div>
-      <h3 class="vor-relations-title" x-text="relAdding ? 'Добавление' : 'Связи'">Связи</h3>
-      <div class="vor-relations-head-side">
-        <button type="button"
-                class="sidebar-btn sidebar-btn-add sidebar-btn-icon vor-relations-head-btn"
-                x-show="editing && !relAdding"
-                x-cloak
-                title="Добавить связь"
-                @click="startRelationAdd()">
-          <i class="bi bi-plus-lg"></i>
-        </button>
-        <button type="button"
-                class="sidebar-btn sidebar-btn-add sidebar-btn-icon vor-relations-head-btn"
-                x-show="editing && relAdding"
-                x-cloak
-                title="Сохранить связь"
-                @click="commitRelationAdd()">
-          <i class="bi bi-floppy2"></i>
-        </button>
-      </div>
+<section class="{% if is_add %}vor-overlay-section vor-add-relations{% else %}vor-view-relations{% endif %}">
+  <div class="vor-relations-head">
+    <div class="vor-relations-head-side">
+      <button type="button"
+              class="sidebar-btn sidebar-btn-icon vor-relations-head-btn"
+              x-show="relationsEditable() && relAdding"
+              x-cloak
+              title="Назад"
+              @click="cancelRelationAdd()">
+        <i class="bi bi-arrow-left"></i>
+      </button>
     </div>
-{% else %}
-  <section class="vor-overlay-section vor-add-relations">
-    <div class="vor-add-section-head">
-      <h3 x-text="relAdding ? 'Добавление' : 'Связи'">Связи</h3>
-      <div class="vor-add-section-actions">
-        <button type="button"
-                class="sidebar-btn sidebar-btn-icon vor-relations-head-btn"
-                x-show="relAdding"
-                x-cloak
-                title="Назад"
-                @click="cancelRelationAdd()">
-          <i class="bi bi-arrow-left"></i>
-        </button>
-        <button type="button"
-                class="sidebar-btn sidebar-btn-add sidebar-btn-icon vor-relations-head-btn"
-                x-show="!relAdding"
-                title="Добавить связь"
-                @click="startRelationAdd()">
-          <i class="bi bi-plus-lg"></i>
-        </button>
-        <button type="button"
-                class="sidebar-btn sidebar-btn-add sidebar-btn-icon vor-relations-head-btn"
-                x-show="relAdding"
-                x-cloak
-                title="Сохранить связь"
-                @click="commitRelationAdd()">
-          <i class="bi bi-floppy2"></i>
-        </button>
-      </div>
+    <h3 class="vor-relations-title" x-text="relAdding ? 'Добавление' : 'Связи'">Связи</h3>
+    <div class="vor-relations-head-side">
+      <button type="button"
+              class="sidebar-btn sidebar-btn-add sidebar-btn-icon vor-relations-head-btn"
+              x-show="relationsEditable() && !relAdding"
+              x-cloak
+              title="Добавить связь"
+              @click="startRelationAdd()">
+        <i class="bi bi-plus-lg"></i>
+      </button>
+      <button type="button"
+              class="sidebar-btn sidebar-btn-add sidebar-btn-icon vor-relations-head-btn"
+              x-show="relationsEditable() && relAdding"
+              x-cloak
+              title="Сохранить связь"
+              @click="commitRelationAdd()">
+        <i class="bi bi-floppy2"></i>
+      </button>
     </div>
-{% endif %}
+  </div>
   <div class="vor-relations-list" x-show="!relAdding">
     <template x-for="item in relations" :key="item.id || (item.type_key + '-' + item.work_id)">
       <div class="vor-relation-item"
@@ -153,8 +121,4 @@
       </div>
     </div>
   </div>
-  {% if not is_add %}
-    </aside>
-  {% else %}
-    </section>
-  {% endif %}
+</section>
