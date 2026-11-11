@@ -221,8 +221,9 @@ document.addEventListener("alpine:init", () => {
         return;
       }
       const rect = el.getBoundingClientRect();
-      tipEl.style.left = `${rect.left}px`;
-      tipEl.style.top = `${rect.bottom + 6}px`;
+      tipEl.style.setProperty("--tip-left", `${rect.left}px`);
+      tipEl.style.setProperty("--tip-top", `${rect.bottom + 6}px`);
+      tipEl.style.setProperty("--tip-shift-y", "0px");
     },
     openRelated(item) {
       this.leaveOr(() => {

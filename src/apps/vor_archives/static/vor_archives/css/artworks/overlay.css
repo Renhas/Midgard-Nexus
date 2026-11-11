@@ -776,6 +776,10 @@
   display: block;
 }
 
+.vor-chip-tip.is-below {
+  transform: none;
+}
+
 .vor-chip-list.is-editing {
   flex-wrap: wrap;
 }

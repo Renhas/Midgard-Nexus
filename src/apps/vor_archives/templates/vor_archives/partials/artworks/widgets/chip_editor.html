@@ -7,7 +7,7 @@
         <button type="button" class="vor-chip-remove" title="Отвязать" @click.stop="removeChip('{{ kind }}', item.id)">
           <i class="bi bi-x"></i>
         </button>
-        <span class="vor-chip-tip" x-show="item.tip" x-text="item.tip"></span>
+        <span class="vor-chip-tip is-below" x-show="item.tip" x-text="item.tip"></span>
       </span>
     </template>
     <div class="vor-chip-picker-wrap" @click.outside="pickerKind === '{{ kind }}' && closePicker()">
