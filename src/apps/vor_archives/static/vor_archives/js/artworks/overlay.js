@@ -25,8 +25,6 @@ document.addEventListener("alpine:init", () => {
     tags: opts.tags || [],
     platforms: opts.platforms || [],
     catalog: opts.catalog || {},
-    relations: opts.relations || [],
-    relationTypes: opts.relationTypes || [],
     ageChoices: opts.ageChoices || [],
     saveUrl: opts.saveUrl || "",
     relationSearchUrl: opts.relationSearchUrl || "",
@@ -38,12 +36,6 @@ document.addEventListener("alpine:init", () => {
       dateCursor: opts.releaseDate ? new Date(`${opts.releaseDate}T00:00:00`) : new Date(),
     }),
     linkOpen: false,
-    relAdding: false,
-    relQuery: "",
-    relResults: [],
-    relPick: null,
-    relPickType: "other",
-    relTypeEdit: null,
     leaveConfirmOpen: false,
     attachOpen: false,
     saving: false,
@@ -73,7 +65,10 @@ document.addEventListener("alpine:init", () => {
       progressUnit: opts.progressUnit || "",
       progressStep: Number(opts.progressStep || 1),
     }),
-    ...getRelationsMixin(),
+    ...getRelationsMixin({
+      relations: opts.relations,
+      relationTypes: opts.relationTypes,
+    }),
     ...getAttachMixin(),
     init() {
       this.snapshot = this.serializeDraft();

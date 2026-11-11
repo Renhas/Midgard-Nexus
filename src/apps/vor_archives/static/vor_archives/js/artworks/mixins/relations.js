@@ -5,8 +5,19 @@ import {
   relationLabelFor as pureRelationLabelFor,
 } from "@vor/artworks/pure/relations";
 
-export function getRelationsMixin() {
+export function getRelationsMixin({
+  relations = [],
+  relationTypes = [],
+} = {}) {
   return {
+    relations,
+    relationTypes,
+    relAdding: false,
+    relQuery: "",
+    relResults: [],
+    relPick: null,
+    relPickType: "other",
+    relTypeEdit: null,
     allowedRelationTypes(otherType) {
       return pureAllowedRelationTypes(this.relationTypes, otherType, this.workType);
     },

@@ -37,14 +37,6 @@ document.addEventListener("alpine:init", () => {
     attachUrl: opts.attachUrl || "",
     listUrl: opts.listUrl || "",
     relationSearchUrl: opts.relationSearchUrl || "",
-    relationTypes: opts.relationTypes || [],
-    relations: [],
-    relAdding: false,
-    relQuery: "",
-    relResults: [],
-    relPick: null,
-    relPickType: "other",
-    relTypeEdit: null,
     selectedWorkId: null,
     createdWorkId: null,
     createdWorkType: "",
@@ -61,7 +53,7 @@ document.addEventListener("alpine:init", () => {
     ...getStatusMixin({ choices: opts.statusChoices }),
     ...getRatingMixin(),
     ...getProgressMixin(),
-    ...getRelationsMixin(),
+    ...getRelationsMixin({ relationTypes: opts.relationTypes }),
     ...getAttachMixin(),
     get catalog() {
       return this.catalogs[this.workType] || {
