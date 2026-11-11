@@ -6,10 +6,11 @@ import {
   yearGridStart,
   buildYearCells,
 } from "@vor/artworks/pure/dates";
-import { wheelDirection } from "@vor/shared/pure/wheel";
 
-export function datePickerApi() {
+export function getDatePickerMixin({ dateCursor = null } = {}) {
   return {
+    dateOpen: false,
+    dateCursor,
     dateView: "days",
     formatDate(iso) {
       if (!iso) {
@@ -108,43 +109,6 @@ export function datePickerApi() {
     },
     setTodayDate() {
       this.setReleaseDate(toIsoDate(new Date()));
-    },
-    onNumberWheel(event, field, min = 1, max = null) {
-      const direction = wheelDirection(event.deltaY);
-      if (!direction) {
-        return;
-      }
-      const raw = this[field];
-      const value = raw === "" || raw == null ? 0 : Number(raw);
-      const current = Number.isFinite(value) ? value : 0;
-      let next = current + direction;
-      if (next < min) {
-        next = current === 0 && direction < 0 ? 0 : min;
-      }
-      if (max != null && next > max) {
-        next = max;
-      }
-      this[field] = next < min ? "" : next;
-    },
-    onAgeWheel(event) {
-      const direction = wheelDirection(event.deltaY);
-      if (!direction) {
-        return;
-      }
-      const options = [""].concat((this.ageChoices || []).map((item) => item.value));
-      const index = Math.max(0, options.indexOf(this.ageRating || ""));
-      const next = Math.max(0, Math.min(options.length - 1, index + direction));
-      this.ageRating = options[next];
-    },
-    onFilmTypeWheel(event) {
-      const direction = wheelDirection(event.deltaY);
-      if (!direction) {
-        return;
-      }
-      const options = ["movie", "tv_show"];
-      const index = Math.max(0, options.indexOf(this.filmType || "movie"));
-      const next = Math.max(0, Math.min(options.length - 1, index + direction));
-      this.filmType = options[next];
     },
   };
 }

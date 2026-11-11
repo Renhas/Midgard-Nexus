@@ -1,54 +1,27 @@
 import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
-import { closeOverlay as closeOverlayImpl } from "@vor/shared/overlay_lifecycle";
-import { datePickerApi } from "@vor/artworks/datepicker";
-import { getCoverMixin, getStatusMixin, getRatingMixin, getProgressMixin, getRelationsMixin, getAttachMixin } from "@vor/artworks/overlay_mixins";
+import { getOverlayLifecycleMixin } from "@vor/artworks/mixins/overlay_lifecycle";
+import { getDatePickerMixin } from "@vor/artworks/mixins/datepicker";
+import { getAttachMixin } from "@vor/artworks/mixins/attach";
+import { getCoverMixin } from "@vor/artworks/mixins/cover";
+import { getProgressMixin } from "@vor/artworks/mixins/progress";
+import { getRatingMixin } from "@vor/artworks/mixins/rating";
+import { getRelationsMixin } from "@vor/artworks/mixins/relations";
+import { getStatusMixin } from "@vor/artworks/mixins/status";
+import { getAgePickerMixin } from "@vor/artworks/mixins/age_picker";
+import { getNumberWheelMixin } from "@vor/artworks/mixins/number_wheel";
+import { getAttributeMixin } from "@vor/artworks/mixins/attributes";
+import { getWorkFieldsMixin } from "@vor/artworks/mixins/work_fields";
+import { getValidationMixin } from "@vor/artworks/mixins/validation";
+import { wheelDirection } from "@vor/shared/pure/wheel";
 import { VorApi } from "@vor/artworks/api";
 
 document.addEventListener("alpine:init", () => {
-  const FIELD_TO_STATE = {
-    title: { key: "title", trim: true },
-    pages: { key: "pages" },
-    duration_minutes: { key: "durationMinutes" },
-    episode_count: { key: "episodeCount" },
-  };
-
   getAlpine().data("vorAddOverlay", (opts = {}) => ({
-    workType: opts.workType || "book",
-    title: "",
-    description: "",
-    releaseDate: "",
-    ageRating: "",
-    externalLink: "",
-    pages: "",
-    durationMinutes: "",
-    episodeCount: "",
-    filmType: "movie",
-    coverPreview: "",
-    coverWarning: "",
-    coverFile: null,
-    authors: [],
-    genres: [],
-    tags: [],
-    platforms: [],
-    catalogs: opts.catalogs || {},
-    ageChoices: opts.ageChoices || [],
-    statusChoices: opts.statusChoices || [],
-    requiredFieldsByType: opts.requiredFields || {},
     saveUrl: opts.saveUrl || "",
     searchUrl: opts.searchUrl || "",
     previewUrl: opts.previewUrl || "",
-    attachUrl: opts.attachUrl || "",
-    listUrl: opts.listUrl || "",
     relationSearchUrl: opts.relationSearchUrl || "",
-    relationTypes: opts.relationTypes || [],
-    relations: [],
-    relAdding: false,
-    relQuery: "",
-    relResults: [],
-    relPick: null,
-    relPickType: "other",
-    relTypeEdit: null,
     selectedWorkId: null,
     createdWorkId: null,
     createdWorkType: "",
@@ -58,42 +31,20 @@ document.addEventListener("alpine:init", () => {
     errors: {},
     formError: "",
     doneMessage: "",
-    dateOpen: false,
-    dateCursor: new Date(),
-    ...datePickerApi(),
-    ageOpen: false,
-    status: "planning",
-    statusOpen: false,
-    rating: 0,
-    hoverRating: 0,
-    progress: 0,
-    progressMax: null,
-    progressUnit: "",
-    progressStep: 1,
-    progressEditing: false,
-    progressHover: false,
-    progressDraft: "",
+    ...getDatePickerMixin({ dateCursor: new Date() }),
     searchTimer: null,
     ...getCoverMixin(),
-    ...getStatusMixin(),
+    ...getStatusMixin({ choices: opts.statusChoices }),
     ...getRatingMixin(),
     ...getProgressMixin(),
-    ...getRelationsMixin(),
-    ...getAttachMixin(),
-    get catalog() {
-      return this.catalogs[this.workType] || {
-        authors: [],
-        genres: [],
-        tags: [],
-        platforms: [],
-      };
-    },
-    init() {
-      this.dateCursor = new Date();
-    },
-    closeOverlay() {
-      return closeOverlayImpl();
-    },
+    ...getRelationsMixin({ relationTypes: opts.relationTypes }),
+    ...getAttachMixin({ attachUrl: opts.attachUrl }),
+    ...getWorkFieldsMixin({ workType: opts.workType || "book" }),
+    ...getAgePickerMixin({ ageChoices: opts.ageChoices }),
+    ...getValidationMixin({ requiredFieldsByType: opts.requiredFields }),
+    ...getNumberWheelMixin(),
+    ...getAttributeMixin({ catalogs: opts.catalogs }),
+    ...getOverlayLifecycleMixin(),
     setType(type) {
       if (this.workType === type) {
         return;
@@ -188,70 +139,6 @@ document.addEventListener("alpine:init", () => {
         target: "#work-suggestions",
         swap: "innerHTML",
       });
-    },
-    filterCatalog(kind, query) {
-      const q = String(query || "").trim().toLowerCase();
-      return (this.catalog[kind] || []).filter((item) => (
-        !q || String(item.name || "").toLowerCase().includes(q)
-      ));
-    },
-    hasAttr(kind, id) {
-      return (this[kind] || []).some((item) => Number(item.id) === Number(id));
-    },
-    toggleAttr(kind, opt) {
-      if (this.hasAttr(kind, opt.id)) {
-        this[kind] = this[kind].filter((item) => Number(item.id) !== Number(opt.id));
-        return;
-      }
-      this[kind] = [...this[kind], opt];
-    },
-    setAgeRating(value) {
-      this.ageRating = value;
-      this.ageOpen = false;
-    },
-    requiredFields() {
-      const base = this.requiredFieldsByType[this.workType] || [];
-      const extras = (this.workType === "film" && this.filmType === "tv_show")
-        ? ["episode_count"]
-        : [];
-      return [...base, ...extras];
-    },
-    isRequired(name) {
-      return this.requiredFields().includes(name);
-    },
-    isEmpty(name) {
-      const spec = FIELD_TO_STATE[name];
-      if (!spec) {
-        return false;
-      }
-      const value = this[spec.key];
-      if (spec.trim) {
-        return !String(value || "").trim();
-      }
-      return value === "" || value == null;
-    },
-    showRequired(name) {
-      return this.isRequired(name) && this.isEmpty(name);
-    },
-    fieldInvalid(name) {
-      return this.showRequired(name) || Boolean(this.fieldError(name));
-    },
-    fieldError(name) {
-      const items = this.errors[name];
-      if (!items || !items.length) {
-        return "";
-      }
-      const item = items[0];
-      if (item.persistent) {
-        return item.message || item || "";
-      }
-      if (this.isRequired(name) && !this.isEmpty(name)) {
-        return "";
-      }
-      return item.message || item || "";
-    },
-    formBanner() {
-      return this.fieldError("__all__") || this.formError || "";
     },
     onSuggestionsLoaded(owned) {
       const alreadyOwnedMessage = "Это произведение уже есть в вашем списке";
@@ -354,19 +241,7 @@ document.addEventListener("alpine:init", () => {
       this.closeOverlay();
     },
     resetForm() {
-      this.title = "";
-      this.description = "";
-      this.releaseDate = "";
-      this.ageRating = "";
-      this.externalLink = "";
-      this.pages = "";
-      this.durationMinutes = "";
-      this.episodeCount = "";
-      this.filmType = "movie";
-      this.authors = [];
-      this.genres = [];
-      this.tags = [];
-      this.platforms = [];
+      this.resetWorkFields();
       this.relations = [];
       this.cancelRelationAdd();
       this.clearCover();
@@ -381,9 +256,6 @@ document.addEventListener("alpine:init", () => {
       this.resetAttachFields();
       this.phase = "form";
     },
-    refreshList() {
-      document.body.dispatchEvent(new CustomEvent("vor:reload-list"));
-    },
     onAttachSuccess() {
       this.doneMessage = this.justCreated
         ? "Произведение создано и добавлено в ваш список."
@@ -393,6 +265,16 @@ document.addEventListener("alpine:init", () => {
     },
     onAttachError() {
       this.formError = "Не удалось добавить произведение в список";
+    },
+    onFilmTypeWheel(event) {
+      const direction = wheelDirection(event.deltaY);
+      if (!direction) {
+        return;
+      }
+      const options = ["movie", "tv_show"];
+      const index = Math.max(0, options.indexOf(this.filmType || "movie"));
+      const next = Math.max(0, Math.min(options.length - 1, index + direction));
+      this.filmType = options[next];
     },
   }));
 });

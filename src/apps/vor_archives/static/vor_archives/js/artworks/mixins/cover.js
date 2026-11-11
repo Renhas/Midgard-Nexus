@@ -1,0 +1,55 @@
+import { cropCoverFile } from "@vor/shared/cover";
+
+export function getCoverMixin({
+  coverPreview = "",
+  coverFile = null,
+  coverCleared = false,
+} = {}) {
+  return {
+    coverPreview,
+    coverFile,
+    coverCleared,
+    coverWarning: "",
+    async onCoverSelected(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) {
+        return;
+      }
+      const result = await cropCoverFile(file);
+      this.coverFile = result.file;
+      this.coverCleared = false;
+      this.coverPreview = URL.createObjectURL(result.file);
+      this.coverWarning = result.cropped
+        ? `Обложка была обрезана для соответствия размера: исходный ${result.srcW}×${result.srcH}, итоговый ${result.outW}×${result.outH}`
+        : "";
+      this.assignCoverInput(result.file);
+    },
+    assignCoverInput(file) {
+      const input = this.$refs.coverInput;
+      if (!input || typeof DataTransfer === "undefined") {
+        return;
+      }
+      const transfer = new DataTransfer();
+      transfer.items.add(file);
+      input.files = transfer.files;
+    },
+    clearCover() {
+      this.coverPreview = "";
+      this.coverFile = null;
+      this.coverCleared = true;
+      this.coverWarning = "";
+      if (this.$refs.coverInput) {
+        this.$refs.coverInput.value = "";
+      }
+    },
+    resetCover(preview = "") {
+      this.coverPreview = preview;
+      this.coverFile = null;
+      this.coverCleared = false;
+      this.coverWarning = "";
+      if (this.$refs.coverInput) {
+        this.$refs.coverInput.value = "";
+      }
+    },
+  };
+}

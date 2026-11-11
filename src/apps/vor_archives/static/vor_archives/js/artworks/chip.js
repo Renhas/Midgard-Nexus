@@ -1,4 +1,18 @@
 import { getAlpine } from "@lib/alpine";
+import { allChipsFit, computeVisibleChipCount } from "@vor/artworks/pure/chip_fit";
+import { computeTipLayout, computePopupLayout } from "@vor/artworks/pure/popover";
+
+function tempReveal(el, readWidth) {
+  const prevDisplay = el.style.display;
+  el.style.display = "inline-flex";
+  el.style.visibility = "hidden";
+  el.style.position = "absolute";
+  const width = readWidth();
+  el.style.display = prevDisplay;
+  el.style.visibility = "";
+  el.style.position = "";
+  return width;
+}
 
 document.addEventListener("alpine:init", () => {
   getAlpine().data("vorChipOverflow", () => ({
@@ -38,87 +52,61 @@ document.addEventListener("alpine:init", () => {
       const chips = [...root.querySelectorAll("[data-chip]")];
       const more = this.$refs.more;
       chips.forEach((chip) => {
-        chip.style.display = "";
+        chip.classList.remove("is-chip-hidden");
       });
       const available = root.clientWidth;
       if (available <= 0) {
         return;
       }
       const gap = parseFloat(getComputedStyle(root).columnGap || getComputedStyle(root).gap) || 6.4;
-      let total = 0;
-      chips.forEach((chip, index) => {
-        total += chip.offsetWidth + (index ? gap : 0);
-      });
-      if (total <= available) {
+      const chipWidths = chips.map((chip) => chip.offsetWidth);
+      if (allChipsFit(chipWidths, available, gap)) {
         this.visibleCount = chips.length;
         this.hiddenCount = 0;
         return;
       }
-      let moreWidth = 48;
-      const moreWrap = this.$refs.moreWrap;
-      if (moreWrap) {
-        const prevDisplay = moreWrap.style.display;
-        moreWrap.style.display = "inline-flex";
-        moreWrap.style.visibility = "hidden";
-        moreWrap.style.position = "absolute";
-        moreWidth = (more && more.offsetWidth) || moreWrap.offsetWidth || moreWidth;
-        moreWrap.style.display = prevDisplay;
-        moreWrap.style.visibility = "";
-        moreWrap.style.position = "";
-      } else if (more) {
-        const prevDisplay = more.style.display;
-        more.style.display = "inline-flex";
-        more.style.visibility = "hidden";
-        more.style.position = "absolute";
-        moreWidth = more.offsetWidth || moreWidth;
-        more.style.display = prevDisplay;
-        more.style.visibility = "";
-        more.style.position = "";
-      }
-      let used = 0;
-      let visible = 0;
-      for (let i = 0; i < chips.length; i += 1) {
-        const next = used + (i ? gap : 0) + chips[i].offsetWidth;
-        if (next + gap + moreWidth <= available) {
-          used = next;
-          visible = i + 1;
-        } else {
-          break;
-        }
-      }
+      const moreWidth = this.measureMoreWidth(this.$refs.moreWrap, more);
+      const result = computeVisibleChipCount({ chipWidths, available, gap, moreWidth });
       chips.forEach((chip, index) => {
-        chip.style.display = index < visible ? "" : "none";
+        chip.classList.toggle("is-chip-hidden", index >= result.visibleCount);
       });
-      this.visibleCount = visible;
-      this.hiddenCount = chips.length - visible;
+      this.visibleCount = result.visibleCount;
+      this.hiddenCount = result.hiddenCount;
+    },
+    measureMoreWidth(moreWrap, more) {
+      let moreWidth = 48;
+      if (moreWrap) {
+        return tempReveal(
+          moreWrap,
+          () => (more && more.offsetWidth) || moreWrap.offsetWidth,
+        ) || moreWidth;
+      }
+      if (more) {
+        return tempReveal(more, () => more.offsetWidth) || moreWidth;
+      }
+      return moreWidth;
     },
     placeTip(chip) {
       const tip = chip.querySelector(".vor-chip-tip");
       if (!tip) {
         return;
       }
-      const pad = 8;
       const chipRect = chip.getBoundingClientRect();
-      tip.style.position = "fixed";
-      tip.style.left = `${chipRect.right + 6}px`;
-      tip.style.top = `${chipRect.top + chipRect.height / 2}px`;
-      tip.style.right = "auto";
-      tip.style.bottom = "auto";
-      tip.style.transform = "translateY(-50%)";
+      tip.style.setProperty("--tip-left", `${chipRect.right + 6}px`);
+      tip.style.setProperty("--tip-top", `${chipRect.top + chipRect.height / 2}px`);
+      tip.style.setProperty("--tip-shift-y", "0px");
       this.$nextTick(() => {
-        let rect = tip.getBoundingClientRect();
-        if (rect.right > window.innerWidth - pad) {
-          tip.style.left = `${Math.max(pad, chipRect.left - rect.width - 6)}px`;
-          rect = tip.getBoundingClientRect();
-        }
-        let shiftY = 0;
-        if (rect.bottom > window.innerHeight - pad) {
-          shiftY = window.innerHeight - pad - rect.bottom;
-        }
-        if (rect.top + shiftY < pad) {
-          shiftY = pad - rect.top;
-        }
-        tip.style.transform = `translateY(calc(-50% + ${shiftY}px))`;
+        const tipRect = tip.getBoundingClientRect();
+        const layout = computeTipLayout({
+          chipRect,
+          tipSize: { width: tipRect.width, height: tipRect.height },
+          viewportWidth: window.innerWidth,
+          viewportHeight: window.innerHeight,
+          pad: 8,
+        });
+        tip.style.setProperty("--tip-left", `${layout.left}px`);
+        tip.style.setProperty("--tip-top", `${layout.top}px`);
+        tip.style.setProperty("--tip-shift-y", `${layout.shiftY}px`);
       });
     },
     placePopup() {
@@ -126,19 +114,19 @@ document.addEventListener("alpine:init", () => {
       if (!popup) {
         return;
       }
-      popup.style.top = "calc(100% + 4px)";
-      popup.style.left = "0";
-      popup.style.right = "auto";
-      popup.style.bottom = "auto";
-      const pad = 8;
+      popup.classList.remove("is-flipped-h", "is-flipped-v");
       const rect = popup.getBoundingClientRect();
-      if (rect.right > window.innerWidth - pad) {
-        popup.style.left = "auto";
-        popup.style.right = "0";
+      const layout = computePopupLayout({
+        popupRect: rect,
+        viewportWidth: window.innerWidth,
+        viewportHeight: window.innerHeight,
+        pad: 8,
+      });
+      if (layout.flipH) {
+        popup.classList.add("is-flipped-h");
       }
-      if (rect.bottom > window.innerHeight - pad) {
-        popup.style.top = "auto";
-        popup.style.bottom = "calc(100% + 4px)";
+      if (layout.flipV) {
+        popup.classList.add("is-flipped-v");
       }
     },
   }));

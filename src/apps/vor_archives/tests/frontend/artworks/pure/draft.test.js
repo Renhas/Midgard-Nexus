@@ -1,0 +1,116 @@
+import { describe, expect, it } from "vitest";
+import {
+  serializeDraft,
+  parseDraft,
+  dirtyChanges,
+} from "@vor/artworks/pure/draft";
+
+function makeSource() {
+  return {
+    title: "T",
+    description: "D",
+    releaseDate: "2024-01-01",
+    ageRating: "12+",
+    externalLink: "",
+    pages: 10,
+    durationMinutes: "",
+    episodeCount: "",
+    authors: [{ id: 1 }],
+    genres: [],
+    tags: [],
+    platforms: [],
+    relations: [],
+    coverPreview: "/x.jpg",
+    coverCleared: false,
+    coverFile: null,
+  };
+}
+
+describe("serializeDraft", () => {
+  it("returns json string", () => {
+    expect(serializeDraft({ a: 1 })).toBe('{"a":1}');
+  });
+  it("preserves key order of payload", () => {
+    expect(serializeDraft({ b: 2, a: 1 })).toBe('{"b":2,"a":1}');
+  });
+  it("serializes empty payload", () => {
+    expect(serializeDraft({})).toBe("{}");
+  });
+  it("handles null payload", () => {
+    expect(serializeDraft(null)).toBe("{}");
+  });
+  it("serializes arrays inside payload", () => {
+    expect(serializeDraft({ authors: [{ id: 1 }] }))
+      .toBe('{"authors":[{"id":1}]}');
+  });
+});
+
+describe("parseDraft", () => {
+  it("parses valid json", () => {
+    expect(parseDraft('{"a":1}')).toEqual({ a: 1 });
+  });
+  it("returns {} for empty input", () => {
+    expect(parseDraft("")).toEqual({});
+    expect(parseDraft(null)).toEqual({});
+    expect(parseDraft(undefined)).toEqual({});
+  });
+  it("returns {} for malformed json", () => {
+    expect(parseDraft("not-json")).toEqual({});
+    expect(parseDraft('{"a":')).toEqual({});
+  });
+  it("round-trips serializeDraft", () => {
+    const source = makeSource();
+    expect(parseDraft(serializeDraft(source)).title).toBe("T");
+  });
+  it("returns {} for non-string truthy input", () => {
+    expect(parseDraft(123)).toEqual({});
+    expect(parseDraft({ a: 1 })).toEqual({});
+    expect(parseDraft([])).toEqual({});
+  });
+  it("returns {} for falsy input", () => {
+    expect(parseDraft(0)).toEqual({});
+    expect(parseDraft(false)).toEqual({});
+  });
+});
+
+describe("dirtyChanges", () => {
+  const labels = {
+    title: "Название",
+    description: "Описание",
+    authors: "Авторы",
+  };
+
+  it("returns empty for identical snapshots", () => {
+    expect(dirtyChanges({ title: "a" }, { title: "a" }, labels, false))
+      .toEqual([]);
+  });
+  it("detects scalar change", () => {
+    expect(dirtyChanges({ title: "a" }, { title: "b" }, labels, false))
+      .toEqual(["Название"]);
+  });
+  it("treats missing key as empty string", () => {
+    expect(dirtyChanges({}, { title: "b" }, labels, false))
+      .toEqual(["Название"]);
+    expect(dirtyChanges({ title: "b" }, {}, labels, false))
+      .toEqual(["Название"]);
+  });
+  it("detects array change", () => {
+    expect(dirtyChanges({ authors: [{ id: 1 }] }, { authors: [{ id: 2 }] }, labels, false))
+      .toEqual(["Авторы"]);
+  });
+  it("treats equal arrays as no change", () => {
+    expect(dirtyChanges({ authors: [{ id: 1 }] }, { authors: [{ id: 1 }] }, labels, false))
+      .toEqual([]);
+  });
+  it("appends cover change when flag is set", () => {
+    expect(dirtyChanges({}, {}, labels, true)).toEqual(["Обложка"]);
+  });
+  it("does not append cover when flag is false", () => {
+    expect(dirtyChanges({ title: "a" }, { title: "b" }, labels, false))
+      .toEqual(["Название"]);
+  });
+  it("only checks labeled keys", () => {
+    expect(dirtyChanges({ title: "a", other: 1 }, { title: "a", other: 2 }, labels, false))
+      .toEqual([]);
+  });
+});
