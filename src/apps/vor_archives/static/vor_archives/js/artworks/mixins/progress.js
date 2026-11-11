@@ -6,8 +6,20 @@ import {
   parseProgressDraft as pureParseProgressDraft,
 } from "@vor/artworks/pure/progress";
 
-export function getProgressMixin() {
+export function getProgressMixin({
+  progress = 0,
+  progressMax = null,
+  progressUnit = "",
+  progressStep = 1,
+} = {}) {
   return {
+    progress,
+    progressMax,
+    progressUnit,
+    progressStep,
+    progressEditing: false,
+    progressHover: false,
+    progressDraft: "",
     progressValueLabel() {
       return pureProgressValueLabel(this.progress);
     },
