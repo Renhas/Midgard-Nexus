@@ -4,8 +4,12 @@ import {
   starState as pureStarState,
 } from "@vor/artworks/pure/rating";
 
-export function getRatingMixin() {
+export function getRatingMixin({
+  rating = 0,
+} = {}) {
   return {
+    rating,
+    hoverRating: 0,
     displayRating() {
       return pureDisplayRating(this.rating, this.hoverRating);
     },

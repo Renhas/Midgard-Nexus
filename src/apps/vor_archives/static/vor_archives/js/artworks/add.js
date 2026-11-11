@@ -56,8 +56,6 @@ document.addEventListener("alpine:init", () => {
     doneMessage: "",
     ...getDatePickerMixin({ dateCursor: new Date() }),
     ageOpen: false,
-    rating: 0,
-    hoverRating: 0,
     progress: 0,
     progressMax: null,
     progressUnit: "",
