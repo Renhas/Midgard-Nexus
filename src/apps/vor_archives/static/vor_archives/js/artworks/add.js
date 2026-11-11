@@ -7,16 +7,10 @@ import { getAgePickerMixin } from "@vor/artworks/mixins/age_picker";
 import { getNumberWheelMixin } from "@vor/artworks/mixins/number_wheel";
 import { getAttributeMixin } from "@vor/artworks/mixins/attributes";
 import { wheelDirection } from "@vor/shared/pure/wheel";
+import { fieldIsEmpty, isRequiredField } from "@vor/artworks/pure/form_state";
 import { VorApi } from "@vor/artworks/api";
 
 document.addEventListener("alpine:init", () => {
-  const FIELD_TO_STATE = {
-    title: { key: "title", trim: true },
-    pages: { key: "pages" },
-    duration_minutes: { key: "durationMinutes" },
-    episode_count: { key: "episodeCount" },
-  };
-
   getAlpine().data("vorAddOverlay", (opts = {}) => ({
     workType: opts.workType || "book",
     title: "",
@@ -153,26 +147,11 @@ document.addEventListener("alpine:init", () => {
         swap: "innerHTML",
       });
     },
-    requiredFields() {
-      const base = this.requiredFieldsByType[this.workType] || [];
-      const extras = (this.workType === "film" && this.filmType === "tv_show")
-        ? ["episode_count"]
-        : [];
-      return [...base, ...extras];
-    },
     isRequired(name) {
-      return this.requiredFields().includes(name);
+      return isRequiredField(this, name, this.requiredFieldsByType);
     },
     isEmpty(name) {
-      const spec = FIELD_TO_STATE[name];
-      if (!spec) {
-        return false;
-      }
-      const value = this[spec.key];
-      if (spec.trim) {
-        return !String(value || "").trim();
-      }
-      return value === "" || value == null;
+      return fieldIsEmpty(this, name);
     },
     showRequired(name) {
       return this.isRequired(name) && this.isEmpty(name);
