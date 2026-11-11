@@ -1,6 +1,6 @@
 import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
-import { closeOverlay as closeOverlayImpl } from "@vor/shared/overlay_lifecycle";
+import { getOverlayLifecycleMixin } from "@vor/artworks/mixins/overlay_lifecycle";
 import { getDatePickerMixin } from "@vor/artworks/mixins/datepicker";
 import { getCoverMixin, getStatusMixin, getRatingMixin, getProgressMixin, getRelationsMixin, getAttachMixin } from "@vor/artworks/overlay_mixins";
 import { getAgePickerMixin } from "@vor/artworks/mixins/age_picker";
@@ -57,9 +57,7 @@ document.addEventListener("alpine:init", () => {
     ...getAgePickerMixin({ ageChoices: opts.ageChoices }),
     ...getNumberWheelMixin(),
     ...getAttributeMixin({ catalogs: opts.catalogs }),
-    closeOverlay() {
-      return closeOverlayImpl();
-    },
+    ...getOverlayLifecycleMixin(),
     setType(type) {
       if (this.workType === type) {
         return;
@@ -326,9 +324,6 @@ document.addEventListener("alpine:init", () => {
       this.doneMessage = "";
       this.resetAttachFields();
       this.phase = "form";
-    },
-    refreshList() {
-      document.body.dispatchEvent(new CustomEvent("vor:reload-list"));
     },
     onAttachSuccess() {
       this.doneMessage = this.justCreated

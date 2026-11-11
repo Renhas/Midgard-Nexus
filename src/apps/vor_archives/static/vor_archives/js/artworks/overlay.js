@@ -1,6 +1,6 @@
 import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
-import { closeOverlay as closeOverlayImpl } from "@vor/shared/overlay_lifecycle";
+import { getOverlayLifecycleMixin } from "@vor/artworks/mixins/overlay_lifecycle";
 import { getDatePickerMixin } from "@vor/artworks/mixins/datepicker";
 import { getCoverMixin, getStatusMixin, getRatingMixin, getProgressMixin, getRelationsMixin, getAttachMixin } from "@vor/artworks/overlay_mixins";
 import { getAgePickerMixin } from "@vor/artworks/mixins/age_picker";
@@ -75,9 +75,7 @@ document.addEventListener("alpine:init", () => {
     }),
     ...getNumberWheelMixin(),
     ...getAttributeMixin({ catalogs: { [opts.workType]: opts.catalog || {} } }),
-    closeOverlay() {
-      return closeOverlayImpl();
-    },
+    ...getOverlayLifecycleMixin(),
     captureQuickState() {
       return {
         status: this.status,
@@ -339,9 +337,6 @@ document.addEventListener("alpine:init", () => {
       this.applyQuickResult(data);
       this.serverQuickState = this.captureQuickState();
       this.refreshList();
-    },
-    refreshList() {
-      document.body.dispatchEvent(new CustomEvent("vor:reload-list"));
     },
     startAttach() {
       this.status = "planning";
