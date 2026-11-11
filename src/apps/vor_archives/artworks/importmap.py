@@ -30,6 +30,7 @@ _MIXIN_PATHS = {
     "@vor/artworks/mixins/rating": "vor_archives/js/artworks/mixins/rating.js",
     "@vor/artworks/mixins/relations": "vor_archives/js/artworks/mixins/relations.js",
     "@vor/artworks/mixins/status": "vor_archives/js/artworks/mixins/status.js",
+    "@vor/artworks/mixins/work_fields": "vor_archives/js/artworks/mixins/work_fields.js",
 }
 
 _PURE_PATHS = {

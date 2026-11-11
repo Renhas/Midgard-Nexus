@@ -41,6 +41,15 @@ export function getCoverMixin({
       if (this.$refs.coverInput) {
         this.$refs.coverInput.value = "";
       }
-    }
+    },
+    resetCover(preview = "") {
+      this.coverPreview = preview;
+      this.coverFile = null;
+      this.coverCleared = false;
+      this.coverWarning = "";
+      if (this.$refs.coverInput) {
+        this.$refs.coverInput.value = "";
+      }
+    },
   };
 }

@@ -27,26 +27,21 @@ function makeSource() {
 }
 
 describe("serializeDraft", () => {
-  it("serializes all fields", () => {
-    const json = serializeDraft(makeSource());
-    const data = JSON.parse(json);
-    expect(data.title).toBe("T");
-    expect(data.pages).toBe(10);
-    expect(data.authors).toEqual([{ id: 1 }]);
-    expect(data.coverName).toBe("");
-    expect(data.coverCleared).toBe(false);
+  it("returns json string", () => {
+    expect(serializeDraft({ a: 1 })).toBe('{"a":1}');
   });
-  it("captures cover file name", () => {
-    const source = makeSource();
-    source.coverFile = { name: "cover.jpg" };
-    const data = JSON.parse(serializeDraft(source));
-    expect(data.coverName).toBe("cover.jpg");
+  it("preserves key order of payload", () => {
+    expect(serializeDraft({ b: 2, a: 1 })).toBe('{"b":2,"a":1}');
   });
-  it("omits cover file content", () => {
-    const source = makeSource();
-    source.coverFile = { name: "cover.jpg", size: 12345 };
-    const data = JSON.parse(serializeDraft(source));
-    expect(Object.keys(data)).not.toContain("coverFile");
+  it("serializes empty payload", () => {
+    expect(serializeDraft({})).toBe("{}");
+  });
+  it("handles null payload", () => {
+    expect(serializeDraft(null)).toBe("{}");
+  });
+  it("serializes arrays inside payload", () => {
+    expect(serializeDraft({ authors: [{ id: 1 }] }))
+      .toBe('{"authors":[{"id":1}]}');
   });
 });
 

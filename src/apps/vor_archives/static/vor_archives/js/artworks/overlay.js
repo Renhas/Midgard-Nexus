@@ -6,6 +6,7 @@ import { getCoverMixin, getStatusMixin, getRatingMixin, getProgressMixin, getRel
 import { getAgePickerMixin } from "@vor/artworks/mixins/age_picker";
 import { getNumberWheelMixin } from "@vor/artworks/mixins/number_wheel";
 import { getAttributeMixin } from "@vor/artworks/mixins/attributes";
+import { getWorkFieldsMixin } from "@vor/artworks/mixins/work_fields";
 import { serializeDraft, parseDraft, dirtyChanges as dirtyChangesPure } from "@vor/artworks/pure/draft";
 import {
   captureQuickState as captureQuickStatePure,
@@ -33,20 +34,7 @@ const DRAFT_FIELD_LABELS = {
 document.addEventListener("alpine:init", () => {
   getAlpine().data("vorDetailOverlay", (opts = {}) => ({
     editing: Boolean(opts.editing),
-    workType: opts.workType || "",
     workId: opts.workId || null,
-    filmType: opts.filmType || "movie",
-    title: opts.title || "",
-    description: opts.description || "",
-    releaseDate: opts.releaseDate || "",
-    externalLink: opts.externalLink || "",
-    pages: opts.pages == null ? "" : opts.pages,
-    durationMinutes: opts.durationMinutes == null ? "" : opts.durationMinutes,
-    episodeCount: opts.episodeCount == null ? "" : opts.episodeCount,
-    authors: opts.authors || [],
-    genres: opts.genres || [],
-    tags: opts.tags || [],
-    platforms: opts.platforms || [],
     relationSearchUrl: opts.relationSearchUrl || "",
     ...getDatePickerMixin({
       dateCursor: opts.releaseDate ? new Date(`${opts.releaseDate}T00:00:00`) : new Date(),
@@ -84,44 +72,37 @@ document.addEventListener("alpine:init", () => {
       relationTypes: opts.relationTypes,
     }),
     ...getAttachMixin({ attachUrl: opts.attachUrl }),
-    init() {
-      this.snapshot = serializeDraft(this);
-      this.serverQuickState = captureQuickStatePure(this);
-    },
-    ...getAgePickerMixin({
-      ageRating: opts.ageRating || "",
-      ageChoices: opts.ageChoices,
-    }),
+    ...getWorkFieldsMixin(opts),
+    ...getAgePickerMixin({ ageChoices: opts.ageChoices }),
     ...getNumberWheelMixin(),
     ...getAttributeMixin({ catalogs: { [opts.workType]: opts.catalog || {} } }),
     ...getOverlayLifecycleMixin(),
+    init() {
+      this.snapshot = this.buildSnapshot();
+      this.serverQuickState = captureQuickStatePure(this);
+    },
+    buildSnapshot() {
+      return serializeDraft({
+        ...this.workFieldsSnapshot(),
+        relations: this.relations,
+        coverPreview: this.coverPreview,
+        coverCleared: this.coverCleared,
+        coverName: this.coverFile?.name || "",
+      });
+    },
     startEdit() {
       this.editing = true;
       this.coverWarning = "";
-      this.snapshot = serializeDraft(this);
+      this.snapshot = this.buildSnapshot();
     },
     cancelEdit() {
       this.leaveOr(() => this.revertEdit());
     },
     revertEdit() {
       const data = parseDraft(this.snapshot);
-      this.title = data.title || "";
-      this.description = data.description || "";
-      this.releaseDate = data.releaseDate || "";
-      this.ageRating = data.ageRating || "";
-      this.externalLink = data.externalLink || "";
-      this.pages = data.pages ?? "";
-      this.durationMinutes = data.durationMinutes ?? "";
-      this.episodeCount = data.episodeCount ?? "";
-      this.authors = data.authors || [];
-      this.genres = data.genres || [];
-      this.tags = data.tags || [];
-      this.platforms = data.platforms || [];
+      this.applyWorkFields(data);
       this.relations = data.relations || [];
-      this.coverPreview = data.coverPreview || "";
-      this.coverCleared = false;
-      this.coverFile = null;
-      this.coverWarning = "";
+      this.resetCover(data.coverPreview || "");
       this.relAdding = false;
       this.editing = false;
       this.leaveConfirmOpen = false;
@@ -131,7 +112,7 @@ document.addEventListener("alpine:init", () => {
         return [];
       }
       const before = parseDraft(this.snapshot);
-      const after = parseDraft(serializeDraft(this));
+      const after = parseDraft(this.buildSnapshot());
       return dirtyChangesPure(
         before,
         after,

@@ -1,11 +1,9 @@
 import { wheelDirection } from "@vor/shared/pure/wheel";
 
 export function getAgePickerMixin({
-  ageRating = "",
   ageChoices = [],
 } = {}) {
   return {
-    ageRating,
     ageOpen: false,
     ageChoices,
     setAgeRating(value) {

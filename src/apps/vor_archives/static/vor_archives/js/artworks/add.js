@@ -6,25 +6,13 @@ import { getCoverMixin, getStatusMixin, getRatingMixin, getProgressMixin, getRel
 import { getAgePickerMixin } from "@vor/artworks/mixins/age_picker";
 import { getNumberWheelMixin } from "@vor/artworks/mixins/number_wheel";
 import { getAttributeMixin } from "@vor/artworks/mixins/attributes";
+import { getWorkFieldsMixin } from "@vor/artworks/mixins/work_fields";
 import { wheelDirection } from "@vor/shared/pure/wheel";
 import { fieldIsEmpty, isRequiredField } from "@vor/artworks/pure/form_state";
 import { VorApi } from "@vor/artworks/api";
 
 document.addEventListener("alpine:init", () => {
   getAlpine().data("vorAddOverlay", (opts = {}) => ({
-    workType: opts.workType || "book",
-    title: "",
-    description: "",
-    releaseDate: "",
-    externalLink: "",
-    pages: "",
-    durationMinutes: "",
-    episodeCount: "",
-    filmType: "movie",
-    authors: [],
-    genres: [],
-    tags: [],
-    platforms: [],
     requiredFieldsByType: opts.requiredFields || {},
     saveUrl: opts.saveUrl || "",
     searchUrl: opts.searchUrl || "",
@@ -47,6 +35,7 @@ document.addEventListener("alpine:init", () => {
     ...getProgressMixin(),
     ...getRelationsMixin({ relationTypes: opts.relationTypes }),
     ...getAttachMixin({ attachUrl: opts.attachUrl }),
+    ...getWorkFieldsMixin({ workType: opts.workType || "book" }),
     ...getAgePickerMixin({ ageChoices: opts.ageChoices }),
     ...getNumberWheelMixin(),
     ...getAttributeMixin({ catalogs: opts.catalogs }),
@@ -276,19 +265,7 @@ document.addEventListener("alpine:init", () => {
       this.closeOverlay();
     },
     resetForm() {
-      this.title = "";
-      this.description = "";
-      this.releaseDate = "";
-      this.ageRating = "";
-      this.externalLink = "";
-      this.pages = "";
-      this.durationMinutes = "";
-      this.episodeCount = "";
-      this.filmType = "movie";
-      this.authors = [];
-      this.genres = [];
-      this.tags = [];
-      this.platforms = [];
+      this.resetWorkFields();
       this.relations = [];
       this.cancelRelationAdd();
       this.clearCover();

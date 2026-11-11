@@ -1,22 +1,5 @@
-export function serializeDraft(source) {
-  return JSON.stringify({
-    title: source.title,
-    description: source.description,
-    releaseDate: source.releaseDate,
-    ageRating: source.ageRating,
-    externalLink: source.externalLink,
-    pages: source.pages,
-    durationMinutes: source.durationMinutes,
-    episodeCount: source.episodeCount,
-    authors: source.authors,
-    genres: source.genres,
-    tags: source.tags,
-    platforms: source.platforms,
-    relations: source.relations,
-    coverPreview: source.coverPreview,
-    coverCleared: source.coverCleared,
-    coverName: source.coverFile?.name || "",
-  });
+export function serializeDraft(payload) {
+  return JSON.stringify(payload || {});
 }
 
 export function parseDraft(json) {
