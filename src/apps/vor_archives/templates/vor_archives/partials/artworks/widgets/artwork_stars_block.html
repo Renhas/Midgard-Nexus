@@ -1,14 +1,25 @@
-<div class="vor-stars" @mouseleave="hoverRating = 0">
+<div class="vor-stars"
+     @mouseleave="hoverRating = 0"
+     role="slider"
+     tabindex="0"
+     aria-label="Рейтинг"
+     :aria-valuenow="rating"
+     aria-valuemin="0"
+     aria-valuemax="10"
+     @keydown.left.prevent="setRating(Math.max(0, rating - 1))"
+     @keydown.right.prevent="setRating(Math.min(10, rating + 1))">
   <template x-for="star in [1,2,3,4,5]" :key="star">
     <span class="vor-star" :class="starState(star)">
       <i class="bi bi-star vor-star-empty"></i>
       <i class="bi bi-star-fill vor-star-fill"></i>
       <button type="button"
               class="vor-star-hit left"
+              tabindex="-1"
               @mouseenter="hoverRating = star * 2 - 1"
               @click="setRating(star * 2 - 1)"></button>
       <button type="button"
               class="vor-star-hit right"
+              tabindex="-1"
               @mouseenter="hoverRating = star * 2"
               @click="setRating(star * 2)"></button>
     </span>

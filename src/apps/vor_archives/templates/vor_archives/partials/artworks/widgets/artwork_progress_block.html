@@ -4,13 +4,14 @@
        :class="{ 'is-editing': progressEditing }"
        :style="{ '--progress-ch': progressCh() + 'ch' }">
     <span class="vor-progress-text">
-      <span class="vor-progress-value"
-            x-show="!progressEditing"
-            :class="{ 'is-hot': progressHover || progressEditing }"
-            @mouseenter="progressHover = true"
-            @mouseleave="progressHover = false"
-            @click="startProgressEdit()"
-            x-text="progressValueLabel()"></span>
+      <button type="button"
+              class="vor-progress-value"
+              x-show="!progressEditing"
+              :class="{ 'is-hot': progressHover || progressEditing }"
+              @mouseenter="progressHover = true"
+              @mouseleave="progressHover = false"
+              @click="startProgressEdit()"
+              x-text="progressValueLabel()"></button>
       <input class="vor-progress-input"
              x-show="progressEditing"
              x-ref="progressInput"

@@ -3,11 +3,12 @@
     <span class="vor-field-label">Платформы:</span>
     <div class="vor-chip-list" x-data="vorChipOverflow()" :class="{ 'is-open': popupOpen }">
       {% for platform in work.platforms.all %}
-        <span class="vor-chip"
-              data-chip
-              :class="{ 'is-off': platformOff({{ platform.pk }}), 'is-toggle': canTogglePlatform() }"
-              @click="togglePlatform({{ platform.pk }})"
-              @mouseenter="placeTip($el)">{{ platform.name }}</span>
+        <button type="button"
+                class="vor-chip"
+                data-chip
+                :class="{ 'is-off': platformOff({{ platform.pk }}), 'is-toggle': canTogglePlatform() }"
+                @click="togglePlatform({{ platform.pk }})"
+                @mouseenter="placeTip($el)">{{ platform.name }}</button>
       {% endfor %}
       <div class="vor-chip-more-wrap"
            x-ref="moreWrap"
@@ -21,11 +22,12 @@
         <div class="vor-chip-popup" x-ref="popup" x-show="popupOpen" x-cloak>
           <div class="vor-chip-popup-body">
             {% for platform in work.platforms.all %}
-              <span class="vor-chip"
-                    x-show="{{ forloop.counter0 }} >= visibleCount"
-                    :class="{ 'is-off': platformOff({{ platform.pk }}), 'is-toggle': canTogglePlatform() }"
-                    @click="togglePlatform({{ platform.pk }})"
-                    @mouseenter="placeTip($el)">{{ platform.name }}</span>
+              <button type="button"
+                      class="vor-chip"
+                      x-show="{{ forloop.counter0 }} >= visibleCount"
+                      :class="{ 'is-off': platformOff({{ platform.pk }}), 'is-toggle': canTogglePlatform() }"
+                      @click="togglePlatform({{ platform.pk }})"
+                      @mouseenter="placeTip($el)">{{ platform.name }}</button>
             {% endfor %}
           </div>
         </div>
