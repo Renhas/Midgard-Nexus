@@ -1,7 +1,10 @@
 import { VorApi } from "@vor/artworks/api";
 
-export function getAttachMixin() {
+export function getAttachMixin({
+  attachUrl = "",
+} = {}) {
   return {
+    attachUrl,
     resetAttachFields() {
       this.status = "planning";
       this.statusOpen = false;

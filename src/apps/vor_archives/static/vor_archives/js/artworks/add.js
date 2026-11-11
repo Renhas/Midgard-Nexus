@@ -34,7 +34,6 @@ document.addEventListener("alpine:init", () => {
     saveUrl: opts.saveUrl || "",
     searchUrl: opts.searchUrl || "",
     previewUrl: opts.previewUrl || "",
-    attachUrl: opts.attachUrl || "",
     listUrl: opts.listUrl || "",
     relationSearchUrl: opts.relationSearchUrl || "",
     selectedWorkId: null,
@@ -54,7 +53,7 @@ document.addEventListener("alpine:init", () => {
     ...getRatingMixin(),
     ...getProgressMixin(),
     ...getRelationsMixin({ relationTypes: opts.relationTypes }),
-    ...getAttachMixin(),
+    ...getAttachMixin({ attachUrl: opts.attachUrl }),
     get catalog() {
       return this.catalogs[this.workType] || {
         authors: [],

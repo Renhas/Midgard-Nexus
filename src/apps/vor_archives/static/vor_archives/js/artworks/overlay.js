@@ -55,7 +55,6 @@ document.addEventListener("alpine:init", () => {
     serverQuickState: null,
     listUrl: opts.listUrl || "",
     workUrl: opts.workUrl || "",
-    attachUrl: opts.attachUrl || "",
     ...getCoverMixin({ coverPreview: opts.coverUrl || "" }),
     ...getStatusMixin({ status: opts.status || "planning", choices: opts.statusChoices }),
     ...getRatingMixin({ rating: Number(opts.rating || 0) }),
@@ -69,7 +68,7 @@ document.addEventListener("alpine:init", () => {
       relations: opts.relations,
       relationTypes: opts.relationTypes,
     }),
-    ...getAttachMixin(),
+    ...getAttachMixin({ attachUrl: opts.attachUrl }),
     init() {
       this.snapshot = this.serializeDraft();
       this.serverQuickState = this.captureQuickState();
