@@ -8,12 +8,11 @@ import { getNumberWheelMixin } from "@vor/artworks/mixins/number_wheel";
 import { getAttributeMixin } from "@vor/artworks/mixins/attributes";
 import { getWorkFieldsMixin } from "@vor/artworks/mixins/work_fields";
 import { wheelDirection } from "@vor/shared/pure/wheel";
-import { fieldIsEmpty, isRequiredField } from "@vor/artworks/pure/form_state";
+import { getValidationMixin } from "@vor/artworks/mixins/validation";
 import { VorApi } from "@vor/artworks/api";
 
 document.addEventListener("alpine:init", () => {
   getAlpine().data("vorAddOverlay", (opts = {}) => ({
-    requiredFieldsByType: opts.requiredFields || {},
     saveUrl: opts.saveUrl || "",
     searchUrl: opts.searchUrl || "",
     previewUrl: opts.previewUrl || "",
@@ -37,6 +36,7 @@ document.addEventListener("alpine:init", () => {
     ...getAttachMixin({ attachUrl: opts.attachUrl }),
     ...getWorkFieldsMixin({ workType: opts.workType || "book" }),
     ...getAgePickerMixin({ ageChoices: opts.ageChoices }),
+    ...getValidationMixin({ requiredFieldsByType: opts.requiredFields }),
     ...getNumberWheelMixin(),
     ...getAttributeMixin({ catalogs: opts.catalogs }),
     ...getOverlayLifecycleMixin(),
@@ -134,35 +134,6 @@ document.addEventListener("alpine:init", () => {
         target: "#work-suggestions",
         swap: "innerHTML",
       });
-    },
-    isRequired(name) {
-      return isRequiredField(this, name, this.requiredFieldsByType);
-    },
-    isEmpty(name) {
-      return fieldIsEmpty(this, name);
-    },
-    showRequired(name) {
-      return this.isRequired(name) && this.isEmpty(name);
-    },
-    fieldInvalid(name) {
-      return this.showRequired(name) || Boolean(this.fieldError(name));
-    },
-    fieldError(name) {
-      const items = this.errors[name];
-      if (!items || !items.length) {
-        return "";
-      }
-      const item = items[0];
-      if (item.persistent) {
-        return item.message || item || "";
-      }
-      if (this.isRequired(name) && !this.isEmpty(name)) {
-        return "";
-      }
-      return item.message || item || "";
-    },
-    formBanner() {
-      return this.fieldError("__all__") || this.formError || "";
     },
     onSuggestionsLoaded(owned) {
       const alreadyOwnedMessage = "Это произведение уже есть в вашем списке";
