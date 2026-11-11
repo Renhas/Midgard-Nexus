@@ -1,7 +1,15 @@
 import { cropCoverFile } from "@vor/shared/cover";
 
-export function getCoverMixin() {
+export function getCoverMixin({
+  coverPreview = "",
+  coverFile = null,
+  coverCleared = false,
+} = {}) {
   return {
+    coverPreview,
+    coverFile,
+    coverCleared,
+    coverWarning: "",
     async onCoverSelected(event) {
       const file = event.target.files && event.target.files[0];
       if (!file) {
@@ -9,9 +17,7 @@ export function getCoverMixin() {
       }
       const result = await cropCoverFile(file);
       this.coverFile = result.file;
-      if ("coverCleared" in this) {
-        this.coverCleared = false;
-      }
+      this.coverCleared = false;
       this.coverPreview = URL.createObjectURL(result.file);
       this.coverWarning = result.cropped
         ? `Обложка была обрезана для соответствия размера: исходный ${result.srcW}×${result.srcH}, итоговый ${result.outW}×${result.outH}`
@@ -30,9 +36,7 @@ export function getCoverMixin() {
     clearCover() {
       this.coverPreview = "";
       this.coverFile = null;
-      if ("coverCleared" in this) {
-        this.coverCleared = true;
-      }
+      this.coverCleared = true;
       this.coverWarning = "";
       if (this.$refs.coverInput) {
         this.$refs.coverInput.value = "";
