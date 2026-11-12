@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  allowedRelationTypes,
-  relationKey,
-  relationLabelFor,
-} from "@vor/artworks/pure/relations";
+import { allowedRelationTypes, relationKey, relationLabelFor } from "@vor/artworks/pure/relations";
 
 describe("allowedRelationTypes", () => {
   const types = [
@@ -14,9 +10,7 @@ describe("allowedRelationTypes", () => {
   ];
 
   it("always includes other", () => {
-    expect(
-      allowedRelationTypes(types, "game", "book").some((t) => t.value === "other")
-    ).toBe(true);
+    expect(allowedRelationTypes(types, "game", "book").some((t) => t.value === "other")).toBe(true);
   });
   it("adaptation only for different types", () => {
     const same = allowedRelationTypes(types, "book", "book");
@@ -46,15 +40,13 @@ describe("relationKey", () => {
     expect(relationKey({ id: 5, type_key: "book", work_id: 10 })).toBe("5-book-10");
   });
   it("uses 'new' when id is null", () => {
-    expect(relationKey({ id: null, type_key: "book", work_id: 10 }))
-      .toBe("new-book-10");
+    expect(relationKey({ id: null, type_key: "book", work_id: 10 })).toBe("new-book-10");
   });
   it("uses 'new' when id is undefined", () => {
     expect(relationKey({ type_key: "book", work_id: 10 })).toBe("new-book-10");
   });
   it("uses 'new' when id is 0", () => {
-    expect(relationKey({ id: 0, type_key: "book", work_id: 10 }))
-      .toBe("new-book-10");
+    expect(relationKey({ id: 0, type_key: "book", work_id: 10 })).toBe("new-book-10");
   });
 });
 

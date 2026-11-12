@@ -61,12 +61,10 @@ describe("collectRequiredFields", () => {
     expect(collectRequiredFields(byType, "book", "movie")).toEqual(["pages"]);
   });
   it("adds episode_count for tv_show", () => {
-    expect(collectRequiredFields(byType, "film", "tv_show"))
-      .toEqual(["duration_minutes", "episode_count"]);
+    expect(collectRequiredFields(byType, "film", "tv_show")).toEqual(["duration_minutes", "episode_count"]);
   });
   it("does not add episode_count for movie", () => {
-    expect(collectRequiredFields(byType, "film", "movie"))
-      .toEqual(["duration_minutes"]);
+    expect(collectRequiredFields(byType, "film", "movie")).toEqual(["duration_minutes"]);
   });
   it("returns empty for unknown workType", () => {
     expect(collectRequiredFields(byType, "game", "movie")).toEqual([]);
@@ -82,21 +80,13 @@ describe("collectRequiredFields", () => {
 describe("isRequiredField", () => {
   const byType = { book: ["pages"], film: ["duration_minutes"] };
   it("true for base-required field", () => {
-    expect(isRequiredField(
-      { workType: "book", filmType: "movie" }, "pages", byType,
-    )).toBe(true);
+    expect(isRequiredField({ workType: "book", filmType: "movie" }, "pages", byType)).toBe(true);
   });
   it("false for optional field", () => {
-    expect(isRequiredField(
-      { workType: "book", filmType: "movie" }, "description", byType,
-    )).toBe(false);
+    expect(isRequiredField({ workType: "book", filmType: "movie" }, "description", byType)).toBe(false);
   });
   it("respects tv_show extras", () => {
-    expect(isRequiredField(
-      { workType: "film", filmType: "tv_show" }, "episode_count", byType,
-    )).toBe(true);
-    expect(isRequiredField(
-      { workType: "film", filmType: "movie" }, "episode_count", byType,
-    )).toBe(false);
+    expect(isRequiredField({ workType: "film", filmType: "tv_show" }, "episode_count", byType)).toBe(true);
+    expect(isRequiredField({ workType: "film", filmType: "movie" }, "episode_count", byType)).toBe(false);
   });
 });

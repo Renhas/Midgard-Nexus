@@ -27,16 +27,10 @@ export function fieldIsEmpty(state, name) {
 
 export function collectRequiredFields(requiredByType, workType, filmType) {
   const base = (requiredByType && requiredByType[workType]) || [];
-  const extras = (workType === "film" && filmType === "tv_show")
-    ? ["episode_count"]
-    : [];
+  const extras = workType === "film" && filmType === "tv_show" ? ["episode_count"] : [];
   return [...base, ...extras];
 }
 
 export function isRequiredField(state, name, requiredByType) {
-  return collectRequiredFields(
-    requiredByType,
-    state.workType,
-    state.filmType,
-  ).includes(name);
+  return collectRequiredFields(requiredByType, state.workType, state.filmType).includes(name);
 }

@@ -7,7 +7,6 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-
   max-width: 1500px;
   width: 100%;
   margin-inline: auto;
@@ -80,17 +79,20 @@
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   background-color: var(--bg-card);
-  transition: transform 0.15s ease, border-color 0.15s ease,
-    box-shadow 0.15s ease, background-color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .dash-card:hover {
   transform: translateY(-5px);
   border-color: var(--accent-vor);
-  background-color: rgba(167, 139, 250, 0.08);
+  background-color: rgb(167 139 250 / 8%);
   box-shadow:
-    0 0 0 1px rgba(167, 139, 250, 0.2),
-    0 6px 16px rgba(0, 0, 0, 0.18);
+    0 0 0 1px rgb(167 139 250 / 20%),
+    0 6px 16px rgb(0 0 0 / 18%);
   z-index: 1;
 }
 
@@ -190,7 +192,7 @@
   min-width: 0;
 }
 
-.dash-progress-metric+.dash-progress-metric::before {
+.dash-progress-metric + .dash-progress-metric::before {
   content: "";
   position: absolute;
   left: calc(-0.25rem - 0.5px);
@@ -272,15 +274,15 @@
   font-size: 0.85rem;
 }
 
-.dash-attr-row>span {
+.dash-attr-row > span {
   text-align: center;
 }
 
-.dash-attr-row>span:first-child {
+.dash-attr-row > span:first-child {
   text-align: left;
 }
 
-.dash-attr-row>span:last-child {
+.dash-attr-row > span:last-child {
   text-align: right;
 }
 
@@ -486,15 +488,15 @@
 }
 
 .dash-heat-cell.level-1 {
-  background-color: rgba(167, 139, 250, 0.28);
+  background-color: rgb(167 139 250 / 28%);
 }
 
 .dash-heat-cell.level-2 {
-  background-color: rgba(167, 139, 250, 0.5);
+  background-color: rgb(167 139 250 / 50%);
 }
 
 .dash-heat-cell.level-3 {
-  background-color: rgba(167, 139, 250, 0.72);
+  background-color: rgb(167 139 250 / 72%);
 }
 
 .dash-heat-cell.level-4 {
@@ -506,8 +508,7 @@
 }
 
 /* --- Responsive --- */
-@media (max-width: 1200px) {
-
+@media (width <= 1200px) {
   .dash-attr-grid,
   .dash-activity {
     grid-template-columns: 1fr;

@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  WORK_FIELD_KEYS,
-  getWorkFieldsMixin,
-} from "@vor/artworks/mixins/work_fields";
+import { WORK_FIELD_KEYS, getWorkFieldsMixin } from "@vor/artworks/mixins/work_fields";
 
 function mount(source) {
   return { ...getWorkFieldsMixin(source) };

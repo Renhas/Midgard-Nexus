@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  computeTipLayout,
-  computePopupLayout,
-} from "@vor/artworks/pure/popover";
+import { computeTipLayout, computePopupLayout } from "@vor/artworks/pure/popover";
 
 function rect({ left = 0, top = 0, width = 50, height = 20 } = {}) {
   return {
@@ -97,42 +94,52 @@ describe("computeTipLayout", () => {
 
 describe("computePopupLayout", () => {
   it("does not flip when popup fits", () => {
-    expect(computePopupLayout({
-      popupRect: { right: 500, bottom: 500 },
-      viewportWidth: 1000,
-      viewportHeight: 800,
-      pad: 8,
-    })).toEqual({ flipH: false, flipV: false });
+    expect(
+      computePopupLayout({
+        popupRect: { right: 500, bottom: 500 },
+        viewportWidth: 1000,
+        viewportHeight: 800,
+        pad: 8,
+      }),
+    ).toEqual({ flipH: false, flipV: false });
   });
   it("flips horizontally when overflowing right edge", () => {
-    expect(computePopupLayout({
-      popupRect: { right: 995, bottom: 500 },
-      viewportWidth: 1000,
-      viewportHeight: 800,
-      pad: 8,
-    })).toEqual({ flipH: true, flipV: false });
+    expect(
+      computePopupLayout({
+        popupRect: { right: 995, bottom: 500 },
+        viewportWidth: 1000,
+        viewportHeight: 800,
+        pad: 8,
+      }),
+    ).toEqual({ flipH: true, flipV: false });
   });
   it("flips vertically when overflowing bottom edge", () => {
-    expect(computePopupLayout({
-      popupRect: { right: 500, bottom: 795 },
-      viewportWidth: 1000,
-      viewportHeight: 800,
-      pad: 8,
-    })).toEqual({ flipH: false, flipV: true });
+    expect(
+      computePopupLayout({
+        popupRect: { right: 500, bottom: 795 },
+        viewportWidth: 1000,
+        viewportHeight: 800,
+        pad: 8,
+      }),
+    ).toEqual({ flipH: false, flipV: true });
   });
   it("can flip both", () => {
-    expect(computePopupLayout({
-      popupRect: { right: 999, bottom: 799 },
-      viewportWidth: 1000,
-      viewportHeight: 800,
-      pad: 8,
-    })).toEqual({ flipH: true, flipV: true });
+    expect(
+      computePopupLayout({
+        popupRect: { right: 999, bottom: 799 },
+        viewportWidth: 1000,
+        viewportHeight: 800,
+        pad: 8,
+      }),
+    ).toEqual({ flipH: true, flipV: true });
   });
   it("uses default pad when not passed", () => {
-    expect(computePopupLayout({
-      popupRect: { right: 993, bottom: 500 },
-      viewportWidth: 1000,
-      viewportHeight: 800,
-    })).toEqual({ flipH: true, flipV: false });
+    expect(
+      computePopupLayout({
+        popupRect: { right: 993, bottom: 500 },
+        viewportWidth: 1000,
+        viewportHeight: 800,
+      }),
+    ).toEqual({ flipH: true, flipV: false });
   });
 });

@@ -11,7 +11,7 @@ export function getCsrfToken() {
 export function getCsrfHeaders() {
   return {
     "X-CSRFToken": getCsrfToken(),
-    "X-Requested-With": "XMLHttpRequest"
+    "X-Requested-With": "XMLHttpRequest",
   };
 }
 

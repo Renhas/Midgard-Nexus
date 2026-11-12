@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  toIsoDate,
-  buildDateCells,
-  yearGridStart,
-  buildYearCells,
-} from "@vor/artworks/pure/dates";
+import { toIsoDate, buildDateCells, yearGridStart, buildYearCells } from "@vor/artworks/pure/dates";
 
 describe("toIsoDate", () => {
   it("pads single-digit month and day", () => {
@@ -50,8 +45,6 @@ describe("yearGridStart", () => {
 
 describe("buildYearCells", () => {
   it("returns 12 consecutive years", () => {
-    expect(buildYearCells(2016)).toEqual([
-      2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027,
-    ]);
+    expect(buildYearCells(2016)).toEqual([2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027]);
   });
 });

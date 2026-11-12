@@ -1,10 +1,6 @@
 import { cropCoverFile } from "@vor/shared/cover";
 
-export function getCoverMixin({
-  coverPreview = "",
-  coverFile = null,
-  coverCleared = false,
-} = {}) {
+export function getCoverMixin({ coverPreview = "", coverFile = null, coverCleared = false } = {}) {
   return {
     coverPreview,
     coverFile,

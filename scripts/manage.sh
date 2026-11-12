@@ -6,4 +6,3 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 exec docker compose exec -u django web python src/manage.py "$@"
-

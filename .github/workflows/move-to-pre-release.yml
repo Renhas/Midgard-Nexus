@@ -46,4 +46,4 @@ jobs:
           github-token: ${{ secrets.GH_PROJECT_TOKEN }}
           issue-numbers: ${{ steps.extract.outputs.issues }}
           target-status: ${{ steps.target.outputs.status }}
-          forbidden-source-statuses: 'Done'
+          forbidden-source-statuses: "Done"

@@ -102,7 +102,7 @@
 }
 
 .artwork-row:hover {
-  background-color: rgba(99, 102, 241, 0.08);
+  background-color: rgb(99 102 241 / 8%);
   border-color: var(--accent-hover);
 }
 
@@ -237,10 +237,11 @@
 
 .artwork-row.is-selected {
   border: 1.33px solid var(--action-delete);
-  background-color: rgba(239, 68, 68, 0.08);
+  background-color: rgb(239 68 68 / 8%);
 }
 
 /* --- Row preview (hover) --- */
+
 /* --- Hover preview (may move to common.css) --- */
 .artwork-row-preview {
   display: none;
@@ -253,7 +254,7 @@
   border-radius: 0.5rem;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 35%);
   pointer-events: none;
   overflow: hidden;
 }
@@ -481,7 +482,7 @@ body.vor-artworks-list-drag .artwork-tile {
   align-items: center;
   justify-content: center;
   border-radius: 0.25rem;
-  border: 1px solid currentColor;
+  border: 1px solid currentcolor;
   box-sizing: border-box;
   background-color: var(--bg-primary);
   font-size: 1.2rem;

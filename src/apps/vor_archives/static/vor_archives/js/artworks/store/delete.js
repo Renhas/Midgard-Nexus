@@ -42,8 +42,7 @@ export const deleteMixin = {
     if (!this.selectedIds.length) {
       return;
     }
-    const base =
-      document.getElementById("vor-modal")?.dataset.vorDeletePreview;
+    const base = document.getElementById("vor-modal")?.dataset.vorDeletePreview;
     if (!base) {
       return;
     }

@@ -10,10 +10,7 @@ export function overlayAlpine() {
 }
 
 function overlayRequestPath(event) {
-  const raw =
-    event.detail.pathInfo?.requestPath ||
-    event.detail.xhr?.responseURL ||
-    "";
+  const raw = event.detail.pathInfo?.requestPath || event.detail.xhr?.responseURL || "";
   return parseOverlayUrl(raw, window.location.origin);
 }
 
@@ -127,7 +124,7 @@ document.addEventListener(
       window.location.href = anchor.href;
     });
   },
-  true
+  true,
 );
 
 document.body.addEventListener("htmx:afterSwap", (event) => {

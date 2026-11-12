@@ -5,11 +5,7 @@ import {
   relationLabelFor as pureRelationLabelFor,
 } from "@vor/artworks/pure/relations";
 
-export function getRelationsMixin({
-  relations = [],
-  relationTypes = [],
-  isAdd = false,
-} = {}) {
+export function getRelationsMixin({ relations = [], relationTypes = [], isAdd = false } = {}) {
   return {
     relations,
     relationTypes,
@@ -69,12 +65,8 @@ export function getRelationsMixin({
         exclude_type: this.workType,
         exclude_id: String(wId),
       });
-      const taken = new Set(
-        this.relations.map((item) => `${item.type_key}-${item.work_id}`)
-      );
-      this.relResults = (data?.results || []).filter(
-        (item) => !taken.has(`${item.type_key}-${item.work_id}`)
-      );
+      const taken = new Set(this.relations.map((item) => `${item.type_key}-${item.work_id}`));
+      this.relResults = (data?.results || []).filter((item) => !taken.has(`${item.type_key}-${item.work_id}`));
     },
     commitRelationAdd() {
       if (!this.relPick) return;
@@ -103,8 +95,8 @@ export function getRelationsMixin({
           relation_type: item.relation_type,
           type_key: item.type_key,
           work_id: item.work_id,
-        }))
+        })),
       );
-    }
+    },
   };
 }

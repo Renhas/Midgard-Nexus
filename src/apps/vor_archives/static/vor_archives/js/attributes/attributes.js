@@ -35,14 +35,11 @@ document.addEventListener("alpine:init", () => {
       if (!this.selectedIds.length) {
         return;
       }
-      const base =
-        document.getElementById("vor-modal")?.dataset.vorAttrDeletePreview;
+      const base = document.getElementById("vor-modal")?.dataset.vorAttrDeletePreview;
       if (!base) {
         return;
       }
-      const params = this.selectedIds
-        .map((id) => `ids=${encodeURIComponent(id)}`)
-        .join("&");
+      const params = this.selectedIds.map((id) => `ids=${encodeURIComponent(id)}`).join("&");
       htmx.ajax("GET", `${base}?${params}`, {
         target: "#vor-modal",
         swap: "innerHTML",
@@ -116,5 +113,5 @@ document.addEventListener(
       store.toggleSelected(id);
     }
   },
-  true
+  true,
 );

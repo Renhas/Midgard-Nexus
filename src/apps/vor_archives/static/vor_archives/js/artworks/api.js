@@ -68,9 +68,7 @@ export const VorApi = {
     });
   },
   searchRelatedWorks(relationSearchUrl, params) {
-    return requestJson(
-      `${relationSearchUrl}?${new URLSearchParams(params).toString()}`,
-    );
+    return requestJson(`${relationSearchUrl}?${new URLSearchParams(params).toString()}`);
   },
   listArtworkCollections(listUrl, uwId) {
     return requestJson(`${listUrl}${uwId}/collections/`);

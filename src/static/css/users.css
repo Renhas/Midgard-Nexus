@@ -30,7 +30,7 @@
   background-color: var(--bg-input);
   border-color: var(--accent-hover);
   color: var(--text-primary);
-  box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+  box-shadow: 0 0 0 0.2rem rgb(99 102 241 / 25%);
 }
 
 .hexagon-home-btn {
@@ -43,12 +43,14 @@
   color: var(--bg-primary);
   clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
   text-decoration: none;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35));
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+  filter: drop-shadow(0 4px 6px rgb(0 0 0 / 35%));
 }
 
 .hexagon-home-btn:hover {
-  background-color: #4F46E5;
+  background-color: #4f46e5;
   color: var(--bg-primary);
   transform: translateY(-2px);
 }

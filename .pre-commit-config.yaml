@@ -1,20 +1,68 @@
+default_language_version:
+  node: "26.13.1"
+
+exclude: >
+  (?x)^(
+    node_modules/.*|
+    src/static/vendor/.*|
+    package-lock\.json|
+    .*\.min\.(js|css)|
+    (.*/)?LICEN[CS]E(\..*)?$
+  )$
+
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        args: ["--markdown-linebreak-ext=md,markdown"]
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+
+  - repo: local
+    hooks:
+      - id: prettier
+        name: prettier
+        entry: prettier
+        language: node
+        additional_dependencies: ["prettier@3.10"]
+        files: \.(js|mjs|cjs|json|css|md|yml|yaml)$
+        args: ["--write", "--ignore-unknown"]
+
+      - id: stylelint
+        name: stylelint
+        entry: stylelint
+        language: node
+        additional_dependencies:
+          - "stylelint@16.23.1"
+          - "stylelint-config-standard@38.0.0"
+        files: \.css$
+        args: ["--fix", "--formatter", "verbose"]
+
+      - id: oxlint
+        name: oxlint
+        entry: oxlint
+        language: node
+        additional_dependencies: ["oxlint@1.93.0"]
+        files: \.(js|mjs|cjs)$
+        args: ["--tsconfig", "jsconfig.json"]
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.5
     hooks:
       - id: ruff
       - id: ruff-format
+
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.3
     hooks:
       - id: codespell
-        exclude: >
-          (?x)^(
-            .*\.min\.(js|css)|
-            .*/migrations/.*|
-            .*/static/vendor/.*|
-            package-lock\.json
-          )$
+        exclude: .*/migrations/.*
+
   - repo: https://github.com/djlint/djLint
     rev: v1.47.1
     hooks:

@@ -76,10 +76,7 @@ document.addEventListener("alpine:init", () => {
     measureMoreWidth(moreWrap, more) {
       let moreWidth = 48;
       if (moreWrap) {
-        return tempReveal(
-          moreWrap,
-          () => (more && more.offsetWidth) || moreWrap.offsetWidth,
-        ) || moreWidth;
+        return tempReveal(moreWrap, () => (more && more.offsetWidth) || moreWrap.offsetWidth) || moreWidth;
       }
       if (more) {
         return tempReveal(more, () => more.offsetWidth) || moreWidth;

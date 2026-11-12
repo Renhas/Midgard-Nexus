@@ -2,7 +2,7 @@ import { htmx } from "@lib/htmx";
 import { VorApi } from "@vor/artworks/api";
 import { syncPageScrollLock } from "@vor/shared/scroll_lock";
 
-export const searchMixin =  {
+export const searchMixin = {
   searchUrl: "",
   attachUrl: "",
   searchOpen: false,
@@ -51,9 +51,7 @@ export const searchMixin =  {
     });
   },
   async attachFromSearch(typeKey, workId) {
-    const data = await VorApi.attachWorkFromSearch(
-      this.attachUrl, typeKey, workId,
-    );
+    const data = await VorApi.attachWorkFromSearch(this.attachUrl, typeKey, workId);
     if (!data?.ok) {
       return;
     }

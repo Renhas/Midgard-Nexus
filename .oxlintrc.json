@@ -1,0 +1,7 @@
+{
+  "categories": {
+    "correctness": "warn",
+    "suspicious": "warn"
+  },
+  "ignorePatterns": ["node_modules", "src/static/vendor", "**/*.min.js"]
+}

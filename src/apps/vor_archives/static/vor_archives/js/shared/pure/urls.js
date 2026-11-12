@@ -16,11 +16,7 @@ export function isSamePageLink(href, target, location) {
   }
   try {
     const url = new URL(href, location.origin);
-    return (
-      url.origin === location.origin &&
-      url.pathname === location.pathname &&
-      url.search === location.search
-    );
+    return url.origin === location.origin && url.pathname === location.pathname && url.search === location.search;
   } catch (error) {
     return false;
   }

@@ -90,7 +90,7 @@ main {
 .expand:hover {
   color: var(--accent-hover);
   border-color: var(--accent-hover);
-  background-color: rgba(167, 145, 255, 0.1);
+  background-color: rgb(167 145 255 / 10%);
 }
 
 .expand-left {
@@ -129,7 +129,7 @@ main {
 .sidebar-toggle:hover {
   color: var(--accent-hover);
   border-color: var(--accent-hover);
-  background-color: rgba(167, 145, 255, 0.1);
+  background-color: rgb(167 145 255 / 10%);
 }
 
 .toggle-left {
@@ -154,15 +154,13 @@ main {
 /* === Center content (70 %) === */
 .center {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: clamp(180px, 15vw, 220px);
-  right: clamp(180px, 15vw, 220px);
+  inset: 0 clamp(180px, 15vw, 220px);
   min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden auto;
   padding: 1.5rem;
-  transition: left 0.3s ease, right 0.3s ease;
+  transition:
+    left 0.3s ease,
+    right 0.3s ease;
 }
 
 .center.left-collapsed {

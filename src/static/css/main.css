@@ -4,25 +4,23 @@
 
 /* === CSS Variables === */
 :root {
-  --bg-primary: #0B1120;
-  --bg-card: #1A233A;
-  --bg-input: #151D2E;
-  --text-primary: #E2E8F0;
-  --text-secondary: #94A3B8;
-  --accent-hover: #6366F1;
-  --status-in-progress: #818CF8;
-  --success: #34D399;
-  --error: #F87171;
+  --bg-primary: #0b1120;
+  --bg-card: #1a233a;
+  --bg-input: #151d2e;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --accent-hover: #6366f1;
+  --status-in-progress: #818cf8;
+  --success: #34d399;
+  --error: #f87171;
   --border: #334155;
 
   /* Module accents */
-  --accent-vor: #A78BFA;
-  --accent-fafnir: #60A5FA;
-  --accent-kvasir: #FB923C;
-
-  --action-add: #34D399;
-  --action-delete: #EF4444;
-
+  --accent-vor: #a78bfa;
+  --accent-fafnir: #60a5fa;
+  --accent-kvasir: #fb923c;
+  --action-add: #34d399;
+  --action-delete: #ef4444;
   --header-icon-size: 1.5rem;
   --header-height: 57px;
 }
@@ -68,12 +66,14 @@ body {
 .module-card {
   background-color: var(--bg-card);
   border-color: var(--border) !important;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .module-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 0 2rem var(--card-accent, rgba(99, 102, 241, 0.35)) !important;
+  box-shadow: 0 0 2rem var(--card-accent, rgb(99 102 241 / 35%)) !important;
 }
 
 /* === Module cards entrance animation === */
@@ -149,7 +149,7 @@ body {
 .navbar-dark .nav-link:hover,
 .navbar-dark .nav-link.active {
   color: var(--text-primary) !important;
-  background-color: rgba(99, 102, 241, 0.15);
+  background-color: rgb(99 102 241 / 15%);
 }
 
 .navbar-dark .nav-link.active {
@@ -163,13 +163,13 @@ body {
 
 .navbar-dark .btn-outline-light:hover {
   color: var(--text-primary);
-  background-color: rgba(99, 102, 241, 0.15);
+  background-color: rgb(99 102 241 / 15%);
   border-color: var(--accent-hover);
 }
 
 .navbar-dark .dropdown-toggle:hover {
   color: var(--text-primary);
-  background-color: rgba(99, 102, 241, 0.15);
+  background-color: rgb(99 102 241 / 15%);
   border-color: var(--accent-hover);
 }
 
@@ -183,6 +183,7 @@ body {
   justify-content: center;
   gap: 0.5rem;
   padding: 0.4rem 0.8rem;
+
   /* как btn-sm */
   border-radius: 0.375rem;
   border: 1px solid transparent;
@@ -191,6 +192,7 @@ body {
   text-decoration: none;
   transition: all 0.2s ease;
   font-size: 0.875rem;
+
   /* как btn-sm */
   line-height: 1.5;
   white-space: nowrap;
@@ -199,7 +201,7 @@ body {
 
 .nav-btn:hover {
   color: var(--text-primary);
-  background-color: rgba(167, 145, 255, 0.1);
+  background-color: rgb(167 145 255 / 10%);
   border-color: var(--border);
 }
 
@@ -210,7 +212,7 @@ body {
 .nav-btn.active {
   color: var(--accent-vor);
   border-color: var(--accent-vor);
-  background-color: rgba(167, 145, 255, 0.1);
+  background-color: rgb(167 145 255 / 10%);
 }
 
 .nav-btn .header-icon {
@@ -218,7 +220,7 @@ body {
   line-height: 1;
 }
 
-.nav-btn .header-icon+span {
+.nav-btn .header-icon + span {
   font-weight: 500;
 }
 
@@ -266,7 +268,7 @@ body {
    Alert overrides
    ============================================ */
 .alert-danger {
-  background-color: rgba(248, 113, 113, 0.15);
+  background-color: rgb(248 113 113 / 15%);
   border-color: var(--error);
   color: var(--error);
 }
@@ -280,8 +282,8 @@ body {
 }
 
 .btn-primary:hover {
-  background-color: #4F46E5;
-  border-color: #4F46E5;
+  background-color: #4f46e5;
+  border-color: #4f46e5;
 }
 
 /* ============================================
@@ -323,7 +325,7 @@ body {
 }
 
 .dropdown-item:hover {
-  background-color: rgba(99, 102, 241, 0.15);
+  background-color: rgb(99 102 241 / 15%);
   color: var(--text-primary);
 }
 
@@ -348,6 +350,6 @@ body {
   background-color: var(--bg-card);
   border: 1px solid var(--border);
   color: var(--text-primary);
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 35%);
   backdrop-filter: blur(4px);
 }

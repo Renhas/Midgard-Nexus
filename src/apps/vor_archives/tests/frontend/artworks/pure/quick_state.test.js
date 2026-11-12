@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  captureQuickState,
-  restoreQuickState,
-  applyQuickResult,
-} from "@vor/artworks/pure/quick_state";
+import { captureQuickState, restoreQuickState, applyQuickResult } from "@vor/artworks/pure/quick_state";
 
 function makeSource() {
   return {

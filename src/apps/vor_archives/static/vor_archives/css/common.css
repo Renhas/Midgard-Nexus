@@ -36,7 +36,7 @@ html.vor-scroll-lock .center {
   background-color: var(--bg-input);
   border-color: var(--accent-hover);
   color: var(--text-primary);
-  box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+  box-shadow: 0 0 0 0.2rem rgb(99 102 241 / 25%);
 }
 
 .vor-field-errors,
