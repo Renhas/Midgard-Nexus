@@ -10,7 +10,7 @@
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 0.4rem;
-  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0.75rem 1.5rem rgb(0 0 0 / 35%);
 }
 
 .vor-context-item {
@@ -30,7 +30,7 @@
 
 .vor-context-item:hover,
 .vor-context-item.is-checked {
-  background-color: rgba(167, 145, 255, 0.12);
+  background-color: rgb(167 145 255 / 12%);
 }
 
 .vor-context-item.is-danger {
@@ -61,7 +61,7 @@
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 0.4rem;
-  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0.75rem 1.5rem rgb(0 0 0 / 35%);
 }
 
 .vor-context-flyout-empty {

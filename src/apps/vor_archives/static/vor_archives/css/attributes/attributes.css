@@ -38,11 +38,12 @@
   background-color: var(--bg-input);
   border-color: var(--accent-hover);
   color: var(--text-primary);
-  box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+  box-shadow: 0 0 0 0.2rem rgb(99 102 241 / 25%);
 }
 
 .attr-toolbar .sidebar-btn-icon {
   --attr-btn-size: calc(1.5em + 0.75rem + 2px);
+
   width: var(--attr-btn-size);
   height: var(--attr-btn-size);
   padding: 0;
@@ -132,7 +133,7 @@
 
 .attr-group-toggle:hover {
   border-color: var(--accent-hover);
-  background-color: rgba(167, 145, 255, 0.08);
+  background-color: rgb(167 145 255 / 8%);
 }
 
 .attr-group-body {
@@ -155,12 +156,12 @@
 
 .attr-item:hover {
   color: var(--text-primary);
-  background-color: rgba(167, 145, 255, 0.08);
+  background-color: rgb(167 145 255 / 8%);
 }
 
 .attr-item.is-active {
   color: var(--accent-vor);
-  background-color: rgba(167, 145, 255, 0.12);
+  background-color: rgb(167 145 255 / 12%);
 }
 
 .attr-item.is-selected {
@@ -260,7 +261,7 @@
 }
 
 /* --- Responsive --- */
-@media (max-width: 900px) {
+@media (width <= 900px) {
   .attr-split {
     flex-direction: column;
   }

@@ -32,7 +32,7 @@
 .vor-inline-number.is-invalid,
 .vor-inline-number.is-invalid:focus {
   border-color: var(--error);
-  box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.25);
+  box-shadow: 0 0 0 2px rgb(248 113 113 / 25%);
 }
 
 .vor-suggestions {
@@ -74,7 +74,7 @@
 }
 
 .vor-suggestion-item:hover {
-  background-color: rgba(167, 145, 255, 0.12);
+  background-color: rgb(167 145 255 / 12%);
 }
 
 .vor-suggestion-title {
@@ -93,7 +93,7 @@
   top: calc(100% + 6px);
   padding: 0.45rem 0.8rem;
   border-radius: 0.375rem;
-  background-color: rgba(239, 68, 68, 0.18);
+  background-color: rgb(239 68 68 / 18%);
   border: 1px solid var(--error);
   color: var(--error);
   font-size: 0.95rem;
@@ -101,7 +101,7 @@
   line-height: 1.35;
   white-space: nowrap;
   pointer-events: none;
-  box-shadow: 0 0.4rem 0.9rem rgba(0, 0, 0, 0.28);
+  box-shadow: 0 0.4rem 0.9rem rgb(0 0 0 / 28%);
 }
 
 .vor-add-title-wrap .vor-add-error {
@@ -297,6 +297,7 @@
   min-height: 0;
   height: 100%;
 }
+
 /* --- Overrides for unified relations head in add overlay --- */
 .vor-add-relations .vor-relations-head {
   display: flex;
@@ -442,7 +443,7 @@
 }
 
 /* --- Responsive --- */
-@media (max-width: 900px) {
+@media (width <= 900px) {
   #vor-overlay:has(.is-add) {
     overflow: auto;
   }
@@ -491,7 +492,7 @@
   }
 }
 
-@media (max-width: 1100px) {
+@media (width <= 1100px) {
   .vor-add-hero {
     grid-template-columns: 260px minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);

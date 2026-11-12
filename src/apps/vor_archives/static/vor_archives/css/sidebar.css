@@ -53,7 +53,7 @@
 
 .sidebar-btn:hover {
   color: var(--text-primary);
-  background-color: rgba(167, 145, 255, 0.1);
+  background-color: rgb(167 145 255 / 10%);
   border-color: var(--accent-hover);
 }
 
@@ -64,7 +64,7 @@
 .sidebar-btn.active {
   color: var(--accent-vor);
   border-color: var(--accent-vor);
-  background-color: rgba(167, 145, 255, 0.12);
+  background-color: rgb(167 145 255 / 12%);
 }
 
 .sidebar-btn-primary {
@@ -74,7 +74,7 @@
 }
 
 .sidebar-btn-primary:hover {
-  background-color: rgba(167, 145, 255, 0.15);
+  background-color: rgb(167 145 255 / 15%);
 }
 
 .sidebar-btn-icon {
@@ -89,7 +89,7 @@
 }
 
 .sidebar-btn-add:hover {
-  background-color: rgba(52, 211, 153, 0.15);
+  background-color: rgb(52 211 153 / 15%);
   border-color: var(--action-add);
   color: var(--action-add);
 }
@@ -100,7 +100,7 @@
 }
 
 .sidebar-btn-delete:hover {
-  background-color: rgba(239, 68, 68, 0.15);
+  background-color: rgb(239 68 68 / 15%);
   border-color: var(--action-delete);
   color: var(--action-delete);
 }
@@ -161,7 +161,7 @@
 
 .collection-item:hover {
   color: var(--text-primary);
-  background-color: rgba(167, 145, 255, 0.08);
+  background-color: rgb(167 145 255 / 8%);
 }
 
 .collection-tree-node {
@@ -197,12 +197,12 @@
 
 .collection-item.is-active {
   color: var(--text-primary);
-  background-color: rgba(167, 145, 255, 0.16);
+  background-color: rgb(167 145 255 / 16%);
 }
 
 .collection-item.is-drop-target {
   color: var(--text-primary);
-  background-color: rgba(167, 145, 255, 0.28);
+  background-color: rgb(167 145 255 / 28%);
   outline: 1px dashed var(--accent-vor);
 }
 
@@ -250,19 +250,18 @@
 }
 
 body.vor-collections-dragging .collection-children {
-  outline: 1px dashed rgba(167, 145, 255, 0.25);
+  outline: 1px dashed rgb(167 145 255 / 25%);
 }
 
 /* --- Filters --- */
 .sidebar-filters {
   flex: 1;
   display: flex;
-  overflow-y: auto;
-  overflow-x: auto;
+  overflow: auto;
   min-height: 0;
   flex-direction: column;
   gap: 0.5rem;
-  padding: 0.5rem 0.5rem 0 0.5rem;
+  padding: 0.5rem 0.5rem 0;
 }
 
 .sidebar-filters-title-row {
@@ -296,7 +295,7 @@ body.vor-collections-dragging .collection-children {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  padding: 0.5rem 0 0.25rem 0;
+  padding: 0.5rem 0 0.25rem;
 }
 
 .sidebar-accordion-search-row {
@@ -426,7 +425,7 @@ body.vor-collections-dragging .collection-children {
 
 /* Фокус (для доступности) */
 .hidden-checkbox:focus + .custom-checkbox {
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 0 2px rgb(99 102 241 / 30%);
 }
 
 /* --- Sorting --- */
@@ -459,7 +458,7 @@ select.sidebar-select {
 .sidebar-select:focus {
   outline: none;
   border-color: var(--accent-hover);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 0 2px rgb(99 102 241 / 20%);
 }
 
 .sidebar-btn:disabled {
