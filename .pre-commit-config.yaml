@@ -1,3 +1,6 @@
+default_language_version:
+  node: "26.13.1"
+
 exclude: >
   (?x)^(
     node_modules/.*|
@@ -19,6 +22,16 @@ repos:
       - id: check-merge-conflict
       - id: mixed-line-ending
         args: ["--fix=lf"]
+
+  - repo: local
+    hooks:
+      - id: prettier
+        name: prettier
+        entry: prettier
+        language: node
+        additional_dependencies: ["prettier@3.10"]
+        files: \.(js|mjs|cjs|json|css|md|yml|yaml)$
+        args: ["--write", "--ignore-unknown"]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.5

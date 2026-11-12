@@ -1,0 +1,13 @@
+# Generated / third-party
+node_modules/
+src/static/vendor/
+package-lock.json
+*.min.js
+*.min.css
+
+# Licenses
+LICEN[CS]E
+LICEN[CS]E.*
+
+# HTML is formatted by djlint
+*.html
