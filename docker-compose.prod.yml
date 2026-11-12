@@ -53,8 +53,8 @@ services:
 
 volumes:
   postgres_data:
-    name: mn_db_data
+    name: ${DB_VOLUME_NAME:-mn_db_data}
   static_volume:
-    name: mn_static
+    name: ${STATIC_VOLUME_NAME:-mn_static}
   media_volume:
-    name: mn_media
+    name: ${MEDIA_VOLUME_NAME:-mn_media}
