@@ -33,6 +33,16 @@ repos:
         files: \.(js|mjs|cjs|json|css|md|yml|yaml)$
         args: ["--write", "--ignore-unknown"]
 
+      - id: stylelint
+        name: stylelint
+        entry: stylelint
+        language: node
+        additional_dependencies:
+          - "stylelint@16.23.1"
+          - "stylelint-config-standard@38.0.0"
+        files: \.css$
+        args: ["--fix", "--formatter", "verbose"]
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.5
     hooks:
