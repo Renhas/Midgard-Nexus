@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "paths": {
-      "@lib": ["./src/static/js/lib"],
       "@lib/*": ["./src/static/js/lib/*"],
       "@vor/*": ["./src/apps/vor_archives/static/vor_archives/js/*"]
     }

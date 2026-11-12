@@ -1,15 +1,20 @@
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { defineConfig } from "vitest/config";
 
+function loadAliases(configPath) {
+  const jsconfig = JSON.parse(readFileSync(configPath, "utf8"));
+  return Object.fromEntries(
+    Object.entries(jsconfig.compilerOptions.paths).map(([alias, [target]]) => [
+      alias.replace(/\/\*$/, ""),
+      resolve(__dirname, target.replace(/\/\*$/, "")),
+    ]),
+  );
+}
+
 export default defineConfig({
   resolve: {
-    alias: {
-      "@lib": resolve(__dirname, "src/static/js/lib"),
-      "@vor": resolve(
-        __dirname,
-        "src/apps/vor_archives/static/vor_archives/js"
-      ),
-    },
+    alias: loadAliases(resolve(__dirname, "jsconfig.json")),
   },
   test: {
     environment: "jsdom",
