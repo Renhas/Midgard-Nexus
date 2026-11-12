@@ -78,7 +78,7 @@
 {% block page_notifications %}
   {% csrf_token %}
   <div id="vor-overlay"></div>
-  <div id="vor-modal"></div>
+  <div id="vor-modal" data-vor-delete-preview="{% url 'vor_archives:artworks:delete_preview' %}"></div>
   {% include "vor_archives/partials/artworks/search/artwork_library_search.html" %}
   <div x-data="{ visible: false }"
        @collection-update.window="visible = true; setTimeout(() => visible = false, 3000)"
