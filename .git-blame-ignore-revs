@@ -3,3 +3,6 @@ df282c5a1ec102eb8cf5cdc62d79b3459946cd04
 
 # Reformat static files to 2 spaces
 0702fb0b9ee08fb40d46f157f2dff19d32dc67d3
+
+# Apply file hygiene fixes across the codebase
+2b36290b72a216f6b08e33be5de0af2e4e0df3d3
