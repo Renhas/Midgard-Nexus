@@ -236,11 +236,11 @@
   min-width: 100%;
 }
 
-.collection-tree-node>.collection-children {
+.collection-tree-node > .collection-children {
   display: none;
 }
 
-.collection-tree-node.is-expanded>.collection-children {
+.collection-tree-node.is-expanded > .collection-children {
   display: flex;
 }
 
@@ -402,12 +402,12 @@ body.vor-collections-dragging .collection-children {
   border-color: var(--accent-hover);
 }
 
-.hidden-checkbox:checked+.custom-checkbox {
+.hidden-checkbox:checked + .custom-checkbox {
   background-color: var(--accent-hover);
   border-color: var(--accent-hover);
 }
 
-.hidden-checkbox:checked+.custom-checkbox::after,
+.hidden-checkbox:checked + .custom-checkbox::after,
 .custom-checkbox.is-checked::after {
   content: "";
   display: block;
@@ -425,7 +425,7 @@ body.vor-collections-dragging .collection-children {
 }
 
 /* Фокус (для доступности) */
-.hidden-checkbox:focus+.custom-checkbox {
+.hidden-checkbox:focus + .custom-checkbox {
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
 }
 

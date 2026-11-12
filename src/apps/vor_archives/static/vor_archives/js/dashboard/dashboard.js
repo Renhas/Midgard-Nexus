@@ -1,6 +1,13 @@
 import { Chart } from "@lib/chart";
 import { getAlpine } from "@lib/alpine";
-import { DASH_CHART_COLORS, MIN_SIZE_PX, MAX_SIZE_PX, centerTextPlugin, readJsonScript, formatDashPercent } from "@vor/dashboard/charts";
+import {
+  DASH_CHART_COLORS,
+  MIN_SIZE_PX,
+  MAX_SIZE_PX,
+  centerTextPlugin,
+  readJsonScript,
+  formatDashPercent,
+} from "@vor/dashboard/charts";
 
 document.addEventListener("alpine:init", () => {
   getAlpine().data("vorDashStats", () => ({
@@ -23,7 +30,7 @@ document.addEventListener("alpine:init", () => {
       this.ratingMatrix = data.rating_matrix || {};
       this.spent = data.spent || {};
       this.typeMeta = data.type_meta || {};
-      this.statusChoices = data.status_choices || {}
+      this.statusChoices = data.status_choices || {};
       this.ageChoices = data.age_choices || {};
       this.ratingChoices = data.rating_choices || {};
 
@@ -50,12 +57,15 @@ document.addEventListener("alpine:init", () => {
     },
     get averageRating() {
       if (!this.workTypes.length) return "0.0";
-      const total_res = this.workTypes.reduce((res, type) => {
-        const row_res = this.sumByRowWithCount(type, this.ratingMatrix);
-        res.sum += row_res.sum;
-        res.count += row_res.count;
-        return res;
-      }, { "sum": 0, "count": 0 });
+      const total_res = this.workTypes.reduce(
+        (res, type) => {
+          const row_res = this.sumByRowWithCount(type, this.ratingMatrix);
+          res.sum += row_res.sum;
+          res.count += row_res.count;
+          return res;
+        },
+        { sum: 0, count: 0 },
+      );
       return total_res.count ? (total_res.sum / total_res.count).toFixed(1) : "0.0";
     },
     get spentProgressItems() {
@@ -67,38 +77,38 @@ document.addEventListener("alpine:init", () => {
       }));
     },
     get pieTypesItems() {
-      return Object.keys(this.typeMeta).map(type => ({
+      return Object.keys(this.typeMeta).map((type) => ({
         label: this.typeMeta[type].label,
         count: this.sumByRow(type, this.statusMatrix),
       }));
     },
     get pieStatusItems() {
       if (!this.workTypes.length) return {};
-      return Object.keys(this.statusChoices).map(status => ({
+      return Object.keys(this.statusChoices).map((status) => ({
         label: this.statusChoices[status].label,
         count: this.sumByCol(status, this.statusMatrix),
       }));
     },
     get pieAgeItems() {
       if (!this.workTypes.length) return {};
-      return Object.keys(this.ageChoices).map(age => ({
+      return Object.keys(this.ageChoices).map((age) => ({
         label: this.ageChoices[age].label,
         count: this.sumByCol(age, this.ageMatrix),
       }));
     },
     get pieRatingItems() {
       if (!this.workTypes.length) return {};
-      return Object.keys(this.ratingChoices).map(age => ({
+      return Object.keys(this.ratingChoices).map((age) => ({
         label: this.ratingChoices[age].label,
         count: this.sumByCol(age, this.ratingMatrix),
       }));
     },
     get barRatingItems() {
-      return Object.keys(this.typeMeta).map(type => {
+      return Object.keys(this.typeMeta).map((type) => {
         const { sum, count } = this.sumByRowWithCount(type, this.ratingMatrix);
         return {
           label: this.typeMeta[type].label,
-          count: this.avgStr(sum, count)
+          count: this.avgStr(sum, count),
         };
       });
     },
@@ -111,21 +121,23 @@ document.addEventListener("alpine:init", () => {
       }
     },
     sumByCol(col, matrix) {
-      return this.workTypes.reduce((sum, type) =>
-        sum + (matrix[type]?.[col] || 0), 0);
+      return this.workTypes.reduce((sum, type) => sum + (matrix[type]?.[col] || 0), 0);
     },
     sumByRow(row, matrix) {
       const row_data = matrix[row] || {};
-      return Object.values(row_data).reduce((sum, val) => sum + val, 0)
+      return Object.values(row_data).reduce((sum, val) => sum + val, 0);
     },
     sumByRowWithCount(row, matrix) {
       const row_data = matrix[row] || {};
-      return Object.entries(row_data).reduce((res, [rating, count]) => {
-        if (rating === "") return res;
-        res.sum += Number(rating) * count;
-        res.count += count;
-        return res;
-      }, { "sum": 0, "count": 0 });
+      return Object.entries(row_data).reduce(
+        (res, [rating, count]) => {
+          if (rating === "") return res;
+          res.sum += Number(rating) * count;
+          res.count += count;
+          return res;
+        },
+        { sum: 0, count: 0 },
+      );
     },
     avgStr(sum, count) {
       return count ? (sum / count).toFixed(1) : "0.0";
@@ -142,15 +154,15 @@ document.addEventListener("alpine:init", () => {
       this.pieCharts[key] = new Chart(canvas, {
         type: "doughnut",
         data: {
-          labels: items.map(i => i.label),
-          datasets: [{
-            data: items.map(i => i.count),
-            backgroundColor: items.map(
-              (_, index) => DASH_CHART_COLORS[index % DASH_CHART_COLORS.length]
-            ),
-            borderColor: "#1A233A",
-            borderWidth: 2,
-          }],
+          labels: items.map((i) => i.label),
+          datasets: [
+            {
+              data: items.map((i) => i.count),
+              backgroundColor: items.map((_, index) => DASH_CHART_COLORS[index % DASH_CHART_COLORS.length]),
+              borderColor: "#1A233A",
+              borderWidth: 2,
+            },
+          ],
         },
         options: {
           responsive: true,
@@ -163,12 +175,10 @@ document.addEventListener("alpine:init", () => {
                 color: "#E2E8F0",
               },
             },
-            centerText: centerText
-              ? { "text": centerText.value, "label": centerText.label, }
-              : undefined,
+            centerText: centerText ? { text: centerText.value, label: centerText.label } : undefined,
           },
         },
-        plugins: [centerTextPlugin]
+        plugins: [centerTextPlugin],
       });
     },
     _renderBar(key, canvas, items) {
@@ -180,17 +190,17 @@ document.addEventListener("alpine:init", () => {
       this.barCharts[key] = new Chart(canvas, {
         type: "bar",
         data: {
-          labels: items.map(i => i.label),
-          datasets: [{
-            data: items.map(i => i.count),
-            backgroundColor: items.map(
-              (_, index) => DASH_CHART_COLORS[index % DASH_CHART_COLORS.length]
-            ),
-            borderRadius: 4,
-            borderSkipped: false,
-            barThickness: "flex",
-            maxBarThickness: 96,
-          }],
+          labels: items.map((i) => i.label),
+          datasets: [
+            {
+              data: items.map((i) => i.count),
+              backgroundColor: items.map((_, index) => DASH_CHART_COLORS[index % DASH_CHART_COLORS.length]),
+              borderRadius: 4,
+              borderSkipped: false,
+              barThickness: "flex",
+              maxBarThickness: 96,
+            },
+          ],
         },
         options: {
           responsive: true,
@@ -202,7 +212,7 @@ document.addEventListener("alpine:init", () => {
               ticks: {
                 color: "#94A3B8",
                 font: { size: 11 },
-                precision: 0,     // целые числа на оси
+                precision: 0, // целые числа на оси
               },
               grid: { color: "rgba(255,255,255,0.06)" },
               border: { display: false },
@@ -226,47 +236,27 @@ document.addEventListener("alpine:init", () => {
               borderWidth: 1,
             },
           },
-        }
+        },
       });
     },
     renderPieTypes() {
-      this._renderPie(
-        "types",
-        this.$refs.pieTypes,
-        this.pieTypesItems,
-        { centerText: { value: this.worksTotalCount, label: "всего" } }
-      );
+      this._renderPie("types", this.$refs.pieTypes, this.pieTypesItems, {
+        centerText: { value: this.worksTotalCount, label: "всего" },
+      });
     },
     renderPieStatus() {
-      this._renderPie(
-        "statuses",
-        this.$refs.pieStatus,
-        this.pieStatusItems,
-        { centerText: null }
-      );
+      this._renderPie("statuses", this.$refs.pieStatus, this.pieStatusItems, { centerText: null });
     },
     renderPieAge() {
-      this._renderPie(
-        "age",
-        this.$refs.pieAge,
-        this.pieAgeItems,
-        { centerText: null }
-      );
+      this._renderPie("age", this.$refs.pieAge, this.pieAgeItems, { centerText: null });
     },
     renderPieRating() {
-      this._renderPie(
-        "rating",
-        this.$refs.pieRating,
-        this.pieRatingItems,
-        { centerText: { value: this.averageRating, label: "среднее" } }
-      );
+      this._renderPie("rating", this.$refs.pieRating, this.pieRatingItems, {
+        centerText: { value: this.averageRating, label: "среднее" },
+      });
     },
     renderBarRating() {
-      this._renderBar(
-        "rating",
-        this.$refs.barRating,
-        this.barRatingItems,
-      );
+      this._renderBar("rating", this.$refs.barRating, this.barRatingItems);
     },
   }));
 
@@ -294,7 +284,7 @@ document.addEventListener("alpine:init", () => {
           Object.entries(this.attrs).map(([key, items]) => [
             key,
             items.reduce((sum, item) => sum + (item.count || 0), 0),
-          ])
+          ]),
         );
       },
       getItems(attrKey) {
@@ -310,13 +300,15 @@ document.addEventListener("alpine:init", () => {
         const items = this.attrs[attrKey];
         if (!items.length) return [];
 
-        const counts = items.map(i => i.count);
+        const counts = items.map((i) => i.count);
         const min = Math.min(...counts);
         const max = Math.max(...counts);
 
-        return items.map(item => {
-          const size = min === max ? (MIN_SIZE_PX + MAX_SIZE_PX) / 2
-            : MIN_SIZE_PX + ((item.count - min) / (max - min)) * (MAX_SIZE_PX - MIN_SIZE_PX);
+        return items.map((item) => {
+          const size =
+            min === max
+              ? (MIN_SIZE_PX + MAX_SIZE_PX) / 2
+              : MIN_SIZE_PX + ((item.count - min) / (max - min)) * (MAX_SIZE_PX - MIN_SIZE_PX);
 
           return {
             label: item.name,
@@ -348,7 +340,7 @@ document.addEventListener("alpine:init", () => {
             barCharts[key]?.stop();
             barCharts[key]?.destroy();
           } catch (e) {
-            console.error('[attrs] destroy failed for', key, e);
+            console.error("[attrs] destroy failed for", key, e);
           }
           delete barCharts[key];
         }
@@ -359,7 +351,7 @@ document.addEventListener("alpine:init", () => {
             cloudCharts[key]?.stop();
             cloudCharts[key]?.destroy();
           } catch (e) {
-            console.error('[attrs] destroy failed for', key, e);
+            console.error("[attrs] destroy failed for", key, e);
           }
           delete cloudCharts[key];
         }
@@ -372,20 +364,18 @@ document.addEventListener("alpine:init", () => {
       },
       _formBarData(items) {
         return {
-          labels: items.map(i => i.label),
-          data: items.map(i => i.count),
-          bgColor: items.map(
-            (_, index) => DASH_CHART_COLORS[index % DASH_CHART_COLORS.length]
-          ),
-        }
+          labels: items.map((i) => i.label),
+          data: items.map((i) => i.count),
+          bgColor: items.map((_, index) => DASH_CHART_COLORS[index % DASH_CHART_COLORS.length]),
+        };
       },
       _formCloudData(items) {
         return {
-          labels: items.map(i => i.label),
-          data: items.map(i => i.size),
-          counts: items.map(i => i.count),
+          labels: items.map((i) => i.label),
+          data: items.map((i) => i.size),
+          counts: items.map((i) => i.count),
           color: DASH_CHART_COLORS[0],
-        }
+        };
       },
       _renderBar(key, canvas, items) {
         if (!canvas || !Chart) return;
@@ -403,17 +393,19 @@ document.addEventListener("alpine:init", () => {
           type: "bar",
           data: {
             labels: labels,
-            datasets: [{
-              data: data,
-              backgroundColor: bgColor,
-              borderRadius: 4,
-              borderSkipped: false,
-              barThickness: "flex",
-              maxBarThickness: 96,
-            }],
+            datasets: [
+              {
+                data: data,
+                backgroundColor: bgColor,
+                borderRadius: 4,
+                borderSkipped: false,
+                barThickness: "flex",
+                maxBarThickness: 96,
+              },
+            ],
           },
           options: {
-            indexAxis: 'y',
+            indexAxis: "y",
             responsive: true,
             maintainAspectRatio: false,
             scales: {
@@ -446,7 +438,7 @@ document.addEventListener("alpine:init", () => {
                 borderWidth: 1,
               },
             },
-          }
+          },
         });
       },
       _renderCloud(key, canvas, items) {
@@ -466,15 +458,17 @@ document.addEventListener("alpine:init", () => {
           type: "wordCloud",
           data: {
             labels: labels,
-            datasets: [{
-              label: "",
-              data: data,
-              color: color,
-              counts: counts,
-              minRotation: 0,
-              maxRotation: 0,
-              padding: 8,
-            }],
+            datasets: [
+              {
+                label: "",
+                data: data,
+                color: color,
+                counts: counts,
+                minRotation: 0,
+                maxRotation: 0,
+                padding: 8,
+              },
+            ],
           },
           options: {
             responsive: true,
@@ -491,32 +485,24 @@ document.addEventListener("alpine:init", () => {
                 callbacks: {
                   label: (ctx) => {
                     const counts = ctx.dataset.counts ?? [];
-                    return `${counts[ctx.dataIndex] ?? ''}`;
+                    return `${counts[ctx.dataIndex] ?? ""}`;
                   },
                 },
               },
             },
-          }
+          },
         });
       },
       renderSingleBar(attrKey) {
-        this._renderBar(
-          attrKey,
-          this.$refs[`bar-${attrKey}`],
-          this.getHistItems(attrKey),
-        );
+        this._renderBar(attrKey, this.$refs[`bar-${attrKey}`], this.getHistItems(attrKey));
       },
       renderSingleCloud(attrKey) {
-        this._renderCloud(
-          attrKey,
-          this.$refs[`cloud-${attrKey}`],
-          this.getCloudItems(attrKey),
-        );
+        this._renderCloud(attrKey, this.$refs[`cloud-${attrKey}`], this.getCloudItems(attrKey));
       },
       destroy() {
         this._deleteAllBars();
-      }
-    }
+      },
+    };
   });
 });
 

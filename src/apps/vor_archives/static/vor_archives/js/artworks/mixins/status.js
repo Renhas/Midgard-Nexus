@@ -1,14 +1,11 @@
-export function getStatusMixin({
-  status = "planning",
-  choices = [],
-} = {}) {
+export function getStatusMixin({ status = "planning", choices = [] } = {}) {
   return {
     status,
     statusChoices: choices,
     statusOpen: false,
     statusLabel() {
       const found = this.statusChoices.find((item) => item.value === this.status);
-      return found ? found.label : (this.status || "planning");
+      return found ? found.label : this.status || "planning";
     },
     setStatus(value) {
       this.statusOpen = false;
@@ -23,6 +20,6 @@ export function getStatusMixin({
       if (typeof this.saveField === "function") {
         this.saveField("status", value);
       }
-    }
+    },
   };
 }

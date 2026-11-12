@@ -246,24 +246,26 @@
   height: 0.7rem;
   border-radius: 50%;
   background-color: var(--text-secondary);
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .vor-switch:hover .vor-switch-track {
   border-color: var(--accent-hover);
 }
 
-.vor-switch-input:checked+.vor-switch-track {
+.vor-switch-input:checked + .vor-switch-track {
   background-color: var(--accent-hover);
   border-color: var(--accent-hover);
 }
 
-.vor-switch-input:checked+.vor-switch-track .vor-switch-thumb {
+.vor-switch-input:checked + .vor-switch-track .vor-switch-thumb {
   transform: translateX(0.9rem);
   background-color: var(--bg-primary);
 }
 
-.vor-switch-input:focus-visible+.vor-switch-track {
+.vor-switch-input:focus-visible + .vor-switch-track {
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
 }
 
@@ -374,7 +376,7 @@
   margin-bottom: 2px;
 }
 
-.vor-view-attrs>.vor-field-label {
+.vor-view-attrs > .vor-field-label {
   margin-bottom: 4px;
 }
 
@@ -383,8 +385,8 @@
   align-items: center;
 }
 
-.vor-view-labeled>.vor-field-label,
-.vor-view-labeled>.vor-field-value {
+.vor-view-labeled > .vor-field-label,
+.vor-view-labeled > .vor-field-value {
   flex: 0 0 auto;
 }
 
@@ -1438,8 +1440,6 @@ a.vor-relation-item:hover {
 .vor-link-input {
   width: 100%;
 }
-
-
 
 .vor-leave-confirm {
   z-index: 1040;

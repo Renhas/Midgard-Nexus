@@ -3,8 +3,7 @@ import { parseOverlayUrl, isSamePageLink } from "@vor/shared/pure/urls";
 
 describe("parseOverlayUrl", () => {
   it("extracts path and search from raw url", () => {
-    expect(parseOverlayUrl("/foo/bar?x=1", "https://example.com"))
-      .toBe("/foo/bar?x=1");
+    expect(parseOverlayUrl("/foo/bar?x=1", "https://example.com")).toBe("/foo/bar?x=1");
   });
   it("returns raw on empty input", () => {
     expect(parseOverlayUrl("", "https://example.com")).toBe("");
@@ -34,8 +33,7 @@ describe("isSamePageLink", () => {
     expect(isSamePageLink("/vor/artworks/?x=1", "", location)).toBe(false);
   });
   it("returns false for external origin", () => {
-    expect(isSamePageLink("https://other.com/vor/artworks/", "", location))
-      .toBe(false);
+    expect(isSamePageLink("https://other.com/vor/artworks/", "", location)).toBe(false);
   });
   it("returns false for _blank target", () => {
     expect(isSamePageLink("/vor/artworks/", "_blank", location)).toBe(false);

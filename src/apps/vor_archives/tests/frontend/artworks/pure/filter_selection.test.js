@@ -11,16 +11,13 @@ describe("mergeFilterSelection", () => {
     expect(mergeFilterSelection([], null, null)).toEqual([]);
   });
   it("returns all when all saved as selected", () => {
-    expect(mergeFilterSelection(catalog, [1, 2, 3, 4], [1, 2, 3, 4]))
-      .toEqual([1, 2, 3, 4]);
+    expect(mergeFilterSelection(catalog, [1, 2, 3, 4], [1, 2, 3, 4])).toEqual([1, 2, 3, 4]);
   });
   it("excludes known-but-unselected", () => {
-    expect(mergeFilterSelection(catalog, [1, 2], [1, 2, 3, 4]))
-      .toEqual([1, 2]);
+    expect(mergeFilterSelection(catalog, [1, 2], [1, 2, 3, 4])).toEqual([1, 2]);
   });
   it("includes unknown (new) entries", () => {
-    expect(mergeFilterSelection([1, 2, 3, 4, 5], [1, 2], [1, 2, 3, 4]))
-      .toEqual([1, 2, 5]);
+    expect(mergeFilterSelection([1, 2, 3, 4, 5], [1, 2], [1, 2, 3, 4])).toEqual([1, 2, 5]);
   });
   it("compares by string key", () => {
     expect(mergeFilterSelection(["a", "b"], ["a"], ["a", "b"])).toEqual(["a"]);

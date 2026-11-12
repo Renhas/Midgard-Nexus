@@ -80,8 +80,11 @@
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   background-color: var(--bg-card);
-  transition: transform 0.15s ease, border-color 0.15s ease,
-    box-shadow 0.15s ease, background-color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .dash-card:hover {
@@ -190,7 +193,7 @@
   min-width: 0;
 }
 
-.dash-progress-metric+.dash-progress-metric::before {
+.dash-progress-metric + .dash-progress-metric::before {
   content: "";
   position: absolute;
   left: calc(-0.25rem - 0.5px);
@@ -272,15 +275,15 @@
   font-size: 0.85rem;
 }
 
-.dash-attr-row>span {
+.dash-attr-row > span {
   text-align: center;
 }
 
-.dash-attr-row>span:first-child {
+.dash-attr-row > span:first-child {
   text-align: left;
 }
 
-.dash-attr-row>span:last-child {
+.dash-attr-row > span:last-child {
   text-align: right;
 }
 
@@ -507,7 +510,6 @@
 
 /* --- Responsive --- */
 @media (max-width: 1200px) {
-
   .dash-attr-grid,
   .dash-activity {
     grid-template-columns: 1fr;

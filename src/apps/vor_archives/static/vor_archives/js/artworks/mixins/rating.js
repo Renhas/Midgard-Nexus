@@ -4,9 +4,7 @@ import {
   starState as pureStarState,
 } from "@vor/artworks/pure/rating";
 
-export function getRatingMixin({
-  rating = 0,
-} = {}) {
+export function getRatingMixin({ rating = 0 } = {}) {
   return {
     rating,
     hoverRating: 0,
@@ -24,6 +22,6 @@ export function getRatingMixin({
       if (typeof this.saveField === "function") {
         this.saveField("rating", this.rating);
       }
-    }
+    },
   };
 }

@@ -1,9 +1,9 @@
-name: 'Update Project Status'
-description: 'Moves one or more issues to a given status in a GitHub Project'
+name: "Update Project Status"
+description: "Moves one or more issues to a given status in a GitHub Project"
 
 inputs:
   github-token:
-    description: 'PAT with project scope'
+    description: "PAT with project scope"
     required: true
   issue-numbers:
     description: 'Comma-separated list of issue numbers (e.g. "12,34,56")'
@@ -12,20 +12,20 @@ inputs:
     description: 'Target status name (e.g. "In progress")'
     required: true
   project-title:
-    description: 'Project title'
+    description: "Project title"
     required: false
-    default: 'Midgard-Nexus-project'
+    default: "Midgard-Nexus-project"
   status-field-name:
-    description: 'Status field name'
+    description: "Status field name"
     required: false
-    default: 'Status'
+    default: "Status"
   forbidden-source-statuses:
-    description: 'Comma-separated list of statuses. If current issue status matches any, the update is skipped.'
+    description: "Comma-separated list of statuses. If current issue status matches any, the update is skipped."
     required: false
-    default: ''
+    default: ""
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Update project status
       uses: actions/github-script@v7

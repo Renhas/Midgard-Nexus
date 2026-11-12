@@ -1,8 +1,6 @@
 import { VorApi } from "@vor/artworks/api";
 
-export function getAttachMixin({
-  attachUrl = "",
-} = {}) {
+export function getAttachMixin({ attachUrl = "" } = {}) {
   return {
     attachUrl,
     resetAttachFields() {
@@ -35,6 +33,6 @@ export function getAttachMixin({
       } finally {
         this.saving = false;
       }
-    }
+    },
   };
 }

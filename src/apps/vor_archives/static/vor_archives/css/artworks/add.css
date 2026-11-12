@@ -178,7 +178,7 @@
   justify-content: initial;
 }
 
-.vor-overlay.is-add .vor-overlay-bar>.sidebar-btn:first-child {
+.vor-overlay.is-add .vor-overlay-bar > .sidebar-btn:first-child {
   justify-self: start;
 }
 
@@ -256,7 +256,7 @@
   z-index: 3;
 }
 
-.vor-add-info>h3 {
+.vor-add-info > h3 {
   flex-shrink: 0;
 }
 
@@ -350,7 +350,7 @@
   min-height: 0;
 }
 
-.vor-add-attrs .sidebar-accordion+.sidebar-accordion {
+.vor-add-attrs .sidebar-accordion + .sidebar-accordion {
   margin-top: 0.45rem;
 }
 

@@ -1,7 +1,7 @@
 ---
 name: Task
 about: Maintenance, refactoring, docs, tests, CI, infra
-labels: 'type: chore'
+labels: "type: chore"
 ---
 
 ## Контекст

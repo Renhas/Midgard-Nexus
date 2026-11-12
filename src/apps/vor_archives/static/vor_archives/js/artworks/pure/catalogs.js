@@ -1,8 +1,14 @@
 export function filterCatalogue(items, query) {
-  const q = String(query || "").trim().toLowerCase();
-  return (items || []).filter((item) => (
-    !q || String(item.name || "").toLowerCase().includes(q)
-  ));
+  const q = String(query || "")
+    .trim()
+    .toLowerCase();
+  return (items || []).filter(
+    (item) =>
+      !q ||
+      String(item.name || "")
+        .toLowerCase()
+        .includes(q),
+  );
 }
 
 export function isSelected(list, id) {

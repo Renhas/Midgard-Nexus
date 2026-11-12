@@ -1,7 +1,7 @@
 ---
 name: Feature request
 about: Новая функциональность или улучшение
-labels: 'type: feature'
+labels: "type: feature"
 ---
 
 ## Контекст

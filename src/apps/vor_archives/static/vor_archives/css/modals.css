@@ -98,7 +98,9 @@
 
 .vor-search-panel {
   width: min(560px, 100%);
-  transition: transform 0.2s ease, margin 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    margin 0.2s ease;
 }
 
 .vor-search-panel.has-query {

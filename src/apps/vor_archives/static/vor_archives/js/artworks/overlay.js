@@ -118,12 +118,7 @@ document.addEventListener("alpine:init", () => {
       }
       const before = parseDraft(this.snapshot);
       const after = parseDraft(this.buildSnapshot());
-      return dirtyChangesPure(
-        before,
-        after,
-        DRAFT_FIELD_LABELS,
-        Boolean(this.coverFile || this.coverCleared),
-      );
+      return dirtyChangesPure(before, after, DRAFT_FIELD_LABELS, Boolean(this.coverFile || this.coverCleared));
     },
     tryLeave(proceed) {
       const changes = this.dirtyChanges();

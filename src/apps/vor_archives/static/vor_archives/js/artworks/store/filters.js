@@ -3,9 +3,7 @@ import { getAlpine } from "@lib/alpine";
 import { mergeFilterSelection } from "@vor/artworks/pure/filter_selection";
 
 const ALL_WORK_TYPES = ["book", "film", "game"];
-const FILTER_KEYS = [
-  "status", "age_rating", "tags", "genre_book", "genre_film", "genre_game", "platform",
-];
+const FILTER_KEYS = ["status", "age_rating", "tags", "genre_book", "genre_film", "genre_game", "platform"];
 const SIDEBAR_STORAGE_KEY = "vor.artworks.sidebar";
 
 export const filtersMixin = {
@@ -15,17 +13,27 @@ export const filtersMixin = {
   sortField: "custom",
   sortAsc: true,
   filters: {
-    status: [], age_rating: [], tags: [],
-    genre_book: [], genre_film: [], genre_game: [], platform: [],
+    status: [],
+    age_rating: [],
+    tags: [],
+    genre_book: [],
+    genre_film: [],
+    genre_game: [],
+    platform: [],
   },
   filterCatalog: {
-    status: [], age_rating: [], tags: [],
-    genre_book: [], genre_film: [], genre_game: [], platform: [],
+    status: [],
+    age_rating: [],
+    tags: [],
+    genre_book: [],
+    genre_film: [],
+    genre_game: [],
+    platform: [],
   },
   listUrl: "",
 
   get listTitle() {
-    return this.collectionId ? (this.collectionName || "Коллекция") : "Медиатека";
+    return this.collectionId ? this.collectionName || "Коллекция" : "Медиатека";
   },
   restoreSidebar() {
     let saved = null;
@@ -53,11 +61,7 @@ export const filtersMixin = {
       this.sortAsc = saved.sortAsc;
     }
     FILTER_KEYS.forEach((key) => {
-      this.filters[key] = mergeFilterSelection(
-        this.filterCatalog[key],
-        saved.filters?.[key],
-        saved.known?.[key]
-      );
+      this.filters[key] = mergeFilterSelection(this.filterCatalog[key], saved.filters?.[key], saved.known?.[key]);
     });
   },
   persistSidebar() {
@@ -67,15 +71,18 @@ export const filtersMixin = {
       known[key] = [...(this.filterCatalog[key] || [])];
       filters[key] = [...(this.filters[key] || [])];
     });
-    localStorage.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify({
-      workTypes: [...this.workTypes],
-      showHidden: this.showHidden,
-      viewMode: this.viewMode,
-      sortField: this.sortField,
-      sortAsc: this.sortAsc,
-      filters,
-      known,
-    }));
+    localStorage.setItem(
+      SIDEBAR_STORAGE_KEY,
+      JSON.stringify({
+        workTypes: [...this.workTypes],
+        showHidden: this.showHidden,
+        viewMode: this.viewMode,
+        sortField: this.sortField,
+        sortAsc: this.sortAsc,
+        filters,
+        known,
+      }),
+    );
   },
   resetFilters(reload = true) {
     FILTER_KEYS.forEach((key) => {

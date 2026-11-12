@@ -37,7 +37,7 @@ document.addEventListener(
       store.toggleSelected(id);
     }
   },
-  true
+  true,
 );
 
 document.body.addEventListener("vor:reload-list", () => {
@@ -62,11 +62,9 @@ document.body.addEventListener("vor:collection-renamed", (event) => {
   if (String(store.collectionId) === String(payload.id)) {
     store.collectionName = payload.name || store.collectionName;
   }
-  store.collectionPath = (store.collectionPath || []).map((part) => (
-    String(part.id) === String(payload.id)
-      ? { ...part, name: payload.name || part.name }
-      : part
-  ));
+  store.collectionPath = (store.collectionPath || []).map((part) =>
+    String(part.id) === String(payload.id) ? { ...part, name: payload.name || part.name } : part,
+  );
 });
 
 document.addEventListener("contextmenu", (event) => {
@@ -124,13 +122,17 @@ document.addEventListener("click", (event) => {
   store.closeMenu();
 });
 
-window.addEventListener("scroll", (event) => {
-  const menu = document.getElementById("vor-context-menu");
-  if (menu && (menu === event.target || menu.contains(event.target))) {
-    return;
-  }
-  getAlpine()?.store("vorArtworks")?.closeMenu();
-}, true);
+window.addEventListener(
+  "scroll",
+  (event) => {
+    const menu = document.getElementById("vor-context-menu");
+    if (menu && (menu === event.target || menu.contains(event.target))) {
+      return;
+    }
+    getAlpine()?.store("vorArtworks")?.closeMenu();
+  },
+  true,
+);
 
 document.body.addEventListener("htmx:afterSwap", (event) => {
   const el = event.detail.elt;
@@ -160,17 +162,21 @@ document.body.addEventListener("htmx:afterSwap", (event) => {
   }
 });
 
-document.addEventListener("keydown", (event) => {
-  if (!(event.ctrlKey || event.metaKey) || event.code !== "KeyF") {
-    return;
-  }
-  if (!document.getElementById("vor-artworks-opts")) {
-    return;
-  }
-  if (hasContent("vor-overlay")) {
-    return;
-  }
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  getAlpine()?.store("vorArtworks")?.openSearch();
-}, true);
+document.addEventListener(
+  "keydown",
+  (event) => {
+    if (!(event.ctrlKey || event.metaKey) || event.code !== "KeyF") {
+      return;
+    }
+    if (!document.getElementById("vor-artworks-opts")) {
+      return;
+    }
+    if (hasContent("vor-overlay")) {
+      return;
+    }
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    getAlpine()?.store("vorArtworks")?.openSearch();
+  },
+  true,
+);

@@ -1,8 +1,6 @@
 import { wheelDirection } from "@vor/shared/pure/wheel";
 
-export function getAgePickerMixin({
-  ageChoices = [],
-} = {}) {
+export function getAgePickerMixin({ ageChoices = [] } = {}) {
   return {
     ageOpen: false,
     ageChoices,

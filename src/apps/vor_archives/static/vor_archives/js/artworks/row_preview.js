@@ -62,8 +62,9 @@ function fillPreview(item) {
   const title = item.dataset.previewTitle || "";
   const cover = item.dataset.previewCover || "";
   el.querySelector(".artwork-row-preview-title").textContent = title;
-  el.querySelector(".artwork-row-preview-desc").textContent =
-    (item.dataset.previewDesc || "").replace(/\s+/g, " ").trim();
+  el.querySelector(".artwork-row-preview-desc").textContent = (item.dataset.previewDesc || "")
+    .replace(/\s+/g, " ")
+    .trim();
   const img = el.querySelector("img");
   img.alt = title;
   if (cover) {

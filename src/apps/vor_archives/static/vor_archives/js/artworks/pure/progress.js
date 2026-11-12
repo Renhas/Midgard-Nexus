@@ -1,8 +1,6 @@
 export function progressValueLabel(value) {
   const v = Number(value || 0);
-  return v === Math.round(v)
-    ? String(Math.round(v))
-    : String(Math.round(v * 10) / 10);
+  return v === Math.round(v) ? String(Math.round(v)) : String(Math.round(v * 10) / 10);
 }
 
 export function progressSuffix(progressMax, progressUnit) {

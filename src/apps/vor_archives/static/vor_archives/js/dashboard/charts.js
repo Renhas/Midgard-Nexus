@@ -1,8 +1,16 @@
-
 export const DASH_CHART_COLORS = [
-  "#A78BFA", "#60A5FA", "#34D399", "#F87171", "#FB923C",
-  "#818CF8", "#FBBF24", "#22D3EE", "#F472B6", "#94A3B8",
-  "#C084FC", "#38BDF8",
+  "#A78BFA",
+  "#60A5FA",
+  "#34D399",
+  "#F87171",
+  "#FB923C",
+  "#818CF8",
+  "#FBBF24",
+  "#22D3EE",
+  "#F472B6",
+  "#94A3B8",
+  "#C084FC",
+  "#38BDF8",
 ];
 
 export const MIN_SIZE_PX = 12;
@@ -41,7 +49,7 @@ export function readJsonScript(id) {
   } catch (error) {
     return {};
   }
-};
+}
 
 export function formatDashPercent(value) {
   const number = Number(value || 0);
@@ -52,4 +60,4 @@ export function formatDashPercent(value) {
     return `${number}%`;
   }
   return `${number}%`;
-};
+}

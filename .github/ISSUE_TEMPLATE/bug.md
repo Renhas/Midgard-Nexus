@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Что-то работает не так, как ожидалось
-labels: 'type: bug'
+labels: "type: bug"
 ---
 
 ## Описание

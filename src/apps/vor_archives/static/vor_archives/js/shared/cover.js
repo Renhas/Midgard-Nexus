@@ -26,26 +26,28 @@ export function cropCoverFile(file) {
       const canvas = document.createElement("canvas");
       canvas.width = Math.max(1, Math.round(sw));
       canvas.height = Math.max(1, Math.round(sh));
-      canvas.getContext("2d").drawImage(
-        image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height
+      canvas.getContext("2d").drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error("cover"));
+            return;
+          }
+          const next = new File([blob], file.name.replace(/\.\w+$/, ".jpg"), {
+            type: "image/jpeg",
+          });
+          resolve({
+            file: next,
+            cropped: true,
+            srcW,
+            srcH,
+            outW: canvas.width,
+            outH: canvas.height,
+          });
+        },
+        "image/jpeg",
+        0.92,
       );
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          reject(new Error("cover"));
-          return;
-        }
-        const next = new File([blob], file.name.replace(/\.\w+$/, ".jpg"), {
-          type: "image/jpeg",
-        });
-        resolve({
-          file: next,
-          cropped: true,
-          srcW,
-          srcH,
-          outW: canvas.width,
-          outH: canvas.height,
-        });
-      }, "image/jpeg", 0.92);
     };
     image.onerror = () => {
       URL.revokeObjectURL(url);

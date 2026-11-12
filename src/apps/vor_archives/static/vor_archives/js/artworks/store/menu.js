@@ -3,13 +3,24 @@ import { VorApi } from "@vor/artworks/api";
 
 export const menuMixin = {
   menu: {
-    open: false, kind: "", x: 0, y: 0,
-    collectionId: null, collectionName: "",
-    uwId: null, detailUrl: "",
-    flyout: false, flyoutSide: "right", flyoutX: 0, flyoutY: 0,
-    membership: [], membershipLoading: false,
-    canNudgeUp: false, canNudgeDown: false,
-    canLevelUp: false, canLevelDown: false,
+    open: false,
+    kind: "",
+    x: 0,
+    y: 0,
+    collectionId: null,
+    collectionName: "",
+    uwId: null,
+    detailUrl: "",
+    flyout: false,
+    flyoutSide: "right",
+    flyoutX: 0,
+    flyoutY: 0,
+    membership: [],
+    membershipLoading: false,
+    canNudgeUp: false,
+    canNudgeDown: false,
+    canLevelUp: false,
+    canLevelDown: false,
     canRemoveFromCollection: false,
   },
   _flyoutTimer: null,
@@ -68,9 +79,7 @@ export const menuMixin = {
     this.menu.detailUrl = item.dataset.detailUrl || "";
     const nested = Boolean(item.closest(".artwork-list-items-nested"));
     const list = document.getElementById("artwork-list-items");
-    const items = list
-      ? [...list.querySelectorAll(":scope > .artwork-item")]
-      : [];
+    const items = list ? [...list.querySelectorAll(":scope > .artwork-item")] : [];
     const index = items.indexOf(item);
     const canNudge = !nested && this.canReorder() && index >= 0;
     this.menu.canNudgeUp = canNudge && index > 0;
@@ -82,9 +91,7 @@ export const menuMixin = {
     this.loadArtworkCollections();
   },
   nudgeArtwork(delta) {
-    const item = document.querySelector(
-      `.artwork-item[data-uw-id="${this.menu.uwId}"]`,
-    );
+    const item = document.querySelector(`.artwork-item[data-uw-id="${this.menu.uwId}"]`);
     const list = document.getElementById("artwork-list-items");
     this.closeMenu();
     if (!item || !list || item.closest(".artwork-list-items-nested")) {
@@ -198,10 +205,7 @@ export const menuMixin = {
     if (!collectionId || !uwId) {
       return;
     }
-    const data = await VorApi.removeWorkFromCollection(
-      this.collectionUrl(collectionId, "items/"),
-      uwId,
-    );
+    const data = await VorApi.removeWorkFromCollection(this.collectionUrl(collectionId, "items/"), uwId);
     if (!data?.ok) {
       return;
     }
@@ -213,11 +217,7 @@ export const menuMixin = {
       return;
     }
     const adding = !item.in_collection;
-    const data = await VorApi.toggleWorkCollection(
-      this.collectionUrl(item.id, "items/"),
-      this.menu.uwId,
-      adding,
-    );
+    const data = await VorApi.toggleWorkCollection(this.collectionUrl(item.id, "items/"), this.menu.uwId, adding);
     if (!data?.ok) {
       return;
     }

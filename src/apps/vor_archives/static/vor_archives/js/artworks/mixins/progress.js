@@ -6,12 +6,7 @@ import {
   parseProgressDraft as pureParseProgressDraft,
 } from "@vor/artworks/pure/progress";
 
-export function getProgressMixin({
-  progress = 0,
-  progressMax = null,
-  progressUnit = "",
-  progressStep = 1,
-} = {}) {
+export function getProgressMixin({ progress = 0, progressMax = null, progressUnit = "", progressStep = 1 } = {}) {
   return {
     progress,
     progressMax,
@@ -61,6 +56,6 @@ export function getProgressMixin({
     },
     clampProgress(value) {
       return pureClampProgress(value, this.progressMax);
-    }
+    },
   };
 }

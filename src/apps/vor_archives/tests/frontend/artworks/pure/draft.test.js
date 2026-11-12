@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  serializeDraft,
-  parseDraft,
-  dirtyChanges,
-} from "@vor/artworks/pure/draft";
+import { serializeDraft, parseDraft, dirtyChanges } from "@vor/artworks/pure/draft";
 
 function makeSource() {
   return {
@@ -40,8 +36,7 @@ describe("serializeDraft", () => {
     expect(serializeDraft(null)).toBe("{}");
   });
   it("serializes arrays inside payload", () => {
-    expect(serializeDraft({ authors: [{ id: 1 }] }))
-      .toBe('{"authors":[{"id":1}]}');
+    expect(serializeDraft({ authors: [{ id: 1 }] })).toBe('{"authors":[{"id":1}]}');
   });
 });
 
@@ -81,36 +76,28 @@ describe("dirtyChanges", () => {
   };
 
   it("returns empty for identical snapshots", () => {
-    expect(dirtyChanges({ title: "a" }, { title: "a" }, labels, false))
-      .toEqual([]);
+    expect(dirtyChanges({ title: "a" }, { title: "a" }, labels, false)).toEqual([]);
   });
   it("detects scalar change", () => {
-    expect(dirtyChanges({ title: "a" }, { title: "b" }, labels, false))
-      .toEqual(["Название"]);
+    expect(dirtyChanges({ title: "a" }, { title: "b" }, labels, false)).toEqual(["Название"]);
   });
   it("treats missing key as empty string", () => {
-    expect(dirtyChanges({}, { title: "b" }, labels, false))
-      .toEqual(["Название"]);
-    expect(dirtyChanges({ title: "b" }, {}, labels, false))
-      .toEqual(["Название"]);
+    expect(dirtyChanges({}, { title: "b" }, labels, false)).toEqual(["Название"]);
+    expect(dirtyChanges({ title: "b" }, {}, labels, false)).toEqual(["Название"]);
   });
   it("detects array change", () => {
-    expect(dirtyChanges({ authors: [{ id: 1 }] }, { authors: [{ id: 2 }] }, labels, false))
-      .toEqual(["Авторы"]);
+    expect(dirtyChanges({ authors: [{ id: 1 }] }, { authors: [{ id: 2 }] }, labels, false)).toEqual(["Авторы"]);
   });
   it("treats equal arrays as no change", () => {
-    expect(dirtyChanges({ authors: [{ id: 1 }] }, { authors: [{ id: 1 }] }, labels, false))
-      .toEqual([]);
+    expect(dirtyChanges({ authors: [{ id: 1 }] }, { authors: [{ id: 1 }] }, labels, false)).toEqual([]);
   });
   it("appends cover change when flag is set", () => {
     expect(dirtyChanges({}, {}, labels, true)).toEqual(["Обложка"]);
   });
   it("does not append cover when flag is false", () => {
-    expect(dirtyChanges({ title: "a" }, { title: "b" }, labels, false))
-      .toEqual(["Название"]);
+    expect(dirtyChanges({ title: "a" }, { title: "b" }, labels, false)).toEqual(["Название"]);
   });
   it("only checks labeled keys", () => {
-    expect(dirtyChanges({ title: "a", other: 1 }, { title: "a", other: 2 }, labels, false))
-      .toEqual([]);
+    expect(dirtyChanges({ title: "a", other: 1 }, { title: "a", other: 2 }, labels, false)).toEqual([]);
   });
 });

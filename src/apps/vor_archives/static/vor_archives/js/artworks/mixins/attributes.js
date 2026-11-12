@@ -26,8 +26,7 @@ export function getAttributeMixin({ catalogs = {} } = {}) {
     },
     pickerOptions(kind) {
       const query = String(this.pickerQuery || "").trim();
-      return filterCatalogue(this.attributeCatalogue(kind), query)
-        .filter((item) => !isSelected(this[kind], item.id));
+      return filterCatalogue(this.attributeCatalogue(kind), query).filter((item) => !isSelected(this[kind], item.id));
     },
     addPickerItem(kind, opt) {
       this[kind] = addSelection(this[kind], opt);

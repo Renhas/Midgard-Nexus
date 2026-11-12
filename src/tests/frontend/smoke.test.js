@@ -14,9 +14,7 @@ describe("vendor libraries", () => {
 
 describe("vor_archives artworks page", () => {
   it("entry point imports without throwing", async () => {
-    const mod = await import(
-      "../../apps/vor_archives/static/vor_archives/js/pages/artworks.js"
-    );
+    const mod = await import("../../apps/vor_archives/static/vor_archives/js/pages/artworks.js");
     expect(mod).toBeDefined();
   });
 });
