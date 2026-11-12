@@ -53,5 +53,8 @@ services:
 
 volumes:
   postgres_data:
+    name: mn_db_data
   static_volume:
+    name: mn_static
   media_volume:
+    name: mn_media
