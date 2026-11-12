@@ -43,6 +43,14 @@ repos:
         files: \.css$
         args: ["--fix", "--formatter", "verbose"]
 
+      - id: oxlint
+        name: oxlint
+        entry: oxlint
+        language: node
+        additional_dependencies: ["oxlint@1.93.0"]
+        files: \.(js|mjs|cjs)$
+        args: ["--tsconfig", "jsconfig.json"]
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.5
     hooks:
