@@ -1,20 +1,37 @@
+exclude: >
+  (?x)^(
+    node_modules/.*|
+    src/static/vendor/.*|
+    package-lock\.json|
+    .*\.min\.(js|css)|
+    (.*/)?LICEN[CS]E(\..*)?$
+  )$
+
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        args: ["--markdown-linebreak-ext=md,markdown"]
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.5
     hooks:
       - id: ruff
       - id: ruff-format
+
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.3
     hooks:
       - id: codespell
-        exclude: >
-          (?x)^(
-            .*\.min\.(js|css)|
-            .*/migrations/.*|
-            .*/static/vendor/.*|
-            package-lock\.json
-          )$
+        exclude: .*/migrations/.*
+
   - repo: https://github.com/djlint/djLint
     rev: v1.47.1
     hooks:
