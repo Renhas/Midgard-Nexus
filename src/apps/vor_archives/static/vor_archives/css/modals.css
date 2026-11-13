@@ -8,8 +8,8 @@
   margin-bottom: 1rem;
   padding: 0.5rem 0.7rem;
   border: 1px solid var(--border);
-  border-radius: 0.375rem;
-  background: var(--bg-input, transparent);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
   color: var(--text-primary);
 }
 
@@ -33,8 +33,8 @@
   position: fixed;
   inset: 0;
   top: var(--header-height);
-  z-index: 1025;
-  background-color: rgb(11 17 32 / 72%);
+  z-index: var(--z-modal-backdrop);
+  background-color: var(--backdrop-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,9 +45,9 @@
   width: min(480px, 100%);
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   padding: 1.25rem 1.35rem;
-  box-shadow: 0 1rem 2rem rgb(0 0 0 / 40%);
+  box-shadow: var(--shadow-lg);
 }
 
 .vor-modal-title {
@@ -62,8 +62,8 @@
 
 .vor-modal-warning {
   border: 1px solid var(--action-delete);
-  background-color: rgb(239 68 68 / 8%);
-  border-radius: 0.375rem;
+  background-color: rgb(from var(--action-delete) r g b / 8%);
+  border-radius: var(--radius-sm);
   padding: 0.75rem;
   margin-bottom: 1rem;
   color: var(--text-primary);
@@ -88,8 +88,8 @@
   position: fixed;
   inset: 0;
   top: var(--header-height);
-  z-index: 1030;
-  background-color: rgb(11 17 32 / 72%);
+  z-index: var(--z-search-backdrop);
+  background-color: var(--backdrop-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -124,7 +124,7 @@
 .vor-search-field input {
   width: 100%;
   padding: 0.85rem 1rem 0.85rem 2.75rem;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background-color: var(--bg-card);
   color: var(--text-primary);
@@ -140,14 +140,14 @@
 .vor-search-field input:focus {
   outline: none;
   border-color: var(--accent-hover);
-  box-shadow: 0 0 0 2px rgb(99 102 241 / 20%);
+  box-shadow: var(--focus-ring);
 }
 
 .vor-search-segment {
   margin-top: 0.85rem;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   padding: 0.65rem 0.75rem;
 }
 
@@ -187,12 +187,12 @@
   background: transparent;
   color: var(--text-primary);
   text-align: left;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-sm);
   cursor: pointer;
 }
 
 .vor-search-result-main:hover {
-  background-color: rgb(167 145 255 / 12%);
+  background-color: rgb(from var(--accent-vor) r g b / 12%);
 }
 
 .vor-search-cover {

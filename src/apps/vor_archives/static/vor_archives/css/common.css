@@ -43,7 +43,7 @@ html.vor-scroll-lock .center {
   background-color: var(--bg-input);
   border-color: var(--accent-hover);
   color: var(--text-primary);
-  box-shadow: 0 0 0 0.2rem rgb(99 102 241 / 25%);
+  box-shadow: var(--focus-ring-strong);
 }
 
 .vor-field-errors,
@@ -61,7 +61,7 @@ html.vor-scroll-lock .center {
 
 /* ===== Status colors (shared) ===== */
 .status-planning {
-  color: var(--text-secondary);
+  color: var(--status-planning);
 }
 
 .status-in_progress {
@@ -69,9 +69,9 @@ html.vor-scroll-lock .center {
 }
 
 .status-completed {
-  color: var(--success);
+  color: var(--status-completed);
 }
 
 .status-dropped {
-  color: var(--error);
+  color: var(--status-dropped);
 }

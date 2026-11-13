@@ -39,7 +39,7 @@
   justify-content: center;
   gap: 0.4rem;
   padding: 0.35rem 0.65rem;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background-color: transparent;
   color: var(--text-secondary);
@@ -53,7 +53,7 @@
 
 .sidebar-btn:hover {
   color: var(--text-primary);
-  background-color: rgb(167 145 255 / 10%);
+  background-color: rgb(from var(--accent-vor) r g b / 10%);
   border-color: var(--accent-hover);
 }
 
@@ -64,7 +64,7 @@
 .sidebar-btn.active {
   color: var(--accent-vor);
   border-color: var(--accent-vor);
-  background-color: rgb(167 145 255 / 12%);
+  background-color: rgb(from var(--accent-vor) r g b / 12%);
 }
 
 .sidebar-btn-primary {
@@ -74,7 +74,7 @@
 }
 
 .sidebar-btn-primary:hover {
-  background-color: rgb(167 145 255 / 15%);
+  background-color: rgb(from var(--accent-vor) r g b / 15%);
 }
 
 .sidebar-btn-icon {
@@ -89,7 +89,7 @@
 }
 
 .sidebar-btn-add:hover {
-  background-color: rgb(52 211 153 / 15%);
+  background-color: rgb(from var(--action-add) r g b / 15%);
   border-color: var(--action-add);
   color: var(--action-add);
 }
@@ -100,7 +100,7 @@
 }
 
 .sidebar-btn-delete:hover {
-  background-color: rgb(239 68 68 / 15%);
+  background-color: rgb(from var(--action-delete) r g b / 15%);
   border-color: var(--action-delete);
   color: var(--action-delete);
 }
@@ -146,7 +146,7 @@
 
 .collection-item {
   padding: 0.3rem 0.5rem;
-  border-radius: 0.25rem;
+  border-radius: var(--radius-xs);
   font-size: 0.8125rem;
   color: var(--text-secondary);
   cursor: pointer;
@@ -161,7 +161,7 @@
 
 .collection-item:hover {
   color: var(--text-primary);
-  background-color: rgb(167 145 255 / 8%);
+  background-color: rgb(from var(--accent-vor) r g b / 8%);
 }
 
 .collection-tree-node {
@@ -197,12 +197,12 @@
 
 .collection-item.is-active {
   color: var(--text-primary);
-  background-color: rgb(167 145 255 / 16%);
+  background-color: rgb(from var(--accent-vor) r g b / 16%);
 }
 
 .collection-item.is-drop-target {
   color: var(--text-primary);
-  background-color: rgb(167 145 255 / 28%);
+  background-color: rgb(from var(--accent-vor) r g b / 28%);
   outline: 1px dashed var(--accent-vor);
 }
 
@@ -250,7 +250,7 @@
 }
 
 body.vor-collections-dragging .collection-children {
-  outline: 1px dashed rgb(167 145 255 / 25%);
+  outline: 1px dashed rgb(from var(--accent-vor) r g b / 25%);
 }
 
 /* --- Filters --- */
@@ -390,7 +390,7 @@ body.vor-collections-dragging .collection-children {
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   border: 2px solid var(--border);
   background-color: var(--bg-input);
   transition: all 0.2s ease;
@@ -425,14 +425,14 @@ body.vor-collections-dragging .collection-children {
 
 /* Фокус (для доступности) */
 .hidden-checkbox:focus + .custom-checkbox {
-  box-shadow: 0 0 0 2px rgb(99 102 241 / 30%);
+  box-shadow: var(--focus-ring);
 }
 
 /* --- Sorting --- */
 .sidebar-select {
   flex: 1;
   padding: 0.35rem 0.65rem;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background-color: var(--bg-input);
   font-size: 0.8125rem;
@@ -440,6 +440,8 @@ body.vor-collections-dragging .collection-children {
   cursor: pointer;
   transition: all 0.2s ease;
   appearance: none;
+
+  /* SVG arrow color (%2394A3B8 = --text-secondary) can't use var() inside url(). */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394A3B8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.65rem center;
@@ -458,7 +460,7 @@ select.sidebar-select {
 .sidebar-select:focus {
   outline: none;
   border-color: var(--accent-hover);
-  box-shadow: 0 0 0 2px rgb(99 102 241 / 20%);
+  box-shadow: var(--focus-ring);
 }
 
 .sidebar-btn:disabled {
