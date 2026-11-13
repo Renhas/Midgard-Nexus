@@ -1,0 +1,387 @@
+/* --- Status --- */
+.vor-status-dropdown {
+  position: relative;
+  width: auto;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+.vor-status-select {
+  width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+  font-weight: 500;
+  text-align: left;
+}
+
+.vor-status-menu {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  right: 0;
+  z-index: var(--z-popover);
+  padding: 0.25rem;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.vor-status-option {
+  display: block;
+  width: 100%;
+  padding: 0.35rem 0.65rem;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  text-align: left;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.vor-status-option:hover,
+.vor-status-option.is-current {
+  background-color: rgb(from var(--accent-hover) r g b / 15%);
+}
+
+/* --- Progress --- */
+.vor-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  --progress-ch: 4ch;
+}
+
+.vor-progress-text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+}
+
+.vor-progress-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.vor-progress-btn-plus {
+  text-indent: -1px;
+}
+
+.vor-progress-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-hover);
+}
+
+.vor-progress-value,
+.vor-progress-input {
+  box-sizing: content-box;
+  text-align: right;
+  font: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+}
+
+.vor-progress-value {
+  width: auto;
+  min-width: 0;
+  cursor: text;
+  appearance: none;
+  font-family: inherit;
+}
+
+.vor-progress-input {
+  width: var(--progress-ch);
+  min-width: var(--progress-ch);
+}
+
+.vor-progress-value.is-hot,
+.vor-progress.is-editing .vor-progress-input {
+  color: var(--text-primary);
+  border-bottom-color: var(--text-primary);
+}
+
+.vor-progress-input:focus {
+  outline: none;
+}
+
+/* --- Stars --- */
+.vor-stars {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  width: 100%;
+}
+
+.vor-stars:focus-visible {
+  outline: 2px solid var(--accent-hover);
+  outline-offset: 4px;
+  border-radius: var(--radius-xs);
+}
+
+.vor-rating-number {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.35rem;
+  height: 35px;
+  color: var(--text-secondary);
+  font-size: 35px;
+  line-height: 35px;
+}
+
+.vor-star {
+  position: relative;
+  width: 35px;
+  height: 35px;
+  overflow: hidden;
+}
+
+.vor-star .bi {
+  font-size: 35px;
+  line-height: 1;
+}
+
+.vor-star-empty {
+  color: var(--rating-star-empty);
+}
+
+.vor-star-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--rating-star-fill);
+  clip-path: inset(0 100% 0 0);
+}
+
+.vor-star.is-full .vor-star-fill {
+  clip-path: inset(0 0 0 0);
+}
+
+.vor-star.is-half .vor-star-fill {
+  clip-path: inset(0 50% 0 0);
+}
+
+.vor-star-hit {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.vor-star-hit.left {
+  left: 0;
+}
+
+.vor-star-hit.right {
+  right: 0;
+}
+
+/* --- Chips --- */
+.vor-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  background-color: var(--accent-vor);
+  color: var(--bg-primary);
+  font-size: 0.875rem;
+  font-family: inherit;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  cursor: default;
+  appearance: none;
+}
+
+.vor-chip:hover {
+  color: var(--bg-primary);
+  background-color: var(--accent-vor-soft);
+  border-color: var(--text-primary);
+}
+
+.vor-chip.is-toggle {
+  cursor: pointer;
+}
+
+.vor-chip.is-off {
+  background-color: var(--text-secondary);
+  color: var(--bg-primary);
+  opacity: 0.45;
+}
+
+.vor-chip.is-off:hover {
+  background-color: var(--text-secondary);
+  color: var(--bg-primary);
+  border-color: var(--border);
+  opacity: 0.7;
+}
+
+.vor-chip.is-chip-hidden {
+  display: none;
+}
+
+.vor-chip-more-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.vor-chip-more {
+  cursor: pointer;
+}
+
+.vor-chip-popup {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 20;
+  max-width: min(420px, 80vw);
+  padding: 0.55rem;
+  box-shadow: var(--shadow-sm);
+  overflow: visible;
+}
+
+.vor-chip-popup.is-flipped-h {
+  left: auto;
+  right: 0;
+}
+
+.vor-chip-popup.is-flipped-v {
+  top: auto;
+  bottom: calc(100% + 4px);
+}
+
+.vor-chip-popup-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  max-height: 240px;
+  overflow: hidden auto;
+}
+
+.vor-chip-tip {
+  display: none;
+  position: fixed;
+  left: var(--tip-left, 0);
+  top: var(--tip-top, 0);
+  width: max-content;
+  max-width: 240px;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  z-index: var(--z-tooltip);
+  white-space: pre-wrap;
+  pointer-events: none;
+  transform: translateY(calc(-50% + var(--tip-shift-y, 0px)));
+}
+
+.vor-chip:hover .vor-chip-tip {
+  display: block;
+}
+
+.vor-chip-tip.is-below {
+  transform: none;
+}
+
+.vor-chip-list.is-editing {
+  flex-wrap: wrap;
+}
+
+.vor-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  margin-left: 0.2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(from var(--bg-primary) r g b / 25%);
+  color: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.vor-chip-add {
+  background-color: var(--action-add);
+  color: var(--bg-primary);
+  width: 2rem;
+  padding: 0.25rem 0;
+  cursor: pointer;
+}
+
+.vor-chip-add:hover {
+  background-color: var(--action-add-hover);
+  color: var(--bg-primary);
+}
+
+.vor-chip-picker {
+  min-width: 14rem;
+  max-width: 18rem;
+}
+
+.vor-chip-picker-search {
+  width: 100%;
+  margin-bottom: 0.4rem;
+}
+
+.vor-chip-picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-height: 14rem;
+  overflow-y: auto;
+}
+
+.vor-chip-picker-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.3rem 0.4rem;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: none;
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vor-chip-picker-item:hover {
+  background-color: rgb(from var(--accent-vor) r g b / 12%);
+}
+
+.vor-chip-picker-empty {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  padding: 0.35rem 0.15rem;
+}

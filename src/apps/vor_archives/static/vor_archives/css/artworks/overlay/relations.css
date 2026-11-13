@@ -1,0 +1,229 @@
+/* --- Relations --- */
+.vor-view-relations {
+  grid-column: 3;
+  grid-row: 1;
+  width: 330px;
+  height: 390px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  z-index: var(--z-overlay);
+}
+
+.vor-relations-head {
+  display: grid;
+  grid-template-columns: 1.7rem 1fr 1.7rem;
+  align-items: center;
+  min-height: 2.4rem;
+  padding: 0.3rem 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.vor-relations-head-side {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.7rem;
+}
+
+.vor-relations-head-side:last-child {
+  justify-content: flex-end;
+}
+
+.vor-relations-title {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: 0;
+}
+
+.vor-relations-head-btn {
+  width: 1.7rem;
+  height: 1.7rem;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.vor-relations-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.vor-relation-item {
+  position: relative;
+}
+
+.vor-relation-item.is-static {
+  cursor: default;
+  padding-right: 2.6rem;
+}
+
+.vor-relation-item.is-selected,
+.vor-relation-pick.is-selected {
+  background-color: rgb(from var(--accent-vor) r g b / 12%);
+}
+
+button.vor-relation-item,
+.vor-relation-pick {
+  width: 100%;
+  border: 0;
+  background-color: transparent;
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.vor-relation-pick .vor-relation-title {
+  color: var(--text-primary);
+}
+
+.vor-relation-edit {
+  position: absolute;
+  top: 0.15rem;
+  right: 0.15rem;
+}
+
+.vor-relation-actions {
+  display: flex;
+  gap: 0.15rem;
+}
+
+.vor-relation-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background-color: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.vor-relation-action-delete {
+  color: var(--action-delete);
+  border-color: var(--action-delete);
+}
+
+.vor-relation-type-menu {
+  right: 0;
+  left: auto;
+  top: 1.5rem;
+}
+
+.vor-relation-add {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.55rem;
+}
+
+.vor-relation-add-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.vor-relation-add-type {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.vor-relation-add-type-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.vor-relation-add-type-head .vor-field-label {
+  margin: 0;
+}
+
+.vor-relation-add-hint {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.vor-relation-type-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem;
+}
+
+.vor-relation-type-choices .vor-relation-type-option {
+  padding: 0.25rem 0.35rem;
+  font-size: 0.75rem;
+}
+
+.vor-relation-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  padding: 0.2rem;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+a.vor-relation-item:hover {
+  background-color: rgb(from var(--accent-vor) r g b / 10%);
+}
+
+.vor-relation-cover {
+  width: 40px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: var(--radius-xs);
+  flex-shrink: 0;
+  background-color: var(--bg-input);
+}
+
+.vor-relation-cover-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.vor-relation-meta {
+  min-width: 0;
+}
+
+.vor-relation-title {
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vor-relation-type {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.vor-relations-empty {
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  text-align: center;
+  padding: 0.75rem 0.25rem;
+}

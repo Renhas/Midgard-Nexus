@@ -1,0 +1,28 @@
+/* --- Responsive --- */
+@media (width <= 900px) {
+  .vor-view-hero {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+
+  .vor-cover-wrap,
+  .vor-view-cover,
+  .vor-view-info,
+  .vor-view-relations,
+  .vor-view-cover-controls,
+  .vor-view-desc {
+    grid-column: 1;
+    grid-row: auto;
+    width: 100%;
+    height: auto;
+  }
+
+  .vor-view-info {
+    min-height: 0;
+  }
+
+  .vor-view-relations {
+    min-height: 220px;
+    max-height: 320px;
+  }
+}
