@@ -14,7 +14,7 @@
       <button type="button" class="vor-chip vor-chip-add" title="Добавить" @click="togglePicker('{{ kind }}')">
         <i class="bi bi-plus"></i>
       </button>
-      <div class="vor-chip-picker" x-show="pickerKind === '{{ kind }}'" x-cloak>
+      <div class="vor-panel vor-chip-picker" x-show="pickerKind === '{{ kind }}'" x-cloak>
         <input class="vor-chip-picker-search" type="text" placeholder="Поиск" x-model="pickerQuery" @click.stop>
         <div class="vor-chip-picker-list">
           <template x-for="opt in pickerOptions('{{ kind }}')" :key="opt.id">

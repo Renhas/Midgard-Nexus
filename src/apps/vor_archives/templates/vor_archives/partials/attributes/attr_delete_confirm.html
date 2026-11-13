@@ -1,5 +1,5 @@
 <div class="vor-backdrop" @click.self="$store.vorAttributes.closeModal()">
-  <div class="vor-modal" @click.stop>
+  <div class="vor-panel vor-modal" @click.stop>
     <h3 class="vor-modal-title">Подтверждение удаления</h3>
     <p class="vor-modal-text">{{ delete_text }}</p>
     {% if linked_count %}

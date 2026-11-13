@@ -9,7 +9,7 @@
           @click="{% if not is_add %}editing && {% endif %}(ageOpen = !ageOpen)">
     <span x-text="ageRating || '—'">{% if not is_add and work.age_rating %}{{ work.age_rating }}{% endif %}</span>
   </button>
-  <div class="vor-age-menu" x-show="{% if not is_add %}editing && {% endif %}ageOpen" x-cloak>
+  <div class="vor-panel vor-age-menu" x-show="{% if not is_add %}editing && {% endif %}ageOpen" x-cloak>
     <button type="button"
             class="vor-age-option"
             data-age=""

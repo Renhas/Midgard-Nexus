@@ -43,9 +43,6 @@
 
 .vor-modal {
   width: min(480px, 100%);
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
   padding: 1.25rem 1.35rem;
   box-shadow: var(--shadow-lg);
 }
@@ -133,9 +130,6 @@
 
 .vor-search-segment {
   margin-top: 0.85rem;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
   padding: 0.65rem 0.75rem;
 }
 

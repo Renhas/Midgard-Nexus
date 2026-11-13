@@ -13,7 +13,7 @@ function ensurePreview() {
   }
   preview = document.createElement("div");
   preview.id = "artwork-row-preview";
-  preview.className = "artwork-row-preview";
+  preview.className = "vor-panel artwork-row-preview";
   preview.innerHTML = `
             <div class="artwork-row-preview-cover">
                 <img alt="">

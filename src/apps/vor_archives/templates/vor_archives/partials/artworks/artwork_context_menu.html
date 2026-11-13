@@ -1,5 +1,5 @@
 <div id="vor-context-menu"
-     class="vor-context-menu"
+     class="vor-panel vor-context-menu"
      x-data
      x-show="$store.vorArtworks.menu.open"
      x-cloak
@@ -98,7 +98,7 @@
       </button>
     </div>
   </template>
-  <div class="vor-context-flyout"
+  <div class="vor-panel vor-context-flyout"
        x-show="$store.vorArtworks.menu.flyout && $store.vorArtworks.menu.kind === 'artwork'"
        x-cloak
        :style="`left: ${$store.vorArtworks.menu.flyoutX}px; top: ${$store.vorArtworks.menu.flyoutY}px`"

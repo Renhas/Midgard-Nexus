@@ -4,12 +4,9 @@
 
 .vor-context-menu {
   position: fixed;
-  z-index: 1100;
+  z-index: var(--z-context-menu);
   min-width: 188px;
   padding: 0.3rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-md);
 }
 
@@ -51,16 +48,13 @@
 
 .vor-context-flyout {
   position: fixed;
-  z-index: 1101;
+  z-index: var(--z-context-flyout);
   min-width: 220px;
   max-width: 280px;
   max-height: 260px;
   overflow: auto;
   overscroll-behavior: contain;
   padding: 0.3rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-md);
 }
 

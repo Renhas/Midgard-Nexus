@@ -107,7 +107,7 @@
                  title="Ссылка">
                 <i class="bi bi-box-arrow-up-right"></i>
               </a>
-              <div class="vor-link-popup" x-show="editing && linkOpen" x-cloak>
+              <div class="vor-panel vor-link-popup" x-show="editing && linkOpen" x-cloak>
                 <input class="vor-link-input"
                        type="url"
                        x-ref="linkInput"
@@ -239,7 +239,7 @@
     </div>
   </form>
   <div class="vor-backdrop vor-leave-confirm" x-show="attachOpen" x-cloak>
-    <div class="vor-modal" @click.stop>
+    <div class="vor-panel vor-modal" @click.stop>
       {% include "vor_archives/partials/artworks/attach/artwork_attach_body.html" with on_back="attachOpen = false" %}
     </div>
   </div>

@@ -1,5 +1,5 @@
 <div class="vor-backdrop" x-data @click.self="$dispatch('vor:close-modal')">
-  <div class="vor-modal" @click.stop>
+  <div class="vor-panel vor-modal" @click.stop>
     <h3 class="vor-modal-title">Удалить коллекцию</h3>
     <p class="vor-modal-text">Коллекция «{{ collection.name }}» будет удалена.</p>
     {% if child_count %}

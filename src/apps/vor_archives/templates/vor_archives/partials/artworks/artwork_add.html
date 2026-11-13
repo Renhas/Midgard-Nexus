@@ -48,7 +48,7 @@
              @change="onCoverSelected($event)">
       <div class="vor-add-hero">
         {% include "vor_archives/partials/artworks/widgets/artwork_cover_upload.html" with is_add=True %}
-        <section class="vor-overlay-section vor-add-info">
+        <section class="vor-panel vor-overlay-section vor-add-info">
           <h3>Общая информация</h3>
           <div class="vor-add-info-fields">
             <div class="vor-add-field">
@@ -143,7 +143,7 @@
           </div>
         </section>
         <div class="vor-add-side">
-          <section class="vor-overlay-section vor-add-attrs">
+          <section class="vor-panel vor-overlay-section vor-add-attrs">
             <h3>Атрибуты</h3>
             {% include "vor_archives/partials/artworks/widgets/artwork_attr_accordion.html" with title="Авторы" kind="authors" %}
             {% include "vor_archives/partials/artworks/widgets/artwork_attr_accordion.html" with title="Жанры" kind="genres" %}
@@ -162,7 +162,7 @@
     </form>
   </div>
   <div class="vor-backdrop vor-leave-confirm" x-show="phase !== 'form'" x-cloak>
-    <div class="vor-modal" @click.stop>
+    <div class="vor-panel vor-modal" @click.stop>
       <template x-if="phase === 'choice'">
         <div>
           <h3 class="vor-modal-title">Произведение сохранено</h3>

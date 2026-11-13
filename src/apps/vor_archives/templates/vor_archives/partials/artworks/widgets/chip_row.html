@@ -21,7 +21,7 @@
                 class="vor-chip vor-chip-more"
                 x-ref="more"
                 @click="togglePopup()">+<span x-text="hiddenCount"></span></button>
-        <div class="vor-chip-popup" x-ref="popup" x-show="popupOpen" x-cloak>
+        <div class="vor-panel vor-chip-popup" x-ref="popup" x-show="popupOpen" x-cloak>
           <div class="vor-chip-popup-body">
             {% for item in items %}
               <span class="vor-chip" x-show="{{ forloop.counter0 }} >= visibleCount" @mouseenter="placeTip($el)">

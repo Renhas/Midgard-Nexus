@@ -1,5 +1,5 @@
 {% if owned %}
-  <section class="vor-search-segment">
+  <section class="vor-panel vor-search-segment">
     <h3 class="vor-search-segment-title">Ваши произведения</h3>
     <ul class="vor-search-results">
       {% for item in owned %}
@@ -23,7 +23,7 @@
   </section>
 {% endif %}
 {% if other %}
-  <section class="vor-search-segment">
+  <section class="vor-panel vor-search-segment">
     <h3 class="vor-search-segment-title">Новые для вас</h3>
     <ul class="vor-search-results">
       {% for item in other %}
