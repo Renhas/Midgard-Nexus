@@ -84,8 +84,7 @@
   --z-sidebar: 1000;
   --z-sidebar-expand: 1010;
   --z-overlay: 1020;
-  --z-modal-backdrop: 1030;
-  --z-search-backdrop: 1040;
+  --z-backdrop: 1030;
   --z-leave-confirm: 1050;
   --z-navbar: 1070;
   --z-context-menu: 1100;

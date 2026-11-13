@@ -29,11 +29,11 @@
   justify-content: center;
 }
 
-.vor-modal-backdrop {
+.vor-backdrop {
   position: fixed;
   inset: 0;
   top: var(--header-height);
-  z-index: var(--z-modal-backdrop);
+  z-index: var(--z-backdrop);
   background-color: var(--backdrop-bg);
   display: flex;
   align-items: center;
@@ -84,18 +84,6 @@
 }
 
 /* --- Library search --- */
-.vor-search-backdrop {
-  position: fixed;
-  inset: 0;
-  top: var(--header-height);
-  z-index: var(--z-search-backdrop);
-  background-color: var(--backdrop-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-}
-
 .vor-search-panel {
   width: min(560px, 100%);
   transition:

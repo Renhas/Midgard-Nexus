@@ -238,7 +238,7 @@
                 placeholder="Описание произведения"></textarea>
     </div>
   </form>
-  <div class="vor-modal-backdrop vor-leave-confirm" x-show="attachOpen" x-cloak>
+  <div class="vor-backdrop vor-leave-confirm" x-show="attachOpen" x-cloak>
     <div class="vor-modal" @click.stop>
       {% include "vor_archives/partials/artworks/attach/artwork_attach_body.html" with on_back="attachOpen = false" %}
     </div>

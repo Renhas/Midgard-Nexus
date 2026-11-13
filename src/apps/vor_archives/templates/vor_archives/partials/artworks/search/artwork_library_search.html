@@ -1,7 +1,4 @@
-<div class="vor-search-backdrop"
-     x-show="$store.vorArtworks.searchOpen"
-     x-cloak
-     @click.self="$store.vorArtworks.closeSearch()">
+<div class="vor-backdrop" x-show="$store.vorArtworks.searchOpen" x-cloak @click.self="$store.vorArtworks.closeSearch()">
   <div class="vor-search-panel" :class="{ 'has-query': String($store.vorArtworks.searchQuery || '').trim() }">
     <div class="vor-search-field">
       <i class="bi bi-search"></i>
