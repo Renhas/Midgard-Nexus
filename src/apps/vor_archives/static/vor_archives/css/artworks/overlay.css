@@ -205,66 +205,6 @@
   outline: none;
 }
 
-.vor-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  color: var(--text-secondary);
-  font-size: 0.8125rem;
-  cursor: pointer;
-  user-select: none;
-}
-
-.vor-switch-input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-}
-
-.vor-switch-track {
-  position: relative;
-  width: 2.1rem;
-  height: 1.15rem;
-  border-radius: var(--radius-pill);
-  border: 2px solid var(--border);
-  background-color: var(--bg-input);
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
-
-.vor-switch-thumb {
-  position: absolute;
-  top: 1px;
-  left: 1px;
-  width: 0.7rem;
-  height: 0.7rem;
-  border-radius: 50%;
-  background-color: var(--text-secondary);
-  transition:
-    transform 0.2s ease,
-    background-color 0.2s ease;
-}
-
-.vor-switch:hover .vor-switch-track {
-  border-color: var(--accent-hover);
-}
-
-.vor-switch-input:checked + .vor-switch-track {
-  background-color: var(--accent-hover);
-  border-color: var(--accent-hover);
-}
-
-.vor-switch-input:checked + .vor-switch-track .vor-switch-thumb {
-  transform: translateX(0.9rem);
-  background-color: var(--bg-primary);
-}
-
-.vor-switch-input:focus-visible + .vor-switch-track {
-  box-shadow: var(--focus-ring);
-}
-
 .vor-view-info {
   grid-column: 2;
   grid-row: 1;

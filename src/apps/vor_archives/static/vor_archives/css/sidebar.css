@@ -377,55 +377,8 @@ body.vor-collections-dragging .collection-children {
   margin-left: 0.25rem;
 }
 
-.hidden-checkbox {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-}
-
-.custom-checkbox {
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  border-radius: var(--radius-xs);
-  border: 2px solid var(--border);
-  background-color: var(--bg-input);
-  transition: all 0.2s ease;
-  position: relative;
-}
-
 .sidebar-filter-item:hover .custom-checkbox {
   border-color: var(--accent-hover);
-}
-
-.hidden-checkbox:checked + .custom-checkbox {
-  background-color: var(--accent-hover);
-  border-color: var(--accent-hover);
-}
-
-.hidden-checkbox:checked + .custom-checkbox::after,
-.custom-checkbox.is-checked::after {
-  content: "";
-  display: block;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 10px;
-  height: 10px;
-  background-color: var(--bg-primary);
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
-  mask-size: contain;
-  mask-repeat: no-repeat;
-  mask-position: center;
-}
-
-/* Фокус (для доступности) */
-.hidden-checkbox:focus + .custom-checkbox {
-  box-shadow: var(--focus-ring);
 }
 
 /* --- Sorting --- */
