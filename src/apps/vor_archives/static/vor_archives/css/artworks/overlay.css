@@ -1104,14 +1104,22 @@ a.vor-relation-item:hover {
 }
 
 /* --- Inline editing --- */
-.vor-inline-title {
-  width: 100%;
+.vor-inline-title,
+.vor-inline-number,
+.vor-inline-desc,
+.vor-link-input,
+.vor-chip-picker-search {
   border: 1px solid var(--border);
   background-color: var(--bg-input);
   color: var(--text-primary);
-  text-align: center;
-  padding: 0.25rem 0.6rem;
   border-radius: var(--radius-sm);
+}
+
+.vor-inline-number,
+.vor-inline-desc,
+.vor-link-input,
+.vor-chip-picker-search {
+  font: inherit;
 }
 
 .vor-inline-title:focus,
@@ -1124,27 +1132,23 @@ a.vor-relation-item:hover {
   box-shadow: var(--focus-ring);
 }
 
+.vor-inline-title {
+  width: 100%;
+  text-align: center;
+  padding: 0.25rem 0.6rem;
+}
+
 .vor-inline-desc {
   width: 100%;
   min-height: 8rem;
   resize: vertical;
-  border: 1px solid var(--border);
-  background-color: var(--bg-input);
-  color: var(--text-primary);
   padding: 0.65rem 0.75rem;
-  border-radius: var(--radius-sm);
-  font: inherit;
 }
 
 .vor-inline-number,
 .vor-link-input,
 .vor-chip-picker-search {
-  border: 1px solid var(--border);
-  background-color: var(--bg-input);
-  color: var(--text-primary);
-  border-radius: var(--radius-sm);
   padding: 0.15rem 0.45rem;
-  font: inherit;
 }
 
 .vor-inline-number {
