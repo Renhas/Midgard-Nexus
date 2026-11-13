@@ -9,8 +9,8 @@
   padding: 0.3rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 0.4rem;
-  box-shadow: 0 0.75rem 1.5rem rgb(0 0 0 / 35%);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
 }
 
 .vor-context-item {
@@ -20,7 +20,7 @@
   width: 100%;
   padding: 0.4rem 0.65rem;
   border: none;
-  border-radius: 0.3rem;
+  border-radius: var(--radius-xs);
   background: transparent;
   color: var(--text-primary);
   font-size: 0.8125rem;
@@ -30,7 +30,7 @@
 
 .vor-context-item:hover,
 .vor-context-item.is-checked {
-  background-color: rgb(167 145 255 / 12%);
+  background-color: rgb(from var(--accent-vor) r g b / 12%);
 }
 
 .vor-context-item.is-danger {
@@ -60,8 +60,8 @@
   padding: 0.3rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 0.4rem;
-  box-shadow: 0 0.75rem 1.5rem rgb(0 0 0 / 35%);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
 }
 
 .vor-context-flyout-empty {

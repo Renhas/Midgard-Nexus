@@ -32,7 +32,7 @@
 .vor-inline-number.is-invalid,
 .vor-inline-number.is-invalid:focus {
   border-color: var(--error);
-  box-shadow: 0 0 0 2px rgb(248 113 113 / 25%);
+  box-shadow: var(--focus-ring-error);
 }
 
 .vor-suggestions {
@@ -49,7 +49,7 @@
   padding: 0.25rem;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 0.375rem;
+  border-radius: var(--radius-sm);
   max-height: 240px;
   overflow-y: auto;
 }
@@ -70,11 +70,11 @@
   background: transparent;
   color: var(--text-primary);
   text-align: left;
-  border-radius: 0.25rem;
+  border-radius: var(--radius-xs);
 }
 
 .vor-suggestion-item:hover {
-  background-color: rgb(167 145 255 / 12%);
+  background-color: rgb(from var(--accent-vor) r g b / 12%);
 }
 
 .vor-suggestion-title {
@@ -92,8 +92,8 @@
   left: 0;
   top: calc(100% + 6px);
   padding: 0.45rem 0.8rem;
-  border-radius: 0.375rem;
-  background-color: rgb(239 68 68 / 18%);
+  border-radius: var(--radius-sm);
+  background-color: rgb(from var(--action-delete) r g b / 18%);
   border: 1px solid var(--error);
   color: var(--error);
   font-size: 0.95rem;
@@ -101,7 +101,7 @@
   line-height: 1.35;
   white-space: nowrap;
   pointer-events: none;
-  box-shadow: 0 0.4rem 0.9rem rgb(0 0 0 / 28%);
+  box-shadow: var(--shadow-error);
 }
 
 .vor-add-title-wrap .vor-add-error {
@@ -128,7 +128,7 @@
   gap: 1rem;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   padding: 1rem;
   margin-bottom: 1rem;
 }
@@ -137,7 +137,7 @@
   width: 96px;
   height: 128px;
   object-fit: cover;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
 }
 
