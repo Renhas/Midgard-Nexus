@@ -313,24 +313,24 @@
   border: 1px solid var(--border);
   font-size: 0.7rem;
   font-weight: 600;
-  color: var(--bg-primary);
+  color: var(--age-fg);
 }
 
 .vor-age-badge[data-age="0+"],
 .vor-age-badge[data-age="6+"] {
-  background-color: var(--success);
-  border-color: var(--success);
+  background-color: var(--age-ok-bg);
+  border-color: var(--age-ok-bg);
 }
 
 .vor-age-badge[data-age="12+"],
 .vor-age-badge[data-age="16+"] {
-  background-color: #fb923c;
-  border-color: #fb923c;
+  background-color: var(--age-warning-bg);
+  border-color: var(--age-warning-bg);
 }
 
 .vor-age-badge[data-age="18+"] {
-  background-color: var(--error);
-  border-color: var(--error);
+  background-color: var(--age-restricted-bg);
+  border-color: var(--age-restricted-bg);
 }
 
 .vor-view-topline {
@@ -1293,21 +1293,21 @@ a.vor-relation-item:hover {
 .vor-age-option[data-age="0+"],
 .vor-age-option[data-age="6+"] {
   color: var(--bg-primary);
-  background-color: var(--success);
-  border-color: var(--success);
+  background-color: var(--age-ok-bg);
+  border-color: var(--age-ok-bg);
 }
 
 .vor-age-option[data-age="12+"],
 .vor-age-option[data-age="16+"] {
   color: var(--bg-primary);
-  background-color: #fb923c;
-  border-color: #fb923c;
+  background-color: var(--age-warning-bg);
+  border-color: var(--age-warning-bg);
 }
 
 .vor-age-option[data-age="18+"] {
   color: var(--bg-primary);
-  background-color: var(--error);
-  border-color: var(--error);
+  background-color: var(--age-restricted-bg);
+  border-color: var(--age-restricted-bg);
 }
 
 .vor-age-option.is-current,
