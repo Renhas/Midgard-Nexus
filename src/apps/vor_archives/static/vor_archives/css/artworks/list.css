@@ -236,7 +236,7 @@
 }
 
 .artwork-row.is-selected {
-  border: 1.33px solid var(--action-delete);
+  border-color: var(--action-delete);
   background-color: rgb(from var(--action-delete) r g b / 8%);
 }
 
@@ -439,7 +439,7 @@ body.vor-artworks-list-drag .artwork-tile {
 }
 
 .artwork-tile.is-selected .artwork-tile-cover {
-  box-shadow: 0 0 0 2.67px var(--action-delete);
+  box-shadow: 0 0 0 var(--outline-delete-width) var(--action-delete);
 }
 
 .artwork-tile-image {
