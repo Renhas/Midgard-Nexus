@@ -44,7 +44,7 @@ main {
   display: flex;
   flex-direction: column;
   transition: transform 0.3s ease;
-  z-index: 1000;
+  z-index: var(--z-sidebar);
   overflow: hidden;
 }
 
@@ -59,7 +59,7 @@ main {
 }
 
 .sidebar.collapsed {
-  z-index: 999;
+  z-index: var(--z-sidebar-collapsed);
 }
 
 .sidebar-left.collapsed {
@@ -74,7 +74,7 @@ main {
 .expand {
   position: fixed;
   top: calc(var(--header-height) + 0.75rem);
-  z-index: 1001;
+  z-index: var(--z-sidebar-expand);
   display: flex;
   align-items: center;
   justify-content: center;

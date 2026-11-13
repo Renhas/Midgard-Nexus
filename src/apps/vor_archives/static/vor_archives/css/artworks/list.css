@@ -246,7 +246,7 @@
 .artwork-row-preview {
   display: none;
   position: fixed;
-  z-index: 50;
+  z-index: var(--z-hover-preview);
   width: 320px;
   padding: 0.45rem;
   gap: 0.65rem;
