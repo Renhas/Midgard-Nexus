@@ -4,23 +4,94 @@
 
 /* === CSS Variables === */
 :root {
+  /* === Colors === */
   --bg-primary: #0b1120;
   --bg-card: #1a233a;
   --bg-input: #151d2e;
   --text-primary: #e2e8f0;
   --text-secondary: #94a3b8;
   --accent-hover: #6366f1;
-  --status-in-progress: #818cf8;
   --success: #34d399;
   --error: #f87171;
   --border: #334155;
 
-  /* Module accents */
+  /* === Module accents === */
   --accent-vor: #a78bfa;
+  --accent-vor-soft: #c4b5fd;
   --accent-fafnir: #60a5fa;
   --accent-kvasir: #fb923c;
+
+  /* === Actions === */
   --action-add: #34d399;
+  --action-add-hover: #6ee7b7;
   --action-delete: #ef4444;
+  --outline-delete-width: 2.5px;
+
+  /* === Statuses === */
+  --status-planning: var(--text-secondary);
+  --status-in-progress: #818cf8;
+  --status-completed: var(--success);
+  --status-dropped: var(--error);
+
+  /* === Age rating === */
+
+  /* --age-warning-bg shares value with --accent-kvasir today;
+     kept separate so they can evolve independently. */
+  --age-fg: var(--bg-primary);
+  --age-ok-bg: var(--success);
+  --age-warning-bg: #fb923c;
+  --age-restricted-bg: var(--error);
+
+  /* === Rating stars === */
+  --rating-star-fill: #fbbf24;
+  --rating-star-empty: #64748b;
+
+  /* === Radii === */
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-pill: 999px;
+
+  /* === Shadows === */
+  --shadow-sm: 0 0.5rem 1rem rgb(0 0 0 / 35%);
+  --shadow-md: 0 0.75rem 1.5rem rgb(0 0 0 / 35%);
+  --shadow-lg: 0 1rem 2rem rgb(0 0 0 / 40%);
+  --shadow-error: 0 0.4rem 0.9rem rgb(0 0 0 / 28%);
+
+  /* === Focus rings === */
+  --focus-ring: 0 0 0 2px rgb(from var(--accent-hover) r g b / 25%);
+  --focus-ring-strong: 0 0 0 0.2rem rgb(from var(--accent-hover) r g b / 25%);
+  --focus-ring-error: 0 0 0 2px rgb(from var(--error) r g b / 25%);
+
+  /* === Backdrop === */
+  --backdrop-bg: rgb(from var(--bg-primary) r g b / 72%);
+
+  /* === Z-index ===
+     Two ranges: internal (1-60) for values inside a positioned
+     parent; external (900+) for fixed-layer chrome.
+     See docs/frontend-css.md. */
+  --z-base: 1;
+  --z-raised: 2;
+  --z-overlay-bar: 10;
+  --z-popover-host: 15;
+  --z-popover: 20;
+  --z-popover-raised: 30;
+  --z-picker: 40;
+  --z-tooltip: 50;
+  --z-hover-preview: 60;
+  --z-sidebar-collapsed: 900;
+  --z-sidebar: 1000;
+  --z-sidebar-expand: 1010;
+  --z-overlay: 1020;
+  --z-modal-backdrop: 1030;
+  --z-search-backdrop: 1040;
+  --z-leave-confirm: 1050;
+  --z-navbar: 1070;
+  --z-context-menu: 1100;
+  --z-context-flyout: 1110;
+
+  /* === Layout === */
   --header-icon-size: 1.5rem;
   --header-height: 57px;
 }

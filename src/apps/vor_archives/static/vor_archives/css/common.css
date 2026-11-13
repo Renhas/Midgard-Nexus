@@ -12,6 +12,13 @@ html.vor-scroll-lock .center {
   overflow: hidden;
 }
 
+/* --- Panel base (shared card/popover surface) --- */
+.vor-panel {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
 /* --- Form fields (shared across modules) --- */
 .vor-field {
   margin-bottom: 0.75rem;
