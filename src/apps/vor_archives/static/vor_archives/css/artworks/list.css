@@ -509,7 +509,7 @@ body.vor-artworks-list-drag .artwork-tile {
 
 .artwork-tile-rating i {
   font-size: 0.85rem;
-  color: #f5c518;
+  color: var(--rating-star-fill);
 }
 
 .artwork-tile-check {
