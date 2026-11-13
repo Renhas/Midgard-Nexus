@@ -51,7 +51,7 @@
 .vor-overlay-section {
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   padding: 1rem 1.15rem;
   margin-bottom: 1rem;
 }
@@ -126,7 +126,7 @@
   width: 260px;
   height: 390px;
   object-fit: cover;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-sm);
 }
 
 .vor-cover-wrap .vor-view-cover {
@@ -174,7 +174,7 @@
   height: 1.15rem;
   margin-left: 0.25rem;
   padding: 0 0.3rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid transparent;
   background-color: var(--bg-input);
   color: var(--text-primary);
@@ -186,7 +186,7 @@
 .vor-view-counter:hover,
 .vor-view-counter.is-hot {
   color: var(--text-primary);
-  background-color: rgb(167 145 255 / 10%);
+  background-color: rgb(from var(--accent-vor) r g b / 10%);
   border-color: var(--accent-hover);
 }
 
@@ -227,7 +227,7 @@
   position: relative;
   width: 2.1rem;
   height: 1.15rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 2px solid var(--border);
   background-color: var(--bg-input);
   transition: all 0.2s ease;
@@ -262,7 +262,7 @@
 }
 
 .vor-switch-input:focus-visible + .vor-switch-track {
-  box-shadow: 0 0 0 2px rgb(99 102 241 / 30%);
+  box-shadow: var(--focus-ring);
 }
 
 .vor-view-info {
@@ -433,7 +433,7 @@
 .vor-platform {
   font-size: 0.8125rem;
   padding: 0.15rem 0.5rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
 }
 
 .vor-platform.is-owned {
@@ -497,8 +497,8 @@
   padding: 0.25rem;
   background-color: var(--bg-input);
   border: 1px solid var(--border);
-  border-radius: 0.375rem;
-  box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 35%);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
 }
 
 .vor-status-option {
@@ -506,7 +506,7 @@
   width: 100%;
   padding: 0.35rem 0.65rem;
   border: 0;
-  border-radius: 0.25rem;
+  border-radius: var(--radius-xs);
   background: transparent;
   text-align: left;
   font-size: 0.8125rem;
@@ -516,7 +516,7 @@
 
 .vor-status-option:hover,
 .vor-status-option.is-current {
-  background-color: rgb(99 102 241 / 15%);
+  background-color: rgb(from var(--accent-hover) r g b / 15%);
 }
 
 /* --- Progress --- */
@@ -542,7 +542,7 @@
   height: 1.4rem;
   padding: 0;
   border: 1px solid var(--border);
-  border-radius: 0.25rem;
+  border-radius: var(--radius-xs);
   background: transparent;
   color: var(--text-secondary);
   font-size: 0.85rem;
@@ -607,7 +607,7 @@
 .vor-stars:focus-visible {
   outline: 2px solid var(--accent-hover);
   outline-offset: 4px;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
 }
 
 .vor-rating-number {
@@ -633,14 +633,14 @@
 }
 
 .vor-star-empty {
-  color: #64748b;
+  color: var(--rating-star-empty);
 }
 
 .vor-star-fill {
   position: absolute;
   left: 0;
   top: 0;
-  color: #fbbf24;
+  color: var(--rating-star-fill);
   clip-path: inset(0 100% 0 0);
 }
 
@@ -678,7 +678,7 @@
   align-items: center;
   justify-content: center;
   padding: 0.25rem 0.75rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid transparent;
   background-color: var(--accent-vor);
   color: var(--bg-primary);
@@ -694,7 +694,7 @@
 
 .vor-chip:hover {
   color: var(--bg-primary);
-  background-color: #c4b5fd;
+  background-color: var(--accent-vor-soft);
   border-color: var(--text-primary);
 }
 
@@ -735,10 +735,10 @@
   z-index: 20;
   max-width: min(420px, 80vw);
   padding: 0.55rem;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 35%);
+  box-shadow: var(--shadow-sm);
   overflow: visible;
 }
 
@@ -768,7 +768,7 @@
   width: max-content;
   max-width: 240px;
   padding: 0.45rem 0.6rem;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-sm);
   background-color: var(--bg-card);
   border: 1px solid var(--border);
   color: var(--text-primary);
@@ -802,7 +802,7 @@
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: rgb(11 17 32 / 25%);
+  background: rgb(from var(--bg-primary) r g b / 25%);
   color: inherit;
   line-height: 1;
   cursor: pointer;
@@ -817,7 +817,7 @@
 }
 
 .vor-chip-add:hover {
-  background-color: #6ee7b7;
+  background-color: var(--action-add-hover);
   color: var(--bg-primary);
 }
 
@@ -845,7 +845,7 @@
   width: 100%;
   padding: 0.3rem 0.4rem;
   border: 0;
-  border-radius: 0.3rem;
+  border-radius: var(--radius-xs);
   background: none;
   color: var(--text-primary);
   font-size: 0.8125rem;
@@ -854,7 +854,7 @@
 }
 
 .vor-chip-picker-item:hover {
-  background-color: rgb(167 145 255 / 12%);
+  background-color: rgb(from var(--accent-vor) r g b / 12%);
 }
 
 .vor-chip-picker-empty {
@@ -872,7 +872,7 @@
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border);
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   background-color: var(--bg-card);
   overflow: hidden;
   position: relative;
@@ -936,7 +936,7 @@
 
 .vor-relation-item.is-selected,
 .vor-relation-pick.is-selected {
-  background-color: rgb(167 145 255 / 12%);
+  background-color: rgb(from var(--accent-vor) r g b / 12%);
 }
 
 button.vor-relation-item,
@@ -971,7 +971,7 @@ button.vor-relation-item,
   height: 1.2rem;
   padding: 0;
   border: 1px solid var(--border);
-  border-radius: 0.25rem;
+  border-radius: var(--radius-xs);
   background-color: var(--bg-card);
   color: var(--text-secondary);
   cursor: pointer;
@@ -1046,21 +1046,21 @@ button.vor-relation-item,
   gap: 0.55rem;
   min-width: 0;
   padding: 0.2rem;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-sm);
   text-decoration: none;
   color: inherit;
   cursor: pointer;
 }
 
 a.vor-relation-item:hover {
-  background-color: rgb(167 145 255 / 10%);
+  background-color: rgb(from var(--accent-vor) r g b / 10%);
 }
 
 .vor-relation-cover {
   width: 40px;
   height: 60px;
   object-fit: cover;
-  border-radius: 0.25rem;
+  border-radius: var(--radius-xs);
   flex-shrink: 0;
   background-color: var(--bg-input);
 }
@@ -1115,8 +1115,8 @@ a.vor-relation-item:hover {
   width: 2rem;
   height: 2rem;
   border: 1px solid var(--border);
-  border-radius: 0.375rem;
-  background-color: rgb(11 17 32 / 72%);
+  border-radius: var(--radius-sm);
+  background-color: rgb(from var(--bg-primary) r g b / 72%);
   color: var(--text-primary);
   cursor: pointer;
 }
@@ -1155,8 +1155,8 @@ a.vor-relation-item:hover {
   right: 0.4rem;
   bottom: 0.4rem;
   padding: 0.4rem 0.5rem;
-  border-radius: 0.375rem;
-  background-color: rgb(11 17 32 / 86%);
+  border-radius: var(--radius-sm);
+  background-color: rgb(from var(--bg-primary) r g b / 86%);
   border: 1px solid var(--accent-kvasir);
   color: var(--text-primary);
   font-size: 0.7rem;
@@ -1171,7 +1171,7 @@ a.vor-relation-item:hover {
   color: var(--text-primary);
   text-align: center;
   padding: 0.25rem 0.6rem;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-sm);
 }
 
 .vor-inline-title:focus,
@@ -1181,7 +1181,7 @@ a.vor-relation-item:hover {
 .vor-chip-picker-search:focus {
   outline: none;
   border-color: var(--accent-hover);
-  box-shadow: 0 0 0 2px rgb(99 102 241 / 20%);
+  box-shadow: var(--focus-ring);
 }
 
 .vor-inline-desc {
@@ -1192,7 +1192,7 @@ a.vor-relation-item:hover {
   background-color: var(--bg-input);
   color: var(--text-primary);
   padding: 0.65rem 0.75rem;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-sm);
   font: inherit;
 }
 
@@ -1202,7 +1202,7 @@ a.vor-relation-item:hover {
   border: 1px solid var(--border);
   background-color: var(--bg-input);
   color: var(--text-primary);
-  border-radius: 0.375rem;
+  border-radius: var(--radius-sm);
   padding: 0.15rem 0.45rem;
   font: inherit;
 }
@@ -1246,10 +1246,10 @@ a.vor-relation-item:hover {
   z-index: 30;
   min-width: 8rem;
   padding: 0.4rem;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 35%);
+  box-shadow: var(--shadow-sm);
 }
 
 .vor-age-menu {
@@ -1284,7 +1284,7 @@ a.vor-relation-item:hover {
   gap: 0.35rem;
   padding: 0.3rem 0.5rem;
   border: 0;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-sm);
   background: none;
   color: var(--text-primary);
   cursor: pointer;
@@ -1321,7 +1321,7 @@ a.vor-relation-item:hover {
   gap: 0.35rem;
   padding: 0.15rem 0.5rem;
   border: 1px solid var(--border);
-  border-radius: 0.375rem;
+  border-radius: var(--radius-sm);
   background-color: var(--bg-input);
   color: var(--text-primary);
   cursor: pointer;
@@ -1348,11 +1348,11 @@ a.vor-relation-item:hover {
   font-weight: 600;
   cursor: pointer;
   padding: 0.15rem 0.45rem;
-  border-radius: 0.3rem;
+  border-radius: var(--radius-xs);
 }
 
 .vor-date-head:hover:not(:disabled) {
-  background-color: rgb(167 145 255 / 12%);
+  background-color: rgb(from var(--accent-vor) r g b / 12%);
 }
 
 .vor-date-head.is-static,
@@ -1377,7 +1377,7 @@ a.vor-relation-item:hover {
 
 .vor-date-day {
   border: 0;
-  border-radius: 0.3rem;
+  border-radius: var(--radius-xs);
   background: none;
   color: var(--text-primary);
   padding: 0.3rem 0;
@@ -1391,7 +1391,7 @@ a.vor-relation-item:hover {
 
 .vor-date-day.is-selected,
 .vor-date-day:hover {
-  background-color: rgb(167 145 255 / 18%);
+  background-color: rgb(from var(--accent-vor) r g b / 18%);
 }
 
 .vor-date-grid-pick {
@@ -1420,13 +1420,13 @@ a.vor-relation-item:hover {
   color: var(--text-secondary);
   cursor: pointer;
   padding: 0.25rem;
-  border-radius: 0.3rem;
+  border-radius: var(--radius-xs);
 }
 
 .vor-date-today:hover,
 .vor-date-clear:hover {
   color: var(--text-primary);
-  background-color: rgb(167 145 255 / 10%);
+  background-color: rgb(from var(--accent-vor) r g b / 10%);
 }
 
 .vor-link-popup {
