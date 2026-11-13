@@ -4,7 +4,7 @@
 {% block extra_head %}
   {{ block.super }}
   {# Feed items open artwork overlay, so the overlay styles are required here. #}
-  <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/overlay.css' %}">
+  {% include "vor_archives/partials/artworks/overlay_styles.html" %}
   <link rel="stylesheet" href="{% static 'vor_archives/css/dashboard/dashboard.css' %}">
 {% endblock %}
 {% block extra_js %}
