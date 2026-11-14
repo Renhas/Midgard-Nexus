@@ -244,7 +244,7 @@
   overflow: visible;
 }
 
-.vor-chip-list.is-open {
+.vor-chip-list--open {
   z-index: var(--z-popover-host);
 }
 

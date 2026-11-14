@@ -52,7 +52,7 @@ document.addEventListener("alpine:init", () => {
       const chips = [...root.querySelectorAll("[data-chip]")];
       const more = this.$refs.more;
       chips.forEach((chip) => {
-        chip.classList.remove("is-chip-hidden");
+        chip.classList.remove("vor-chip--hidden");
       });
       const available = root.clientWidth;
       if (available <= 0) {
@@ -68,7 +68,7 @@ document.addEventListener("alpine:init", () => {
       const moreWidth = this.measureMoreWidth(this.$refs.moreWrap, more);
       const result = computeVisibleChipCount({ chipWidths, available, gap, moreWidth });
       chips.forEach((chip, index) => {
-        chip.classList.toggle("is-chip-hidden", index >= result.visibleCount);
+        chip.classList.toggle("vor-chip--hidden", index >= result.visibleCount);
       });
       this.visibleCount = result.visibleCount;
       this.hiddenCount = result.hiddenCount;
@@ -111,7 +111,7 @@ document.addEventListener("alpine:init", () => {
       if (!popup) {
         return;
       }
-      popup.classList.remove("is-flipped-h", "is-flipped-v");
+      popup.classList.remove("vor-chip-popup--flipped-h", "vor-chip-popup--flipped-v");
       const rect = popup.getBoundingClientRect();
       const layout = computePopupLayout({
         popupRect: rect,
@@ -120,10 +120,10 @@ document.addEventListener("alpine:init", () => {
         pad: 8,
       });
       if (layout.flipH) {
-        popup.classList.add("is-flipped-h");
+        popup.classList.add("vor-chip-popup--flipped-h");
       }
       if (layout.flipV) {
-        popup.classList.add("is-flipped-v");
+        popup.classList.add("vor-chip-popup--flipped-v");
       }
     },
   }));

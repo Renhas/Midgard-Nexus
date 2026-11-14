@@ -6,7 +6,7 @@
         <button type="button"
                 class="vor-chip"
                 data-chip
-                :class="{ 'is-off': platformOff({{ platform.pk }}), 'is-toggle': canTogglePlatform() }"
+                :class="{ 'vor-chip--off': platformOff({{ platform.pk }}), 'vor-chip--toggle': canTogglePlatform() }"
                 @click="togglePlatform({{ platform.pk }})"
                 @mouseenter="placeTip($el)">{{ platform.name }}</button>
       {% endfor %}
@@ -25,7 +25,7 @@
               <button type="button"
                       class="vor-chip"
                       x-show="{{ forloop.counter0 }} >= visibleCount"
-                      :class="{ 'is-off': platformOff({{ platform.pk }}), 'is-toggle': canTogglePlatform() }"
+                      :class="{ 'vor-chip--off': platformOff({{ platform.pk }}), 'vor-chip--toggle': canTogglePlatform() }"
                       @click="togglePlatform({{ platform.pk }})"
                       @mouseenter="placeTip($el)">{{ platform.name }}</button>
             {% endfor %}

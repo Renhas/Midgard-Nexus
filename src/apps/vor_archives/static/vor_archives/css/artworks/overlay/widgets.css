@@ -224,24 +224,24 @@
   border-color: var(--text-primary);
 }
 
-.vor-chip.is-toggle {
+.vor-chip--toggle {
   cursor: pointer;
 }
 
-.vor-chip.is-off {
+.vor-chip--off {
   background-color: var(--text-secondary);
   color: var(--bg-primary);
   opacity: 0.45;
 }
 
-.vor-chip.is-off:hover {
+.vor-chip--off:hover {
   background-color: var(--text-secondary);
   color: var(--bg-primary);
   border-color: var(--border);
   opacity: 0.7;
 }
 
-.vor-chip.is-chip-hidden {
+.vor-chip--hidden {
   display: none;
 }
 
@@ -265,12 +265,12 @@
   overflow: visible;
 }
 
-.vor-chip-popup.is-flipped-h {
+.vor-chip-popup--flipped-h {
   left: auto;
   right: 0;
 }
 
-.vor-chip-popup.is-flipped-v {
+.vor-chip-popup--flipped-v {
   top: auto;
   bottom: calc(100% + 4px);
 }
@@ -307,11 +307,11 @@
   display: block;
 }
 
-.vor-chip-tip.is-below {
+.vor-chip-tip--below {
   transform: none;
 }
 
-.vor-chip-list.is-editing {
+.vor-chip-list--editing {
   flex-wrap: wrap;
 }
 
