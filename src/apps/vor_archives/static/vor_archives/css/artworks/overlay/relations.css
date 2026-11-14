@@ -8,7 +8,7 @@
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  z-index: var(--z-overlay);
+  z-index: var(--z-base);
 }
 
 .vor-relations-head {
