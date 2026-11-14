@@ -60,12 +60,12 @@ export const menuMixin = {
     this.menu.kind = "collection";
     this.menu.collectionId = Number(el.dataset.collectionId);
     this.menu.collectionName = el.dataset.collectionName || "";
-    const node = el.closest(".collection-tree-node");
+    const node = el.closest(".vor-collection-tree-node");
     const siblings = this.collectionSiblings(node);
     const index = siblings.indexOf(node);
     this.menu.canNudgeUp = index > 0;
     this.menu.canNudgeDown = index >= 0 && index < siblings.length - 1;
-    this.menu.canLevelUp = Boolean(node?.parentElement?.closest(".collection-tree-node"));
+    this.menu.canLevelUp = Boolean(node?.parentElement?.closest(".vor-collection-tree-node"));
     this.menu.canLevelDown = index > 0;
     this.placeMenu(event.clientX, event.clientY);
   },
@@ -139,7 +139,7 @@ export const menuMixin = {
     const index = siblings.indexOf(node);
     if (direction > 0) {
       const prev = index > 0 ? siblings[index - 1] : null;
-      const children = prev?.querySelector(":scope > .collection-children");
+      const children = prev?.querySelector(":scope > .vor-collection-children");
       if (!prev || !children) {
         return;
       }
@@ -148,7 +148,7 @@ export const menuMixin = {
       this.postCollectionMove(node);
       return;
     }
-    const parentNode = node.parentElement?.closest(".collection-tree-node");
+    const parentNode = node.parentElement?.closest(".vor-collection-tree-node");
     if (!parentNode) {
       return;
     }

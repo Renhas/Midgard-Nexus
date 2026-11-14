@@ -144,7 +144,7 @@
   min-width: 0;
 }
 
-.collection-item {
+.vor-collection-item {
   padding: 0.3rem 0.5rem;
   border-radius: var(--radius-xs);
   font-size: 0.8125rem;
@@ -159,18 +159,18 @@
   white-space: nowrap;
 }
 
-.collection-item:hover {
+.vor-collection-item:hover {
   color: var(--text-primary);
   background-color: rgb(from var(--accent-vor) r g b / 8%);
 }
 
-.collection-tree-node {
+.vor-collection-tree-node {
   user-select: none;
   width: max-content;
   min-width: 100%;
 }
 
-.collection-toggle {
+.vor-collection-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -185,28 +185,28 @@
   flex-shrink: 0;
 }
 
-.collection-toggle:hover {
+.vor-collection-toggle:hover {
   color: var(--accent-vor);
 }
 
-.collection-toggle-placeholder {
+.vor-collection-toggle-placeholder {
   display: inline-block;
   width: 16px;
   flex-shrink: 0;
 }
 
-.collection-item.is-active {
+.vor-collection-item.is-active {
   color: var(--text-primary);
   background-color: rgb(from var(--accent-vor) r g b / 16%);
 }
 
-.collection-item.is-drop-target {
+.vor-collection-item.is-drop-target {
   color: var(--text-primary);
   background-color: rgb(from var(--accent-vor) r g b / 28%);
   outline: 1px dashed var(--accent-vor);
 }
 
-.collection-item-name {
+.vor-collection-item-name {
   flex: 0 0 auto;
   white-space: nowrap;
   appearance: none;
@@ -220,15 +220,15 @@
   cursor: pointer;
 }
 
-.collection-item-name:focus-visible,
-.collection-toggle:focus-visible {
+.vor-collection-item-name:focus-visible,
+.vor-collection-toggle:focus-visible {
   outline: 2px solid var(--accent-hover);
   outline-offset: 2px;
   border-radius: 2px;
 }
 
-.collection-tree-root,
-.collection-children {
+.vor-collection-tree-root,
+.vor-collection-children {
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
@@ -236,20 +236,20 @@
   min-width: 100%;
 }
 
-.collection-tree-node > .collection-children {
+.vor-collection-tree-node > .vor-collection-children {
   display: none;
 }
 
-.collection-tree-node.is-expanded > .collection-children {
+.vor-collection-tree-node.is-expanded > .vor-collection-children {
   display: flex;
 }
 
-.collection-children {
+.vor-collection-children {
   padding-left: 0.85rem;
   min-height: 0.4rem;
 }
 
-body.vor-collections-dragging .collection-children {
+body.vor-collections-dragging .vor-collection-children {
   outline: 1px dashed rgb(from var(--accent-vor) r g b / 25%);
 }
 

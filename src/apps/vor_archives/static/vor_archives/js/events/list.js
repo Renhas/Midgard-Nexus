@@ -72,7 +72,7 @@ document.addEventListener("contextmenu", (event) => {
   if (!store || !document.getElementById("vor-artworks-opts")) {
     return;
   }
-  const collectionItem = event.target.closest(".collection-item");
+  const collectionItem = event.target.closest(".vor-collection-item");
   if (collectionItem) {
     event.preventDefault();
     store.openCollectionMenu(event, collectionItem);
@@ -98,16 +98,16 @@ document.addEventListener("click", (event) => {
     return;
   }
   const sidebar = document.getElementById("sidebar-collections-list");
-  const toggle = event.target.closest(".collection-toggle");
+  const toggle = event.target.closest(".vor-collection-toggle");
   if (toggle && sidebar?.contains(toggle)) {
     store.closeMenu();
-    const id = toggle.closest(".collection-tree-node")?.dataset.collectionId;
+    const id = toggle.closest(".vor-collection-tree-node")?.dataset.collectionId;
     if (id) {
       store.toggleCollectionExpanded(id);
     }
     return;
   }
-  const collectionItem = event.target.closest(".collection-item");
+  const collectionItem = event.target.closest(".vor-collection-item");
   if (collectionItem && sidebar?.contains(collectionItem)) {
     store.closeMenu();
     store.selectCollectionFromEl(collectionItem);
