@@ -77,9 +77,9 @@ export const menuMixin = {
     this.menu.kind = "artwork";
     this.menu.uwId = Number(item.dataset.uwId);
     this.menu.detailUrl = item.dataset.detailUrl || "";
-    const nested = Boolean(item.closest(".artwork-list-items-nested"));
-    const list = document.getElementById("artwork-list-items");
-    const items = list ? [...list.querySelectorAll(":scope > .artwork-item")] : [];
+    const nested = Boolean(item.closest(".vor-artwork-list-items-nested"));
+    const list = document.getElementById("vor-artwork-list-items");
+    const items = list ? [...list.querySelectorAll(":scope > .vor-artwork-item")] : [];
     const index = items.indexOf(item);
     const canNudge = !nested && this.canReorder() && index >= 0;
     this.menu.canNudgeUp = canNudge && index > 0;
@@ -91,13 +91,13 @@ export const menuMixin = {
     this.loadArtworkCollections();
   },
   nudgeArtwork(delta) {
-    const item = document.querySelector(`.artwork-item[data-uw-id="${this.menu.uwId}"]`);
-    const list = document.getElementById("artwork-list-items");
+    const item = document.querySelector(`.vor-artwork-item[data-uw-id="${this.menu.uwId}"]`);
+    const list = document.getElementById("vor-artwork-list-items");
     this.closeMenu();
-    if (!item || !list || item.closest(".artwork-list-items-nested")) {
+    if (!item || !list || item.closest(".vor-artwork-list-items-nested")) {
       return;
     }
-    const items = [...list.querySelectorAll(":scope > .artwork-item")];
+    const items = [...list.querySelectorAll(":scope > .vor-artwork-item")];
     const index = items.indexOf(item);
     const next = index + Number(delta);
     if (index < 0 || next < 0 || next >= items.length) {

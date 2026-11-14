@@ -55,14 +55,14 @@ export const dragMixin = {
           },
           sort: allowSort,
           animation: 150,
-          draggable: ".artwork-item",
+          draggable: ".vor-artwork-item",
           forceFallback: true,
           fallbackOnBody: true,
           fallbackTolerance: 4,
           ghostClass: "is-sortable-ghost",
           chosenClass: "is-sortable-chosen",
           dragClass: "is-sortable-drag",
-          filter: ".artwork-row-delete, .artwork-tile-delete, .artwork-row-check, .artwork-tile-check",
+          filter: ".vor-artwork-row-delete, .vor-artwork-tile-delete, .vor-artwork-row-check, .vor-artwork-tile-check",
           preventOnFilter: true,
           onStart: () => {
             this.setArtworkDragState(true);
@@ -79,7 +79,7 @@ export const dragMixin = {
               this.addWorkToCollection(collectionId, evt.item?.dataset?.uwId);
               return;
             }
-            const direct = document.getElementById("artwork-list-items");
+            const direct = document.getElementById("vor-artwork-list-items");
             if (allowSort && this.canReorder() && evt.from === direct && evt.to === direct) {
               this.saveOrder();
               return;
@@ -91,11 +91,11 @@ export const dragMixin = {
         }),
       );
     };
-    const direct = document.getElementById("artwork-list-items");
+    const direct = document.getElementById("vor-artwork-list-items");
     if (direct) {
       bindArtworkSortable(direct, this.canReorder());
     }
-    document.querySelectorAll(".artwork-list-items-nested").forEach((container) => {
+    document.querySelectorAll(".vor-artwork-list-items-nested").forEach((container) => {
       bindArtworkSortable(container, false);
     });
   },
@@ -111,11 +111,13 @@ export const dragMixin = {
     evt.from.insertBefore(evt.item, siblings[evt.oldIndex]);
   },
   async saveOrder() {
-    const container = document.getElementById("artwork-list-items");
+    const container = document.getElementById("vor-artwork-list-items");
     if (!container) {
       return;
     }
-    const ids = [...container.querySelectorAll(":scope > .artwork-item")].map((el) => el.dataset.uwId).filter(Boolean);
+    const ids = [...container.querySelectorAll(":scope > .vor-artwork-item")]
+      .map((el) => el.dataset.uwId)
+      .filter(Boolean);
     if (!this.sortAsc) {
       ids.reverse();
     }

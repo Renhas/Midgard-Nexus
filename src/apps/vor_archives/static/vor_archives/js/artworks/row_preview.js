@@ -12,16 +12,16 @@ function ensurePreview() {
     return preview;
   }
   preview = document.createElement("div");
-  preview.id = "artwork-row-preview";
-  preview.className = "vor-panel artwork-row-preview";
+  preview.id = "vor-artwork-row-preview";
+  preview.className = "vor-panel vor-artwork-row-preview";
   preview.innerHTML = `
-            <div class="artwork-row-preview-cover">
+            <div class="vor-artwork-row-preview-cover">
                 <img alt="">
-                <div class="artwork-row-preview-cover-empty"><i></i></div>
+                <div class="vor-artwork-row-preview-cover-empty"><i></i></div>
             </div>
-            <div class="artwork-row-preview-body">
-                <div class="artwork-row-preview-title"></div>
-                <div class="artwork-row-preview-desc"></div>
+            <div class="vor-artwork-row-preview-body">
+                <div class="vor-artwork-row-preview-title"></div>
+                <div class="vor-artwork-row-preview-desc"></div>
             </div>
         `;
   document.body.appendChild(preview);
@@ -44,7 +44,7 @@ function canShow(row) {
   if (document.body.classList.contains("vor-artworks-dragging")) {
     return false;
   }
-  const list = row.closest(".artwork-list");
+  const list = row.closest(".vor-artwork-list");
   if (!list || list.classList.contains("is-grid")) {
     return false;
   }
@@ -61,8 +61,8 @@ function fillPreview(item) {
   const el = ensurePreview();
   const title = item.dataset.previewTitle || "";
   const cover = item.dataset.previewCover || "";
-  el.querySelector(".artwork-row-preview-title").textContent = title;
-  el.querySelector(".artwork-row-preview-desc").textContent = (item.dataset.previewDesc || "")
+  el.querySelector(".vor-artwork-row-preview-title").textContent = title;
+  el.querySelector(".vor-artwork-row-preview-desc").textContent = (item.dataset.previewDesc || "")
     .replace(/\s+/g, " ")
     .trim();
   const img = el.querySelector("img");
@@ -73,7 +73,7 @@ function fillPreview(item) {
   } else {
     img.removeAttribute("src");
     el.classList.add("is-empty");
-    const icon = el.querySelector(".artwork-row-preview-cover-empty i");
+    const icon = el.querySelector(".vor-artwork-row-preview-cover-empty i");
     if (icon) {
       icon.className = item.dataset.previewIcon || "";
     }
@@ -100,8 +100,8 @@ function placePreview(clientX, clientY) {
 }
 
 document.addEventListener("pointermove", (event) => {
-  const row = event.target.closest(".artwork-row");
-  const item = row?.closest(".artwork-item");
+  const row = event.target.closest(".vor-artwork-row");
+  const item = row?.closest(".vor-artwork-item");
   if (!canShow(row) || !item) {
     hidePreview();
     return;

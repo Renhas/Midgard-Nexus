@@ -58,7 +58,7 @@ def test_library_renders_seeded_works(live_server, authenticated_page, user_work
 
     authenticated_page.goto(f"{live_server.url}/library/")
     expect(authenticated_page).to_have_title(re.compile("Произведения"))
-    list_body = authenticated_page.locator("#artwork-list-body")
+    list_body = authenticated_page.locator("#vor-artwork-list-body")
     try:
         expect(list_body.get_by_text("Загрузка…")).to_be_hidden(timeout=20_000)
     except AssertionError as exc:

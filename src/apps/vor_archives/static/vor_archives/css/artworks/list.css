@@ -3,32 +3,32 @@
     ============================================ */
 
 /* --- Library header --- */
-.artwork-library-title {
+.vor-artwork-library-title {
   font-size: 1.15rem;
   font-weight: 600;
   color: var(--text-primary);
   padding: 0.35rem 0.25rem 0.75rem;
 }
 
-.artwork-library-path {
+.vor-artwork-library-path {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.15rem 0;
 }
 
-.artwork-library-path-item {
+.vor-artwork-library-path-item {
   display: inline-flex;
   align-items: center;
 }
 
-.artwork-library-path-sep {
+.vor-artwork-library-path-sep {
   margin: 0 0.4rem;
   color: var(--text-secondary);
   font-weight: 500;
 }
 
-.artwork-library-path-link {
+.vor-artwork-library-path-link {
   border: none;
   padding: 0;
   background: transparent;
@@ -38,26 +38,26 @@
   cursor: pointer;
 }
 
-.artwork-library-path-link:hover:not(:disabled) {
+.vor-artwork-library-path-link:hover:not(:disabled) {
   text-decoration: underline;
 }
 
-.artwork-library-path-link.is-current,
-.artwork-library-path-link:disabled {
+.vor-artwork-library-path-link.is-current,
+.vor-artwork-library-path-link:disabled {
   color: var(--text-primary);
   cursor: default;
 }
 
-.artwork-library-path-current {
+.vor-artwork-library-path-current {
   color: var(--text-primary);
 }
 
 /* --- Segments --- */
-.artwork-list-segment {
+.vor-artwork-list-segment {
   margin-top: 1rem;
 }
 
-.artwork-list-segment-title {
+.vor-artwork-list-segment-title {
   display: inline-flex;
   align-items: center;
   border: none;
@@ -72,24 +72,24 @@
   cursor: pointer;
 }
 
-.artwork-list-segment-title:hover {
+.vor-artwork-list-segment-title:hover {
   color: var(--accent-vor);
 }
 
 /* --- List layout --- */
-.artwork-list {
+.vor-artwork-list {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.artwork-list-items {
+.vor-artwork-list-items {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.artwork-row {
+.vor-artwork-row {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -101,23 +101,23 @@
   cursor: pointer;
 }
 
-.artwork-row:hover {
+.vor-artwork-row:hover {
   background-color: rgb(from var(--accent-hover) r g b / 8%);
   border-color: var(--accent-hover);
 }
 
-.artwork-row:focus,
-.artwork-tile:focus {
+.vor-artwork-row:focus,
+.vor-artwork-tile:focus {
   outline: none;
 }
 
-.artwork-row:focus-visible,
-.artwork-tile:focus-visible {
+.vor-artwork-row:focus-visible,
+.vor-artwork-tile:focus-visible {
   outline: 2px solid var(--accent-hover);
   outline-offset: 2px;
 }
 
-.artwork-row-type {
+.vor-artwork-row-type {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -127,7 +127,7 @@
   font-size: 1rem;
 }
 
-.artwork-row-title {
+.vor-artwork-row-title {
   flex: 1;
   min-width: 0;
   white-space: nowrap;
@@ -137,7 +137,7 @@
   font-weight: 500;
 }
 
-.artwork-row-year {
+.vor-artwork-row-year {
   width: 4rem;
   text-align: center;
   flex-shrink: 0;
@@ -145,7 +145,7 @@
   font-size: 0.875rem;
 }
 
-.artwork-row-status {
+.vor-artwork-row-status {
   width: 7rem;
   text-align: center;
   flex-shrink: 0;
@@ -153,7 +153,7 @@
   font-weight: 500;
 }
 
-.artwork-row-rating {
+.vor-artwork-row-rating {
   width: 2.5rem;
   text-align: center;
   flex-shrink: 0;
@@ -161,7 +161,7 @@
   font-size: 0.875rem;
 }
 
-.artwork-row-progress {
+.vor-artwork-row-progress {
   width: 7rem;
   text-align: right;
   flex-shrink: 0;
@@ -169,7 +169,7 @@
   font-size: 0.8125rem;
 }
 
-.artwork-list-header {
+.vor-artwork-list-header {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -182,27 +182,27 @@
   margin-bottom: 0.25rem;
 }
 
-.artwork-list-header .artwork-row-type,
-.artwork-list-header .artwork-row-title,
-.artwork-list-header .artwork-row-year,
-.artwork-list-header .artwork-row-status,
-.artwork-list-header .artwork-row-rating,
-.artwork-list-header .artwork-row-progress {
+.vor-artwork-list-header .vor-artwork-row-type,
+.vor-artwork-list-header .vor-artwork-row-title,
+.vor-artwork-list-header .vor-artwork-row-year,
+.vor-artwork-list-header .vor-artwork-row-status,
+.vor-artwork-list-header .vor-artwork-row-rating,
+.vor-artwork-list-header .vor-artwork-row-progress {
   font-weight: 600;
 }
 
-.artwork-item {
+.vor-artwork-item {
   display: flex;
   align-items: center;
   gap: 0.35rem;
 }
 
-.artwork-item .artwork-row {
+.vor-artwork-item .vor-artwork-row {
   flex: 1;
   min-width: 0;
 }
 
-.artwork-row-delete-slot {
+.vor-artwork-row-delete-slot {
   width: 2rem;
   flex-shrink: 0;
   display: flex;
@@ -210,7 +210,7 @@
   justify-content: center;
 }
 
-.artwork-row-check {
+.vor-artwork-row-check {
   width: 1.25rem;
   flex-shrink: 0;
   display: flex;
@@ -218,24 +218,24 @@
   justify-content: center;
 }
 
-.artwork-row-check .custom-checkbox.is-checked,
-.artwork-row-check .custom-checkbox.is-checked:hover,
-.artwork-tile-check .custom-checkbox.is-checked,
-.artwork-tile-check .custom-checkbox.is-checked:hover {
+.vor-artwork-row-check .custom-checkbox.is-checked,
+.vor-artwork-row-check .custom-checkbox.is-checked:hover,
+.vor-artwork-tile-check .custom-checkbox.is-checked,
+.vor-artwork-tile-check .custom-checkbox.is-checked:hover {
   background-color: var(--accent-hover);
   border-color: var(--accent-hover);
 }
 
-.artwork-row-delete {
+.vor-artwork-row-delete {
   opacity: 0;
 }
 
-.artwork-item:hover .artwork-row-delete,
-.artwork-item:focus-within .artwork-row-delete {
+.vor-artwork-item:hover .vor-artwork-row-delete,
+.vor-artwork-item:focus-within .vor-artwork-row-delete {
   opacity: 1;
 }
 
-.artwork-row.is-selected {
+.vor-artwork-row.is-selected {
   border-color: var(--action-delete);
   background-color: rgb(from var(--action-delete) r g b / 8%);
 }
@@ -243,7 +243,7 @@
 /* --- Row preview (hover) --- */
 
 /* --- Hover preview (may move to common.css) --- */
-.artwork-row-preview {
+.vor-artwork-row-preview {
   display: none;
   position: fixed;
   z-index: var(--z-hover-preview);
@@ -256,12 +256,12 @@
   overflow: hidden;
 }
 
-.artwork-row-preview.is-visible {
+.vor-artwork-row-preview.is-visible {
   display: flex;
   align-items: stretch;
 }
 
-.artwork-row-preview-cover {
+.vor-artwork-row-preview-cover {
   width: 64px;
   height: 96px;
   flex-shrink: 0;
@@ -270,15 +270,15 @@
   background-color: var(--bg-input);
 }
 
-.artwork-row-preview-cover img,
-.artwork-row-preview-cover-empty {
+.vor-artwork-row-preview-cover img,
+.vor-artwork-row-preview-cover-empty {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.artwork-row-preview-cover-empty {
+.vor-artwork-row-preview-cover-empty {
   display: none;
   align-items: center;
   justify-content: center;
@@ -286,15 +286,15 @@
   font-size: 1.35rem;
 }
 
-.artwork-row-preview.is-empty .artwork-row-preview-cover img {
+.vor-artwork-row-preview.is-empty .vor-artwork-row-preview-cover img {
   display: none;
 }
 
-.artwork-row-preview.is-empty .artwork-row-preview-cover-empty {
+.vor-artwork-row-preview.is-empty .vor-artwork-row-preview-cover-empty {
   display: flex;
 }
 
-.artwork-row-preview-body {
+.vor-artwork-row-preview-body {
   flex: 1;
   min-width: 0;
   min-height: 0;
@@ -304,7 +304,7 @@
   gap: 0.25rem;
 }
 
-.artwork-row-preview-title {
+.vor-artwork-row-preview-title {
   flex-shrink: 0;
   color: var(--text-primary);
   font-size: 0.8125rem;
@@ -315,7 +315,7 @@
   text-overflow: ellipsis;
 }
 
-.artwork-row-preview-desc {
+.vor-artwork-row-preview-desc {
   flex: 0 1 auto;
   min-height: 0;
   max-height: calc(0.75rem * 1.35 * 4);
@@ -332,32 +332,32 @@
 }
 
 /* --- Drag & drop states --- */
-.artwork-list.is-sortable,
-.artwork-list.is-sortable * {
+.vor-artwork-list.is-sortable,
+.vor-artwork-list.is-sortable * {
   user-select: none;
 }
 
-.artwork-list.is-sortable .artwork-item {
+.vor-artwork-list.is-sortable .vor-artwork-item {
   cursor: grab;
 }
 
-.artwork-list.is-sortable .artwork-list-items-nested .artwork-item {
+.vor-artwork-list.is-sortable .vor-artwork-list-items-nested .vor-artwork-item {
   cursor: grab;
 }
 
-.artwork-item.is-sortable-ghost,
-.artwork-item.is-sortable-chosen {
+.vor-artwork-item.is-sortable-ghost,
+.vor-artwork-item.is-sortable-chosen {
   opacity: 1 !important;
 }
 
-.artwork-item.is-sortable-ghost .artwork-row,
-.artwork-item.is-sortable-chosen .artwork-row,
-.artwork-item.is-sortable-ghost .artwork-tile-cover,
-.artwork-item.is-sortable-chosen .artwork-tile-cover {
+.vor-artwork-item.is-sortable-ghost .vor-artwork-row,
+.vor-artwork-item.is-sortable-chosen .vor-artwork-row,
+.vor-artwork-item.is-sortable-ghost .vor-artwork-tile-cover,
+.vor-artwork-item.is-sortable-chosen .vor-artwork-tile-cover {
   box-shadow: 0 0 0 2px var(--accent-vor);
 }
 
-.artwork-item.is-sortable-drag,
+.vor-artwork-item.is-sortable-drag,
 .sortable-fallback {
   opacity: 0 !important;
   visibility: hidden !important;
@@ -369,63 +369,63 @@ body.vor-artworks-dragging {
   cursor: grabbing;
 }
 
-body.vor-artworks-dragging .artwork-row-delete,
-body.vor-artworks-dragging .artwork-tile-delete {
+body.vor-artworks-dragging .vor-artwork-row-delete,
+body.vor-artworks-dragging .vor-artwork-tile-delete {
   display: none !important;
 }
 
-body.vor-artworks-grid-drag .artwork-row,
-body.vor-artworks-grid-drag .artwork-row-delete-slot {
+body.vor-artworks-grid-drag .vor-artwork-row,
+body.vor-artworks-grid-drag .vor-artwork-row-delete-slot {
   display: none !important;
 }
 
-body.vor-artworks-list-drag .artwork-tile {
+body.vor-artworks-list-drag .vor-artwork-tile {
   display: none !important;
 }
 
 /* --- Tile grid --- */
-.artwork-list.is-grid .artwork-list-items {
+.vor-artwork-list.is-grid .vor-artwork-list-items {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
   gap: 1rem;
 }
 
-.artwork-list.is-grid .artwork-list-segment-title {
+.vor-artwork-list.is-grid .vor-artwork-list-segment-title {
   padding-left: 0;
 }
 
-.artwork-list.is-grid .artwork-item {
+.vor-artwork-list.is-grid .vor-artwork-item {
   display: block;
 }
 
-.artwork-list.is-grid .artwork-list-header,
-.artwork-list.is-grid .artwork-row,
-.artwork-list.is-grid .artwork-row-delete-slot {
+.vor-artwork-list.is-grid .vor-artwork-list-header,
+.vor-artwork-list.is-grid .vor-artwork-row,
+.vor-artwork-list.is-grid .vor-artwork-row-delete-slot {
   display: none !important;
 }
 
-.artwork-list:not(.is-grid) .artwork-tile {
+.vor-artwork-list:not(.is-grid) .vor-artwork-tile {
   display: none !important;
 }
 
-.artwork-list:not(.is-delete-mode) .artwork-row-check,
-.artwork-list:not(.is-delete-mode) .artwork-tile-check {
+.vor-artwork-list:not(.is-delete-mode) .vor-artwork-row-check,
+.vor-artwork-list:not(.is-delete-mode) .vor-artwork-tile-check {
   display: none !important;
 }
 
-.artwork-list.is-delete-mode .artwork-row-delete,
-.artwork-list.is-delete-mode .artwork-tile-delete {
+.vor-artwork-list.is-delete-mode .vor-artwork-row-delete,
+.vor-artwork-list.is-delete-mode .vor-artwork-tile-delete {
   display: none !important;
 }
 
-.artwork-tile {
+.vor-artwork-tile {
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
   cursor: pointer;
 }
 
-.artwork-tile-cover {
+.vor-artwork-tile-cover {
   position: relative;
   width: 100%;
   aspect-ratio: 2 / 3;
@@ -435,18 +435,18 @@ body.vor-artworks-list-drag .artwork-tile {
   background-color: var(--bg-input);
 }
 
-.artwork-tile.is-selected .artwork-tile-cover {
+.vor-artwork-tile.is-selected .vor-artwork-tile-cover {
   box-shadow: 0 0 0 var(--outline-delete-width) var(--action-delete);
 }
 
-.artwork-tile-image {
+.vor-artwork-tile-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.artwork-tile-image-empty {
+.vor-artwork-tile-image-empty {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -454,7 +454,7 @@ body.vor-artworks-list-drag .artwork-tile {
   font-size: 1.75rem;
 }
 
-.artwork-tile-type {
+.vor-artwork-tile-type {
   position: absolute;
   bottom: 0.4rem;
   left: 0.4rem;
@@ -469,7 +469,7 @@ body.vor-artworks-list-drag .artwork-tile {
   font-size: 1.15rem;
 }
 
-.artwork-tile-status {
+.vor-artwork-tile-status {
   position: absolute;
   top: 0.4rem;
   left: 0.4rem;
@@ -485,7 +485,7 @@ body.vor-artworks-list-drag .artwork-tile {
   font-size: 1.2rem;
 }
 
-.artwork-tile-rating {
+.vor-artwork-tile-rating {
   position: absolute;
   right: 0.4rem;
   bottom: 0.4rem;
@@ -504,19 +504,19 @@ body.vor-artworks-list-drag .artwork-tile {
   font-weight: 600;
 }
 
-.artwork-tile-rating i {
+.vor-artwork-tile-rating i {
   font-size: 0.85rem;
   color: var(--rating-star-fill);
 }
 
-.artwork-tile-check {
+.vor-artwork-tile-check {
   position: absolute;
   top: 0.4rem;
   right: 0.4rem;
   z-index: 2;
 }
 
-.artwork-tile-delete {
+.vor-artwork-tile-delete {
   position: absolute;
   top: 0.3rem;
   right: 0.3rem;
@@ -525,12 +525,12 @@ body.vor-artworks-list-drag .artwork-tile {
   border-color: var(--action-delete);
 }
 
-.artwork-tile:hover .artwork-tile-delete,
-.artwork-tile:focus-within .artwork-tile-delete {
+.vor-artwork-tile:hover .vor-artwork-tile-delete,
+.vor-artwork-tile:focus-within .vor-artwork-tile-delete {
   opacity: 1;
 }
 
-.artwork-tile-title {
+.vor-artwork-tile-title {
   font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-primary);

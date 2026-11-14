@@ -1,5 +1,5 @@
 {% load vor_archives_extras %}
-<div class="artwork-tile"
+<div class="vor-artwork-tile"
      role="button"
      tabindex="0"
      aria-label="{{ user_work.work.title }}"
@@ -7,31 +7,31 @@
      hx-target="#vor-overlay"
      hx-swap="innerHTML"
      hx-trigger="click, keyup[key=='Enter']">
-  <div class="artwork-tile-cover">
+  <div class="vor-artwork-tile-cover">
     {% if user_work.work.cover %}
-      <img class="artwork-tile-image" src="{{ user_work.work.cover.url }}" alt="{{ user_work.work.title }}">
+      <img class="vor-artwork-tile-image" src="{{ user_work.work.cover.url }}" alt="{{ user_work.work.title }}">
     {% else %}
-      <div class="artwork-tile-image artwork-tile-image-empty">
+      <div class="vor-artwork-tile-image vor-artwork-tile-image-empty">
         <i class="{{ user_work|get_work_type_icon }}"></i>
       </div>
     {% endif %}
-    <div class="artwork-tile-status status-{{ user_work.status }}" title="{{ user_work|status_label_ru }}">
+    <div class="vor-artwork-tile-status status-{{ user_work.status }}" title="{{ user_work|status_label_ru }}">
       <i class="{{ user_work|status_icon }}"></i>
     </div>
-    <div class="artwork-tile-type">
+    <div class="vor-artwork-tile-type">
       <i class="{{ user_work|get_work_type_icon }}"></i>
     </div>
     {% if user_work.rating %}
-      <div class="artwork-tile-rating">
+      <div class="vor-artwork-tile-rating">
         <i class="bi bi-star-fill"></i>
         <span>{{ user_work.rating }}</span>
       </div>
     {% endif %}
-    <div class="artwork-tile-check">
+    <div class="vor-artwork-tile-check">
       <span class="custom-checkbox"></span>
     </div>
     <button type="button"
-            class="sidebar-btn sidebar-btn-delete sidebar-btn-icon artwork-tile-delete"
+            class="sidebar-btn sidebar-btn-delete sidebar-btn-icon vor-artwork-tile-delete"
             tabindex="-1"
             title="Удалить"
             @click.stop
@@ -41,5 +41,5 @@
       <i class="bi bi-trash-fill"></i>
     </button>
   </div>
-  <div class="artwork-tile-title" title="{{ user_work.work.title }}">{{ user_work.work.title }}</div>
+  <div class="vor-artwork-tile-title" title="{{ user_work.work.title }}">{{ user_work.work.title }}</div>
 </div>
