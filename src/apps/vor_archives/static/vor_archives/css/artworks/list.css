@@ -256,7 +256,7 @@
   overflow: hidden;
 }
 
-.vor-artwork-row-preview.is-visible {
+.vor-artwork-row-preview--visible {
   display: flex;
   align-items: stretch;
 }
@@ -286,11 +286,11 @@
   font-size: 1.35rem;
 }
 
-.vor-artwork-row-preview.is-empty .vor-artwork-row-preview-cover img {
+.vor-artwork-row-preview--empty .vor-artwork-row-preview-cover img {
   display: none;
 }
 
-.vor-artwork-row-preview.is-empty .vor-artwork-row-preview-cover-empty {
+.vor-artwork-row-preview--empty .vor-artwork-row-preview-cover-empty {
   display: flex;
 }
 

@@ -33,7 +33,7 @@ function hidePreview() {
   showTimer = 0;
   currentItem = null;
   if (preview) {
-    preview.classList.remove("is-visible");
+    preview.classList.remove("vor-artwork-row-preview--visible");
   }
 }
 
@@ -69,10 +69,10 @@ function fillPreview(item) {
   img.alt = title;
   if (cover) {
     img.src = cover;
-    el.classList.remove("is-empty");
+    el.classList.remove("vor-artwork-row-preview--empty");
   } else {
     img.removeAttribute("src");
-    el.classList.add("is-empty");
+    el.classList.add("vor-artwork-row-preview--empty");
     const icon = el.querySelector(".vor-artwork-row-preview-cover-empty i");
     if (icon) {
       icon.className = item.dataset.previewIcon || "";
@@ -82,7 +82,7 @@ function fillPreview(item) {
 
 function placePreview(clientX, clientY) {
   const el = ensurePreview();
-  el.classList.add("is-visible");
+  el.classList.add("vor-artwork-row-preview--visible");
   const width = el.offsetWidth;
   const height = el.offsetHeight;
   let x = clientX + OFFSET;
@@ -110,7 +110,7 @@ document.addEventListener("pointermove", (event) => {
     currentItem = item;
     fillPreview(item);
     window.clearTimeout(showTimer);
-    if (preview?.classList.contains("is-visible")) {
+    if (preview?.classList.contains("vor-artwork-row-preview--visible")) {
       placePreview(event.clientX, event.clientY);
       return;
     }
@@ -121,7 +121,7 @@ document.addEventListener("pointermove", (event) => {
     }, SHOW_DELAY);
     return;
   }
-  if (preview?.classList.contains("is-visible")) {
+  if (preview?.classList.contains("vor-artwork-row-preview--visible")) {
     placePreview(event.clientX, event.clientY);
   }
 });
