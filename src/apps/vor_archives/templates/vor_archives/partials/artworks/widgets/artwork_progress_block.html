@@ -7,7 +7,7 @@
       <button type="button"
               class="vor-progress-value"
               x-show="!progressEditing"
-              :class="{ 'is-hot': progressHover || progressEditing }"
+              :class="{ 'vor-progress-value--hot': progressHover || progressEditing }"
               @mouseenter="progressHover = true"
               @mouseleave="progressHover = false"
               @click="startProgressEdit()"

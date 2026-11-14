@@ -5,10 +5,10 @@
 {% block extra_head %}
   {{ block.super }}
   {# Page-specific: list, add form, context menu, artwork overlay. #}
+  {% include "vor_archives/partials/artworks/overlay_styles.html" %}
   <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/list.css' %}">
   <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/add.css' %}">
   <link rel="stylesheet" href="{% static 'vor_archives/css/artworks/context_menu.css' %}">
-  {% include "vor_archives/partials/artworks/overlay_styles.html" %}
 {% endblock %}
 {% block extra_js %}
   {{ block.super }}

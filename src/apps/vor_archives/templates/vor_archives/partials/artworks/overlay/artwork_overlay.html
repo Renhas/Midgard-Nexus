@@ -82,7 +82,7 @@
            required>
     <div class="vor-view-hero">
       {% include "vor_archives/partials/artworks/widgets/artwork_cover_upload.html" with is_add=False %}
-      <div class="vor-view-info" :class="{ 'is-editing': editing }">
+      <div class="vor-view-info" :class="{ 'vor-view-info--editing': editing }">
         <div class="vor-view-row vor-view-topline">
           <span class="vor-view-type">
             <i class="{{ work|get_model_icon }}"></i>
@@ -191,7 +191,7 @@
               <span class="vor-view-counter"
                     role="button"
                     tabindex="0"
-                    :class="{ 'is-hot': counterHover || counterEditing }"
+                    :class="{ 'vor-view-counter--hot': counterHover || counterEditing }"
                     @mouseenter="counterHover = true"
                     @mouseleave="counterHover = false"
                     @click="startCounterEdit()"

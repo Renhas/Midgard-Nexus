@@ -27,10 +27,10 @@
   pointer-events: none;
 }
 
-.vor-inline-title.is-invalid,
-.vor-inline-title.is-invalid:focus,
-.vor-inline-number.is-invalid,
-.vor-inline-number.is-invalid:focus {
+.vor-inline-title--invalid,
+.vor-inline-title--invalid:focus,
+.vor-inline-number--invalid,
+.vor-inline-number--invalid:focus {
   border-color: var(--error);
   box-shadow: var(--focus-ring-error);
 }
@@ -110,7 +110,7 @@
   text-align: center;
 }
 
-.vor-add-error.is-under-center {
+.vor-add-error--under-center {
   top: calc(100% + 8px);
   white-space: normal;
   max-width: calc(100% - 2rem);
@@ -168,14 +168,14 @@
 }
 
 /* --- Layout shell --- */
-.vor-overlay.is-add .vor-overlay-bar {
+.vor-overlay--add .vor-overlay-bar {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: start;
   justify-content: initial;
 }
 
-.vor-overlay.is-add .vor-overlay-bar > .sidebar-btn:first-child {
+.vor-overlay--add .vor-overlay-bar > .sidebar-btn:first-child {
   justify-self: start;
 }
 
@@ -201,18 +201,18 @@
   line-height: 1;
 }
 
-.vor-overlay.is-add {
+.vor-overlay--add {
   height: 100%;
   min-height: 0;
   overflow: hidden;
   padding-bottom: 0.85rem;
 }
 
-.vor-overlay.is-add .vor-overlay-bar {
+.vor-overlay--add .vor-overlay-bar {
   flex-shrink: 0;
 }
 
-.vor-overlay.is-add .vor-overlay-body {
+.vor-overlay--add .vor-overlay-body {
   flex: 1;
   min-height: 0;
   display: flex;
@@ -441,17 +441,17 @@
 
 /* --- Responsive --- */
 @media (width <= 900px) {
-  #vor-overlay:has(.is-add) {
+  #vor-overlay:has(.vor-overlay--add) {
     overflow: auto;
   }
 
-  .vor-overlay.is-add {
+  .vor-overlay--add {
     height: auto;
     min-height: 100%;
     overflow: visible;
   }
 
-  .vor-overlay.is-add .vor-overlay-bar {
+  .vor-overlay--add .vor-overlay-bar {
     grid-template-columns: 1fr;
     justify-items: start;
   }
