@@ -14,7 +14,7 @@ export const deleteMixin = {
         node.classList.toggle("vor-artwork-tile--selected", selected);
       });
       item.querySelectorAll(".vor-checkbox").forEach((node) => {
-        node.classList.toggle("is-checked", selected);
+        node.classList.toggle("vor-checkbox--checked", selected);
       });
     });
   },

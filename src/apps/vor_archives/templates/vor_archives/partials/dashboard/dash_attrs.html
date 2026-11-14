@@ -6,7 +6,7 @@
       {% for type in view_types %}
         <button type="button"
                 class="sidebar-btn"
-                :class="{ 'active': attrView === '{{ type.key }}' }"
+                :class="{ 'sidebar-btn--active': attrView === '{{ type.key }}' }"
                 @click="setAttrView('{{ type.key }}')"
                 title="{{ type.label }}">
           <i class="{{ type.icon }}"></i>

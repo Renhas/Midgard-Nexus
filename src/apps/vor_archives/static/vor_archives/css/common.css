@@ -46,7 +46,7 @@ html.vor-scroll-lock .center {
 }
 
 .vor-checkbox__input:checked + .vor-checkbox::after,
-.vor-checkbox.is-checked::after {
+.vor-checkbox--checked::after {
   content: "";
   display: block;
   position: absolute;

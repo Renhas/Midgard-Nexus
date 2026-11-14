@@ -279,7 +279,7 @@ body {
   transform: scale(0.96);
 }
 
-.nav-btn.active {
+.nav-btn--active {
   color: var(--accent-vor);
   border-color: var(--accent-vor);
   background-color: rgb(167 145 255 / 10%);

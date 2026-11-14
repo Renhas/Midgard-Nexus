@@ -218,10 +218,10 @@
   justify-content: center;
 }
 
-.vor-artwork-row-check .vor-checkbox.is-checked,
-.vor-artwork-row-check .vor-checkbox.is-checked:hover,
-.vor-artwork-tile-check .vor-checkbox.is-checked,
-.vor-artwork-tile-check .vor-checkbox.is-checked:hover {
+.vor-artwork-row-check .vor-checkbox--checked,
+.vor-artwork-row-check .vor-checkbox--checked:hover,
+.vor-artwork-tile-check .vor-checkbox--checked,
+.vor-artwork-tile-check .vor-checkbox--checked:hover {
   background-color: var(--accent-hover);
   border-color: var(--accent-hover);
 }

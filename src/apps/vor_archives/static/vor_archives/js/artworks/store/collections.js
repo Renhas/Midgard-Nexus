@@ -87,13 +87,16 @@ export const collectionsMixin = {
   applyCollectionExpandState() {
     document.querySelectorAll(".vor-collection-tree-node").forEach((node) => {
       const expanded = this.isCollectionExpanded(node.dataset.collectionId);
-      node.classList.toggle("is-expanded", expanded);
+      node.classList.toggle("vor-collection-tree-node--expanded", expanded);
       node.querySelector(":scope > .vor-collection-item .bi-chevron-right")?.classList.toggle("bi-rotate-90", expanded);
     });
   },
   applyCollectionTreeState() {
     document.querySelectorAll(".vor-collection-item").forEach((item) => {
-      item.classList.toggle("is-active", String(this.collectionId || "") === String(item.dataset.collectionId || ""));
+      item.classList.toggle(
+        "vor-collection-item--active",
+        String(this.collectionId || "") === String(item.dataset.collectionId || ""),
+      );
     });
     this.applyCollectionExpandState();
   },
@@ -228,8 +231,8 @@ export const collectionsMixin = {
     return el?.closest(".vor-collection-item")?.dataset?.collectionId || null;
   },
   clearCollectionDropTargets() {
-    document.querySelectorAll(".vor-collection-item.is-drop-target").forEach((node) => {
-      node.classList.remove("is-drop-target");
+    document.querySelectorAll(".vor-collection-item--drop-target").forEach((node) => {
+      node.classList.remove("vor-collection-item--drop-target");
     });
   },
   highlightCollectionAtPoint(x, y) {
@@ -242,7 +245,9 @@ export const collectionsMixin = {
     if (!id || id === this._dragCollectionId) {
       return;
     }
-    document.querySelector(`.vor-collection-item[data-collection-id="${id}"]`)?.classList.add("is-drop-target");
+    document
+      .querySelector(`.vor-collection-item[data-collection-id="${id}"]`)
+      ?.classList.add("vor-collection-item--drop-target");
   },
   collectionRowAtPoint(x, y, dragged) {
     if (x == null || y == null) {
@@ -288,7 +293,7 @@ export const collectionsMixin = {
     if (relY < 0.16 || relY > 0.84) {
       return false;
     }
-    row.classList.add("is-drop-target");
+    row.classList.add("vor-collection-item--drop-target");
     this._pendingNestId = row.dataset.collectionId || "";
     return Boolean(this._pendingNestId);
   },

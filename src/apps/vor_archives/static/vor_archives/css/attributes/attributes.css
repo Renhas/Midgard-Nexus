@@ -159,12 +159,12 @@
   background-color: rgb(167 145 255 / 8%);
 }
 
-.attr-item.is-active {
+.attr-item--active {
   color: var(--accent-vor);
   background-color: rgb(167 145 255 / 12%);
 }
 
-.attr-item.is-selected {
+.attr-item--selected {
   outline: 1px solid var(--accent-vor);
 }
 
@@ -181,8 +181,8 @@
   flex-shrink: 0;
 }
 
-.attr-item-check .vor-checkbox.is-checked,
-.attr-item-check .vor-checkbox.is-checked:hover {
+.attr-item-check .vor-checkbox--checked,
+.attr-item-check .vor-checkbox--checked:hover {
   background-color: var(--accent-hover);
   border-color: var(--accent-hover);
 }

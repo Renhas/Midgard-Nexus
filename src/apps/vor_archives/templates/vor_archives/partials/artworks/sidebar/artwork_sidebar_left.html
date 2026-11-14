@@ -3,7 +3,7 @@
     <button type="button"
             class="sidebar-btn sidebar-btn-primary"
             title="Медиатека"
-            :class="{ 'active': !$store.vorArtworks.collectionId }"
+            :class="{ 'sidebar-btn--active': !$store.vorArtworks.collectionId }"
             @click="$store.vorArtworks.selectLibrary()">
       <i class="bi bi-collection"></i>
       <span>Медиатека</span>
