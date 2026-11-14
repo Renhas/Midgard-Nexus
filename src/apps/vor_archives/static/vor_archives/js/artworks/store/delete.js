@@ -7,8 +7,11 @@ export const deleteMixin = {
   syncSelectedDom() {
     document.querySelectorAll(".vor-artwork-item").forEach((item) => {
       const selected = this.isSelected(item.dataset.uwId);
-      item.querySelectorAll(".vor-artwork-row, .vor-artwork-tile").forEach((node) => {
-        node.classList.toggle("is-selected", selected);
+      item.querySelectorAll(".vor-artwork-row").forEach((node) => {
+        node.classList.toggle("vor-artwork-row--selected", selected);
+      });
+      item.querySelectorAll(".vor-artwork-tile").forEach((node) => {
+        node.classList.toggle("vor-artwork-tile--selected", selected);
       });
       item.querySelectorAll(".vor-checkbox").forEach((node) => {
         node.classList.toggle("is-checked", selected);

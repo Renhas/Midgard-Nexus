@@ -59,9 +59,9 @@ export const dragMixin = {
           forceFallback: true,
           fallbackOnBody: true,
           fallbackTolerance: 4,
-          ghostClass: "is-sortable-ghost",
-          chosenClass: "is-sortable-chosen",
-          dragClass: "is-sortable-drag",
+          ghostClass: "vor-artwork-item--ghost",
+          chosenClass: "vor-artwork-item--chosen",
+          dragClass: "vor-artwork-item--drag",
           filter: ".vor-artwork-row-delete, .vor-artwork-tile-delete, .vor-artwork-row-check, .vor-artwork-tile-check",
           preventOnFilter: true,
           onStart: () => {

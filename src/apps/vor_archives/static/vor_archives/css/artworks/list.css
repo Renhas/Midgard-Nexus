@@ -235,7 +235,7 @@
   opacity: 1;
 }
 
-.vor-artwork-row.is-selected {
+.vor-artwork-row--selected {
   border-color: var(--action-delete);
   background-color: rgb(from var(--action-delete) r g b / 8%);
 }
@@ -345,19 +345,19 @@
   cursor: grab;
 }
 
-.vor-artwork-item.is-sortable-ghost,
-.vor-artwork-item.is-sortable-chosen {
+.vor-artwork-item--ghost,
+.vor-artwork-item--chosen {
   opacity: 1 !important;
 }
 
-.vor-artwork-item.is-sortable-ghost .vor-artwork-row,
-.vor-artwork-item.is-sortable-chosen .vor-artwork-row,
-.vor-artwork-item.is-sortable-ghost .vor-artwork-tile-cover,
-.vor-artwork-item.is-sortable-chosen .vor-artwork-tile-cover {
+.vor-artwork-item--ghost .vor-artwork-row,
+.vor-artwork-item--chosen .vor-artwork-row,
+.vor-artwork-item--ghost .vor-artwork-tile-cover,
+.vor-artwork-item--chosen .vor-artwork-tile-cover {
   box-shadow: 0 0 0 2px var(--accent-vor);
 }
 
-.vor-artwork-item.is-sortable-drag,
+.vor-artwork-item--drag,
 .sortable-fallback {
   opacity: 0 !important;
   visibility: hidden !important;
@@ -435,7 +435,7 @@ body.vor-artworks-list-drag .vor-artwork-tile {
   background-color: var(--bg-input);
 }
 
-.vor-artwork-tile.is-selected .vor-artwork-tile-cover {
+.vor-artwork-tile--selected .vor-artwork-tile-cover {
   box-shadow: 0 0 0 var(--outline-delete-width) var(--action-delete);
 }
 
