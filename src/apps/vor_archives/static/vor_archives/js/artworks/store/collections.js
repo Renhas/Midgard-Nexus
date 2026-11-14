@@ -316,7 +316,7 @@ export const collectionsMixin = {
       return;
     }
     if (data.changed) {
-      window.dispatchEvent(new Event("collection-update"));
+      window.dispatchEvent(new Event("vor:collection-update"));
     }
     if (this.collectionId) {
       this.reloadList();

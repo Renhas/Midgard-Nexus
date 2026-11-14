@@ -209,7 +209,7 @@ export const menuMixin = {
     if (!data?.ok) {
       return;
     }
-    window.dispatchEvent(new Event("collection-update"));
+    window.dispatchEvent(new Event("vor:collection-update"));
     this.reloadList();
   },
   async toggleWorkCollection(item) {
@@ -222,7 +222,7 @@ export const menuMixin = {
       return;
     }
     item.in_collection = adding;
-    window.dispatchEvent(new Event("collection-update"));
+    window.dispatchEvent(new Event("vor:collection-update"));
     this.reloadList();
   },
   menuRenameCollection() {
