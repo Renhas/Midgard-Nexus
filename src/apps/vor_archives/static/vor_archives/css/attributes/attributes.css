@@ -181,8 +181,8 @@
   flex-shrink: 0;
 }
 
-.attr-item-check .custom-checkbox.is-checked,
-.attr-item-check .custom-checkbox.is-checked:hover {
+.attr-item-check .vor-checkbox.is-checked,
+.attr-item-check .vor-checkbox.is-checked:hover {
   background-color: var(--accent-hover);
   border-color: var(--accent-hover);
 }

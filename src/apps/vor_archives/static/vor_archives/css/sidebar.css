@@ -377,7 +377,7 @@ body.vor-collections-dragging .vor-collection-children {
   margin-left: 0.25rem;
 }
 
-.sidebar-filter-item:hover .custom-checkbox {
+.sidebar-filter-item:hover .vor-checkbox {
   border-color: var(--accent-hover);
 }
 

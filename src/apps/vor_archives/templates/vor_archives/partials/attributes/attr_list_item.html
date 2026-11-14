@@ -10,7 +10,7 @@
      hx-disinherit="hx-include"
      @click="$store.vorAttributes.select('{{ item.key }}')">
   <div class="attr-item-check" x-show="$store.vorAttributes.deleteMode" x-cloak>
-    <span class="custom-checkbox" :class="{ 'is-checked': $store.vorAttributes.isSelected('{{ item.key }}') }"></span>
+    <span class="vor-checkbox" :class="{ 'is-checked': $store.vorAttributes.isSelected('{{ item.key }}') }"></span>
   </div>
   <span class="attr-item-name">{{ item.name }}</span>
   <span class="attr-item-count">({{ item.work_count }})</span>

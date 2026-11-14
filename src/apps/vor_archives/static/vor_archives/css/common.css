@@ -20,7 +20,7 @@ html.vor-scroll-lock .center {
 }
 
 /* --- Checkbox --- */
-.hidden-checkbox {
+.vor-checkbox__input {
   position: absolute;
   opacity: 0;
   width: 0;
@@ -28,7 +28,7 @@ html.vor-scroll-lock .center {
   pointer-events: none;
 }
 
-.custom-checkbox {
+.vor-checkbox {
   display: inline-block;
   width: 18px;
   height: 18px;
@@ -40,13 +40,13 @@ html.vor-scroll-lock .center {
   position: relative;
 }
 
-.hidden-checkbox:checked + .custom-checkbox {
+.vor-checkbox__input:checked + .vor-checkbox {
   background-color: var(--accent-hover);
   border-color: var(--accent-hover);
 }
 
-.hidden-checkbox:checked + .custom-checkbox::after,
-.custom-checkbox.is-checked::after {
+.vor-checkbox__input:checked + .vor-checkbox::after,
+.vor-checkbox.is-checked::after {
   content: "";
   display: block;
   position: absolute;
@@ -62,7 +62,7 @@ html.vor-scroll-lock .center {
   mask-position: center;
 }
 
-.hidden-checkbox:focus + .custom-checkbox {
+.vor-checkbox__input:focus + .vor-checkbox {
   box-shadow: var(--focus-ring);
 }
 

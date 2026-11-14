@@ -10,7 +10,7 @@ export const deleteMixin = {
       item.querySelectorAll(".vor-artwork-row, .vor-artwork-tile").forEach((node) => {
         node.classList.toggle("is-selected", selected);
       });
-      item.querySelectorAll(".custom-checkbox").forEach((node) => {
+      item.querySelectorAll(".vor-checkbox").forEach((node) => {
         node.classList.toggle("is-checked", selected);
       });
     });

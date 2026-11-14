@@ -49,10 +49,10 @@
           <input type="checkbox"
                  name="{{ name }}"
                  value="{{ option.value }}"
-                 class="hidden-checkbox"
+                 class="vor-checkbox__input"
                  :checked="$store.vorArtworks.isFilterOn('{{ name }}', '{{ option.value }}')"
                  @change="$store.vorArtworks.toggleFilter('{{ name }}', '{{ option.value }}')">
-          <span class="custom-checkbox"></span>
+          <span class="vor-checkbox"></span>
           {{ option.label }}
         </label>
       {% endfor %}
