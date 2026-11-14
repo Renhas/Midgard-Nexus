@@ -10,7 +10,7 @@
       {% for wt in work_types %}
         <button type="button"
                 class="sidebar-btn vor-add-type-btn"
-                :class="{ active: workType === '{{ wt.key }}' }"
+                :class="{ 'sidebar-btn--active': workType === '{{ wt.key }}' }"
                 @click="setType('{{ wt.key }}')"
                 title="{{ wt.label }}">
           <i class="{{ wt.icon }}"></i>
