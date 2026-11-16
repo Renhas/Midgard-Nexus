@@ -113,7 +113,7 @@
 }
 
 .vor-progress-value.is-hot,
-.vor-progress.is-editing .vor-progress-input {
+.vor-progress--editing .vor-progress-input {
   color: var(--text-primary);
   border-bottom-color: var(--text-primary);
 }
@@ -170,11 +170,11 @@
   clip-path: inset(0 100% 0 0);
 }
 
-.vor-star.is-full .vor-star-fill {
+.vor-star--full .vor-star-fill {
   clip-path: inset(0 0 0 0);
 }
 
-.vor-star.is-half .vor-star-fill {
+.vor-star--half .vor-star-fill {
   clip-path: inset(0 50% 0 0);
 }
 
