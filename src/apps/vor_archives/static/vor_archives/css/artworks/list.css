@@ -332,16 +332,16 @@
 }
 
 /* --- Drag & drop states --- */
-.vor-artwork-list.is-sortable,
-.vor-artwork-list.is-sortable * {
+.vor-artwork-list[data-sortable="true"],
+.vor-artwork-list[data-sortable="true"] * {
   user-select: none;
 }
 
-.vor-artwork-list.is-sortable .vor-artwork-item {
+.vor-artwork-list[data-sortable="true"] .vor-artwork-item {
   cursor: grab;
 }
 
-.vor-artwork-list.is-sortable .vor-artwork-list-items-nested .vor-artwork-item {
+.vor-artwork-list[data-sortable="true"] .vor-artwork-list-items-nested .vor-artwork-item {
   cursor: grab;
 }
 
@@ -364,57 +364,57 @@
   pointer-events: none !important;
 }
 
-body.vor-artworks-dragging {
+body[data-dragging] {
   user-select: none;
   cursor: grabbing;
 }
 
-body.vor-artworks-dragging .vor-artwork-row-delete,
-body.vor-artworks-dragging .vor-artwork-tile-delete {
+body[data-dragging] .vor-artwork-row-delete,
+body[data-dragging] .vor-artwork-tile-delete {
   display: none !important;
 }
 
-body.vor-artworks-grid-drag .vor-artwork-row,
-body.vor-artworks-grid-drag .vor-artwork-row-delete-slot {
+body[data-dragging="grid"] .vor-artwork-row,
+body[data-dragging="grid"] .vor-artwork-row-delete-slot {
   display: none !important;
 }
 
-body.vor-artworks-list-drag .vor-artwork-tile {
+body[data-dragging="list"] .vor-artwork-tile {
   display: none !important;
 }
 
 /* --- Tile grid --- */
-.vor-artwork-list.is-grid .vor-artwork-list-items {
+.vor-artwork-list[data-view="grid"] .vor-artwork-list-items {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
   gap: 1rem;
 }
 
-.vor-artwork-list.is-grid .vor-artwork-list-segment-title {
+.vor-artwork-list[data-view="grid"] .vor-artwork-list-segment-title {
   padding-left: 0;
 }
 
-.vor-artwork-list.is-grid .vor-artwork-item {
+.vor-artwork-list[data-view="grid"] .vor-artwork-item {
   display: block;
 }
 
-.vor-artwork-list.is-grid .vor-artwork-list-header,
-.vor-artwork-list.is-grid .vor-artwork-row,
-.vor-artwork-list.is-grid .vor-artwork-row-delete-slot {
+.vor-artwork-list[data-view="grid"] .vor-artwork-list-header,
+.vor-artwork-list[data-view="grid"] .vor-artwork-row,
+.vor-artwork-list[data-view="grid"] .vor-artwork-row-delete-slot {
   display: none !important;
 }
 
-.vor-artwork-list:not(.is-grid) .vor-artwork-tile {
+.vor-artwork-list:not([data-view="grid"]) .vor-artwork-tile {
   display: none !important;
 }
 
-.vor-artwork-list:not(.is-delete-mode) .vor-artwork-row-check,
-.vor-artwork-list:not(.is-delete-mode) .vor-artwork-tile-check {
+.vor-artwork-list:not([data-mode="delete"]) .vor-artwork-row-check,
+.vor-artwork-list:not([data-mode="delete"]) .vor-artwork-tile-check {
   display: none !important;
 }
 
-.vor-artwork-list.is-delete-mode .vor-artwork-row-delete,
-.vor-artwork-list.is-delete-mode .vor-artwork-tile-delete {
+.vor-artwork-list[data-mode="delete"] .vor-artwork-row-delete,
+.vor-artwork-list[data-mode="delete"] .vor-artwork-tile-delete {
   display: none !important;
 }
 

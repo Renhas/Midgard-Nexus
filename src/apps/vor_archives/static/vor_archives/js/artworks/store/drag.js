@@ -25,15 +25,18 @@ export const dragMixin = {
   setArtworkDragState(active) {
     this._artworkDragging = active;
     if (active) {
-      const dragViewClass = this.viewMode === "grid" ? "vor-artworks-grid-drag" : "vor-artworks-list-drag";
-      document.body.classList.add(dragViewClass, "vor-artworks-dragging");
+      document.body.dataset.dragging = this.viewMode === "grid" ? "grid" : "list";
     } else {
-      document.body.classList.remove("vor-artworks-grid-drag", "vor-artworks-list-drag", "vor-artworks-dragging");
+      delete document.body.dataset.dragging;
     }
   },
   setCollectionDragState(active) {
     this.collectionDragging = active;
-    document.body.classList.toggle("vor-collections-dragging", active);
+    if (active) {
+      document.body.dataset.dragging = "collections";
+    } else {
+      delete document.body.dataset.dragging;
+    }
   },
   syncSortable() {
     this.destroySortables(this._sortables);

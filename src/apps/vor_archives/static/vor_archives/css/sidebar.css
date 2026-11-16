@@ -249,7 +249,7 @@
   min-height: 0.4rem;
 }
 
-body.vor-collections-dragging .vor-collection-children {
+body[data-dragging="collections"] .vor-collection-children {
   outline: 1px dashed rgb(from var(--accent-vor) r g b / 25%);
 }
 

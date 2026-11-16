@@ -37,11 +37,9 @@
   </div>
   <div id="vor-artwork-list"
        class="vor-artwork-list"
-       :class="{
-        'is-grid': $store.vorArtworks.viewMode === 'grid',
-        'is-sortable': $store.vorArtworks.canDrag(),
-        'is-delete-mode': $store.vorArtworks.deleteMode
-     }">
+       :data-view="$store.vorArtworks.viewMode"
+       :data-mode="$store.vorArtworks.deleteMode ? 'delete' : 'normal'"
+       :data-sortable="$store.vorArtworks.canDrag() ? 'true' : 'false'">
     <div id="vor-artwork-list-body">
       <div class="text-center text-muted py-4">Загрузка…</div>
     </div>

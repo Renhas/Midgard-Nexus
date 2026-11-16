@@ -41,7 +41,7 @@ function canShow(row) {
   if (!row) {
     return false;
   }
-  if (document.body.classList.contains("vor-artworks-dragging")) {
+  if (document.body.dataset.dragging) {
     return false;
   }
   const list = row.closest(".vor-artwork-list");

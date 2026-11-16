@@ -179,11 +179,6 @@ export const filtersMixin = {
   },
   applyListState() {
     const list = document.getElementById("vor-artwork-list");
-    if (list) {
-      list.classList.toggle("is-grid", this.viewMode === "grid");
-      list.classList.toggle("is-sortable", this.canDrag());
-      list.classList.toggle("is-delete-mode", this.deleteMode);
-    }
     this.syncSelectedDom();
     this.syncSortable();
   },
