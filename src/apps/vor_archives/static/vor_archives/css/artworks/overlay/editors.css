@@ -191,7 +191,7 @@
   background-color: rgb(from var(--accent-vor) r g b / 12%);
 }
 
-.vor-date-head.is-static,
+.vor-date-head--static,
 .vor-date-head:disabled {
   cursor: default;
   opacity: 1;
@@ -220,12 +220,12 @@
   cursor: pointer;
 }
 
-.vor-date-day.is-muted {
+.vor-date-day--muted {
   color: var(--text-secondary);
   opacity: 0.55;
 }
 
-.vor-date-day.is-selected,
+.vor-date-day--selected,
 .vor-date-day:hover {
   background-color: rgb(from var(--accent-vor) r g b / 18%);
 }

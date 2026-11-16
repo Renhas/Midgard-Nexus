@@ -5,7 +5,7 @@
     </button>
     <button type="button"
             class="vor-date-head"
-            :class="{ 'is-static': dateView === 'years' }"
+            :class="{ 'vor-date-head--static': dateView === 'years' }"
             :disabled="dateView === 'years'"
             @click="onDateHeaderClick()"
             x-text="dateHeaderLabel()"></button>
@@ -23,7 +23,7 @@
       <template x-for="cell in dateCells()" :key="cell.key">
         <button type="button"
                 class="vor-date-day"
-                :class="{ 'is-muted': !cell.current, 'is-selected': cell.iso === releaseDate }"
+                :class="{ 'vor-date-day--muted': !cell.current, 'vor-date-day--selected': cell.iso === releaseDate }"
                 @click="setReleaseDate(cell.iso)"
                 x-text="cell.day"></button>
       </template>
@@ -33,7 +33,7 @@
     <template x-for="(month, index) in monthCells()" :key="month">
       <button type="button"
               class="vor-date-day vor-date-pick"
-              :class="{ 'is-selected': isMonthSelected(index) }"
+              :class="{ 'vor-date-day--selected': isMonthSelected(index) }"
               @click="selectMonth(index)"
               x-text="month"></button>
     </template>
@@ -42,7 +42,7 @@
     <template x-for="year in yearCells()" :key="year">
       <button type="button"
               class="vor-date-day vor-date-pick"
-              :class="{ 'is-selected': isYearSelected(year) }"
+              :class="{ 'vor-date-day--selected': isYearSelected(year) }"
               @click="selectYear(year)"
               x-text="year"></button>
     </template>
