@@ -26,22 +26,22 @@
 }
 
 .vor-context-item:hover,
-.vor-context-item.is-checked {
+.vor-context-item--checked {
   background-color: rgb(from var(--accent-vor) r g b / 12%);
 }
 
-.vor-context-item.is-danger {
+.vor-context-item--danger {
   color: var(--action-delete);
 }
 
-.vor-context-item.is-disabled,
+.vor-context-item--disabled,
 .vor-context-item:disabled {
   opacity: 0.4;
   cursor: default;
   pointer-events: none;
 }
 
-.vor-context-item.has-submenu {
+.vor-context-item--with-submenu {
   position: relative;
   justify-content: space-between;
 }
