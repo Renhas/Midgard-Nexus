@@ -1,6 +1,6 @@
 <div class="vor-view-row vor-view-labeled vor-view-attrs" x-show="editing || {{ kind }}.length" x-cloak>
   <span class="vor-field-label">{{ label }}</span>
-  <div class="vor-chip-list is-editing">
+  <div class="vor-chip-list vor-chip-list--editing">
     <template x-for="item in {{ kind }}" :key="item.id">
       <span class="vor-chip" @mouseenter="placeChipTip($el, item.tip)">
         <span x-text="item.name"></span>
