@@ -2,16 +2,27 @@ import { getAlpine } from "@lib/alpine";
 import { allChipsFit, computeVisibleChipCount } from "@vor/artworks/pure/chip_fit";
 import { computeTipLayout, computePopupLayout } from "@vor/artworks/pure/popover";
 
-function tempReveal(el, readWidth) {
+function measureHidden(el, display, fn) {
   const prevDisplay = el.style.display;
-  el.style.display = "inline-flex";
+  const prevVisibility = el.style.visibility;
+  el.style.display = display;
   el.style.visibility = "hidden";
+  try {
+    return fn();
+  } finally {
+    el.style.display = prevDisplay;
+    el.style.visibility = prevVisibility;
+  }
+}
+
+function tempReveal(el, readWidth) {
+  const prevPosition = el.style.position;
   el.style.position = "absolute";
-  const width = readWidth();
-  el.style.display = prevDisplay;
-  el.style.visibility = "";
-  el.style.position = "";
-  return width;
+  try {
+    return measureHidden(el, "inline-flex", readWidth);
+  } finally {
+    el.style.position = prevPosition;
+  }
 }
 
 document.addEventListener("alpine:init", () => {
@@ -42,10 +53,15 @@ document.addEventListener("alpine:init", () => {
       this._ro?.disconnect();
     },
     togglePopup() {
-      this.popupOpen = !this.popupOpen;
       if (this.popupOpen) {
-        this.$nextTick(() => this.placePopup());
+        this.popupOpen = false;
+        return;
       }
+      const popup = this.$refs.popup;
+      if (popup) {
+        measureHidden(popup, "block", () => this.placePopup());
+      }
+      this.popupOpen = true;
     },
     fit() {
       const root = this.$el;
@@ -89,10 +105,7 @@ document.addEventListener("alpine:init", () => {
         return;
       }
       const chipRect = chip.getBoundingClientRect();
-      tip.style.setProperty("--tip-left", `${chipRect.right + 6}px`);
-      tip.style.setProperty("--tip-top", `${chipRect.top + chipRect.height / 2}px`);
-      tip.style.setProperty("--tip-shift-y", "0px");
-      this.$nextTick(() => {
+      measureHidden(tip, "block", () => {
         const tipRect = tip.getBoundingClientRect();
         const layout = computeTipLayout({
           chipRect,
