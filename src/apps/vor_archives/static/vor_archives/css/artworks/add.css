@@ -175,7 +175,7 @@
   justify-content: initial;
 }
 
-.vor-overlay--add .vor-overlay-bar > .sidebar-btn:first-child {
+.vor-add-back-btn {
   justify-self: start;
 }
 
@@ -312,10 +312,6 @@
   align-items: center;
   gap: 0.35rem;
   min-height: 0;
-}
-
-.vor-add-relations .vor-relations-head-side:last-child {
-  justify-content: flex-end;
 }
 
 .vor-add-relations .vor-relations-title {

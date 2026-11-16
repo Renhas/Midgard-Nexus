@@ -2,7 +2,7 @@
 <div class="vor-overlay vor-overlay--add"
      x-data="vorAddOverlay(JSON.parse(document.getElementById('vor-add-opts').textContent))">
   <div class="vor-overlay-bar">
-    <button type="button" class="sidebar-btn" @click="closeOverlay()">
+    <button type="button" class="sidebar-btn vor-add-back-btn" @click="closeOverlay()">
       <i class="bi bi-arrow-left"></i>
       <span>Назад</span>
     </button>
