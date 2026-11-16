@@ -40,19 +40,14 @@
     <!-- Left sidebar (15 %) -->
     <aside class="sidebar sidebar-left" :class="{ collapsed: !leftOpen }">
       <div class="sidebar-body">
-        <button type="button" class="sidebar-toggle toggle-left" @click="leftOpen = !leftOpen" title="Скрыть панель">
-          <i class="bi bi-chevron-left"></i>
-        </button>
         {% block left_content %}{% endblock %}
       </div>
     </aside>
     <button type="button"
-            class="expand expand-left"
-            x-cloak
-            :class="{ 'd-none': leftOpen }"
-            @click="leftOpen = true"
-            title="Показать панель">
-      <i class="bi bi-chevron-right"></i>
+            class="sidebar-handle handle-left"
+            @click="leftOpen = !leftOpen"
+            :title="leftOpen ? 'Скрыть панель' : 'Показать панель'">
+      <i class="bi" :class="leftOpen ? 'bi-chevron-left' : 'bi-chevron-right'"></i>
     </button>
     <!-- Center content (70 %) -->
     <div class="center" :class="{ 'left-collapsed': !leftOpen, 'right-collapsed': !rightOpen }">
@@ -62,22 +57,14 @@
       <!-- Right sidebar (15 %) -->
       <aside class="sidebar sidebar-right" :class="{ collapsed: !rightOpen }">
         <div class="sidebar-body">
-          <button type="button"
-                  class="sidebar-toggle toggle-right"
-                  @click="rightOpen = !rightOpen"
-                  title="Скрыть панель">
-            <i class="bi bi-chevron-right"></i>
-          </button>
           {% block right_content %}{% endblock %}
         </div>
       </aside>
       <button type="button"
-              class="expand expand-right"
-              x-cloak
-              :class="{ 'd-none': rightOpen }"
-              @click="rightOpen = true"
-              title="Показать панель">
-        <i class="bi bi-chevron-left"></i>
+              class="sidebar-handle handle-right"
+              @click="rightOpen = !rightOpen"
+              :title="rightOpen ? 'Скрыть панель' : 'Показать панель'">
+        <i class="bi" :class="rightOpen ? 'bi-chevron-right' : 'bi-chevron-left'"></i>
       </button>
     {% endif %}
     <!-- Page-level notifications -->
