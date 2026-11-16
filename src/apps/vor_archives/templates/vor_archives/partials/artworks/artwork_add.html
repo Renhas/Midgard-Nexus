@@ -69,7 +69,6 @@
             </div>
             <div class="vor-add-field"
                  x-show="workType === 'book'"
-                 :class="{ 'is-required-empty': showRequired('pages') }"
                  :title="showRequired('pages') ? 'Обязательное поле' : ''">
               <span class="vor-field-label">Страницы<span class="vor-req-star"
       x-show="showRequired('pages')"
@@ -93,7 +92,6 @@
             </div>
             <div class="vor-add-field"
                  x-show="workType === 'film'"
-                 :class="{ 'is-required-empty': showRequired('duration_minutes') }"
                  :title="showRequired('duration_minutes') ? 'Обязательное поле' : ''">
               <span class="vor-field-label">
                 <span x-text="filmType === 'tv_show' ? 'Длительность эпизода' : 'Длительность'"></span><span class="vor-req-star"
@@ -119,7 +117,6 @@
             <div class="vor-add-field"
                  x-show="workType === 'film' && filmType === 'tv_show'"
                  x-cloak
-                 :class="{ 'is-required-empty': showRequired('episode_count') }"
                  :title="showRequired('episode_count') ? 'Обязательное поле' : ''">
               <span class="vor-field-label">Эпизоды<span class="vor-req-star"
       x-show="showRequired('episode_count')"

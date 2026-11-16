@@ -162,8 +162,8 @@ html.vor-scroll-lock .center {
   padding-left: 1rem;
 }
 
-.vor-field.has-error .form-control,
-.vor-field.has-error .form-select {
+.vor-field--with-error .form-control,
+.vor-field--with-error .form-select {
   border-color: var(--error);
 }
 
