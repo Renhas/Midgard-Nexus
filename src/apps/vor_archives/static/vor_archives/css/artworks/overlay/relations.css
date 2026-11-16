@@ -61,13 +61,7 @@
   position: relative;
 }
 
-.vor-relation-item.is-static {
-  cursor: default;
-  padding-right: 2.6rem;
-}
-
-.vor-relation-item.is-selected,
-.vor-relation-pick.is-selected {
+.vor-relation-pick--selected {
   background-color: rgb(from var(--accent-vor) r g b / 12%);
 }
 
@@ -182,6 +176,11 @@ button.vor-relation-item,
   text-decoration: none;
   color: inherit;
   cursor: pointer;
+}
+
+.vor-relation-item--static {
+  cursor: default;
+  padding-right: 2.6rem;
 }
 
 a.vor-relation-item:hover {

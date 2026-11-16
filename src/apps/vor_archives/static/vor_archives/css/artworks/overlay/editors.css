@@ -147,7 +147,7 @@
 }
 
 .vor-age-option.is-current,
-.vor-relation-type-option.is-current {
+.vor-relation-type-option--current {
   box-shadow: inset 0 0 0 2px var(--text-primary);
 }
 
