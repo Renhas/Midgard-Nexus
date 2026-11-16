@@ -41,7 +41,7 @@
 }
 
 .vor-status-option:hover,
-.vor-status-option.is-current {
+.vor-status-option--current {
   background-color: rgb(from var(--accent-hover) r g b / 15%);
 }
 
