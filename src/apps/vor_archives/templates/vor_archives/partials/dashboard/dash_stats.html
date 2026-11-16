@@ -5,21 +5,21 @@
     <div class="dash-type-filters">
       <button type="button"
               class="sidebar-btn sidebar-btn-type"
-              :class="{ 'active': workTypes.includes('book') }"
+              :class="{ 'sidebar-btn--active': workTypes.includes('book') }"
               @click="toggleType('book')"
               title="Книги">
         <i class="icon-book-text"></i>
       </button>
       <button type="button"
               class="sidebar-btn sidebar-btn-type"
-              :class="{ 'active': workTypes.includes('film') }"
+              :class="{ 'sidebar-btn--active': workTypes.includes('film') }"
               @click="toggleType('film')"
               title="Фильмы">
         <i class="icon-clapperboard"></i>
       </button>
       <button type="button"
               class="sidebar-btn sidebar-btn-type"
-              :class="{ 'active': workTypes.includes('game') }"
+              :class="{ 'sidebar-btn--active': workTypes.includes('game') }"
               @click="toggleType('game')"
               title="Игры">
         <i class="icon-gamepad-2"></i>

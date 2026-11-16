@@ -1,9 +1,8 @@
 <div id="vor-context-menu"
-     class="vor-context-menu"
+     class="vor-panel vor-context-menu"
      x-data
      x-show="$store.vorArtworks.menu.open"
      x-cloak
-     :class="{ 'has-flyout': $store.vorArtworks.menu.flyout }"
      :style="`left: ${$store.vorArtworks.menu.x}px; top: ${$store.vorArtworks.menu.y}px`"
      @contextmenu.prevent
      @wheel.stop
@@ -16,7 +15,7 @@
       </button>
       <button type="button"
               class="vor-context-item"
-              :class="{ 'is-disabled': !$store.vorArtworks.menu.canNudgeUp }"
+              :class="{ 'vor-context-item--disabled': !$store.vorArtworks.menu.canNudgeUp }"
               :disabled="!$store.vorArtworks.menu.canNudgeUp"
               @click="$store.vorArtworks.nudgeCollection(-1)">
         <i class="bi bi-arrow-up"></i>
@@ -24,7 +23,7 @@
       </button>
       <button type="button"
               class="vor-context-item"
-              :class="{ 'is-disabled': !$store.vorArtworks.menu.canNudgeDown }"
+              :class="{ 'vor-context-item--disabled': !$store.vorArtworks.menu.canNudgeDown }"
               :disabled="!$store.vorArtworks.menu.canNudgeDown"
               @click="$store.vorArtworks.nudgeCollection(1)">
         <i class="bi bi-arrow-down"></i>
@@ -32,7 +31,7 @@
       </button>
       <button type="button"
               class="vor-context-item"
-              :class="{ 'is-disabled': !$store.vorArtworks.menu.canLevelUp }"
+              :class="{ 'vor-context-item--disabled': !$store.vorArtworks.menu.canLevelUp }"
               :disabled="!$store.vorArtworks.menu.canLevelUp"
               @click="$store.vorArtworks.shiftCollectionLevel(-1)">
         <i class="bi bi-box-arrow-up-left"></i>
@@ -40,13 +39,15 @@
       </button>
       <button type="button"
               class="vor-context-item"
-              :class="{ 'is-disabled': !$store.vorArtworks.menu.canLevelDown }"
+              :class="{ 'vor-context-item--disabled': !$store.vorArtworks.menu.canLevelDown }"
               :disabled="!$store.vorArtworks.menu.canLevelDown"
               @click="$store.vorArtworks.shiftCollectionLevel(1)">
         <i class="bi bi-box-arrow-in-down-right"></i>
         <span>Уровень вниз</span>
       </button>
-      <button type="button" class="vor-context-item is-danger" @click="$store.vorArtworks.menuDeleteCollection()">
+      <button type="button"
+              class="vor-context-item vor-context-item--danger"
+              @click="$store.vorArtworks.menuDeleteCollection()">
         <i class="bi bi-trash"></i>
         <span>Удалить</span>
       </button>
@@ -60,7 +61,7 @@
       </button>
       <button type="button"
               class="vor-context-item"
-              :class="{ 'is-disabled': !$store.vorArtworks.menu.canNudgeUp }"
+              :class="{ 'vor-context-item--disabled': !$store.vorArtworks.menu.canNudgeUp }"
               :disabled="!$store.vorArtworks.menu.canNudgeUp"
               @click="$store.vorArtworks.nudgeArtwork(-1)">
         <i class="bi bi-arrow-up"></i>
@@ -68,14 +69,14 @@
       </button>
       <button type="button"
               class="vor-context-item"
-              :class="{ 'is-disabled': !$store.vorArtworks.menu.canNudgeDown }"
+              :class="{ 'vor-context-item--disabled': !$store.vorArtworks.menu.canNudgeDown }"
               :disabled="!$store.vorArtworks.menu.canNudgeDown"
               @click="$store.vorArtworks.nudgeArtwork(1)">
         <i class="bi bi-arrow-down"></i>
         <span>Вниз</span>
       </button>
       <button type="button"
-              class="vor-context-item has-submenu"
+              class="vor-context-item vor-context-item--with-submenu"
               @mouseenter="$store.vorArtworks.openCollectionFlyout()"
               @mouseleave="$store.vorArtworks.scheduleCloseFlyout()"
               @click.stop="$store.vorArtworks.toggleCollectionFlyout()">
@@ -92,13 +93,15 @@
         <i class="bi bi-folder-minus"></i>
         <span>Убрать из коллекции</span>
       </button>
-      <button type="button" class="vor-context-item is-danger" @click="$store.vorArtworks.menuDeleteArtwork()">
+      <button type="button"
+              class="vor-context-item vor-context-item--danger"
+              @click="$store.vorArtworks.menuDeleteArtwork()">
         <i class="bi bi-trash"></i>
         <span>Удалить</span>
       </button>
     </div>
   </template>
-  <div class="vor-context-flyout"
+  <div class="vor-panel vor-context-flyout"
        x-show="$store.vorArtworks.menu.flyout && $store.vorArtworks.menu.kind === 'artwork'"
        x-cloak
        :style="`left: ${$store.vorArtworks.menu.flyoutX}px; top: ${$store.vorArtworks.menu.flyoutY}px`"
@@ -116,7 +119,7 @@
     <template x-for="item in $store.vorArtworks.menu.membership" :key="'member-' + item.id">
       <button type="button"
               class="vor-context-item"
-              :class="{ 'is-checked': item.in_collection }"
+              :class="{ 'vor-context-item--checked': item.in_collection }"
               :style="`padding-left: ${0.65 + item.level * 0.85}rem`"
               @click.stop="$store.vorArtworks.toggleWorkCollection(item)">
         <i class="bi" :class="item.in_collection ? 'bi-check-square' : 'bi-square'"></i>

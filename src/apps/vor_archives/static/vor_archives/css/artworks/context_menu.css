@@ -4,13 +4,10 @@
 
 .vor-context-menu {
   position: fixed;
-  z-index: 1100;
+  z-index: var(--z-context-menu);
   min-width: 188px;
   padding: 0.3rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 0.4rem;
-  box-shadow: 0 0.75rem 1.5rem rgb(0 0 0 / 35%);
+  box-shadow: var(--shadow-md);
 }
 
 .vor-context-item {
@@ -20,7 +17,7 @@
   width: 100%;
   padding: 0.4rem 0.65rem;
   border: none;
-  border-radius: 0.3rem;
+  border-radius: var(--radius-xs);
   background: transparent;
   color: var(--text-primary);
   font-size: 0.8125rem;
@@ -29,39 +26,36 @@
 }
 
 .vor-context-item:hover,
-.vor-context-item.is-checked {
-  background-color: rgb(167 145 255 / 12%);
+.vor-context-item--checked {
+  background-color: rgb(from var(--accent-vor) r g b / 12%);
 }
 
-.vor-context-item.is-danger {
+.vor-context-item--danger {
   color: var(--action-delete);
 }
 
-.vor-context-item.is-disabled,
+.vor-context-item--disabled,
 .vor-context-item:disabled {
   opacity: 0.4;
   cursor: default;
   pointer-events: none;
 }
 
-.vor-context-item.has-submenu {
+.vor-context-item--with-submenu {
   position: relative;
   justify-content: space-between;
 }
 
 .vor-context-flyout {
   position: fixed;
-  z-index: 1101;
+  z-index: var(--z-context-flyout);
   min-width: 220px;
   max-width: 280px;
   max-height: 260px;
   overflow: auto;
   overscroll-behavior: contain;
   padding: 0.3rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 0.4rem;
-  box-shadow: 0 0.75rem 1.5rem rgb(0 0 0 / 35%);
+  box-shadow: var(--shadow-md);
 }
 
 .vor-context-flyout-empty {

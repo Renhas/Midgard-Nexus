@@ -15,19 +15,19 @@
 {% block header_center %}
   <div class="btn-group btn-group-sm" role="group">
     <a href="{% url 'vor_archives:index' %}"
-       class="nav-btn{% if active_section == 'artworks' %} active{% endif %}"
+       class="nav-btn{% if active_section == 'artworks' %} nav-btn--active{% endif %}"
        title="Произведения">
       <i class="bi bi-collection header-icon"></i>
       <span class="vor-nav-label">Произведения</span>
     </a>
     <a href="{% url 'vor_archives:attributes' %}"
-       class="nav-btn{% if active_section == 'attributes' %} active{% endif %}"
+       class="nav-btn{% if active_section == 'attributes' %} nav-btn--active{% endif %}"
        title="Аттрибуты">
       <i class="bi bi-tags header-icon"></i>
       <span class="vor-nav-label">Аттрибуты</span>
     </a>
     <a href="{% url 'vor_archives:dashboard' %}"
-       class="nav-btn{% if active_section == 'dashboard' %} active{% endif %}"
+       class="nav-btn{% if active_section == 'dashboard' %} nav-btn--active{% endif %}"
        title="Дашборд">
       <i class="bi bi-bar-chart-line header-icon"></i>
       <span class="vor-nav-label">Дашборд</span>

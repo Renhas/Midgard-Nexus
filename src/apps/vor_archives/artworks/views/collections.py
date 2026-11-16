@@ -222,7 +222,7 @@ def _collection_mutation_response():
         {
             "vor:reload-tree": True,
             "vor:close-modal": True,
-            "collection-update": True,
+            "vor:collection-update": True,
         }
     )
     return response

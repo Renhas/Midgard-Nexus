@@ -5,7 +5,7 @@
 /* --- Search suggestions --- */
 .vor-add-search {
   position: relative;
-  z-index: 8;
+  z-index: var(--z-overlay-bar);
   flex-shrink: 0;
   margin-bottom: 1rem;
 }
@@ -27,12 +27,12 @@
   pointer-events: none;
 }
 
-.vor-inline-title.is-invalid,
-.vor-inline-title.is-invalid:focus,
-.vor-inline-number.is-invalid,
-.vor-inline-number.is-invalid:focus {
+.vor-inline-title--invalid,
+.vor-inline-title--invalid:focus,
+.vor-inline-number--invalid,
+.vor-inline-number--invalid:focus {
   border-color: var(--error);
-  box-shadow: 0 0 0 2px rgb(248 113 113 / 25%);
+  box-shadow: var(--focus-ring-error);
 }
 
 .vor-suggestions {
@@ -40,7 +40,7 @@
   left: 0;
   right: 0;
   top: 100%;
-  z-index: 9;
+  z-index: var(--z-popover);
 }
 
 .vor-suggestions-list {
@@ -49,7 +49,7 @@
   padding: 0.25rem;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 0.375rem;
+  border-radius: var(--radius-sm);
   max-height: 240px;
   overflow-y: auto;
 }
@@ -70,11 +70,11 @@
   background: transparent;
   color: var(--text-primary);
   text-align: left;
-  border-radius: 0.25rem;
+  border-radius: var(--radius-xs);
 }
 
 .vor-suggestion-item:hover {
-  background-color: rgb(167 145 255 / 12%);
+  background-color: rgb(from var(--accent-vor) r g b / 12%);
 }
 
 .vor-suggestion-title {
@@ -88,12 +88,12 @@
 
 .vor-add-error {
   position: absolute;
-  z-index: 12;
+  z-index: var(--z-popover-raised);
   left: 0;
   top: calc(100% + 6px);
   padding: 0.45rem 0.8rem;
-  border-radius: 0.375rem;
-  background-color: rgb(239 68 68 / 18%);
+  border-radius: var(--radius-sm);
+  background-color: rgb(from var(--action-delete) r g b / 18%);
   border: 1px solid var(--error);
   color: var(--error);
   font-size: 0.95rem;
@@ -101,7 +101,7 @@
   line-height: 1.35;
   white-space: nowrap;
   pointer-events: none;
-  box-shadow: 0 0.4rem 0.9rem rgb(0 0 0 / 28%);
+  box-shadow: var(--shadow-error);
 }
 
 .vor-add-title-wrap .vor-add-error {
@@ -110,7 +110,7 @@
   text-align: center;
 }
 
-.vor-add-error.is-under-center {
+.vor-add-error--under-center {
   top: calc(100% + 8px);
   white-space: normal;
   max-width: calc(100% - 2rem);
@@ -126,9 +126,6 @@
 .vor-preview-card {
   display: flex;
   gap: 1rem;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
   padding: 1rem;
   margin-bottom: 1rem;
 }
@@ -137,7 +134,7 @@
   width: 96px;
   height: 128px;
   object-fit: cover;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
 }
 
@@ -171,14 +168,14 @@
 }
 
 /* --- Layout shell --- */
-.vor-overlay.is-add .vor-overlay-bar {
+.vor-overlay--add .vor-overlay-bar {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: start;
   justify-content: initial;
 }
 
-.vor-overlay.is-add .vor-overlay-bar > .sidebar-btn:first-child {
+.vor-add-back-btn {
   justify-self: start;
 }
 
@@ -204,18 +201,18 @@
   line-height: 1;
 }
 
-.vor-overlay.is-add {
+.vor-overlay--add {
   height: 100%;
   min-height: 0;
   overflow: hidden;
   padding-bottom: 0.85rem;
 }
 
-.vor-overlay.is-add .vor-overlay-bar {
+.vor-overlay--add .vor-overlay-bar {
   flex-shrink: 0;
 }
 
-.vor-overlay.is-add .vor-overlay-body {
+.vor-overlay--add .vor-overlay-body {
   flex: 1;
   min-height: 0;
   display: flex;
@@ -253,7 +250,7 @@
   height: 100%;
   overflow: visible;
   position: relative;
-  z-index: 3;
+  z-index: var(--z-raised);
 }
 
 .vor-add-info > h3 {
@@ -315,10 +312,6 @@
   align-items: center;
   gap: 0.35rem;
   min-height: 0;
-}
-
-.vor-add-relations .vor-relations-head-side:last-child {
-  justify-content: flex-end;
 }
 
 .vor-add-relations .vor-relations-title {
@@ -444,17 +437,17 @@
 
 /* --- Responsive --- */
 @media (width <= 900px) {
-  #vor-overlay:has(.is-add) {
+  #vor-overlay:has(.vor-overlay--add) {
     overflow: auto;
   }
 
-  .vor-overlay.is-add {
+  .vor-overlay--add {
     height: auto;
     min-height: 100%;
     overflow: visible;
   }
 
-  .vor-overlay.is-add .vor-overlay-bar {
+  .vor-overlay--add .vor-overlay-bar {
     grid-template-columns: 1fr;
     justify-items: start;
   }

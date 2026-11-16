@@ -45,7 +45,7 @@ def test_collection_new_post_valid_creates(client_logged_in, user):
     trigger = _trigger(response)
     assert trigger["vor:reload-tree"] is True
     assert trigger["vor:close-modal"] is True
-    assert trigger["collection-update"] is True
+    assert trigger["vor:collection-update"] is True
     assert Collection.objects.filter(user=user, name="My List").exists()
 
 

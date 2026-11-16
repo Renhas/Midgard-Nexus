@@ -85,15 +85,18 @@ export const collectionsMixin = {
     this.applyCollectionExpandState();
   },
   applyCollectionExpandState() {
-    document.querySelectorAll(".collection-tree-node").forEach((node) => {
+    document.querySelectorAll(".vor-collection-tree-node").forEach((node) => {
       const expanded = this.isCollectionExpanded(node.dataset.collectionId);
-      node.classList.toggle("is-expanded", expanded);
-      node.querySelector(":scope > .collection-item .bi-chevron-right")?.classList.toggle("bi-rotate-90", expanded);
+      node.classList.toggle("vor-collection-tree-node--expanded", expanded);
+      node.querySelector(":scope > .vor-collection-item .bi-chevron-right")?.classList.toggle("bi-rotate-90", expanded);
     });
   },
   applyCollectionTreeState() {
-    document.querySelectorAll(".collection-item").forEach((item) => {
-      item.classList.toggle("is-active", String(this.collectionId || "") === String(item.dataset.collectionId || ""));
+    document.querySelectorAll(".vor-collection-item").forEach((item) => {
+      item.classList.toggle(
+        "vor-collection-item--active",
+        String(this.collectionId || "") === String(item.dataset.collectionId || ""),
+      );
     });
     this.applyCollectionExpandState();
   },
@@ -108,11 +111,11 @@ export const collectionsMixin = {
   },
   pruneExpandedCollections() {
     this.expandedCollectionIds = this.expandedCollectionIds.filter((id) => {
-      const node = document.querySelector(`.collection-tree-node[data-collection-id="${id}"]`);
+      const node = document.querySelector(`.vor-collection-tree-node[data-collection-id="${id}"]`);
       if (!node) {
         return false;
       }
-      return Boolean(node.querySelector(":scope > .collection-children > .collection-tree-node"));
+      return Boolean(node.querySelector(":scope > .vor-collection-children > .vor-collection-tree-node"));
     });
   },
   collectionNode(id) {
@@ -148,14 +151,14 @@ export const collectionsMixin = {
     if (!root) {
       return;
     }
-    const containers = [root, ...root.querySelectorAll(".collection-children")];
+    const containers = [root, ...root.querySelectorAll(".vor-collection-children")];
     containers.forEach((container) => {
       this._collectionSortables.push(
         Sortable.create(container, {
           group: "vor-collections",
           animation: 150,
-          draggable: ".collection-tree-node",
-          handle: ".collection-item",
+          draggable: ".vor-collection-tree-node",
+          handle: ".vor-collection-item",
           direction: "vertical",
           forceFallback: true,
           fallbackOnBody: true,
@@ -167,11 +170,11 @@ export const collectionsMixin = {
           ghostClass: "is-sortable-ghost",
           chosenClass: "is-sortable-chosen",
           dragClass: "is-sortable-drag",
-          filter: ".collection-toggle",
+          filter: ".vor-collection-toggle",
           preventOnFilter: false,
           onMove: (evt, originalEvent) => {
             const target = evt.to;
-            if (target?.classList.contains("collection-children")) {
+            if (target?.classList.contains("vor-collection-children")) {
               const parentId = target.dataset.parentId;
               if (parentId && !this.isCollectionExpanded(parentId)) {
                 return false;
@@ -225,11 +228,11 @@ export const collectionsMixin = {
       return null;
     }
     const el = document.elementFromPoint(x, y);
-    return el?.closest(".collection-item")?.dataset?.collectionId || null;
+    return el?.closest(".vor-collection-item")?.dataset?.collectionId || null;
   },
   clearCollectionDropTargets() {
-    document.querySelectorAll(".collection-item.is-drop-target").forEach((node) => {
-      node.classList.remove("is-drop-target");
+    document.querySelectorAll(".vor-collection-item--drop-target").forEach((node) => {
+      node.classList.remove("vor-collection-item--drop-target");
     });
   },
   highlightCollectionAtPoint(x, y) {
@@ -242,7 +245,9 @@ export const collectionsMixin = {
     if (!id || id === this._dragCollectionId) {
       return;
     }
-    document.querySelector(`.collection-item[data-collection-id="${id}"]`)?.classList.add("is-drop-target");
+    document
+      .querySelector(`.vor-collection-item[data-collection-id="${id}"]`)
+      ?.classList.add("vor-collection-item--drop-target");
   },
   collectionRowAtPoint(x, y, dragged) {
     if (x == null || y == null) {
@@ -259,7 +264,7 @@ export const collectionsMixin = {
     blockers.forEach((node) => {
       node.style.pointerEvents = "none";
     });
-    const row = document.elementFromPoint(x, y)?.closest(".collection-item");
+    const row = document.elementFromPoint(x, y)?.closest(".vor-collection-item");
     blockers.forEach((node, index) => {
       node.style.pointerEvents = prev[index] || "";
     });
@@ -288,7 +293,7 @@ export const collectionsMixin = {
     if (relY < 0.16 || relY > 0.84) {
       return false;
     }
-    row.classList.add("is-drop-target");
+    row.classList.add("vor-collection-item--drop-target");
     this._pendingNestId = row.dataset.collectionId || "";
     return Boolean(this._pendingNestId);
   },
@@ -297,7 +302,7 @@ export const collectionsMixin = {
       return false;
     }
     const targetNode = this.collectionNode(targetId);
-    const children = targetNode?.querySelector(":scope > .collection-children");
+    const children = targetNode?.querySelector(":scope > .vor-collection-children");
     if (!targetNode || !children || item.contains(targetNode)) {
       return false;
     }
@@ -316,7 +321,7 @@ export const collectionsMixin = {
       return;
     }
     if (data.changed) {
-      window.dispatchEvent(new Event("collection-update"));
+      window.dispatchEvent(new Event("vor:collection-update"));
     }
     if (this.collectionId) {
       this.reloadList();

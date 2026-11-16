@@ -15,8 +15,8 @@
            @click.stop>
     <template x-for="opt in filterCatalog('{{ kind }}', query)" :key="'{{ kind }}'+opt.id">
       <label class="sidebar-filter-item" @click.prevent="toggleAttr('{{ kind }}', opt)">
-        <input class="hidden-checkbox" type="checkbox" :checked="hasAttr('{{ kind }}', opt.id)">
-        <span class="custom-checkbox"></span>
+        <input class="vor-checkbox__input" type="checkbox" :checked="hasAttr('{{ kind }}', opt.id)">
+        <span class="vor-checkbox"></span>
         <span x-text="opt.name"></span>
       </label>
     </template>

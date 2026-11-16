@@ -1,0 +1,99 @@
+/* --- Shell --- */
+#vor-overlay:not(:empty) {
+  position: fixed;
+  inset: var(--header-height) 0 0 0;
+  z-index: var(--z-overlay);
+  background-color: var(--bg-primary);
+  overflow: auto;
+}
+
+#vor-overlay:has(.is-add) {
+  overflow: hidden;
+}
+
+.vor-overlay {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1.5rem 2rem;
+}
+
+.vor-overlay-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-overlay);
+  background-color: var(--bg-primary);
+  padding: 0.25rem 0 0.75rem;
+}
+
+.vor-overlay-bar-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.45rem;
+}
+
+.vor-overlay-body {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.vor-overlay-section {
+  padding: 1rem 1.15rem;
+  margin-bottom: 1rem;
+}
+
+.vor-overlay-section h3,
+.vor-overlay-section h4 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 0.85rem;
+}
+
+.vor-overlay-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+/* --- Fields --- */
+.vor-dl {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.vor-dl-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.9rem;
+}
+
+.vor-dl-row span {
+  color: var(--text-secondary);
+}
+
+.vor-dl-row strong {
+  color: var(--text-primary);
+  font-weight: 500;
+  text-align: right;
+}
+
+.vor-leave-confirm {
+  z-index: var(--z-leave-confirm);
+}
+
+.vor-leave-list {
+  margin: 0 0 1rem;
+  padding-left: 1.15rem;
+  color: var(--text-primary);
+}

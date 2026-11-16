@@ -173,31 +173,26 @@ export const filtersMixin = {
     this.closeMenu();
     this._reloadSeq = (this._reloadSeq || 0) + 1;
     htmx.ajax("GET", `${this.listUrl}?${this.listQuery().toString()}`, {
-      target: "#artwork-list-body",
+      target: "#vor-artwork-list-body",
       swap: "innerHTML",
     });
   },
   applyListState() {
-    const list = document.getElementById("artwork-list");
-    if (list) {
-      list.classList.toggle("is-grid", this.viewMode === "grid");
-      list.classList.toggle("is-sortable", this.canDrag());
-      list.classList.toggle("is-delete-mode", this.deleteMode);
-    }
+    const list = document.getElementById("vor-artwork-list");
     this.syncSelectedDom();
     this.syncSortable();
   },
 };
 
 document.body.addEventListener("htmx:beforeRequest", (event) => {
-  if (event.detail.target?.id !== "artwork-list-body") return;
+  if (event.detail.target?.id !== "vor-artwork-list-body") return;
   const store = getAlpine()?.store("vorArtworks");
   if (!store) return;
   event.detail.xhr.__vorSeq = store._reloadSeq;
 });
 
 document.body.addEventListener("htmx:beforeSwap", (event) => {
-  if (event.detail.target?.id !== "artwork-list-body") return;
+  if (event.detail.target?.id !== "vor-artwork-list-body") return;
   const store = getAlpine()?.store("vorArtworks");
   if (!store) return;
   const requestSeq = event.detail.xhr.__vorSeq;

@@ -2,14 +2,14 @@
 <div class="sidebar-nav-row">
   <button type="button"
           class="sidebar-btn sidebar-btn-display"
-          :class="{ 'active': $store.vorArtworks.viewMode === 'list' }"
+          :class="{ 'sidebar-btn--active': $store.vorArtworks.viewMode === 'list' }"
           @click="$store.vorArtworks.setViewMode('list')"
           title="Список">
     <i class="bi bi-list-ul"></i>
   </button>
   <button type="button"
           class="sidebar-btn sidebar-btn-display"
-          :class="{ 'active': $store.vorArtworks.viewMode === 'grid' }"
+          :class="{ 'sidebar-btn--active': $store.vorArtworks.viewMode === 'grid' }"
           @click="$store.vorArtworks.setViewMode('grid')"
           title="Плитки">
     <i class="bi bi-grid"></i>

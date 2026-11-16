@@ -12,16 +12,16 @@ function ensurePreview() {
     return preview;
   }
   preview = document.createElement("div");
-  preview.id = "artwork-row-preview";
-  preview.className = "artwork-row-preview";
+  preview.id = "vor-artwork-row-preview";
+  preview.className = "vor-panel vor-artwork-row-preview";
   preview.innerHTML = `
-            <div class="artwork-row-preview-cover">
+            <div class="vor-artwork-row-preview-cover">
                 <img alt="">
-                <div class="artwork-row-preview-cover-empty"><i></i></div>
+                <div class="vor-artwork-row-preview-cover-empty"><i></i></div>
             </div>
-            <div class="artwork-row-preview-body">
-                <div class="artwork-row-preview-title"></div>
-                <div class="artwork-row-preview-desc"></div>
+            <div class="vor-artwork-row-preview-body">
+                <div class="vor-artwork-row-preview-title"></div>
+                <div class="vor-artwork-row-preview-desc"></div>
             </div>
         `;
   document.body.appendChild(preview);
@@ -33,7 +33,7 @@ function hidePreview() {
   showTimer = 0;
   currentItem = null;
   if (preview) {
-    preview.classList.remove("is-visible");
+    preview.classList.remove("vor-artwork-row-preview--visible");
   }
 }
 
@@ -41,10 +41,10 @@ function canShow(row) {
   if (!row) {
     return false;
   }
-  if (document.body.classList.contains("vor-artworks-dragging")) {
+  if (document.body.dataset.dragging) {
     return false;
   }
-  const list = row.closest(".artwork-list");
+  const list = row.closest(".vor-artwork-list");
   if (!list || list.classList.contains("is-grid")) {
     return false;
   }
@@ -61,19 +61,19 @@ function fillPreview(item) {
   const el = ensurePreview();
   const title = item.dataset.previewTitle || "";
   const cover = item.dataset.previewCover || "";
-  el.querySelector(".artwork-row-preview-title").textContent = title;
-  el.querySelector(".artwork-row-preview-desc").textContent = (item.dataset.previewDesc || "")
+  el.querySelector(".vor-artwork-row-preview-title").textContent = title;
+  el.querySelector(".vor-artwork-row-preview-desc").textContent = (item.dataset.previewDesc || "")
     .replace(/\s+/g, " ")
     .trim();
   const img = el.querySelector("img");
   img.alt = title;
   if (cover) {
     img.src = cover;
-    el.classList.remove("is-empty");
+    el.classList.remove("vor-artwork-row-preview--empty");
   } else {
     img.removeAttribute("src");
-    el.classList.add("is-empty");
-    const icon = el.querySelector(".artwork-row-preview-cover-empty i");
+    el.classList.add("vor-artwork-row-preview--empty");
+    const icon = el.querySelector(".vor-artwork-row-preview-cover-empty i");
     if (icon) {
       icon.className = item.dataset.previewIcon || "";
     }
@@ -82,7 +82,7 @@ function fillPreview(item) {
 
 function placePreview(clientX, clientY) {
   const el = ensurePreview();
-  el.classList.add("is-visible");
+  el.classList.add("vor-artwork-row-preview--visible");
   const width = el.offsetWidth;
   const height = el.offsetHeight;
   let x = clientX + OFFSET;
@@ -100,8 +100,8 @@ function placePreview(clientX, clientY) {
 }
 
 document.addEventListener("pointermove", (event) => {
-  const row = event.target.closest(".artwork-row");
-  const item = row?.closest(".artwork-item");
+  const row = event.target.closest(".vor-artwork-row");
+  const item = row?.closest(".vor-artwork-item");
   if (!canShow(row) || !item) {
     hidePreview();
     return;
@@ -110,7 +110,7 @@ document.addEventListener("pointermove", (event) => {
     currentItem = item;
     fillPreview(item);
     window.clearTimeout(showTimer);
-    if (preview?.classList.contains("is-visible")) {
+    if (preview?.classList.contains("vor-artwork-row-preview--visible")) {
       placePreview(event.clientX, event.clientY);
       return;
     }
@@ -121,7 +121,7 @@ document.addEventListener("pointermove", (event) => {
     }, SHOW_DELAY);
     return;
   }
-  if (preview?.classList.contains("is-visible")) {
+  if (preview?.classList.contains("vor-artwork-row-preview--visible")) {
     placePreview(event.clientX, event.clientY);
   }
 });

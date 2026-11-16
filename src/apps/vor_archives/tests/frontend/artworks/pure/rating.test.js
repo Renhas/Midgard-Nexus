@@ -32,15 +32,15 @@ describe("ratingLabel", () => {
 
 describe("starState", () => {
   it("is-full when value >= star*2", () => {
-    expect(starState(10, 5)).toBe("is-full");
-    expect(starState(8, 4)).toBe("is-full");
+    expect(starState(10, 5)).toBe("vor-star--full");
+    expect(starState(8, 4)).toBe("vor-star--full");
   });
   it("is-half when value === star*2 - 1", () => {
-    expect(starState(9, 5)).toBe("is-half");
-    expect(starState(7, 4)).toBe("is-half");
+    expect(starState(9, 5)).toBe("vor-star--half");
+    expect(starState(7, 4)).toBe("vor-star--half");
   });
   it("is-empty otherwise", () => {
-    expect(starState(0, 1)).toBe("is-empty");
-    expect(starState(2, 5)).toBe("is-empty");
+    expect(starState(0, 1)).toBe("vor-star--empty");
+    expect(starState(2, 5)).toBe("vor-star--empty");
   });
 });

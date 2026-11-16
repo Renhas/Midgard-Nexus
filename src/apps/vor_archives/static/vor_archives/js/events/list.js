@@ -26,8 +26,8 @@ document.addEventListener(
     if (!store?.deleteMode) {
       return;
     }
-    const item = event.target.closest(".artwork-item");
-    if (!item || event.target.closest(".artwork-row-delete, .artwork-tile-delete")) {
+    const item = event.target.closest(".vor-artwork-item");
+    if (!item || event.target.closest(".vor-artwork-row-delete, .vor-artwork-tile-delete")) {
       return;
     }
     event.preventDefault();
@@ -72,16 +72,16 @@ document.addEventListener("contextmenu", (event) => {
   if (!store || !document.getElementById("vor-artworks-opts")) {
     return;
   }
-  const collectionItem = event.target.closest(".collection-item");
+  const collectionItem = event.target.closest(".vor-collection-item");
   if (collectionItem) {
     event.preventDefault();
     store.openCollectionMenu(event, collectionItem);
     return;
   }
-  const artwork = event.target.closest(".artwork-row, .artwork-tile");
+  const artwork = event.target.closest(".vor-artwork-row, .vor-artwork-tile");
   if (artwork) {
     event.preventDefault();
-    store.openArtworkMenu(event, artwork.closest(".artwork-item"));
+    store.openArtworkMenu(event, artwork.closest(".vor-artwork-item"));
   }
 });
 
@@ -98,16 +98,16 @@ document.addEventListener("click", (event) => {
     return;
   }
   const sidebar = document.getElementById("sidebar-collections-list");
-  const toggle = event.target.closest(".collection-toggle");
+  const toggle = event.target.closest(".vor-collection-toggle");
   if (toggle && sidebar?.contains(toggle)) {
     store.closeMenu();
-    const id = toggle.closest(".collection-tree-node")?.dataset.collectionId;
+    const id = toggle.closest(".vor-collection-tree-node")?.dataset.collectionId;
     if (id) {
       store.toggleCollectionExpanded(id);
     }
     return;
   }
-  const collectionItem = event.target.closest(".collection-item");
+  const collectionItem = event.target.closest(".vor-collection-item");
   if (collectionItem && sidebar?.contains(collectionItem)) {
     store.closeMenu();
     store.selectCollectionFromEl(collectionItem);
@@ -136,7 +136,7 @@ window.addEventListener(
 
 document.body.addEventListener("htmx:afterSwap", (event) => {
   const el = event.detail.elt;
-  const isList = el?.id === "artwork-list-body" || el?.id === "artwork-list";
+  const isList = el?.id === "vor-artwork-list-body" || el?.id === "vor-artwork-list";
   const isTree = el?.id === "sidebar-collections-list";
   if (!isList && !isTree) return;
   const store = getAlpine()?.store("vorArtworks");
