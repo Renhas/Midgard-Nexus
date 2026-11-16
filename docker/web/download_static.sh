@@ -20,7 +20,8 @@ mkdir -p "$VENDOR_DIR/bootstrap/css" "$VENDOR_DIR/bootstrap/js" \
          "$VENDOR_DIR/lucide/css" "$VENDOR_DIR/lucide/fonts" \
          "$VENDOR_DIR/htmx" "$VENDOR_DIR/alpine" \
          "$VENDOR_DIR/chart" "$VENDOR_DIR/wordcloud" \
-         "$VENDOR_DIR/sortable"
+         "$VENDOR_DIR/sortable" \
+         "$VENDOR_DIR/floating-ui"
 
 echo "Скачивание библиотек..."
 echo "Bootstrap"
@@ -61,6 +62,13 @@ curl -L -o "$VENDOR_DIR/wordcloud/chartjs-chart-wordcloud.min.js" \
 echo "Sortable"
 curl -L -o "$VENDOR_DIR/sortable/Sortable.min.js" \
     https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js
+echo "Floating UI"
+curl -L --fail -o "$VENDOR_DIR/floating-ui/core.umd.min.js" \
+    "https://cdn.jsdelivr.net/npm/@floating-ui/core@1.8.0/dist/floating-ui.core.umd.min.js"
+curl -L --fail -o "$VENDOR_DIR/floating-ui/utils.umd.min.js" \
+    "https://cdn.jsdelivr.net/npm/@floating-ui/utils@0.2.12/dist/floating-ui.utils.umd.min.js"
+curl -L --fail -o "$VENDOR_DIR/floating-ui/dom.umd.min.js" \
+    "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.8.0/dist/floating-ui.dom.umd.min.js"
 
 echo "Stripping sourceMappingURL comments…"
 find "$VENDOR_DIR" -type f \( -name '*.js' -o -name '*.css' \) -exec \
