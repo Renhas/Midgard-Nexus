@@ -371,16 +371,16 @@ body[data-dragging] {
 
 body[data-dragging] .vor-artwork-row-delete,
 body[data-dragging] .vor-artwork-tile-delete {
-  display: none !important;
+  display: none;
 }
 
 body[data-dragging="grid"] .vor-artwork-row,
 body[data-dragging="grid"] .vor-artwork-row-delete-slot {
-  display: none !important;
+  display: none;
 }
 
 body[data-dragging="list"] .vor-artwork-tile {
-  display: none !important;
+  display: none;
 }
 
 /* --- Tile grid --- */
@@ -401,21 +401,21 @@ body[data-dragging="list"] .vor-artwork-tile {
 .vor-artwork-list[data-view="grid"] .vor-artwork-list-header,
 .vor-artwork-list[data-view="grid"] .vor-artwork-row,
 .vor-artwork-list[data-view="grid"] .vor-artwork-row-delete-slot {
-  display: none !important;
+  display: none;
 }
 
 .vor-artwork-list:not([data-view="grid"]) .vor-artwork-tile {
-  display: none !important;
+  display: none;
 }
 
 .vor-artwork-list:not([data-mode="delete"]) .vor-artwork-row-check,
 .vor-artwork-list:not([data-mode="delete"]) .vor-artwork-tile-check {
-  display: none !important;
+  display: none;
 }
 
 .vor-artwork-list[data-mode="delete"] .vor-artwork-row-delete,
 .vor-artwork-list[data-mode="delete"] .vor-artwork-tile-delete {
-  display: none !important;
+  display: none;
 }
 
 .vor-artwork-tile {
