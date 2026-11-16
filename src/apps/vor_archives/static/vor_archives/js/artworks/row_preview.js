@@ -1,4 +1,5 @@
 import { getAlpine } from "@lib/alpine";
+import { FloatingUI } from "@lib/floating-ui";
 
 const OFFSET = 14;
 const PAD = 12;
@@ -6,6 +7,9 @@ const SHOW_DELAY = 180;
 let preview = null;
 let currentItem = null;
 let showTimer = 0;
+let placeSeq = 0;
+let lastX = 0;
+let lastY = 0;
 
 function ensurePreview() {
   if (preview) {
@@ -32,8 +36,10 @@ function hidePreview() {
   window.clearTimeout(showTimer);
   showTimer = 0;
   currentItem = null;
+  placeSeq += 1;
   if (preview) {
     preview.classList.remove("vor-artwork-row-preview--visible");
+    preview.style.visibility = "";
   }
 }
 
@@ -80,26 +86,71 @@ function fillPreview(item) {
   }
 }
 
-function placePreview(clientX, clientY) {
+function getSafeBoundary() {
+  const sidebar = document.querySelector(".sidebar-right");
+  if (!sidebar || sidebar.classList.contains("collapsed")) {
+    return { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight };
+  }
+  const rect = sidebar.getBoundingClientRect();
+  return { x: 0, y: 0, width: rect.left, height: window.innerHeight };
+}
+
+async function placePreview() {
   const el = ensurePreview();
+  const seq = (placeSeq += 1);
+  const x = lastX;
+  const y = lastY;
   el.classList.add("vor-artwork-row-preview--visible");
-  const width = el.offsetWidth;
-  const height = el.offsetHeight;
-  let x = clientX + OFFSET;
-  let y = clientY + OFFSET;
-  if (x + width > window.innerWidth - PAD) {
-    x = clientX - width - OFFSET;
+  el.style.visibility = "hidden";
+  const virtualEl = {
+    getBoundingClientRect: () => ({
+      x,
+      y,
+      top: y,
+      left: x,
+      right: x,
+      bottom: y,
+      width: 0,
+      height: 0,
+    }),
+  };
+  const boundary = getSafeBoundary();
+  let coords;
+  try {
+    coords = await FloatingUI.computePosition(virtualEl, el, {
+      placement: "right-start",
+      strategy: "fixed",
+      middleware: [
+        // Offset is asymmetric. A right placement starts OFFSET
+        // past the cursor so the tooltip does not visually touch the
+        // pointer that triggered it. A left placement should sit flush
+        // against the cursor (0), because the tooltip grows leftward from
+        // the pointer and any gap reads as "not attached". Read placement
+        // inside the callback: flip may switch sides between calls.
+        FloatingUI.offset(({ placement }) => ({
+          mainAxis: placement.startsWith("left") ? 0 : OFFSET,
+        })),
+        FloatingUI.flip({ boundary, padding: PAD }),
+        FloatingUI.shift({ boundary, padding: PAD }),
+      ],
+    });
+  } catch {
+    if (seq === placeSeq) {
+      hidePreview();
+    }
+    return;
   }
-  if (y + height > window.innerHeight - PAD) {
-    y = clientY - height - OFFSET;
+  if (seq !== placeSeq) {
+    return;
   }
-  x = Math.max(PAD, x);
-  y = Math.max(PAD, y);
-  el.style.left = `${x}px`;
-  el.style.top = `${y}px`;
+  el.style.left = `${coords.x}px`;
+  el.style.top = `${coords.y}px`;
+  el.style.visibility = "";
 }
 
 document.addEventListener("pointermove", (event) => {
+  lastX = event.clientX;
+  lastY = event.clientY;
   const row = event.target.closest(".vor-artwork-row");
   const item = row?.closest(".vor-artwork-item");
   if (!canShow(row) || !item) {
@@ -111,18 +162,20 @@ document.addEventListener("pointermove", (event) => {
     fillPreview(item);
     window.clearTimeout(showTimer);
     if (preview?.classList.contains("vor-artwork-row-preview--visible")) {
-      placePreview(event.clientX, event.clientY);
+      void placePreview();
       return;
     }
+    // Do not capture the event: by the time the timer fires the cursor
+    // may have moved on. placePreview reads lastX/lastY at call time.
     showTimer = window.setTimeout(() => {
       if (currentItem === item) {
-        placePreview(event.clientX, event.clientY);
+        void placePreview();
       }
     }, SHOW_DELAY);
     return;
   }
   if (preview?.classList.contains("vor-artwork-row-preview--visible")) {
-    placePreview(event.clientX, event.clientY);
+    void placePreview();
   }
 });
 
