@@ -49,6 +49,7 @@ VENDOR_IMPORTMAP_PATHS = {
     "@lib/alpine": "js/lib/alpine.js",
     "@lib/sortable": "js/lib/sortable.js",
     "@lib/chart": "js/lib/chart.js",
+    "@lib/floating-ui": "js/lib/floating-ui.js",
 }
 
 APP_IMPORTMAP_MODULES = [

@@ -43,6 +43,10 @@
     <script src="{% static 'vendor/wordcloud/chartjs-chart-wordcloud.min.js' %}"></script>
     <!-- Sortable.js -->
     <script src="{% static 'vendor/sortable/Sortable.min.js' %}"></script>
+    <!-- Floating UI -->
+    <script src="{% static 'vendor/floating-ui/core.umd.min.js' %}"></script>
+    <script src="{% static 'vendor/floating-ui/utils.umd.min.js' %}"></script>
+    <script src="{% static 'vendor/floating-ui/dom.umd.min.js' %}"></script>
     {% block extra_js %}{% endblock %}
     {# Deferred and after extra_js so ES modules can subscribe to alpine:init before Alpine.start() fires. #}
     <!-- Alpine.js -->
