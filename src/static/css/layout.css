@@ -70,80 +70,49 @@ main {
   transform: translateX(100%);
 }
 
-/* === Expand handle (top-edge, same style as toggle) === */
-.expand {
+/* === Sidebar handle (persistent toggle button) === */
+.sidebar-handle {
   position: fixed;
-  top: calc(var(--header-height) + 0.75rem);
+  top: calc(var(--header-height) + var(--sidebar-handle-top-offset));
   z-index: var(--z-sidebar-expand);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: var(--sidebar-handle-size);
+  height: var(--sidebar-handle-size);
   border-radius: 50%;
   background-color: transparent;
   border: 1px solid var(--border);
   color: var(--text-secondary);
   transition: all 0.2s ease;
+  padding: 0;
 }
 
-.expand:hover {
+.sidebar-handle:hover {
   color: var(--accent-hover);
   border-color: var(--accent-hover);
   background-color: rgb(167 145 255 / 10%);
 }
 
-.expand-left {
-  left: 0;
+.handle-left {
+  left: var(--sidebar-handle-offset);
 }
 
-.expand-right {
-  right: 0;
+.handle-right {
+  right: var(--sidebar-handle-offset);
 }
 
-.expand i {
+.sidebar-handle i {
   font-size: 1.1rem;
+  line-height: 1;
 }
 
-/* === Sidebar body (holds toggle + nav) === */
+/* === Sidebar body === */
 .sidebar-body {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding-top: 0.5rem;
-}
-
-/* === Sidebar toggle button === */
-.sidebar-toggle {
-  align-self: flex-end;
-  margin: 0.25rem 0.5rem 0.25rem 0;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background-color: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  transition: all 0.2s ease;
-}
-
-.sidebar-toggle:hover {
-  color: var(--accent-hover);
-  border-color: var(--accent-hover);
-  background-color: rgb(167 145 255 / 10%);
-}
-
-.toggle-left {
-  margin-right: auto;
-  margin-left: 0.5rem;
-}
-
-.toggle-right {
-  margin-left: auto;
-  margin-right: 0.5rem;
-}
-
-.sidebar-toggle i {
-  font-size: 1.1rem;
+  padding-top: calc(var(--sidebar-handle-top-offset) + var(--sidebar-handle-size) + var(--sidebar-handle-gap));
 }
 
 .content-card {
