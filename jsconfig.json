@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@lib/*": ["./src/static/js/lib/*"],
+      "@vor/*": ["./src/apps/vor_archives/static/vor_archives/js/*"]
+    }
+  },
+  "include": ["src", "vitest.config.js", "vitest.setup.js"]
+}

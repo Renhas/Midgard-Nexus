@@ -1,0 +1,65 @@
+/* ============================================
+    VOR Archives — Artwork context menu
+    ============================================ */
+
+.vor-context-menu {
+  position: fixed;
+  z-index: var(--z-context-menu);
+  min-width: 188px;
+  padding: 0.3rem;
+  box-shadow: var(--shadow-md);
+}
+
+.vor-context-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.4rem 0.65rem;
+  border: none;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vor-context-item:hover,
+.vor-context-item--checked {
+  background-color: rgb(from var(--accent-vor) r g b / 12%);
+}
+
+.vor-context-item--danger {
+  color: var(--action-delete);
+}
+
+.vor-context-item--disabled,
+.vor-context-item:disabled {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+
+.vor-context-item--with-submenu {
+  position: relative;
+  justify-content: space-between;
+}
+
+.vor-context-flyout {
+  position: fixed;
+  z-index: var(--z-context-flyout);
+  min-width: 220px;
+  max-width: 280px;
+  max-height: 260px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 0.3rem;
+  box-shadow: var(--shadow-md);
+}
+
+.vor-context-flyout-empty {
+  padding: 0.45rem 0.65rem;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+}

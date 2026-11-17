@@ -85,6 +85,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "config.context_processors.modules",
                 "config.context_processors.app_version",
+                "config.context_processors.importmap",
             ],
         },
     },
@@ -158,7 +159,7 @@ AUTH_USER_MODEL = "users.User"
 
 # Application modules
 # Authentication settings
-LOGIN_URL = "login"
+LOGIN_URL = "users:login"
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
 

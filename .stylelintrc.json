@@ -1,0 +1,9 @@
+{
+  "extends": ["stylelint-config-standard"],
+  "defaultSeverity": "warning",
+  "rules": {
+    "declaration-no-important": [true, { "severity": "warning" }],
+    "selector-class-pattern": null,
+    "no-descending-specificity": [true, { "severity": "warning" }]
+  }
+}

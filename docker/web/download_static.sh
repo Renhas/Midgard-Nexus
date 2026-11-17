@@ -20,7 +20,8 @@ mkdir -p "$VENDOR_DIR/bootstrap/css" "$VENDOR_DIR/bootstrap/js" \
          "$VENDOR_DIR/lucide/css" "$VENDOR_DIR/lucide/fonts" \
          "$VENDOR_DIR/htmx" "$VENDOR_DIR/alpine" \
          "$VENDOR_DIR/chart" "$VENDOR_DIR/wordcloud" \
-         "$VENDOR_DIR/sortable"
+         "$VENDOR_DIR/sortable" \
+         "$VENDOR_DIR/floating-ui"
 
 echo "Скачивание библиотек..."
 echo "Bootstrap"
@@ -38,15 +39,14 @@ curl -L -o "$VENDOR_DIR/bootstrap/css/fonts/bootstrap-icons.woff" \
 
 curl -L -o "$VENDOR_DIR/bootstrap/js/bootstrap.bundle.min.js" \
     https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js
-echo "Licude Icons"
-curl -L -o "$VENDOR_DIR/lucide/css/lucide.min.css" \
+echo "Lucide Icons"
+curl -L --fail -o "$VENDOR_DIR/lucide/css/lucide.min.css" \
     "https://cdn.jsdelivr.net/npm/lucide-static@${LUCIDE_VERSION}/font/lucide.min.css"
 
-curl -L -o "$VENDOR_DIR/lucide/css/lucide.woff2" \
-    "https://cdn.jsdelivr.net/npm/lucide-static@${LUCIDE_VERSION}/font/lucide.woff2"
-
-curl -L -o "$VENDOR_DIR/lucide/css/lucide.woff" \
-    "https://cdn.jsdelivr.net/npm/lucide-static@${LUCIDE_VERSION}/font/lucide.woff"
+for _fmt in eot svg ttf woff woff2; do
+    curl -L --fail -o "$VENDOR_DIR/lucide/css/lucide.${_fmt}" \
+        "https://cdn.jsdelivr.net/npm/lucide-static@${LUCIDE_VERSION}/font/lucide.${_fmt}"
+done
 echo "HTMX"
 curl -L -o "$VENDOR_DIR/htmx/htmx.min.js" \
     https://unpkg.com/htmx.org@1.9.10/dist/htmx.min.js
@@ -62,5 +62,16 @@ curl -L -o "$VENDOR_DIR/wordcloud/chartjs-chart-wordcloud.min.js" \
 echo "Sortable"
 curl -L -o "$VENDOR_DIR/sortable/Sortable.min.js" \
     https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js
+echo "Floating UI"
+curl -L --fail -o "$VENDOR_DIR/floating-ui/core.umd.min.js" \
+    "https://cdn.jsdelivr.net/npm/@floating-ui/core@1.8.0/dist/floating-ui.core.umd.min.js"
+curl -L --fail -o "$VENDOR_DIR/floating-ui/utils.umd.min.js" \
+    "https://cdn.jsdelivr.net/npm/@floating-ui/utils@0.2.12/dist/floating-ui.utils.umd.min.js"
+curl -L --fail -o "$VENDOR_DIR/floating-ui/dom.umd.min.js" \
+    "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.8.0/dist/floating-ui.dom.umd.min.js"
+
+echo "Stripping sourceMappingURL comments…"
+find "$VENDOR_DIR" -type f \( -name '*.js' -o -name '*.css' \) -exec \
+    sed -i -E 's|sourceMappingURL=[^[:space:]]*||g' {} +
 
 echo "✅ Static libraries downloaded to $VENDOR_DIR"

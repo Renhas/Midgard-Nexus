@@ -4,152 +4,247 @@
 
 /* === CSS Variables === */
 :root {
-    --bg-primary: #0B1120;
-    --bg-card: #1A233A;
-    --bg-input: #151D2E;
-    --text-primary: #E2E8F0;
-    --text-secondary: #94A3B8;
-    --accent-hover: #6366F1;
-    --status-in-progress: #818CF8;
-    --success: #34D399;
-    --error: #F87171;
-    --border: #334155;
+  /* === Colors === */
+  --bg-primary: #0b1120;
+  --bg-card: #1a233a;
+  --bg-input: #151d2e;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --accent-hover: #6366f1;
+  --success: #34d399;
+  --error: #f87171;
+  --border: #334155;
 
-    /* Module accents */
-    --accent-vor: #A78BFA;
-    --accent-fafnir: #60A5FA;
-    --accent-kvasir: #FB923C;
+  /* === Module accents === */
+  --accent-vor: #a78bfa;
+  --accent-vor-soft: #c4b5fd;
+  --accent-fafnir: #60a5fa;
+  --accent-kvasir: #fb923c;
 
-    --action-add: #34D399;
-    --action-delete: #EF4444;
+  /* === Actions === */
+  --action-add: #34d399;
+  --action-add-hover: #6ee7b7;
+  --action-delete: #ef4444;
+  --outline-delete-width: 2.5px;
 
-    --header-icon-size: 1.5rem;
-    --header-height: 57px;
+  /* === Statuses === */
+  --status-planning: var(--text-secondary);
+  --status-in-progress: #818cf8;
+  --status-completed: var(--success);
+  --status-dropped: var(--error);
+
+  /* === Age rating === */
+
+  /* --age-warning-bg shares value with --accent-kvasir today;
+     kept separate so they can evolve independently. */
+  --age-fg: var(--bg-primary);
+  --age-ok-bg: var(--success);
+  --age-warning-bg: #fb923c;
+  --age-restricted-bg: var(--error);
+
+  /* === Rating stars === */
+  --rating-star-fill: #fbbf24;
+  --rating-star-empty: #64748b;
+
+  /* === Radii === */
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-pill: 999px;
+
+  /* === Shadows === */
+  --shadow-sm: 0 0.5rem 1rem rgb(0 0 0 / 35%);
+  --shadow-md: 0 0.75rem 1.5rem rgb(0 0 0 / 35%);
+  --shadow-lg: 0 1rem 2rem rgb(0 0 0 / 40%);
+  --shadow-error: 0 0.4rem 0.9rem rgb(0 0 0 / 28%);
+
+  /* === Focus rings === */
+  --focus-ring: 0 0 0 2px rgb(from var(--accent-hover) r g b / 25%);
+  --focus-ring-strong: 0 0 0 0.2rem rgb(from var(--accent-hover) r g b / 25%);
+  --focus-ring-error: 0 0 0 2px rgb(from var(--error) r g b / 25%);
+
+  /* === Backdrop === */
+  --backdrop-bg: rgb(from var(--bg-primary) r g b / 72%);
+
+  /* === Z-index ===
+     Two ranges: internal (1-60) for values inside a positioned
+     parent; external (900+) for fixed-layer chrome.
+     See docs/frontend-css.md. */
+  --z-base: 1;
+  --z-raised: 2;
+  --z-overlay-bar: 10;
+  --z-popover-host: 15;
+  --z-popover: 20;
+  --z-popover-raised: 30;
+  --z-picker: 40;
+  --z-tooltip: 50;
+  --z-hover-preview: 60;
+  --z-sidebar-collapsed: 900;
+  --z-sidebar: 1000;
+  --z-sidebar-expand: 1010;
+  --z-overlay: 1020;
+  --z-backdrop: 1030;
+  --z-leave-confirm: 1050;
+  --z-navbar: 1070;
+  --z-context-menu: 1100;
+  --z-context-flyout: 1110;
+
+  /* === Layout === */
+  --header-icon-size: 1.5rem;
+  --header-height: 57px;
+  --sidebar-handle-offset: 0.5rem;
+  --sidebar-handle-size: 28px;
+  --sidebar-handle-top-offset: 0.75rem;
+  --sidebar-handle-gap: 0.25rem;
 }
 
 /* === Global Body === */
 body {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 /* === Custom scrollbar === */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-::-webkit-scrollbar-track {
-    background: var(--bg-primary);
-}
-::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: var(--accent-hover);
+  width: 8px;
+  height: 8px;
 }
 
-[x-cloak] { display: none !important; }
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-hover);
+}
+
+[x-cloak] {
+  display: none !important;
+}
 
 /* ============================================
     Home page — module cards
     ============================================ */
 .home-center {
-    display: flex;
-    align-items: center;
-    min-height: 100vh;
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
 }
 
 .module-card {
-    background-color: var(--bg-card);
-    border-color: var(--border) !important;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  background-color: var(--bg-card);
+  border-color: var(--border) !important;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
+
 .module-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 0 2rem var(--card-accent, rgba(99, 102, 241, 0.35)) !important;
+  transform: translateY(-4px);
+  box-shadow: 0 0 2rem var(--card-accent, rgb(99 102 241 / 35%)) !important;
 }
 
 /* === Module cards entrance animation === */
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .module-item {
-    opacity: 0;
-    animation: fadeInUp 1s ease forwards;
+  opacity: 0;
+  animation: fadeInUp 1s ease forwards;
 }
 
-.module-item:nth-child(1) { animation-delay: 0.1s; }
-.module-item:nth-child(2) { animation-delay: 0.3s; }
-.module-item:nth-child(3) { animation-delay: 0.5s; }
+.module-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.module-item:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.module-item:nth-child(3) {
+  animation-delay: 0.5s;
+}
 
 .circle-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 /* ============================================
    Navbar overrides
    ============================================ */
 .navbar-spacer {
-    height: var(--header-height);
+  height: var(--header-height);
 }
 
 .navbar {
-    height: var(--header-height);
-    box-sizing: border-box;
-    background-color: var(--bg-card) !important;
-    border-bottom: 1px solid var(--border);
-    z-index: 1100;
+  height: var(--header-height);
+  box-sizing: border-box;
+  background-color: var(--bg-card) !important;
+  border-bottom: 1px solid var(--border);
+  z-index: var(--z-navbar);
 }
 
 .navbar .container-fluid {
-    position: relative;
+  position: relative;
 }
 
 .navbar-center {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
+
 .navbar-dark .nav-link {
-    color: var(--text-secondary) !important;
+  color: var(--text-secondary) !important;
 }
+
 .navbar-dark .nav-link:hover,
 .navbar-dark .nav-link.active {
-    color: var(--text-primary) !important;
-    background-color: rgba(99, 102, 241, 0.15);
+  color: var(--text-primary) !important;
+  background-color: rgb(99 102 241 / 15%);
 }
+
 .navbar-dark .nav-link.active {
-    color: var(--accent-hover) !important;
+  color: var(--accent-hover) !important;
 }
+
 .navbar-dark .btn-outline-light {
-    color: var(--text-secondary);
-    border-color: var(--border);
+  color: var(--text-secondary);
+  border-color: var(--border);
 }
+
 .navbar-dark .btn-outline-light:hover {
-    color: var(--text-primary);
-    background-color: rgba(99, 102, 241, 0.15);
-    border-color: var(--accent-hover);
+  color: var(--text-primary);
+  background-color: rgb(99 102 241 / 15%);
+  border-color: var(--accent-hover);
 }
+
 .navbar-dark .dropdown-toggle:hover {
-    color: var(--text-primary);
-    background-color: rgba(99, 102, 241, 0.15);
-    border-color: var(--accent-hover);
+  color: var(--text-primary);
+  background-color: rgb(99 102 241 / 15%);
+  border-color: var(--accent-hover);
 }
 
 /* ============================================
@@ -157,165 +252,178 @@ body {
    ============================================ */
 
 .nav-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.4rem 0.8rem;        /* как btn-sm */
-    border-radius: 0.375rem;
-    border: 1px solid transparent;
-    background-color: transparent;
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: all 0.2s ease;
-    font-size: 0.875rem;            /* как btn-sm */
-    line-height: 1.5;
-    white-space: nowrap;
-    cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+
+  /* как btn-sm */
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  background-color: transparent;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+
+  /* как btn-sm */
+  line-height: 1.5;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 .nav-btn:hover {
-    color: var(--text-primary);
-    background-color: rgba(167, 145, 255, 0.1);
-    border-color: var(--border);
+  color: var(--text-primary);
+  background-color: rgb(167 145 255 / 10%);
+  border-color: var(--border);
 }
 
 .nav-btn:active {
-    transform: scale(0.96);
+  transform: scale(0.96);
 }
 
-.nav-btn.active {
-    color: var(--accent-vor);
-    border-color: var(--accent-vor);
-    background-color: rgba(167, 145, 255, 0.1);
+.nav-btn--active {
+  color: var(--accent-vor);
+  border-color: var(--accent-vor);
+  background-color: rgb(167 145 255 / 10%);
 }
 
 .nav-btn .header-icon {
-    font-size: var(--header-icon-size);
-    line-height: 1;
+  font-size: var(--header-icon-size);
+  line-height: 1;
 }
 
 .nav-btn .header-icon + span {
-    font-weight: 500;
+  font-weight: 500;
 }
 
 .home-icon {
-    width: var(--header-icon-size);
-    height: var(--header-icon-size);
-    color: var(--text-secondary);
-    display: block;
+  width: var(--header-icon-size);
+  height: var(--header-icon-size);
+  color: var(--text-secondary);
+  display: block;
 }
 
 .nav-btn:hover .home-icon {
-    color: var(--text-primary);
+  color: var(--text-primary);
 }
 
 .nav-btn.icon-only {
-    padding: 0.4rem 0.5rem;
-    aspect-ratio: 1 / 1;
+  padding: 0.4rem 0.5rem;
+  aspect-ratio: 1 / 1;
 }
 
 /* ============================================
    Card overrides
    ============================================ */
 .card {
-    background-color: var(--bg-card);
-    border-color: var(--border);
+  background-color: var(--bg-card);
+  border-color: var(--border);
 }
+
 .module-card .card-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    text-align: center;
-    color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+  color: var(--text-primary);
 }
 
 .card-body {
-    color: var(--text-primary);
+  color: var(--text-primary);
 }
+
 .card-text {
-    color: var(--text-secondary) !important;
+  color: var(--text-secondary) !important;
 }
 
 /* ============================================
    Alert overrides
    ============================================ */
 .alert-danger {
-    background-color: rgba(248, 113, 113, 0.15);
-    border-color: var(--error);
-    color: var(--error);
+  background-color: rgb(248 113 113 / 15%);
+  border-color: var(--error);
+  color: var(--error);
 }
 
 /* ============================================
    Button overrides
    ============================================ */
 .btn-primary {
-    background-color: var(--accent-hover);
-    border-color: var(--accent-hover);
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
+
 .btn-primary:hover {
-    background-color: #4F46E5;
-    border-color: #4F46E5;
+  background-color: #4f46e5;
+  border-color: #4f46e5;
 }
 
 /* ============================================
    Text color helpers
    ============================================ */
 .text-primary {
-    color: var(--accent-hover) !important;
+  color: var(--accent-hover) !important;
 }
+
 .text-muted {
-    color: var(--text-secondary) !important;
+  color: var(--text-secondary) !important;
 }
 
 /* ============================================
    Form overrides
    ============================================ */
 .form-label {
-    color: var(--text-primary);
+  color: var(--text-primary);
 }
+
 .form-text {
-    color: var(--text-secondary) !important;
+  color: var(--text-secondary) !important;
 }
+
 .invalid-feedback {
-    color: var(--error);
+  color: var(--error);
 }
 
 /* ============================================
    Dropdown overrides
    ============================================ */
 .dropdown-menu {
-    background-color: var(--bg-card);
-    border-color: var(--border);
+  background-color: var(--bg-card);
+  border-color: var(--border);
 }
+
 .dropdown-item {
-    color: var(--text-primary);
+  color: var(--text-primary);
 }
+
 .dropdown-item:hover {
-    background-color: rgba(99, 102, 241, 0.15);
-    color: var(--text-primary);
+  background-color: rgb(99 102 241 / 15%);
+  color: var(--text-primary);
 }
+
 .dropdown-divider {
-    border-top-color: var(--border);
+  border-top-color: var(--border);
 }
 
 /* ============================================
     Toast notification
     ============================================ */
 .custom-toast {
-    position: fixed;
-    bottom: 1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2000;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.25rem;
-    border-radius: 0.375rem;
-    background-color: var(--bg-card);
-    border: 1px solid var(--border);
-    color: var(--text-primary);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(4px);
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.375rem;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 35%);
+  backdrop-filter: blur(4px);
 }

@@ -34,5 +34,5 @@ jobs:
         with:
           github-token: ${{ secrets.GH_PROJECT_TOKEN }}
           issue-numbers: ${{ steps.extract.outputs.issues }}
-          target-status: 'In review'
-          forbidden-source-statuses: 'In Dev,Pre-release,Done'
+          target-status: "In review"
+          forbidden-source-statuses: "In Dev,Pre-release,Done"
