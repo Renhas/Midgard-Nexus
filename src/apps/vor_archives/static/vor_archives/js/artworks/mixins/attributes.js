@@ -11,6 +11,10 @@ export function getAttributeMixin({ catalogs = {} } = {}) {
     catalogs,
     pickerKind: null,
     pickerQuery: "",
+    openAttrAccordion: null,
+    toggleAttrAccordion(kind) {
+      this.openAttrAccordion = this.openAttrAccordion === kind ? null : kind;
+    },
     attributeCatalogue(kind) {
       const byType = this.catalogs[this.workType] || {};
       return byType[kind] || [];

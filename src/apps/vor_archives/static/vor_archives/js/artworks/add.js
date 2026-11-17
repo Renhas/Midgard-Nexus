@@ -53,6 +53,9 @@ document.addEventListener("alpine:init", () => {
       this.genres = [];
       if (type !== "game") {
         this.platforms = [];
+        if (this.openAttrAccordion === "platforms") {
+          this.openAttrAccordion = null;
+        }
       }
       this.clearSelection();
       this.refreshSearch();
@@ -242,6 +245,7 @@ document.addEventListener("alpine:init", () => {
     },
     resetForm() {
       this.resetWorkFields();
+      this.openAttrAccordion = null;
       this.relations = [];
       this.cancelRelationAdd();
       this.clearCover();
