@@ -1,3 +1,4 @@
+from functools import wraps
 import json
 
 from django.http import Http404, HttpResponseForbidden
@@ -14,10 +15,14 @@ from ..services import (
 )
 
 
-def require_staff(request):
-    if not request.user.is_staff:
-        return HttpResponseForbidden("Недостаточно прав")
-    return None
+def staff_required(view_func):
+    @wraps(view_func)
+    def _wrapped(request, *args, **kwargs):
+        if not request.user.is_staff:
+            return HttpResponseForbidden("Недостаточно прав")
+        return view_func(request, *args, **kwargs)
+
+    return _wrapped
 
 
 def attr_tab_or_404(kind):
@@ -31,23 +36,26 @@ def search_query(request):
     return request.GET.get("q") or request.POST.get("q") or ""
 
 
+def _item_urls(kind, pk, type_key=None):
+    if type_key:
+        return {
+            "detail_url": reverse(
+                "vor_archives:attributes:genre_detail",
+                args=[type_key, pk],
+            ),
+            "edit_url": reverse(
+                "vor_archives:attributes:genre_edit",
+                args=[type_key, pk],
+            ),
+        }
+    return {
+        "detail_url": reverse("vor_archives:attributes:detail", args=[kind, pk]),
+        "edit_url": reverse("vor_archives:attributes:edit", args=[kind, pk]),
+    }
+
+
 def attach_item_urls(kind, item):
-    if item.get("type_key"):
-        item["detail_url"] = reverse(
-            "vor_archives:attributes:genre_detail",
-            args=[item["type_key"], item["pk"]],
-        )
-        item["edit_url"] = reverse(
-            "vor_archives:attributes:genre_edit",
-            args=[item["type_key"], item["pk"]],
-        )
-    else:
-        item["detail_url"] = reverse(
-            "vor_archives:attributes:detail", args=[kind, item["pk"]]
-        )
-        item["edit_url"] = reverse(
-            "vor_archives:attributes:edit", args=[kind, item["pk"]]
-        )
+    item.update(_item_urls(kind, item["pk"], item.get("type_key")))
     return item
 
 
@@ -77,11 +85,10 @@ def attr_list_context(request, kind):
     }
 
 
-def genre_item_context(request, obj, type_key):
-    meta = genre_type_meta(type_key)
-    item = attach_item_urls(
-        "genres",
-        {
+def attr_item_context(request, kind, obj, type_key=None):
+    if kind == "genres":
+        meta = genre_type_meta(type_key)
+        item = {
             "key": genre_composite_id(type_key, obj.pk),
             "pk": obj.pk,
             "type_key": type_key,
@@ -91,22 +98,11 @@ def genre_item_context(request, obj, type_key):
             "work_count": genre_work_count(obj, type_key),
             "has_text": True,
             "empty_text": "Нет описания",
-        },
-    )
-    return {
-        "kind": "genres",
-        "tab": get_attr_tab("genres"),
-        "item": item,
-        "is_staff": request.user.is_staff,
-    }
-
-
-def simple_item_context(request, kind, obj):
-    meta = SIMPLE_KINDS[kind]
-    text_field = meta["text_field"]
-    item = attach_item_urls(
-        kind,
-        {
+        }
+    else:
+        meta = SIMPLE_KINDS[kind]
+        text_field = meta["text_field"]
+        item = {
             "key": str(obj.pk),
             "pk": obj.pk,
             "name": obj.name,
@@ -114,8 +110,8 @@ def simple_item_context(request, kind, obj):
             "work_count": simple_work_count(obj, kind),
             "has_text": bool(text_field),
             "empty_text": meta.get("empty_text") or "Нет описания",
-        },
-    )
+        }
+    attach_item_urls(kind, item)
     return {
         "kind": kind,
         "tab": get_attr_tab(kind),
@@ -138,20 +134,13 @@ def form_context(
 ):
     tab = get_attr_tab(kind)
     has_text = kind == "genres" or bool(SIMPLE_KINDS.get(kind, {}).get("text_field"))
-    cancel_url = reverse("vor_archives:attributes:empty", args=[kind])
-    if not is_create:
-        if kind == "genres":
-            cancel_url = reverse(
-                "vor_archives:attributes:genre_detail", args=[type_key, pk]
-            )
-            save_url = reverse(
-                "vor_archives:attributes:genre_edit", args=[type_key, pk]
-            )
-        else:
-            cancel_url = reverse("vor_archives:attributes:detail", args=[kind, pk])
-            save_url = reverse("vor_archives:attributes:edit", args=[kind, pk])
-    else:
+    if is_create:
         save_url = reverse("vor_archives:attributes:new", args=[kind])
+        cancel_url = reverse("vor_archives:attributes:empty", args=[kind])
+    else:
+        urls = _item_urls(kind, pk, type_key if kind == "genres" else None)
+        save_url = urls["edit_url"]
+        cancel_url = urls["detail_url"]
     return {
         "kind": kind,
         "tab": tab,
