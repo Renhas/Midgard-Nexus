@@ -1,7 +1,6 @@
 from .common import (
     parse_id_list,
     parse_ids,
-    parse_int_list,
 )
 from .artworks import (
     artwork_list_params,

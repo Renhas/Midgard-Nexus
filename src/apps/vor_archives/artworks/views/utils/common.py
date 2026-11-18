@@ -1,23 +1,4 @@
-def parse_int_list(raw_values, *, comma_separated=False):
-    """Parse raw string values into a list of ints.
-
-    Empty and non-numeric entries are skipped silently. When
-    comma_separated is True, each raw value is split on commas first,
-    allowing both repeated keys and comma-separated lists to be used in
-    the same field.
-    """
-    result = []
-    for raw in raw_values:
-        parts = str(raw).split(",") if comma_separated else [str(raw)]
-        for part in parts:
-            part = part.strip()
-            if not part:
-                continue
-            try:
-                result.append(int(part))
-            except ValueError:
-                continue
-    return result
+from apps.vor_archives.utils import parse_int_list
 
 
 def parse_ids(request):

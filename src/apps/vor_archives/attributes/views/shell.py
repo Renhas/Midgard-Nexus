@@ -2,8 +2,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import redirect, render
 
+from apps.vor_archives.utils import module_base_context
 from ..catalog import ATTR_TABS, DEFAULT_KIND, get_attr_tab
-from .utils import module_context
 
 
 @login_required
@@ -18,16 +18,11 @@ def attributes_kind(request, kind):
     tab = get_attr_tab(kind)
     if tab is None:
         raise Http404("Неизвестный тип атрибута")
-    module = module_context()
     return render(
         request,
         "vor_archives/attributes.html",
         {
-            "module_name": module["name"],
-            "module_icon": module["icon"],
-            "module_color": module["color"],
-            "active_section": "attributes",
-            "hide_right": True,
+            **module_base_context("attributes", hide_right=True),
             "attr_kind": kind,
             "attr_label": tab["label"],
             "attr_icon": tab["icon"],

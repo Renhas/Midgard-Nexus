@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import redirect, render
@@ -15,46 +14,32 @@ from .dashboard import (
 )
 from .dashboard_catalog import DASHBOARD_TABS, DEFAULT_DASH_TAB, get_dash_tab
 from .registry import WORK_TYPE_REGISTRY
-from .models import (
-    BookGenre,
-    FilmGenre,
-    GameGenre,
-    Platform,
-    Tag,
-)
+from .models import Platform, Tag
+from .utils import module_base_context
 from .artworks.services import (
     get_user_collection_trees,
 )
 
 
-def _module_context():
-    """Возвращает общие переменные шаблона для модуля vor_archives."""
-    return next(m for m in settings.MODULES if m["url_name"] == "vor_archives")
-
-
 @login_required
 def index(request):
     """Главная страница модуля «Библиотека» — страница произведений."""
-    module = _module_context()
     collections = get_user_collection_trees(request.user)
     platforms = list(Platform.objects.all())
     tags = list(Tag.objects.all())
     platform_options = [{"value": p.id, "label": p.name} for p in platforms]
     tags_options = [{"value": p.id, "label": p.name} for p in tags]
-    genre_models = [
-        ("book", BookGenre, "Книги"),
-        ("film", FilmGenre, "Фильмы"),
-        ("game", GameGenre, "Игры"),
-    ]
     genres_nested = []
     genre_catalog = {}
-    for type_key, model, label in genre_models:
-        options = [{"value": g.id, "label": g.name} for g in model.objects.all()]
+    for type_key, meta in WORK_TYPE_REGISTRY.items():
+        options = [
+            {"value": g.id, "label": g.name} for g in meta.genre_model.objects.all()
+        ]
         genre_catalog[f"genre_{type_key}"] = [item["value"] for item in options]
         if options:
             genres_nested.append(
                 {
-                    "title": label,
+                    "title": meta.label_plural,
                     "options": options,
                     "name": f"genre_{type_key}",
                     "show_condition": f"$store.vorArtworks.workTypes.includes('{type_key}')",
@@ -83,10 +68,7 @@ def index(request):
         request,
         "vor_archives/artworks.html",
         {
-            "module_name": module["name"],
-            "module_icon": module["icon"],
-            "module_color": module["color"],
-            "active_section": "artworks",
+            **module_base_context("artworks"),
             "collections": collections,
             "filter_sections": filter_sections,
             "sort_fields": [
@@ -131,13 +113,8 @@ def _dashboard_shell(request, tab_kind, extra=None):
     tab = get_dash_tab(tab_kind)
     if tab is None:
         raise Http404("Неизвестная вкладка дашборда")
-    module = _module_context()
     context = {
-        "module_name": module["name"],
-        "module_icon": module["icon"],
-        "module_color": module["color"],
-        "active_section": "dashboard",
-        "hide_right": True,
+        **module_base_context("dashboard", hide_right=True),
         "dash_kind": tab_kind,
         "dash_tabs": DASHBOARD_TABS,
         "dash_tab": tab,

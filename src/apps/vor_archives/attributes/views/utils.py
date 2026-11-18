@@ -1,6 +1,5 @@
 import json
 
-from django.conf import settings
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import render
 from django.urls import reverse
@@ -13,11 +12,6 @@ from ..services import (
     list_simple_attrs,
     simple_work_count,
 )
-
-
-def module_context():
-    """Возвращает общие переменные шаблона для модуля vor_archives."""
-    return next(m for m in settings.MODULES if m["url_name"] == "vor_archives")
 
 
 def require_staff(request):
