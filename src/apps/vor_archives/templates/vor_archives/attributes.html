@@ -12,7 +12,7 @@
 {% block left_content %}
   <div class="sidebar-nav">
     {% for tab in attr_tabs %}
-      <a href="{% url 'vor_archives:attributes_kind' tab.kind %}"
+      <a href="{% url 'vor_archives:attributes:kind' tab.kind %}"
          class="sidebar-btn sidebar-btn-full sidebar-btn-tab{% if tab.kind == attr_kind %} sidebar-btn--active{% endif %}"
          title="{{ tab.label }}">
         <i class="{{ tab.icon }}"></i>
@@ -32,7 +32,7 @@
                name="q"
                placeholder="{{ search_placeholder }}"
                autocomplete="off"
-               hx-get="{% url 'vor_archives:attr_list' attr_kind %}"
+               hx-get="{% url 'vor_archives:attributes:list' attr_kind %}"
                hx-trigger="input changed delay:200ms"
                hx-target="#attr-list"
                hx-swap="outerHTML">
@@ -42,7 +42,7 @@
                 class="sidebar-btn sidebar-btn-add sidebar-btn-icon"
                 title="Создать"
                 x-show="!$store.vorAttributes.deleteMode"
-                hx-get="{% url 'vor_archives:attr_new' attr_kind %}"
+                hx-get="{% url 'vor_archives:attributes:new' attr_kind %}"
                 hx-target="#attr-detail"
                 hx-swap="innerHTML">
           <i class="bi bi-plus-circle"></i>
@@ -77,7 +77,7 @@
       <div class="attr-list-pane">
         <div id="attr-list"
              class="attr-list"
-             hx-get="{% url 'vor_archives:attr_list' attr_kind %}"
+             hx-get="{% url 'vor_archives:attributes:list' attr_kind %}"
              hx-trigger="load, vor:attr-list-refresh from:body"
              hx-include="#attr-search"
              hx-swap="outerHTML">
@@ -92,5 +92,5 @@
 {% endblock %}
 {% block page_notifications %}
   {% csrf_token %}
-  <div id="vor-modal" data-vor-attr-delete-preview="{% url 'vor_archives:attr_delete_preview' attr_kind %}"></div>
+  <div id="vor-modal" data-vor-attr-delete-preview="{% url 'vor_archives:attributes:delete_preview' attr_kind %}"></div>
 {% endblock %}

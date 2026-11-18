@@ -1,9 +1,11 @@
-from functools import reduce
-from operator import add
-
-from django.db.models import Count
-
-from .models import BookGenre, FilmGenre, GameGenre, Person, Platform, Tag
+from apps.vor_archives.models import (
+    BookGenre,
+    FilmGenre,
+    GameGenre,
+    Person,
+    Platform,
+    Tag,
+)
 
 ATTR_TABS = [
     {
@@ -110,133 +112,3 @@ def get_attr_tab(kind):
 
 def genre_type_meta(type_key):
     return GENRE_TYPES.get(type_key)
-
-
-def genre_type_key(obj):
-    if isinstance(obj, BookGenre):
-        return "book"
-    if isinstance(obj, FilmGenre):
-        return "film"
-    if isinstance(obj, GameGenre):
-        return "game"
-    raise ValueError(f"Unknown genre model: {obj!r}")
-
-
-def genre_composite_id(type_key, pk):
-    return f"{type_key}:{pk}"
-
-
-def parse_genre_ids(raw_values):
-    parsed = []
-    seen = set()
-    for raw in raw_values:
-        for part in str(raw).split(","):
-            part = part.strip()
-            if ":" not in part:
-                continue
-            type_key, pk_raw = part.split(":", 1)
-            if type_key not in GENRE_TYPES:
-                continue
-            try:
-                pk = int(pk_raw)
-            except (TypeError, ValueError):
-                continue
-            key = (type_key, pk)
-            if key in seen:
-                continue
-            seen.add(key)
-            parsed.append(key)
-    return parsed
-
-
-def parse_simple_ids(raw_values):
-    parsed = []
-    seen = set()
-    for raw in raw_values:
-        for part in str(raw).split(","):
-            part = part.strip()
-            try:
-                pk = int(part)
-            except (TypeError, ValueError):
-                continue
-            if pk in seen:
-                continue
-            seen.add(pk)
-            parsed.append(pk)
-    return parsed
-
-
-def get_genre(type_key, pk):
-    meta = genre_type_meta(type_key)
-    if meta is None:
-        return None
-    return meta["model"].objects.filter(pk=pk).first()
-
-
-def get_simple_attr(kind, pk):
-    meta = SIMPLE_KINDS.get(kind)
-    if meta is None:
-        return None
-    return meta["model"].objects.filter(pk=pk).first()
-
-
-def genre_work_count(obj, type_key=None):
-    type_key = type_key or genre_type_key(obj)
-    accessor = f"{GENRE_TYPES[type_key]['count_field']}_set"
-    return getattr(obj, accessor).count()
-
-
-def simple_work_count(obj, kind):
-    meta = SIMPLE_KINDS[kind]
-    return sum(getattr(obj, f"{field}_set").count() for field in meta["count_fields"])
-
-
-def list_genre_groups(query=""):
-    query = (query or "").strip()
-    groups = []
-    total = 0
-    for type_key, meta in GENRE_TYPES.items():
-        total += meta["model"].objects.count()
-        qs = meta["model"].objects.annotate(
-            work_count=Count(meta["count_field"], distinct=True)
-        )
-        if query:
-            qs = qs.filter(name__icontains=query)
-        items = [
-            {
-                "key": genre_composite_id(type_key, obj.pk),
-                "pk": obj.pk,
-                "type_key": type_key,
-                "name": obj.name,
-                "work_count": obj.work_count,
-            }
-            for obj in qs.order_by("name")
-        ]
-        groups.append(
-            {
-                "type_key": type_key,
-                "label": meta["label"],
-                "items": items,
-            }
-        )
-    return groups, total
-
-
-def list_simple_attrs(kind, query=""):
-    meta = SIMPLE_KINDS[kind]
-    query = (query or "").strip()
-    total = meta["model"].objects.count()
-    counts = [Count(field, distinct=True) for field in meta["count_fields"]]
-    qs = meta["model"].objects.annotate(work_count=reduce(add, counts))
-    if query:
-        qs = qs.filter(name__icontains=query)
-    items = [
-        {
-            "key": str(obj.pk),
-            "pk": obj.pk,
-            "name": obj.name,
-            "work_count": obj.work_count,
-        }
-        for obj in qs.order_by("name")
-    ]
-    return items, total

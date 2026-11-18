@@ -1,6 +1,7 @@
 from django import forms
 
-from .attr_catalog import GENRE_TYPES, SIMPLE_KINDS, genre_type_key
+from .catalog import GENRE_TYPES, SIMPLE_KINDS
+from .services import genre_type_key
 
 
 class GenreForm(forms.Form):
