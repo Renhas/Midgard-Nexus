@@ -10,42 +10,50 @@ from .queries import (
 from .utils import genre_composite_id, parse_genre_ids, parse_simple_ids
 
 
-def build_genre_delete_items(pairs):
+def _collect_delete_items(entries, resolver):
     items = []
-    for type_key, pk in pairs:
-        obj = get_genre(type_key, pk)
-        if obj is None:
-            continue
-        items.append(
-            {
-                "key": genre_composite_id(type_key, pk),
-                "type_key": type_key,
-                "pk": pk,
-                "name": obj.name,
-                "type_label": genre_type_meta(type_key)["label"],
-                "work_count": genre_work_count(obj, type_key),
-                "obj": obj,
-            }
-        )
+    for entry in entries:
+        item = resolver(entry)
+        if item is not None:
+            items.append(item)
     return items
+
+
+def _resolve_genre_delete_item(pair):
+    type_key, pk = pair
+    obj = get_genre(type_key, pk)
+    if obj is None:
+        return None
+    return {
+        "key": genre_composite_id(type_key, pk),
+        "type_key": type_key,
+        "pk": pk,
+        "name": obj.name,
+        "type_label": genre_type_meta(type_key)["label"],
+        "work_count": genre_work_count(obj, type_key),
+        "obj": obj,
+    }
+
+
+def _resolve_simple_delete_item(kind, pk):
+    obj = get_simple_attr(kind, pk)
+    if obj is None:
+        return None
+    return {
+        "key": str(pk),
+        "pk": pk,
+        "name": obj.name,
+        "work_count": simple_work_count(obj, kind),
+        "obj": obj,
+    }
+
+
+def build_genre_delete_items(pairs):
+    return _collect_delete_items(pairs, _resolve_genre_delete_item)
 
 
 def build_simple_delete_items(kind, pks):
-    items = []
-    for pk in pks:
-        obj = get_simple_attr(kind, pk)
-        if obj is None:
-            continue
-        items.append(
-            {
-                "key": str(pk),
-                "pk": pk,
-                "name": obj.name,
-                "work_count": simple_work_count(obj, kind),
-                "obj": obj,
-            }
-        )
-    return items
+    return _collect_delete_items(pks, lambda pk: _resolve_simple_delete_item(kind, pk))
 
 
 def resolve_delete_items(kind, raw_ids):
