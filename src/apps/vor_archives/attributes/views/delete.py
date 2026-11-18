@@ -9,16 +9,14 @@ from .utils import (
     attr_mutation_response,
     attr_tab_or_404,
     empty_context,
-    require_staff,
+    staff_required,
 )
 
 
 @login_required
+@staff_required
 @require_GET
 def attr_delete_preview(request, kind):
-    forbidden = require_staff(request)
-    if forbidden:
-        return forbidden
     tab = attr_tab_or_404(kind)
     try:
         items = resolve_delete_items(kind, request.GET.getlist("ids"))
@@ -44,11 +42,9 @@ def attr_delete_preview(request, kind):
 
 
 @login_required
+@staff_required
 @require_POST
 def attr_delete(request, kind):
-    forbidden = require_staff(request)
-    if forbidden:
-        return forbidden
     attr_tab_or_404(kind)
     try:
         delete_attrs(kind, request.POST.getlist("ids"))

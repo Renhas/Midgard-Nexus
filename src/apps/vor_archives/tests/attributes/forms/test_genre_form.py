@@ -18,6 +18,7 @@ pytestmark = pytest.mark.django_db
 
 def test_genre_form_widgets_and_initial():
     form = GenreForm(initial_type="film")
+    assert list(form.fields) == ["name", "type_key", "description"]
     assert form.fields["type_key"].widget.attrs["class"] == "form-select"
     assert form.fields["name"].widget.attrs["class"] == "form-control"
     assert form.fields["description"].widget.attrs["class"] == "form-control"

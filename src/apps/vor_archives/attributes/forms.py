@@ -4,11 +4,42 @@ from .catalog import GENRE_TYPES, SIMPLE_KINDS
 from .services import genre_type_key
 
 
-class GenreForm(forms.Form):
+class BaseAttrForm(forms.Form):
+    name = forms.CharField(max_length=255, label="Название")
+
+    def __init__(self, *args, instance=None, **kwargs):
+        self.instance = instance
+        super().__init__(*args, **kwargs)
+        self._apply_widget_classes()
+
+    def _apply_widget_classes(self):
+        for field in self.fields.values():
+            widget = field.widget
+            css_class = (
+                "form-select"
+                if isinstance(widget, (forms.Select, forms.SelectMultiple))
+                else "form-control"
+            )
+            widget.attrs.setdefault("class", css_class)
+
+    def _clean_unique_name(self, model, *, empty_error, unique_error):
+        name = (self.cleaned_data.get("name") or "").strip()
+        if not name:
+            raise forms.ValidationError(empty_error)
+        if model is None:
+            return name
+        qs = model.objects.filter(name__iexact=name)
+        if self.instance is not None:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError(unique_error)
+        return name
+
+
+class GenreForm(BaseAttrForm):
     TYPE_CHOICES = tuple((key, meta["label"]) for key, meta in GENRE_TYPES.items())
 
     type_key = forms.ChoiceField(choices=TYPE_CHOICES, label="Тип")
-    name = forms.CharField(max_length=255, label="Название")
     description = forms.CharField(
         required=False,
         label="Описание",
@@ -18,7 +49,6 @@ class GenreForm(forms.Form):
     def __init__(
         self, *args, instance=None, lock_type=False, initial_type=None, **kwargs
     ):
-        self.instance = instance
         self.lock_type = lock_type
         self.fixed_type = initial_type
         if instance is not None and self.fixed_type is None:
@@ -29,13 +59,7 @@ class GenreForm(forms.Form):
             initial.setdefault("description", instance.description)
         if self.fixed_type:
             initial.setdefault("type_key", self.fixed_type)
-        super().__init__(*args, initial=initial, **kwargs)
-        for field in self.fields.values():
-            widget = field.widget
-            if isinstance(widget, (forms.Select, forms.SelectMultiple)):
-                widget.attrs.setdefault("class", "form-select")
-            else:
-                widget.attrs.setdefault("class", "form-control")
+        super().__init__(*args, instance=instance, initial=initial, **kwargs)
         if lock_type:
             self.fields["type_key"].disabled = True
             self.fields["type_key"].required = False
@@ -46,19 +70,14 @@ class GenreForm(forms.Form):
         return self.cleaned_data.get("type_key") or self.fixed_type
 
     def clean_name(self):
-        name = (self.cleaned_data.get("name") or "").strip()
-        if not name:
-            raise forms.ValidationError("Введите название")
         type_key = self.data.get("type_key") or self.fixed_type
         meta = GENRE_TYPES.get(type_key)
-        if meta is None:
-            return name
-        qs = meta["model"].objects.filter(name__iexact=name)
-        if self.instance is not None:
-            qs = qs.exclude(pk=self.instance.pk)
-        if qs.exists():
-            raise forms.ValidationError("Жанр с таким названием уже существует")
-        return name
+        model = meta["model"] if meta is not None else None
+        return self._clean_unique_name(
+            model,
+            empty_error="Введите название",
+            unique_error="Жанр с таким названием уже существует",
+        )
 
     def save(self):
         type_key = self._resolved_type()
@@ -74,8 +93,7 @@ class GenreForm(forms.Form):
         return self.instance, type_key
 
 
-class AttrForm(forms.Form):
-    name = forms.CharField(max_length=255, label="Название")
+class AttrForm(BaseAttrForm):
     text = forms.CharField(
         required=False,
         label="Описание",
@@ -85,36 +103,25 @@ class AttrForm(forms.Form):
     def __init__(self, *args, kind=None, instance=None, **kwargs):
         self.kind = kind
         self.meta = SIMPLE_KINDS[kind]
-        self.instance = instance
         initial = kwargs.pop("initial", None) or {}
         if instance is not None:
             initial.setdefault("name", instance.name)
             text_field = self.meta["text_field"]
             if text_field:
                 initial.setdefault("text", getattr(instance, text_field) or "")
-        super().__init__(*args, initial=initial, **kwargs)
+        super().__init__(*args, instance=instance, initial=initial, **kwargs)
         self.fields["name"].label = self.meta["name_label"]
         if self.meta["text_field"]:
             self.fields["text"].label = self.meta["text_label"]
         else:
             del self.fields["text"]
-        for field in self.fields.values():
-            widget = field.widget
-            if isinstance(widget, (forms.Select, forms.SelectMultiple)):
-                widget.attrs.setdefault("class", "form-select")
-            else:
-                widget.attrs.setdefault("class", "form-control")
 
     def clean_name(self):
-        name = (self.cleaned_data.get("name") or "").strip()
-        if not name:
-            raise forms.ValidationError(f"Введите {self.meta['name_label'].lower()}")
-        qs = self.meta["model"].objects.filter(name__iexact=name)
-        if self.instance is not None:
-            qs = qs.exclude(pk=self.instance.pk)
-        if qs.exists():
-            raise forms.ValidationError(self.meta["unique_error"])
-        return name
+        return self._clean_unique_name(
+            self.meta["model"],
+            empty_error=f"Введите {self.meta['name_label'].lower()}",
+            unique_error=self.meta["unique_error"],
+        )
 
     def save(self):
         model = self.meta["model"]

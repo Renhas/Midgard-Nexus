@@ -6,10 +6,9 @@ from django.views.decorators.http import require_GET
 from ..catalog import SIMPLE_KINDS, genre_type_meta
 from ..services import get_genre, get_simple_attr
 from .utils import (
+    attr_item_context,
     attr_list_context,
     empty_context,
-    genre_item_context,
-    simple_item_context,
 )
 
 
@@ -46,7 +45,7 @@ def attr_detail(request, kind, pk):
     return render(
         request,
         "vor_archives/partials/attributes/attr_detail.html",
-        simple_item_context(request, kind, obj),
+        attr_item_context(request, kind, obj),
     )
 
 
@@ -61,5 +60,5 @@ def genre_detail(request, type_key, pk):
     return render(
         request,
         "vor_archives/partials/attributes/attr_detail.html",
-        genre_item_context(request, obj, type_key),
+        attr_item_context(request, "genres", obj, type_key=type_key),
     )

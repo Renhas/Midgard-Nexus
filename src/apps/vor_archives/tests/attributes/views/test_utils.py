@@ -3,22 +3,21 @@
 import json
 
 import pytest
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.test import RequestFactory
 from django.urls import reverse
 
 from apps.vor_archives.attributes.forms import AttrForm, GenreForm
 from apps.vor_archives.attributes.views.utils import (
     attach_item_urls,
+    attr_item_context,
     attr_list_context,
     attr_mutation_response,
     attr_tab_or_404,
     empty_context,
     form_context,
-    genre_item_context,
-    require_staff,
     search_query,
-    simple_item_context,
+    staff_required,
 )
 from apps.vor_archives.tests.factories import (
     BookFactory,
@@ -30,21 +29,26 @@ from apps.vor_archives.tests.factories import (
 pytestmark = pytest.mark.django_db
 
 
-# ─── require_staff & attr_tab_or_404 & search_query ─────────────────────────
+# ─── staff_required & attr_tab_or_404 & search_query ────────────────────────
 
 
-def test_require_staff_blocks_regular_user_and_allows_staff(user, staff_user):
+def test_staff_required_blocks_regular_user_and_allows_staff(user, staff_user):
     rf = RequestFactory()
+
+    @staff_required
+    def dummy_view(request):
+        return HttpResponse("ok")
 
     req_user = rf.get("/")
     req_user.user = user
-    forbidden = require_staff(req_user)
-    assert forbidden is not None
+    forbidden = dummy_view(req_user)
     assert forbidden.status_code == 403
 
     req_staff = rf.get("/")
     req_staff.user = staff_user
-    assert require_staff(req_staff) is None
+    allowed = dummy_view(req_staff)
+    assert allowed.status_code == 200
+    assert allowed.content == b"ok"
 
 
 def test_attr_tab_or_404():
@@ -81,7 +85,7 @@ def test_attach_item_urls_simple_and_genre():
     )
 
 
-# ─── attr_list_context, *_item_context, empty_context ───────────────────────
+# ─── attr_list_context, attr_item_context, empty_context ────────────────────
 
 
 def test_attr_list_context_simple_and_genres(user):
@@ -114,7 +118,7 @@ def test_item_contexts_and_empty_context(staff_user):
     req.user = staff_user
 
     platform = PlatformFactory(name="PC")
-    simple_ctx = simple_item_context(req, "platforms", platform)
+    simple_ctx = attr_item_context(req, "platforms", platform)
     assert simple_ctx["item"]["has_text"] is False
     assert simple_ctx["item"]["description"] == ""
     assert simple_ctx["is_staff"] is True
@@ -122,7 +126,7 @@ def test_item_contexts_and_empty_context(staff_user):
     genre = BookGenreFactory(name="Fantasy", description="Magic")
     book = BookFactory()
     book.genres.add(genre)
-    genre_ctx = genre_item_context(req, genre, "book")
+    genre_ctx = attr_item_context(req, "genres", genre, type_key="book")
     assert genre_ctx["item"]["key"] == f"book:{genre.pk}"
     assert genre_ctx["item"]["type_label"] == "Книги"
     assert genre_ctx["item"]["work_count"] == 1

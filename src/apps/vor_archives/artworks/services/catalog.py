@@ -1,14 +1,11 @@
 """Presentation helpers for work catalogs."""
 
 from apps.vor_archives.models import (
-    BookGenre,
-    FilmGenre,
-    GameGenre,
     Person,
     Platform,
     Tag,
 )
-from apps.vor_archives.registry import WORK_TYPES
+from apps.vor_archives.registry import GENRE_MODELS, WORK_TYPES
 
 
 def chip_payload(items, tip_field="description"):
@@ -23,7 +20,7 @@ def chip_payload(items, tip_field="description"):
 
 
 def attr_catalog(type_key):
-    genre_model = {"book": BookGenre, "film": FilmGenre, "game": GameGenre}[type_key]
+    genre_model = GENRE_MODELS[type_key]
     return {
         "authors": chip_payload(Person.objects.order_by("name"), "bio"),
         "genres": chip_payload(genre_model.objects.order_by("name")),

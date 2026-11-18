@@ -1,15 +1,12 @@
-from apps.vor_archives.models import BookGenre, FilmGenre, GameGenre
-from ..catalog import GENRE_TYPES
+from apps.vor_archives.registry import GENRE_MODELS, GENRE_TYPE_BY_MODEL
+from apps.vor_archives.utils import parse_int_list
 
 
 def genre_type_key(obj):
-    if isinstance(obj, BookGenre):
-        return "book"
-    if isinstance(obj, FilmGenre):
-        return "film"
-    if isinstance(obj, GameGenre):
-        return "game"
-    raise ValueError(f"Unknown genre model: {obj!r}")
+    type_key = GENRE_TYPE_BY_MODEL.get(type(obj))
+    if type_key is None:
+        raise ValueError(f"Unknown genre model: {obj!r}")
+    return type_key
 
 
 def genre_composite_id(type_key, pk):
@@ -25,7 +22,7 @@ def parse_genre_ids(raw_values):
             if ":" not in part:
                 continue
             type_key, pk_raw = part.split(":", 1)
-            if type_key not in GENRE_TYPES:
+            if type_key not in GENRE_MODELS:
                 continue
             try:
                 pk = int(pk_raw)
@@ -40,17 +37,4 @@ def parse_genre_ids(raw_values):
 
 
 def parse_simple_ids(raw_values):
-    parsed = []
-    seen = set()
-    for raw in raw_values:
-        for part in str(raw).split(","):
-            part = part.strip()
-            try:
-                pk = int(part)
-            except (TypeError, ValueError):
-                continue
-            if pk in seen:
-                continue
-            seen.add(pk)
-            parsed.append(pk)
-    return parsed
+    return parse_int_list(raw_values, comma_separated=True, unique=True)

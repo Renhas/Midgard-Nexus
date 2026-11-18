@@ -205,6 +205,12 @@ def test_list_simple_attrs_ordering_and_distinct_counts():
     ]
 
 
+def test_list_simple_attrs_empty():
+    items, total = list_simple_attrs("tags")
+    assert total == 0
+    assert items == []
+
+
 def test_list_simple_attrs_query_filters_items_but_preserves_total():
     PlatformFactory(name="PlayStation 5")
     PlatformFactory(name="Xbox Series X")
