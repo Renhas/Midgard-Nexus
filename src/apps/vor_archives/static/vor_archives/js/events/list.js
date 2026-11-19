@@ -171,7 +171,7 @@ document.addEventListener(
     if (!document.getElementById("vor-artworks-opts")) {
       return;
     }
-    if (hasContent("vor-overlay")) {
+    if (hasContent("vor-overlay") || hasContent("vor-modal")) {
       return;
     }
     event.preventDefault();
