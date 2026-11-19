@@ -1,19 +1,19 @@
 <div id="attr-list"
-     class="attr-list"
+     class="vor-attr-list"
      hx-get="{% url 'vor_archives:attributes:list' kind %}"
      hx-trigger="vor:attr-list-refresh from:body"
      hx-include="#attr-search"
      hx-swap="outerHTML">
-  <div class="attr-list-header">{{ tab.count_label }}: {{ total_count }}</div>
+  <div class="vor-attr-list-header">{{ tab.count_label }}: {{ total_count }}</div>
   {% if groups %}
     {% for group in groups %}
       {% if group.items %}
-        <div class="attr-group" x-data="{ expanded: true }">
-          <button type="button" class="attr-group-toggle" @click="expanded = !expanded">
+        <div class="vor-attr-group" x-data="{ expanded: true }">
+          <button type="button" class="vor-attr-group-toggle" @click="expanded = !expanded">
             <span>{{ group.label }} ({{ group.items|length }})</span>
             <i class="bi" :class="expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
           </button>
-          <div class="attr-group-body" x-show="expanded">
+          <div class="vor-attr-group-body" x-show="expanded">
             {% for item in group.items %}
               {% include "vor_archives/partials/attributes/attr_list_item.html" with item=item %}
             {% endfor %}
@@ -27,6 +27,6 @@
     {% endfor %}
   {% endif %}
   {% if not has_items %}
-    <div class="attr-list-empty">{% if total_count %}Ничего не найдено{% else %}{{ tab.none_yet }}{% endif %}</div>
+    <div class="vor-attr-list-empty">{% if total_count %}Ничего не найдено{% else %}{{ tab.none_yet }}{% endif %}</div>
   {% endif %}
 </div>

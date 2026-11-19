@@ -22,12 +22,12 @@
   </div>
 {% endblock %}
 {% block vor_content %}
-  <div class="attr-page">
-    <div class="attr-toolbar">
-      <div class="attr-search-wrap">
-        <i class="bi bi-search attr-search-icon"></i>
+  <div class="vor-attr-page">
+    <div class="vor-attr-toolbar">
+      <div class="vor-attr-search-wrap">
+        <i class="bi bi-search vor-attr-search-icon"></i>
         <input id="attr-search"
-               class="form-control attr-search"
+               class="form-control vor-attr-search"
                type="search"
                name="q"
                placeholder="{{ search_placeholder }}"
@@ -73,10 +73,10 @@
         </button>
       {% endif %}
     </div>
-    <div class="attr-split">
-      <div class="attr-list-pane">
+    <div class="vor-attr-split">
+      <div class="vor-panel vor-attr-list-pane">
         <div id="attr-list"
-             class="attr-list"
+             class="vor-attr-list"
              hx-get="{% url 'vor_archives:attributes:list' attr_kind %}"
              hx-trigger="load, vor:attr-list-refresh from:body"
              hx-include="#attr-search"
@@ -84,8 +84,8 @@
           <div class="text-center text-muted py-4">Загрузка…</div>
         </div>
       </div>
-      <div class="attr-detail-pane">
-        <div id="attr-detail" class="attr-detail">{% include "vor_archives/partials/attributes/attr_empty.html" %}</div>
+      <div class="vor-panel vor-attr-detail-pane">
+        <div id="attr-detail" class="vor-attr-detail">{% include "vor_archives/partials/attributes/attr_empty.html" %}</div>
       </div>
     </div>
   </div>

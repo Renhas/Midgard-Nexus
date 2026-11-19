@@ -13,7 +13,7 @@ document.body.addEventListener("vor:close-attr-modal", () => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (!document.querySelector(".attr-page")) {
+  if (!document.querySelector(".vor-attr-page")) {
     return;
   }
   const store = getAlpine()?.store("vorAttributes");
@@ -43,7 +43,7 @@ document.addEventListener(
     if (!store?.deleteMode) {
       return;
     }
-    const item = event.target.closest(".attr-item");
+    const item = event.target.closest(".vor-attr-item");
     if (!item) {
       return;
     }
