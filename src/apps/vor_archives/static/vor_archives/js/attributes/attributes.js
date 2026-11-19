@@ -1,6 +1,6 @@
 import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
-import { hasContent } from "@vor/shared/dom";
+import { buildDeletePreviewUrl, hasSelectedId, toggleSelectedId } from "@vor/attributes/pure/selection";
 
 document.addEventListener("alpine:init", () => {
   getAlpine().store("vorAttributes", {
@@ -17,101 +17,24 @@ document.addEventListener("alpine:init", () => {
       this.selectedIds = [];
     },
     toggleSelected(id) {
-      id = String(id);
-      const index = this.selectedIds.indexOf(id);
-      if (index > -1) {
-        this.selectedIds.splice(index, 1);
-      } else {
-        this.selectedIds.push(id);
-      }
+      this.selectedIds = toggleSelectedId(this.selectedIds, id);
     },
     isSelected(id) {
-      return this.selectedIds.includes(String(id));
+      return hasSelectedId(this.selectedIds, id);
     },
     select(id) {
       this.selectedKey = id ? String(id) : "";
     },
     openPreview() {
-      if (!this.selectedIds.length) {
-        return;
-      }
       const base = document.getElementById("vor-modal")?.dataset.vorAttrDeletePreview;
-      if (!base) {
+      const url = buildDeletePreviewUrl(base, this.selectedIds);
+      if (!url) {
         return;
       }
-      const params = this.selectedIds.map((id) => `ids=${encodeURIComponent(id)}`).join("&");
-      htmx.ajax("GET", `${base}?${params}`, {
+      htmx.ajax("GET", url, {
         target: "#vor-modal",
         swap: "innerHTML",
       });
     },
-    closeModal() {
-      const el = document.getElementById("vor-modal");
-      if (el) {
-        el.innerHTML = "";
-      }
-    },
   });
 });
-
-document.body.addEventListener("vor:close-attr-modal", () => {
-  const store = getAlpine()?.store("vorAttributes");
-  if (!store) {
-    return;
-  }
-  store.closeModal();
-  store.exitDeleteMode();
-  store.select("");
-});
-
-document.addEventListener("keydown", (event) => {
-  const store = getAlpine()?.store("vorAttributes");
-  if (!store) {
-    return;
-  }
-  const attrPage = document.querySelector(".attr-page");
-  if (!attrPage) {
-    return;
-  }
-  if (event.key === "Escape") {
-    if (hasContent("vor-modal")) {
-      store.closeModal();
-      return;
-    }
-    if (store.deleteMode) {
-      store.exitDeleteMode();
-    }
-    return;
-  }
-  if (event.key === "Enter" && store.deleteMode && store.selectedIds.length) {
-    if (["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)) {
-      return;
-    }
-    if (hasContent("vor-modal")) {
-      return;
-    }
-    event.preventDefault();
-    store.openPreview();
-  }
-});
-
-document.addEventListener(
-  "click",
-  (event) => {
-    const store = getAlpine()?.store("vorAttributes");
-    if (!store?.deleteMode) {
-      return;
-    }
-    const item = event.target.closest(".attr-item");
-    if (!item) {
-      return;
-    }
-    event.preventDefault();
-    event.stopPropagation();
-    const id = item.dataset.attrId;
-    if (id) {
-      store.toggleSelected(id);
-    }
-  },
-  true,
-);
