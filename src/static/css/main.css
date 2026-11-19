@@ -60,8 +60,7 @@
   --shadow-error: 0 0.4rem 0.9rem rgb(0 0 0 / 28%);
 
   /* === Focus rings === */
-  --focus-ring: 0 0 0 2px rgb(from var(--accent-hover) r g b / 25%);
-  --focus-ring-strong: 0 0 0 0.2rem rgb(from var(--accent-hover) r g b / 25%);
+  --focus-ring: 0 0 0 0.125rem rgb(from var(--accent-hover) r g b / 25%);
   --focus-ring-error: 0 0 0 2px rgb(from var(--error) r g b / 25%);
 
   /* === Backdrop === */

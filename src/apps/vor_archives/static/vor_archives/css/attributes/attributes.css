@@ -27,18 +27,7 @@
 }
 
 .vor-attr-search {
-  width: 100%;
   padding-left: 2.35rem;
-  background-color: var(--bg-input);
-  border-color: var(--border);
-  color: var(--text-primary);
-}
-
-.vor-attr-search:focus {
-  background-color: var(--bg-input);
-  border-color: var(--accent-hover);
-  color: var(--text-primary);
-  box-shadow: var(--focus-ring-strong);
 }
 
 .vor-attr-toolbar .sidebar-btn-icon {

@@ -151,7 +151,7 @@ html.vor-scroll-lock .center {
   background-color: var(--bg-input);
   border-color: var(--accent-hover);
   color: var(--text-primary);
-  box-shadow: var(--focus-ring-strong);
+  box-shadow: var(--focus-ring);
 }
 
 .vor-field-errors,
@@ -182,4 +182,23 @@ html.vor-scroll-lock .center {
 
 .status-dropped {
   color: var(--status-dropped);
+}
+
+/* ===== Search Field ===== */
+.vor-search-input {
+  --bs-body-bg: var(--bg-input);
+  --bs-body-color: var(--text-primary);
+
+  width: 100%;
+  border: 1px solid var(--border);
+}
+
+.vor-search-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.55;
+}
+
+.vor-search-input:focus {
+  border-color: var(--accent-hover);
+  box-shadow: var(--focus-ring);
 }
