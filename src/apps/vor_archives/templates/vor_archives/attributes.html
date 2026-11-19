@@ -23,56 +23,7 @@
 {% endblock %}
 {% block vor_content %}
   <div class="vor-attr-page">
-    <div class="vor-attr-toolbar">
-      <div class="vor-attr-search-wrap">
-        <i class="bi bi-search vor-attr-search-icon"></i>
-        <input id="attr-search"
-               class="form-control vor-attr-search"
-               type="search"
-               name="q"
-               placeholder="{{ search_placeholder }}"
-               autocomplete="off"
-               hx-get="{% url 'vor_archives:attributes:list' attr_kind %}"
-               hx-trigger="input changed delay:200ms"
-               hx-target="#attr-list"
-               hx-swap="outerHTML">
-      </div>
-      {% if is_staff %}
-        <button type="button"
-                class="sidebar-btn sidebar-btn-add sidebar-btn-icon"
-                title="Создать"
-                x-show="!$store.vorAttributes.deleteMode"
-                hx-get="{% url 'vor_archives:attributes:new' attr_kind %}"
-                hx-target="#attr-detail"
-                hx-swap="innerHTML">
-          <i class="bi bi-plus-circle"></i>
-        </button>
-        <button type="button"
-                class="sidebar-btn sidebar-btn-add sidebar-btn-icon"
-                title="Отменить"
-                x-show="$store.vorAttributes.deleteMode"
-                x-cloak
-                @click="$store.vorAttributes.exitDeleteMode()">
-          <i class="bi bi-x-circle"></i>
-        </button>
-        <button type="button"
-                class="sidebar-btn sidebar-btn-delete sidebar-btn-icon"
-                title="Удалить"
-                x-show="!$store.vorAttributes.deleteMode"
-                @click="$store.vorAttributes.enterDeleteMode()">
-          <i class="bi bi-trash"></i>
-        </button>
-        <button type="button"
-                class="sidebar-btn sidebar-btn-delete sidebar-btn-icon"
-                title="Подтвердить"
-                x-show="$store.vorAttributes.deleteMode"
-                x-cloak
-                :disabled="!$store.vorAttributes.selectedIds.length"
-                @click="$store.vorAttributes.openPreview()">
-          <i class="bi bi-check-lg"></i>
-        </button>
-      {% endif %}
-    </div>
+    {% include "vor_archives/partials/attributes/attr_toolbar.html" %}
     <div class="vor-attr-split">
       <div class="vor-panel vor-attr-list-pane">
         <div id="attr-list"
@@ -80,7 +31,7 @@
              hx-get="{% url 'vor_archives:attributes:list' attr_kind %}"
              hx-trigger="load, vor:attr-list-refresh from:body"
              hx-include="#attr-search"
-             hx-swap="outerHTML">
+             hx-swap="innerHTML">
           <div class="text-center text-muted py-4">Загрузка…</div>
         </div>
       </div>
