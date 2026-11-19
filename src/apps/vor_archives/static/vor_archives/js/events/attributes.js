@@ -20,10 +20,6 @@ document.addEventListener("keydown", (event) => {
   if (!store?.deleteMode) {
     return;
   }
-  if (event.key === "Escape" && !hasContent("vor-modal")) {
-    store.exitDeleteMode();
-    return;
-  }
   if (event.key === "Enter" && store.selectedIds.length) {
     if (["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)) {
       return;
