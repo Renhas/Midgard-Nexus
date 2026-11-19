@@ -4,6 +4,8 @@
 
 /* === CSS Variables === */
 :root {
+  color-scheme: dark;
+
   /* === Colors === */
   --bg-primary: #0b1120;
   --bg-card: #1a233a;
@@ -46,6 +48,10 @@
   --rating-star-fill: #fbbf24;
   --rating-star-empty: #64748b;
 
+  /* === Search styles === */
+  --search-clear-opacity: 0.6;
+  --search-clear-opacity-hover: 0.9;
+
   /* === Radii === */
   --radius-xs: 0.25rem;
   --radius-sm: 0.375rem;
@@ -60,8 +66,7 @@
   --shadow-error: 0 0.4rem 0.9rem rgb(0 0 0 / 28%);
 
   /* === Focus rings === */
-  --focus-ring: 0 0 0 2px rgb(from var(--accent-hover) r g b / 25%);
-  --focus-ring-strong: 0 0 0 0.2rem rgb(from var(--accent-hover) r g b / 25%);
+  --focus-ring: 0 0 0 0.125rem rgb(from var(--accent-hover) r g b / 25%);
   --focus-ring-error: 0 0 0 2px rgb(from var(--error) r g b / 25%);
 
   /* === Backdrop === */
