@@ -223,3 +223,14 @@ html.vor-scroll-lock .center {
   border-color: var(--accent-hover);
   box-shadow: var(--focus-ring);
 }
+
+/* Настройка кнопки очистки для type="search" */
+.vor-search-input::-webkit-search-cancel-button {
+  cursor: pointer;
+  opacity: var(--search-clear-opacity);
+  transition: opacity 0.15s ease;
+}
+
+.vor-search-input::-webkit-search-cancel-button:hover {
+  opacity: var(--search-clear-opacity-hover);
+}

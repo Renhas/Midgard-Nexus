@@ -4,6 +4,8 @@
 
 /* === CSS Variables === */
 :root {
+  color-scheme: dark;
+
   /* === Colors === */
   --bg-primary: #0b1120;
   --bg-card: #1a233a;
@@ -45,6 +47,10 @@
   /* === Rating stars === */
   --rating-star-fill: #fbbf24;
   --rating-star-empty: #64748b;
+
+  /* === Search styles === */
+  --search-clear-opacity: 0.6;
+  --search-clear-opacity-hover: 0.9;
 
   /* === Radii === */
   --radius-xs: 0.25rem;
