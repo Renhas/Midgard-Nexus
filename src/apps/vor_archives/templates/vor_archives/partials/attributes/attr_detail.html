@@ -1,15 +1,15 @@
-<div class="attr-card" x-init="$store.vorAttributes.select('{{ item.key }}')">
-  <div class="attr-card-header">
-    <h3 class="attr-card-title">{{ item.name }}</h3>
+<div class="vor-attr-card" x-init="$store.vorAttributes.select('{{ item.key }}')">
+  <div class="vor-attr-card-header">
+    <h3 class="vor-attr-card-title">{{ item.name }}</h3>
     {% if item.type_label %}
-      <span class="attr-card-type">{{ item.type_label }}</span>
+      <span class="vor-attr-card-type">{{ item.type_label }}</span>
     {% endif %}
   </div>
   {% if item.has_text %}
-    <div class="attr-card-desc">{% if item.description %}{{ item.description|linebreaksbr }}{% else %}<span class="text-muted">{{ item.empty_text }}</span>{% endif %}</div>
+    <div class="vor-attr-card-desc">{% if item.description %}{{ item.description|linebreaksbr }}{% else %}<span class="text-muted">{{ item.empty_text }}</span>{% endif %}</div>
   {% endif %}
   {% if is_staff %}
-    <div class="attr-detail-actions">
+    <div class="vor-attr-detail-actions">
       <button type="button"
               class="sidebar-btn"
               hx-get="{{ item.edit_url }}"
