@@ -93,39 +93,14 @@
   margin-top: 12vh;
 }
 
-.vor-search-field {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.vor-search-field i {
-  position: absolute;
+.vor-search--modal .vor-search-icon {
   left: 1rem;
-  color: var(--text-secondary);
-  pointer-events: none;
 }
 
-.vor-search-field input {
-  width: 100%;
+.vor-search--modal .vor-search-input {
   padding: 0.85rem 1rem 0.85rem 2.75rem;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background-color: var(--bg-card);
-  color: var(--text-primary);
   text-align: center;
-  font-size: 1rem;
-}
-
-.vor-search-field input::placeholder {
-  color: var(--text-secondary);
-  opacity: 0.55;
-}
-
-.vor-search-field input:focus {
-  outline: none;
-  border-color: var(--accent-hover);
-  box-shadow: var(--focus-ring);
 }
 
 .vor-search-segment {

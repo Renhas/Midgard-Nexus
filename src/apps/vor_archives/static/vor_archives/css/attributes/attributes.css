@@ -16,20 +16,6 @@
   min-width: 0;
 }
 
-.vor-attr-search-icon {
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-secondary);
-  pointer-events: none;
-  font-size: 1rem;
-}
-
-.vor-attr-search {
-  padding-left: 2.35rem;
-}
-
 .vor-attr-toolbar .sidebar-btn-icon {
   --vor-attr-btn-size: calc(1.5em + 0.75rem + 2px);
 

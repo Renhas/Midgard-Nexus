@@ -185,12 +185,32 @@ html.vor-scroll-lock .center {
 }
 
 /* ===== Search Field ===== */
+.vor-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.vor-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--text-secondary);
+  pointer-events: none;
+  font-size: 1rem;
+  line-height: 1;
+}
+
 .vor-search-input {
   --bs-body-bg: var(--bg-input);
   --bs-body-color: var(--text-primary);
 
   width: 100%;
+  padding-left: 2.35rem;
   border: 1px solid var(--border);
+
+  /* Страховка, если нет класса form-control */
+  background-color: var(--bg-input);
+  color: var(--text-primary);
 }
 
 .vor-search-input::placeholder {
@@ -199,6 +219,7 @@ html.vor-scroll-lock .center {
 }
 
 .vor-search-input:focus {
+  outline: none;
   border-color: var(--accent-hover);
   box-shadow: var(--focus-ring);
 }
