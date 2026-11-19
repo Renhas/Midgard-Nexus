@@ -4,6 +4,7 @@ from config.importmap import build_importmap
 
 _OWN_IMPORTMAP_PATHS = {
     "@vor/attributes/attributes": "vor_archives/js/attributes/attributes.js",
+    "@vor/attributes/pure/selection": "vor_archives/js/attributes/pure/selection.js",
 }
 
 _SUBMODULE_IMPORTMAP_MODULES: list[str] = []
