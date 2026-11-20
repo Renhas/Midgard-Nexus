@@ -2,11 +2,13 @@
 
 from decimal import Decimal
 
+from django.contrib.contenttypes.models import ContentType
 import pytest
 
 from apps.users.tests.factories import UserFactory
 from apps.vor_archives.constants import AgeRatingChoices, UserWorkStatusChoices
 from apps.vor_archives.dashboard.services.stats import progress_spent, stats_payload
+from apps.vor_archives.models import Book, UserWork
 from apps.vor_archives.tests.factories import (
     BookFactory,
     FilmFactory,
@@ -167,3 +169,24 @@ def test_stats_payload_exclude_other_user(user, book):
 
     assert rating_matrix["book"]["8"] == 1
     assert sum(rating_matrix["book"].values()) == 1
+
+
+@pytest.mark.django_db
+def test_progress_spent_edge_cases(user, book, tv_show):
+    default_progress_uw = UserWorkFactory(user=user, work=book)
+    assert progress_spent(default_progress_uw) == ("book", 0.0, "стр.")
+
+    tv_show.duration_minutes = 0
+    tv_show.save()
+    zero_duration_tv = UserWorkFactory(user=user, work=tv_show, progress=Decimal("5"))
+    assert progress_spent(zero_duration_tv) == ("film", 0.0, "ч.")
+
+
+@pytest.mark.django_db
+def test_stats_payload_empty_library(user):
+    empty_opts = stats_payload(user)["stats_opts"]
+    assert empty_opts["spent"] == {"book": 0.0, "film": 0.0, "game": 0.0}
+    for type_key in ("book", "film", "game"):
+        assert sum(empty_opts["status_matrix"][type_key].values()) == 0
+        assert sum(empty_opts["age_matrix"][type_key].values()) == 0
+        assert sum(empty_opts["rating_matrix"][type_key].values()) == 0

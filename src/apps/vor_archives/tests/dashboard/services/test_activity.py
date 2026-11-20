@@ -9,6 +9,7 @@ from django.utils import timezone
 from apps.users.tests.factories import UserFactory
 from apps.vor_archives.constants import FEED_ACTION_ICONS, FEED_ACTION_LABELS_RU
 from apps.vor_archives.dashboard.services.activity import (
+    activity_years,
     feed_page,
     heat_level,
     heatmap_payload,
@@ -187,6 +188,77 @@ def test_heatmap_range_for_year():
     assert end == date(2025, 12, 31)
     assert grid_start == date(2024, 12, 30)
     assert grid_end == date(2026, 1, 4)
+
+
+def test_heatmap_range_rolling_365_days():
+    today = date(2025, 5, 15)
+    start, end, grid_start, grid_end = heatmap_range(None, today=today)
+
+    assert end == today
+    assert start == date(2024, 5, 15)
+    assert grid_start.weekday() == 0
+    assert grid_start <= start
+    assert grid_end.weekday() == 6
+    assert grid_end >= end
+
+
+@pytest.mark.django_db
+def test_activity_years_empty_defaults_to_current_year(user):
+    assert activity_years(user) == [timezone.localdate().year]
+
+
+@pytest.mark.django_db
+def test_heatmap_month_labels_and_cell_titles(user, book):
+    user_work = UserWorkFactory(user=user, work=book)
+    item = FeedItem.objects.get(user_work=user_work)
+    _set_timestamp(item, timezone.make_aware(datetime(2025, 1, 10, 12, 0)))
+
+    payload = heatmap_payload(user, year=2025)
+
+    assert payload["month_labels"][0] == "Янв"
+    non_empty_months = [m for m in payload["month_labels"] if m]
+    assert non_empty_months == [
+        "Янв",
+        "Фев",
+        "Мар",
+        "Апр",
+        "Май",
+        "Июн",
+        "Июл",
+        "Авг",
+        "Сен",
+        "Окт",
+        "Ноя",
+        "Дек",
+    ]
+
+    first_week = payload["weeks"][0]
+    out_of_range_cell = first_week[0]  # 2024-12-30 (Пн)
+    assert out_of_range_cell["date"] == "2024-12-30"
+    assert out_of_range_cell["in_range"] is False
+    assert out_of_range_cell["title"] == ""
+
+    empty_jan_cell = first_week[2]  # 2025-01-01 (Ср)
+    assert empty_jan_cell["date"] == "2025-01-01"
+    assert empty_jan_cell["in_range"] is True
+    assert empty_jan_cell["title"] == "Нет активности — 01.01.2025"
+
+    active_cell = next(
+        day for week in payload["weeks"] for day in week if day["date"] == "2025-01-10"
+    )
+    assert active_cell["title"] == "1 — 10.01.2025"
+
+
+@pytest.mark.django_db
+def test_feed_page_exact_limit_has_no_more(user, book, movie, game):
+    UserWorkFactory(user=user, work=book)
+    UserWorkFactory(user=user, work=movie)
+    UserWorkFactory(user=user, work=game)
+
+    page, has_more = feed_page(user, offset=0, limit=3)
+
+    assert len(page) == 3
+    assert has_more is False
 
 
 @pytest.mark.parametrize(
