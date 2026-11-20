@@ -2,8 +2,11 @@
 
 import pytest
 
+from django.contrib.contenttypes.models import ContentType
+
 from apps.users.tests.factories import UserFactory
 from apps.vor_archives.dashboard.services.attrs import attrs_payload
+from apps.vor_archives.models import Book, UserWork
 from apps.vor_archives.tests.factories import (
     BookFactory,
     BookGenreFactory,
@@ -157,3 +160,15 @@ def test_attrs_payload_excludes_orphans_and_foreign(user, game):
     assert "orphan-platform" not in platform_names
     assert not any(name.startswith("orphan-genre") for name in genre_names)
     assert "foreign-tag" not in tag_names
+
+
+@pytest.mark.django_db
+def test_attrs_payload_empty_library(user):
+    empty_opts = attrs_payload(user)["attrs_opts"]
+    assert empty_opts["total"] == 0
+    assert empty_opts["attrs"] == {
+        "tags": [],
+        "genres": [],
+        "persons": [],
+        "platforms": [],
+    }
