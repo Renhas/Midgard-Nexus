@@ -8,7 +8,7 @@
       <div class="dash-heatmap-year-select">
         <select class="form-select form-select-sm dash-year-select"
                 name="year"
-                hx-get="{% url 'vor_archives:dashboard_heatmap' %}"
+                hx-get="{% url 'vor_archives:dashboard:heatmap' %}"
                 hx-target="#dash-heatmap"
                 hx-swap="innerHTML">
           <option value="" {% if not heatmap.year %}selected{% endif %}>Последние 12 месяцев</option>

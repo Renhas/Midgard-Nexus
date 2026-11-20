@@ -1,4 +1,4 @@
-"""Tests for apps.vor_archives dashboard views."""
+"""Tests for apps.vor_archives.dashboard views."""
 
 import json
 import re
@@ -6,12 +6,11 @@ import re
 import pytest
 from django.urls import reverse
 
-from apps.vor_archives.dashboard_catalog import DASHBOARD_TABS
+from apps.vor_archives.dashboard.catalog import DASHBOARD_TABS
 from apps.vor_archives.tests.factories import (
     BookFactory,
     UserWorkFactory,
 )
-
 
 pytestmark = pytest.mark.django_db
 
@@ -23,16 +22,16 @@ TAB_PARAMS = [(tab["kind"], tab["label"]) for tab in DASHBOARD_TABS]
 
 
 def test_dashboard_requires_login(client):
-    response = client.get(reverse("vor_archives:dashboard"))
+    response = client.get(reverse("vor_archives:dashboard:index"))
     assert response.status_code == 302
 
 
 def test_dashboard_redirects_to_stats(client, user):
     client.force_login(user)
-    response = client.get(reverse("vor_archives:dashboard"))
+    response = client.get(reverse("vor_archives:dashboard:index"))
     assert response.status_code == 302
     assert response["Location"] == reverse(
-        "vor_archives:dashboard_tab", kwargs={"tab": "stats"}
+        "vor_archives:dashboard:tab", kwargs={"tab": "stats"}
     )
 
 
@@ -43,7 +42,7 @@ def test_dashboard_redirects_to_stats(client, user):
 def test_dashboard_tabs_ok(client, user, book, tab, label):
     UserWorkFactory(user=user, work=book)
     client.force_login(user)
-    response = client.get(reverse("vor_archives:dashboard_tab", kwargs={"tab": tab}))
+    response = client.get(reverse("vor_archives:dashboard:tab", kwargs={"tab": tab}))
     assert response.status_code == 200
     ctx = response.context
     assert ctx["dash_kind"] == tab
@@ -59,7 +58,7 @@ def test_dashboard_tabs_ok(client, user, book, tab, label):
 def test_dashboard_unknown_tab_404(client, user):
     client.force_login(user)
     response = client.get(
-        reverse("vor_archives:dashboard_tab", kwargs={"tab": "unknown"})
+        reverse("vor_archives:dashboard:tab", kwargs={"tab": "unknown"})
     )
     assert response.status_code == 404
 
@@ -68,7 +67,7 @@ def test_dashboard_legacy_charts_tab_404(client, user):
     """Регрессия: вкладка charts переименована в attrs."""
     client.force_login(user)
     response = client.get(
-        reverse("vor_archives:dashboard_tab", kwargs={"tab": "charts"})
+        reverse("vor_archives:dashboard:tab", kwargs={"tab": "charts"})
     )
     assert response.status_code == 404
 
@@ -81,7 +80,7 @@ def test_stats_context_has_stats_opts(client, user, book):
     UserWorkFactory(user=user, work=book)
     client.force_login(user)
     response = client.get(
-        reverse("vor_archives:dashboard_tab", kwargs={"tab": "stats"})
+        reverse("vor_archives:dashboard:tab", kwargs={"tab": "stats"})
     )
     assert response.status_code == 200
     assert "stats_opts" in response.context
@@ -92,7 +91,7 @@ def test_stats_json_payload_keys_match_js_contract(client, user, book):
     UserWorkFactory(user=user, work=book)
     client.force_login(user)
     response = client.get(
-        reverse("vor_archives:dashboard_tab", kwargs={"tab": "stats"})
+        reverse("vor_archives:dashboard:tab", kwargs={"tab": "stats"})
     )
     payload = _extract_json_script(response.content.decode(), "dash-stats-opts")
     # зеркало vorDashStats.init()
@@ -113,7 +112,7 @@ def test_stats_template_has_all_canvases(client, user, book):
     UserWorkFactory(user=user, work=book)
     client.force_login(user)
     response = client.get(
-        reverse("vor_archives:dashboard_tab", kwargs={"tab": "stats"})
+        reverse("vor_archives:dashboard:tab", kwargs={"tab": "stats"})
     )
     content = response.content.decode()
     assert 'x-data="vorDashStats()"' in content
@@ -130,7 +129,7 @@ def test_attrs_context_and_view_buttons(client, user, book):
     UserWorkFactory(user=user, work=book)
     client.force_login(user)
     response = client.get(
-        reverse("vor_archives:dashboard_tab", kwargs={"tab": "attrs"})
+        reverse("vor_archives:dashboard:tab", kwargs={"tab": "attrs"})
     )
     assert response.status_code == 200
     ctx = response.context
@@ -165,7 +164,7 @@ def test_activity_tab_contains_heatmap_and_feed(client, user, book):
     UserWorkFactory(user=user, work=book)  # сигнал создаст FeedItem(ADDED)
     client.force_login(user)
     response = client.get(
-        reverse("vor_archives:dashboard_tab", kwargs={"tab": "activity"})
+        reverse("vor_archives:dashboard:tab", kwargs={"tab": "activity"})
     )
     assert response.status_code == 200
     ctx = response.context
@@ -177,14 +176,14 @@ def test_activity_tab_contains_heatmap_and_feed(client, user, book):
     content = response.content.decode()
     assert 'id="dash-heatmap"' in content
     assert 'id="dash-feed-list"' in content
-    assert reverse("vor_archives:dashboard_heatmap") in content
+    assert reverse("vor_archives:dashboard:heatmap") in content
 
 
 def test_activity_tab_year_filter(client, user, book):
     UserWorkFactory(user=user, work=book)
     client.force_login(user)
     response = client.get(
-        reverse("vor_archives:dashboard_tab", kwargs={"tab": "activity"}),
+        reverse("vor_archives:dashboard:tab", kwargs={"tab": "activity"}),
         {"year": "2024"},
     )
     assert response.status_code == 200
@@ -194,7 +193,7 @@ def test_activity_tab_year_filter(client, user, book):
 def test_activity_tab_invalid_year_falls_back_to_none(client, user):
     client.force_login(user)
     response = client.get(
-        reverse("vor_archives:dashboard_tab", kwargs={"tab": "activity"}),
+        reverse("vor_archives:dashboard:tab", kwargs={"tab": "activity"}),
         {"year": "not-a-year"},
     )
     assert response.status_code == 200
@@ -204,7 +203,7 @@ def test_activity_tab_invalid_year_falls_back_to_none(client, user):
 def test_dashboard_feed_partial_returns_items(client, user, book):
     UserWorkFactory(user=user, work=book)  # → FeedItem(ADDED)
     client.force_login(user)
-    response = client.get(reverse("vor_archives:dashboard_feed"))
+    response = client.get(reverse("vor_archives:dashboard:feed"))
     assert response.status_code == 200
     content = response.content.decode()
     assert "dash-feed-item" in content
@@ -223,13 +222,13 @@ def test_dashboard_feed_pagination(client, user):
         UserWorkFactory(user=user, work=BookFactory())
     client.force_login(user)
 
-    first = client.get(reverse("vor_archives:dashboard_feed"))
+    first = client.get(reverse("vor_archives:dashboard:feed"))
     assert first.status_code == 200
     assert first.context["feed_has_more"] is True
     assert first.context["feed_next_offset"] == 30
 
     second = client.get(
-        reverse("vor_archives:dashboard_feed"),
+        reverse("vor_archives:dashboard:feed"),
         {"offset": first.context["feed_next_offset"]},
     )
     assert second.status_code == 200
@@ -242,7 +241,7 @@ def test_dashboard_feed_pagination(client, user):
 def test_dashboard_feed_invalid_offset_falls_back_to_zero(client, user):
     client.force_login(user)
     for bad in ("abc", "-5", ""):
-        response = client.get(reverse("vor_archives:dashboard_feed"), {"offset": bad})
+        response = client.get(reverse("vor_archives:dashboard:feed"), {"offset": bad})
         assert response.status_code == 200, bad
 
 
@@ -250,7 +249,7 @@ def test_dashboard_heatmap_partial_ok(client, user, book):
     """Wiring: view парсит ?year и прокидывает в шаблон partial."""
     UserWorkFactory(user=user, work=book)
     client.force_login(user)
-    response = client.get(reverse("vor_archives:dashboard_heatmap"), {"year": "2024"})
+    response = client.get(reverse("vor_archives:dashboard:heatmap"), {"year": "2024"})
     assert response.status_code == 200
     assert response.context["heatmap"]["year"] == 2024
     assert "dash-heatmap" in response.content.decode()
@@ -261,7 +260,7 @@ def test_dashboard_heatmap_partial_ok(client, user, book):
 
 @pytest.mark.parametrize(
     "name",
-    ["vor_archives:dashboard_feed", "vor_archives:dashboard_heatmap"],
+    ["vor_archives:dashboard:feed", "vor_archives:dashboard:heatmap"],
 )
 def test_partials_require_login(client, name):
     response = client.get(reverse(name))
@@ -270,7 +269,7 @@ def test_partials_require_login(client, name):
 
 def test_feed_and_heatmap_require_get(client, user):
     client.force_login(user)
-    for name in ("vor_archives:dashboard_feed", "vor_archives:dashboard_heatmap"):
+    for name in ("vor_archives:dashboard:feed", "vor_archives:dashboard:heatmap"):
         response = client.post(reverse(name))
         assert response.status_code == 405, name
 
