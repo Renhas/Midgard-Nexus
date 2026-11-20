@@ -26,7 +26,7 @@
 {% endfor %}
 {% if feed_has_more %}
   <div id="dash-feed-more"
-       hx-get="{% url 'vor_archives:dashboard_feed' %}?offset={{ feed_next_offset }}"
+       hx-get="{% url 'vor_archives:dashboard:feed' %}?offset={{ feed_next_offset }}"
        hx-trigger="intersect once, click"
        hx-target="this"
        hx-swap="outerHTML">
