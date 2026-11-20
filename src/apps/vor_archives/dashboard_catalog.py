@@ -1,16 +1,13 @@
-DASHBOARD_TABS = [
-    {"kind": "stats", "label": "Статистика", "icon": "bi bi-pie-chart"},
-    {"kind": "attrs", "label": "Аттрибуты", "icon": "bi bi-cloud"},
-    {"kind": "activity", "label": "Активность", "icon": "bi bi-calendar-date"},
+from apps.vor_archives.dashboard.catalog import (
+    DASHBOARD_TABS,
+    DASH_TAB_KINDS,
+    DEFAULT_DASH_TAB,
+    get_dash_tab,
+)
+
+__all__ = [
+    "DASHBOARD_TABS",
+    "DASH_TAB_KINDS",
+    "DEFAULT_DASH_TAB",
+    "get_dash_tab",
 ]
-
-DEFAULT_DASH_TAB = "stats"
-
-DASH_TAB_KINDS = {tab["kind"] for tab in DASHBOARD_TABS}
-
-
-def get_dash_tab(kind):
-    for tab in DASHBOARD_TABS:
-        if tab["kind"] == kind:
-            return tab
-    return None

@@ -7,59 +7,30 @@ from django.db.models.functions import TruncDate
 from django.urls import reverse
 from django.utils import timezone
 
-from .constants import (
-    AgeRatingChoices,
+from ..constants import (
     FEED_ACTION_ICONS,
     FEED_ACTION_LABELS_RU,
     FilmTypeChoices,
     STATUS_LABELS_RU,
     UserWorkStatusChoices,
 )
-from .registry import (
-    WORK_TYPE_ICONS,
-    WORK_TYPE_LABELS_PLURAL,
-    WORK_TYPE_UNITS,
-    WORK_TYPES,
-)
-from .prefetch import (
+from ..models import FeedItem, UserWork
+from ..prefetch import (
     prefetch_user_works,
     prefetch_work_relations,
 )
-from .models import FeedItem, UserWork
-
-AGE_CHOICES_EXT = [("", "Не указан")] + list(AgeRatingChoices.choices)
-RATING_CHOICES_EXT = [("", "Без оценки")] + [
-    (str(value), str(value)) for value in range(1, 11)
-]
-
-TYPE_META = {
-    key: {
-        "label": WORK_TYPE_LABELS_PLURAL[key],
-        "icon": WORK_TYPE_ICONS[key],
-        "unit": WORK_TYPE_UNITS[key],
-    }
-    for key in WORK_TYPES
-}
-
-MONTHS_RU = {
-    1: "Янв",
-    2: "Фев",
-    3: "Мар",
-    4: "Апр",
-    5: "Май",
-    6: "Июн",
-    7: "Июл",
-    8: "Авг",
-    9: "Сен",
-    10: "Окт",
-    11: "Ноя",
-    12: "Дек",
-}
-
-WEEKDAY_LABELS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
-
-FEED_PAGE_SIZE = 30
-HIST_TOP_N = 12
+from ..registry import WORK_TYPES
+from .catalog import (
+    AGE_CHOICES_EXT,
+    ATTR_KINDS,
+    ATTR_VIEW_TYPES,
+    FEED_PAGE_SIZE,
+    HIST_TOP_N,
+    MONTHS_RU,
+    RATING_CHOICES_EXT,
+    TYPE_META,
+    WEEKDAY_LABELS,
+)
 
 
 def format_number(value):
