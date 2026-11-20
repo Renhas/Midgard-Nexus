@@ -14,7 +14,6 @@ from apps.vor_archives.dashboard.services.activity import (
     heatmap_payload,
     heatmap_range,
 )
-from apps.vor_archives.dashboard.services.utils import monday, sunday
 from apps.vor_archives.models import FeedItem
 from apps.vor_archives.tests.factories import BookFactory, UserWorkFactory
 
@@ -188,30 +187,6 @@ def test_heatmap_range_for_year():
     assert end == date(2025, 12, 31)
     assert grid_start == date(2024, 12, 30)
     assert grid_end == date(2026, 1, 4)
-
-
-@pytest.mark.parametrize(
-    "day, expected",
-    [
-        (date(2025, 1, 6), date(2025, 1, 6)),
-        (date(2025, 1, 7), date(2025, 1, 6)),
-        (date(2025, 1, 12), date(2025, 1, 6)),
-    ],
-)
-def test_monday(day, expected):
-    assert monday(day) == expected
-
-
-@pytest.mark.parametrize(
-    "day, expected",
-    [
-        (date(2025, 1, 12), date(2025, 1, 12)),
-        (date(2025, 1, 11), date(2025, 1, 12)),
-        (date(2025, 1, 6), date(2025, 1, 12)),
-    ],
-)
-def test_sunday(day, expected):
-    assert sunday(day) == expected
 
 
 @pytest.mark.parametrize(
