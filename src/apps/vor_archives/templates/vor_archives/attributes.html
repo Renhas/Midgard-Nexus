@@ -24,7 +24,7 @@
 {% block vor_content %}
   <div class="vor-attr-page">
     {% include "vor_archives/partials/attributes/attr_toolbar.html" %}
-    <div class="vor-attr-split">
+    <div class="vor-attr-split" :data-mode="$store.vorAttributes.deleteMode ? 'delete' : 'normal'">
       <div class="vor-panel vor-attr-list-pane">
         <div id="attr-list"
              class="vor-attr-list"
