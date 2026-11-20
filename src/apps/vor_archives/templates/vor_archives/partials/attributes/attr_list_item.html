@@ -2,14 +2,14 @@
      data-attr-id="{{ item.key }}"
      :class="{
          'vor-attr-item--active': $store.vorAttributes.selectedKey === '{{ item.key }}',
-         'vor-attr-item--selected': $store.vorAttributes.isSelected('{{ item.key }}')
+         'vor-delete-selected': $store.vorAttributes.isSelected('{{ item.key }}')
      }"
      hx-get="{{ item.detail_url }}"
      hx-target="#attr-detail"
      hx-swap="innerHTML"
      hx-disinherit="hx-include"
      @click="$store.vorAttributes.select('{{ item.key }}')">
-  <div class="vor-attr-item-check">
+  <div class="vor-delete-check">
     <span class="vor-checkbox"
           :class="{ 'vor-checkbox--checked': $store.vorAttributes.isSelected('{{ item.key }}') }"></span>
   </div>
