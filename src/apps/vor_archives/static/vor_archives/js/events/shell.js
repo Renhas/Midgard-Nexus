@@ -35,6 +35,11 @@ document.addEventListener("keydown", (event) => {
   }
   if (store?.deleteMode) {
     store.exitDeleteMode();
+    return;
+  }
+  const attrStore = getAlpine()?.store("vorAttributes");
+  if (attrStore?.deleteMode) {
+    attrStore.exitDeleteMode();
   }
 });
 

@@ -66,6 +66,32 @@ html.vor-scroll-lock .center {
   box-shadow: var(--focus-ring);
 }
 
+/* --- Delete mode (shared across lists) --- */
+.vor-delete-check {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vor-delete-check .vor-checkbox--checked,
+.vor-delete-check .vor-checkbox--checked:hover {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+[data-mode]:not([data-mode="delete"]) .vor-delete-check {
+  display: none;
+}
+
+[data-mode="delete"] .vor-delete-selected,
+[data-mode="delete"] .vor-delete-selected:hover {
+  border-color: var(--action-delete);
+  background-color: rgb(from var(--action-delete) r g b / 8%);
+}
+
 /* --- Switch --- */
 .vor-switch {
   display: inline-flex;
@@ -151,7 +177,7 @@ html.vor-scroll-lock .center {
   background-color: var(--bg-input);
   border-color: var(--accent-hover);
   color: var(--text-primary);
-  box-shadow: var(--focus-ring-strong);
+  box-shadow: var(--focus-ring);
 }
 
 .vor-field-errors,
@@ -182,4 +208,55 @@ html.vor-scroll-lock .center {
 
 .status-dropped {
   color: var(--status-dropped);
+}
+
+/* ===== Search Field ===== */
+.vor-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.vor-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--text-secondary);
+  pointer-events: none;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.vor-search-input {
+  --bs-body-bg: var(--bg-input);
+  --bs-body-color: var(--text-primary);
+
+  width: 100%;
+  padding-left: 2.35rem;
+  border: 1px solid var(--border);
+
+  /* Страховка, если нет класса form-control */
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+}
+
+.vor-search-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.55;
+}
+
+.vor-search-input:focus {
+  outline: none;
+  border-color: var(--accent-hover);
+  box-shadow: var(--focus-ring);
+}
+
+/* Настройка кнопки очистки для type="search" */
+.vor-search-input::-webkit-search-cancel-button {
+  cursor: pointer;
+  opacity: var(--search-clear-opacity);
+  transition: opacity 0.15s ease;
+}
+
+.vor-search-input::-webkit-search-cancel-button:hover {
+  opacity: var(--search-clear-opacity-hover);
 }

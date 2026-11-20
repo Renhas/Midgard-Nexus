@@ -4,13 +4,14 @@ from dataclasses import dataclass
 
 from django.db.models import Model
 
-from .models import Book, Film, Game
+from .models import Book, BookGenre, Film, FilmGenre, Game, GameGenre
 
 
 @dataclass(frozen=True)
 class WorkTypeMeta:
     key: str
     model: type[Model]
+    genre_model: type[Model]
     icon: str
     label: str
     label_plural: str
@@ -23,6 +24,7 @@ WORK_TYPE_REGISTRY: dict[str, WorkTypeMeta] = {
         WorkTypeMeta(
             key="book",
             model=Book,
+            genre_model=BookGenre,
             icon="icon-book-text",
             label="Книга",
             label_plural="Книги",
@@ -31,6 +33,7 @@ WORK_TYPE_REGISTRY: dict[str, WorkTypeMeta] = {
         WorkTypeMeta(
             key="film",
             model=Film,
+            genre_model=FilmGenre,
             icon="icon-clapperboard",
             label="Фильм",
             label_plural="Фильмы",
@@ -39,6 +42,7 @@ WORK_TYPE_REGISTRY: dict[str, WorkTypeMeta] = {
         WorkTypeMeta(
             key="game",
             model=Game,
+            genre_model=GameGenre,
             icon="icon-gamepad-2",
             label="Игра",
             label_plural="Игры",
@@ -68,6 +72,14 @@ WORK_TYPE_LABELS_PLURAL: dict[str, str] = {
 
 WORK_TYPE_UNITS: dict[str, str] = {
     key: meta.unit for key, meta in WORK_TYPE_REGISTRY.items()
+}
+
+GENRE_MODELS: dict[str, type[Model]] = {
+    key: meta.genre_model for key, meta in WORK_TYPE_REGISTRY.items()
+}
+
+GENRE_TYPE_BY_MODEL: dict[type[Model], str] = {
+    meta.genre_model: key for key, meta in WORK_TYPE_REGISTRY.items()
 }
 
 

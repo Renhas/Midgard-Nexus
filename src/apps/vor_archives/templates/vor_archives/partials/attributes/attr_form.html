@@ -1,18 +1,18 @@
-<form class="attr-card attr-form"
+<form class="vor-attr-card vor-attr-form"
       x-init="{% if is_create %}$store.vorAttributes.select(''){% endif %}"
       hx-post="{{ save_url }}"
       hx-target="#attr-detail"
       hx-swap="innerHTML">
   {% csrf_token %}
-  <div class="attr-card-header">
-    <h3 class="attr-card-title">{% if is_create %}{{ tab.create_title }}{% else %}Редактирование{% endif %}</h3>
+  <div class="vor-attr-card-header">
+    <h3 class="vor-attr-card-title">{% if is_create %}{{ tab.create_title }}{% else %}Редактирование{% endif %}</h3>
   </div>
-  <div class="attr-card-body">
+  <div class="vor-attr-card-body">
     {% if show_type %}
       {% if lock_type %}
         <div class="vor-field">
           <span class="vor-field-label">Тип</span>
-          <div class="attr-readonly">{{ type_label }}</div>
+          <div class="vor-attr-readonly">{{ type_label }}</div>
         </div>
       {% else %}
         {% include "vor_archives/partials/common/form_field.html" with field=form.type_key %}
@@ -27,7 +27,7 @@
       {% endif %}
     {% endif %}
   </div>
-  <div class="attr-detail-actions">
+  <div class="vor-attr-detail-actions">
     <button type="button" class="sidebar-btn" hx-get="{{ cancel_url }}" hx-target="#attr-detail" hx-swap="innerHTML">
       Отмена
     </button>
