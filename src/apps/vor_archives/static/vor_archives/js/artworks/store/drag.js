@@ -65,7 +65,7 @@ export const dragMixin = {
           ghostClass: "vor-artwork-item--ghost",
           chosenClass: "vor-artwork-item--chosen",
           dragClass: "vor-artwork-item--drag",
-          filter: ".vor-artwork-row-delete, .vor-artwork-tile-delete, .vor-artwork-row-check, .vor-artwork-tile-check",
+          filter: ".vor-artwork-row-delete, .vor-artwork-tile-delete, .vor-delete-check",
           preventOnFilter: true,
           onStart: () => {
             this.setArtworkDragState(true);

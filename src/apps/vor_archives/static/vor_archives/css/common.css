@@ -66,6 +66,32 @@ html.vor-scroll-lock .center {
   box-shadow: var(--focus-ring);
 }
 
+/* --- Delete mode (shared across lists) --- */
+.vor-delete-check {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vor-delete-check .vor-checkbox--checked,
+.vor-delete-check .vor-checkbox--checked:hover {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+[data-mode]:not([data-mode="delete"]) .vor-delete-check {
+  display: none;
+}
+
+[data-mode="delete"] .vor-delete-selected,
+[data-mode="delete"] .vor-delete-selected:hover {
+  border-color: var(--action-delete);
+  background-color: rgb(from var(--action-delete) r g b / 8%);
+}
+
 /* --- Switch --- */
 .vor-switch {
   display: inline-flex;

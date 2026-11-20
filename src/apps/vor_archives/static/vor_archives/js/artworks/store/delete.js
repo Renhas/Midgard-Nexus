@@ -8,7 +8,7 @@ export const deleteMixin = {
     document.querySelectorAll(".vor-artwork-item").forEach((item) => {
       const selected = this.isSelected(item.dataset.uwId);
       item.querySelectorAll(".vor-artwork-row").forEach((node) => {
-        node.classList.toggle("vor-artwork-row--selected", selected);
+        node.classList.toggle("vor-delete-selected", selected);
       });
       item.querySelectorAll(".vor-artwork-tile").forEach((node) => {
         node.classList.toggle("vor-artwork-tile--selected", selected);

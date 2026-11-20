@@ -67,6 +67,7 @@
 .vor-attr-detail {
   height: 100%;
   overflow-y: auto;
+  scrollbar-gutter: stable;
   padding: 0.75rem;
 }
 
@@ -115,6 +116,7 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.35rem 0.5rem;
+  border: 1px solid transparent;
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   cursor: pointer;
@@ -131,10 +133,6 @@
   background-color: rgb(from var(--accent-vor) r g b / 12%);
 }
 
-.vor-attr-item--selected {
-  outline: 1px solid var(--accent-vor);
-}
-
 .vor-attr-item-name {
   flex: 1;
   min-width: 0;
@@ -146,12 +144,6 @@
 .vor-attr-item-count {
   color: var(--text-secondary);
   flex-shrink: 0;
-}
-
-.vor-attr-item-check .vor-checkbox--checked,
-.vor-attr-item-check .vor-checkbox--checked:hover {
-  background-color: var(--accent-hover);
-  border-color: var(--accent-hover);
 }
 
 .vor-attr-list-empty,
