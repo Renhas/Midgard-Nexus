@@ -12,7 +12,7 @@ from .activity import (
     heatmap_range,
 )
 from .attrs import attrs_payload
-from .stats import progress_spent, stats_payload
+from .stats import stats_payload
 from .utils import (
     load_user_works,
     monday,
@@ -39,7 +39,6 @@ __all__ = [
     "heatmap_range",
     "load_user_works",
     "monday",
-    "progress_spent",
     "stats_payload",
     "sunday",
 ]

@@ -4,6 +4,9 @@ from decimal import Decimal
 from typing import NamedTuple
 
 from apps.vor_archives.constants import FilmTypeChoices
+from apps.vor_archives.registry import WORK_TYPE_UNITS
+
+MINUTES_PER_HOUR = 60.0
 
 
 class ProgressMeta(NamedTuple):
@@ -82,3 +85,24 @@ def clamp_progress_for_work(work) -> None:
         if user_work.progress > limit:
             user_work.progress = limit
             user_work.save()
+
+
+def _film_spent_hours(work, progress: float) -> float:
+    if work.film_type == FilmTypeChoices.TV_SHOW:
+        duration = float(work.duration_minutes or 0)
+        return duration * progress / MINUTES_PER_HOUR
+    return progress / MINUTES_PER_HOUR
+
+
+def progress_spent(user_work) -> tuple[str, float, str] | None:
+    """Return ``(type_key, spent_amount, unit)`` for a UserWork."""
+    work = getattr(user_work, "work", None)
+    if work is None:
+        return None
+    type_key = work._meta.model_name
+    unit = WORK_TYPE_UNITS.get(type_key)
+    if unit is None:
+        return None
+    progress = float(user_work.progress or 0)
+    amount = _film_spent_hours(work, progress) if type_key == "film" else progress
+    return (type_key, amount, unit)

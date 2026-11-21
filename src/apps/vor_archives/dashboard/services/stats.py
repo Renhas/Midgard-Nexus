@@ -1,36 +1,14 @@
 from collections.abc import Iterable
 
 from apps.vor_archives.constants import (
-    FilmTypeChoices,
     STATUS_LABELS_RU,
     UserWorkStatusChoices,
 )
-from apps.vor_archives.registry import WORK_TYPES, WORK_TYPE_UNITS
+from apps.vor_archives.progress import progress_spent
+from apps.vor_archives.registry import WORK_TYPES
 
 from ..catalog import AGE_CHOICES_EXT, RATING_CHOICES_EXT, TYPE_META
 from .utils import load_user_works
-
-MINUTES_PER_HOUR = 60.0
-
-
-def _film_spent_hours(work, progress: float) -> float:
-    if work.film_type == FilmTypeChoices.TV_SHOW:
-        duration = float(work.duration_minutes or 0)
-        return duration * progress / MINUTES_PER_HOUR
-    return progress / MINUTES_PER_HOUR
-
-
-def progress_spent(user_work) -> tuple[str, float, str] | None:
-    work = getattr(user_work, "work", None)
-    if work is None:
-        return None
-    type_key = work._meta.model_name
-    unit = WORK_TYPE_UNITS.get(type_key)
-    if unit is None:
-        return None
-    progress = float(user_work.progress or 0)
-    amount = _film_spent_hours(work, progress) if type_key == "film" else progress
-    return (type_key, amount, unit)
 
 
 def _empty_matrix(columns: Iterable[str]) -> dict[str, dict[str, int]]:
