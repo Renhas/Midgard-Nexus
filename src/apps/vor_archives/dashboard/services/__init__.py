@@ -1,5 +1,6 @@
 from .activity import (
     activity_years,
+    feed_context,
     feed_page,
     heat_level,
     heatmap_payload,
@@ -16,6 +17,7 @@ from .utils import (
 __all__ = [
     "activity_years",
     "attrs_payload",
+    "feed_context",
     "feed_page",
     "heat_level",
     "heatmap_payload",
