@@ -3,27 +3,15 @@
   <section class="dash-toolbar">
     <h2 class="dash-segment-title">Фильтры</h2>
     <div class="dash-type-filters">
-      <button type="button"
-              class="sidebar-btn sidebar-btn-type"
-              :class="{ 'sidebar-btn--active': workTypes.includes('book') }"
-              @click="toggleType('book')"
-              title="Книги">
-        <i class="icon-book-text"></i>
-      </button>
-      <button type="button"
-              class="sidebar-btn sidebar-btn-type"
-              :class="{ 'sidebar-btn--active': workTypes.includes('film') }"
-              @click="toggleType('film')"
-              title="Фильмы">
-        <i class="icon-clapperboard"></i>
-      </button>
-      <button type="button"
-              class="sidebar-btn sidebar-btn-type"
-              :class="{ 'sidebar-btn--active': workTypes.includes('game') }"
-              @click="toggleType('game')"
-              title="Игры">
-        <i class="icon-gamepad-2"></i>
-      </button>
+      {% for key, meta in stats_opts.type_meta.items %}
+        <button type="button"
+                class="sidebar-btn sidebar-btn-type"
+                :class="{ 'sidebar-btn--active': workTypes.includes('{{ key }}') }"
+                @click="toggleType('{{ key }}')"
+                title="{{ meta.label }}">
+          <i class="{{ meta.icon }}"></i>
+        </button>
+      {% endfor %}
     </div>
   </section>
   <div class="dash-segments">

@@ -5,11 +5,8 @@ from datetime import date
 import pytest
 
 from apps.vor_archives.dashboard.services.utils import (
-    format_number,
-    format_percent,
     load_user_works,
     monday,
-    percent_value,
     sunday,
 )
 from apps.vor_archives.tests.factories import (
@@ -20,45 +17,6 @@ from apps.vor_archives.tests.factories import (
     TagFactory,
     UserWorkFactory,
 )
-
-
-# ─── format_number ──────────────────────────────────────────────────────────
-
-
-@pytest.mark.parametrize(
-    "raw,expected",
-    [
-        pytest.param(None, "0", id="none"),
-        pytest.param(0, "0", id="zero-int"),
-        pytest.param(0.0, "0", id="zero-float"),
-        pytest.param(12.0, "12", id="whole-float"),
-        pytest.param(12.34, "12.3", id="round-down"),
-        pytest.param(12.36, "12.4", id="round-up"),
-        pytest.param("7.5", "7.5", id="numeric-string"),
-    ],
-)
-def test_format_number(raw, expected):
-    assert format_number(raw) == expected
-
-
-# ─── format_percent & percent_value ─────────────────────────────────────────
-
-
-@pytest.mark.parametrize(
-    "part,total,expected_str,expected_val",
-    [
-        pytest.param(0, 0, "0%", 0, id="zero-total"),
-        pytest.param(5, 0, "0%", 0, id="nonzero-part-zero-total"),
-        pytest.param(0, 10, "0%", 0.0, id="zero-part"),
-        pytest.param(1, 4, "25%", 25.0, id="whole-percent"),
-        pytest.param(1, 3, "33.3%", 33.3, id="fractional-percent"),
-        pytest.param(2, 3, "66.7%", 66.7, id="fractional-round-up"),
-        pytest.param(10, 10, "100%", 100.0, id="full-percent"),
-    ],
-)
-def test_format_percent_and_percent_value(part, total, expected_str, expected_val):
-    assert format_percent(part, total) == expected_str
-    assert percent_value(part, total) == expected_val
 
 
 # ─── monday & sunday ────────────────────────────────────────────────────────

@@ -10,6 +10,7 @@ from apps.users.tests.factories import UserFactory
 from apps.vor_archives.constants import FEED_ACTION_ICONS, FEED_ACTION_LABELS_RU
 from apps.vor_archives.dashboard.services.activity import (
     activity_years,
+    feed_context,
     feed_page,
     heat_level,
     heatmap_payload,
@@ -107,7 +108,7 @@ def test_feed_item_payload_with_deleted_user_work(user, book):
 def test_heatmap_payload_grid_structure(user):
     payload = heatmap_payload(user, year=2024)
 
-    assert payload["weekday_labels"] == ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+    assert list(payload["weekday_labels"]) == ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
     assert all(len(week) == 7 for week in payload["weeks"])
     assert len(payload["month_labels"]) == len(payload["weeks"])
 
@@ -281,3 +282,15 @@ def test_feed_page_exact_limit_has_no_more(user, book, movie, game):
 )
 def test_heat_level(count, max_count, expected):
     assert heat_level(count, max_count) == expected
+
+
+@pytest.mark.django_db
+def test_feed_context_returns_pagination_dict(user, book, movie):
+    UserWorkFactory(user=user, work=book)
+    UserWorkFactory(user=user, work=movie)
+
+    ctx = feed_context(user, offset=0, limit=1)
+
+    assert len(ctx["feed_items"]) == 1
+    assert ctx["feed_has_more"] is True
+    assert ctx["feed_next_offset"] == 1

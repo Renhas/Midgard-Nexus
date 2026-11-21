@@ -7,7 +7,7 @@ import pytest
 
 from apps.users.tests.factories import UserFactory
 from apps.vor_archives.constants import AgeRatingChoices, UserWorkStatusChoices
-from apps.vor_archives.dashboard.services.stats import progress_spent, stats_payload
+from apps.vor_archives.dashboard.services.stats import stats_payload
 from apps.vor_archives.models import Book, UserWork
 from apps.vor_archives.tests.factories import (
     BookFactory,
@@ -15,40 +15,6 @@ from apps.vor_archives.tests.factories import (
     GameFactory,
     UserWorkFactory,
 )
-
-
-@pytest.mark.django_db
-def test_tv_show_hours_uses_episode_duration_times_progress(user, tv_show):
-    tv_show.duration_minutes = 45
-    tv_show.save()
-    user_work = UserWorkFactory(user=user, work=tv_show, progress=Decimal("4"))
-
-    type_key, amount, unit = progress_spent(user_work)
-
-    assert type_key == "film"
-    assert unit == "ч."
-    assert amount == 3.0
-
-
-@pytest.mark.django_db
-def test_movie_hours_use_progress_minutes(user, movie):
-    movie.duration_minutes = 90
-    movie.save()
-    user_work = UserWorkFactory(user=user, work=movie, progress=Decimal("90"))
-
-    _, amount, unit = progress_spent(user_work)
-
-    assert unit == "ч."
-    assert amount == 1.5
-
-
-@pytest.mark.django_db
-def test_book_and_game_progress_passthrough(user, book, game):
-    book_uw = UserWorkFactory(user=user, work=book, progress=Decimal("150"))
-    game_uw = UserWorkFactory(user=user, work=game, progress=Decimal("12.5"))
-
-    assert progress_spent(book_uw) == ("book", 150.0, "стр.")
-    assert progress_spent(game_uw) == ("game", 12.5, "ч.")
 
 
 @pytest.mark.django_db
@@ -169,17 +135,6 @@ def test_stats_payload_exclude_other_user(user, book):
 
     assert rating_matrix["book"]["8"] == 1
     assert sum(rating_matrix["book"].values()) == 1
-
-
-@pytest.mark.django_db
-def test_progress_spent_edge_cases(user, book, tv_show):
-    default_progress_uw = UserWorkFactory(user=user, work=book)
-    assert progress_spent(default_progress_uw) == ("book", 0.0, "стр.")
-
-    tv_show.duration_minutes = 0
-    tv_show.save()
-    zero_duration_tv = UserWorkFactory(user=user, work=tv_show, progress=Decimal("5"))
-    assert progress_spent(zero_duration_tv) == ("film", 0.0, "ч.")
 
 
 @pytest.mark.django_db

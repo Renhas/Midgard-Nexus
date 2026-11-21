@@ -88,3 +88,42 @@ def get_work_model(type_key: str) -> type[Model]:
         return WORK_MODELS[type_key]
     except KeyError:
         raise ValueError(f"Unknown work type: {type_key}")
+
+
+@dataclass(frozen=True)
+class AttributeKindMeta:
+    key: str
+    label: str
+    icon: str
+    work_types: tuple[str, ...]
+
+
+ATTRIBUTE_KIND_REGISTRY: dict[str, AttributeKindMeta] = {
+    meta.key: meta
+    for meta in (
+        AttributeKindMeta(
+            key="tags",
+            label="Теги",
+            icon="bi bi-tag",
+            work_types=WORK_TYPES,
+        ),
+        AttributeKindMeta(
+            key="persons",
+            label="Авторы",
+            icon="bi bi-person",
+            work_types=WORK_TYPES,
+        ),
+        AttributeKindMeta(
+            key="genres",
+            label="Жанры",
+            icon="icon-drama",
+            work_types=WORK_TYPES,
+        ),
+        AttributeKindMeta(
+            key="platforms",
+            label="Платформы",
+            icon="bi bi-controller",
+            work_types=("game",),
+        ),
+    )
+}
