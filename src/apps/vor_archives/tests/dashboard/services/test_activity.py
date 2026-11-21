@@ -107,7 +107,7 @@ def test_feed_item_payload_with_deleted_user_work(user, book):
 def test_heatmap_payload_grid_structure(user):
     payload = heatmap_payload(user, year=2024)
 
-    assert payload["weekday_labels"] == ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+    assert list(payload["weekday_labels"]) == ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
     assert all(len(week) == 7 for week in payload["weeks"])
     assert len(payload["month_labels"]) == len(payload["weeks"])
 

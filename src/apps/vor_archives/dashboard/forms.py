@@ -1,8 +1,14 @@
 from django import forms
 
+from .catalog import HEATMAP_MAX_YEAR, HEATMAP_MIN_YEAR
+
 
 class HeatmapFilterForm(forms.Form):
-    year = forms.IntegerField(required=False, min_value=1970, max_value=2100)
+    year = forms.IntegerField(
+        required=False,
+        min_value=HEATMAP_MIN_YEAR,
+        max_value=HEATMAP_MAX_YEAR,
+    )
 
     def get_year(self) -> int | None:
         if self.is_valid():
