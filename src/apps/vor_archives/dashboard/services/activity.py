@@ -17,6 +17,7 @@ from ..catalog import (
     ROLLING_DAYS,
     WEEKDAY_LABELS,
 )
+from ..forms import HeatmapFilterForm
 from .utils import monday, sunday
 
 
@@ -187,4 +188,12 @@ def heatmap_payload(user, year: int | None = None, today: date | None = None) ->
         "month_labels": _build_month_labels(weeks),
         "weekday_labels": WEEKDAY_LABELS,
         "max_count": max_count,
+    }
+
+
+def activity_context(user, query_params) -> dict:
+    year = HeatmapFilterForm(query_params).get_year()
+    return {
+        **feed_context(user),
+        "heatmap": heatmap_payload(user, year=year),
     }

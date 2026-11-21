@@ -1,4 +1,9 @@
+from collections.abc import Callable
+
+from django.http import QueryDict
+
 from .activity import (
+    activity_context,
     activity_years,
     feed_context,
     feed_page,
@@ -14,7 +19,17 @@ from .utils import (
     sunday,
 )
 
+TabContextBuilder = Callable[[object, QueryDict], dict]
+
+TAB_CONTEXT_BUILDERS: dict[str, TabContextBuilder] = {
+    "stats": lambda user, _params: stats_payload(user),
+    "attrs": lambda user, _params: attrs_payload(user),
+    "activity": activity_context,
+}
+
 __all__ = [
+    "TAB_CONTEXT_BUILDERS",
+    "activity_context",
     "activity_years",
     "attrs_payload",
     "feed_context",

@@ -26,14 +26,15 @@ def test_dash_tab_or_404():
         dash_tab_or_404("unknown")
 
 
-def test_render_dashboard_shell_merges_context(user):
+@pytest.mark.parametrize("tab_arg", ["stats", get_dash_tab("stats")])
+def test_render_dashboard_shell_merges_context(user, tab_arg):
     rf = RequestFactory()
     request = rf.get("/vor/dashboard/stats/")
     request.user = user
 
     response = render_dashboard_shell(
         request,
-        "stats",
+        tab_arg,
         extra={"stats_opts": {"custom": 1}},
     )
     assert response.status_code == 200
