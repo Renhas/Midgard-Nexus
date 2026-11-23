@@ -26,7 +26,7 @@ export function createDashStatsComponent() {
     ratingChoices: {},
 
     init() {
-      const data = readJsonScript("dash-stats-opts");
+      const data = readJsonScript("vor-dash-stats-opts");
       this.statusMatrix = data.status_matrix || {};
       this.ageMatrix = data.age_matrix || {};
       this.ratingMatrix = data.rating_matrix || {};

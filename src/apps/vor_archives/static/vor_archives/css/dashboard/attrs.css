@@ -2,7 +2,7 @@
     VOR Archives — Dashboard Attributes Tab
     ============================================ */
 
-.dash-attr-grid {
+.vor-dash-attr-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: repeat(2, minmax(0, 1fr));
@@ -11,17 +11,17 @@
   min-height: 0;
 }
 
-.dash-attr-grid .dash-card {
+.vor-dash-attr-grid .vor-dash-card {
   height: 100%;
   min-height: 0;
   overflow: hidden;
 }
 
-.dash-attr-grid .dash-segment-head {
+.vor-dash-attr-grid .vor-dash-segment-head {
   flex: 0 0 auto;
 }
 
-.dash-attr-list {
+.vor-dash-attr-list {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
@@ -29,7 +29,7 @@
   gap: 0.35rem;
 }
 
-.dash-attr-body {
+.vor-dash-attr-body {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
@@ -37,7 +37,7 @@
   padding-inline: 0.5rem;
 }
 
-.dash-attr-row {
+.vor-dash-attr-row {
   display: grid;
   grid-template-columns: 1fr 3.5rem 3.5rem;
   gap: 0.75rem;
@@ -47,19 +47,19 @@
   font-size: 0.85rem;
 }
 
-.dash-attr-row > span {
+.vor-dash-attr-row > span {
   text-align: center;
 }
 
-.dash-attr-row > span:first-child {
+.vor-dash-attr-row > span:first-child {
   text-align: left;
 }
 
-.dash-attr-row > span:last-child {
+.vor-dash-attr-row > span:last-child {
   text-align: right;
 }
 
-.dash-attr-row--header {
+.vor-dash-attr-row--header {
   flex: 0 0 auto;
   overflow: hidden;
   font-size: 0.75rem;
@@ -71,21 +71,21 @@
   scrollbar-gutter: stable both-edges;
 }
 
-.dash-attr-name {
+.vor-dash-attr-name {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.dash-attr-count,
-.dash-attr-pct {
+.vor-dash-attr-count,
+.vor-dash-attr-pct {
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }
 
 @media (width <= 1200px) {
-  .dash-attr-grid {
+  .vor-dash-attr-grid {
     grid-template-columns: 1fr;
     height: auto;
   }

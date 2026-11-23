@@ -24,7 +24,7 @@ export function createDashAttrsComponent() {
     histTopN: 12,
 
     init() {
-      const data = readJsonScript("dash-attrs-opts");
+      const data = readJsonScript("vor-dash-attrs-opts");
       this.attrs = data.attrs || {};
       this.histTopN = data.histTopN || 12;
       this.attrTotals = calcAttrTotals(this.attrs);

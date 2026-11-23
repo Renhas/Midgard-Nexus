@@ -39,5 +39,6 @@ def test_render_dashboard_shell_merges_context(user, tab_arg):
     )
     assert response.status_code == 200
     assert (
-        b"stats_opts" not in response.content or b"dash-stats-opts" in response.content
+        b"stats_opts" not in response.content
+        or b"vor-dash-stats-opts" in response.content
     )
