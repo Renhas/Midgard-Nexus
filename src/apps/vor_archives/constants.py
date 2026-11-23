@@ -57,6 +57,17 @@ FEED_ACTION_META: dict[str, FeedActionMeta] = {
     "rated": FeedActionMeta("Оценка", "bi bi-star"),
 }
 
+DEFAULT_FEED_ACTION_ICON = "bi bi-circle"
+
+
+def get_feed_action_meta(action_type: str) -> FeedActionMeta:
+    """Return localized label and icon for a feed action type."""
+    if action_type in FEED_ACTION_META:
+        return FEED_ACTION_META[action_type]
+    fallback = FeedItemActionTypeChoices(action_type).label
+    return FeedActionMeta(label=fallback, icon=DEFAULT_FEED_ACTION_ICON)
+
+
 FEED_ACTION_LABELS_RU: dict[str, str] = {
     key: meta.label for key, meta in FEED_ACTION_META.items()
 }

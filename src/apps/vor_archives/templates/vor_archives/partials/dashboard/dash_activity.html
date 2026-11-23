@@ -1,15 +1,16 @@
-<div class="dash-page dash-activity">
-  <section class="dash-pane">
-    <div class="dash-pane-head">
-      <h2 class="dash-segment-title">Активность</h2>
+<div class="vor-dash-page vor-dash-activity">
+  <section class="vor-dash-pane">
+    <div class="vor-dash-pane-head">
+      <h2 class="vor-dash-segment-title">Активность</h2>
     </div>
-    <div class="dash-pane-body dash-heatmap-wrap">
-      <div id="dash-heatmap">{% include "vor_archives/partials/dashboard/dash_heatmap.html" %}</div>
-      <div class="dash-heatmap-year-select">
-        <select class="form-select form-select-sm dash-year-select"
+    <div class="vor-dash-pane-body vor-dash-heatmap-wrap">
+      <div id="vor-dash-heatmap">{% include "vor_archives/partials/dashboard/dash_heatmap.html" %}</div>
+      <div class="vor-dash-heatmap-year-select">
+        <select class="form-select form-select-sm vor-dash-year-select"
                 name="year"
-                hx-get="{% url 'vor_archives:dashboard_heatmap' %}"
-                hx-target="#dash-heatmap"
+                aria-label="Год активности"
+                hx-get="{% url 'vor_archives:dashboard:heatmap' %}"
+                hx-target="#vor-dash-heatmap"
                 hx-swap="innerHTML">
           <option value="" {% if not heatmap.year %}selected{% endif %}>Последние 12 месяцев</option>
           {% for year in heatmap.years %}
@@ -19,12 +20,12 @@
       </div>
     </div>
   </section>
-  <section class="dash-pane">
-    <div class="dash-pane-head">
-      <h2 class="dash-segment-title">История</h2>
+  <section class="vor-dash-pane">
+    <div class="vor-dash-pane-head">
+      <h2 class="vor-dash-segment-title">История</h2>
     </div>
-    <div class="dash-pane-body" id="dash-feed-scroll">
-      <div id="dash-feed-list">{% include "vor_archives/partials/dashboard/dash_feed_items.html" %}</div>
+    <div class="vor-dash-pane-body">
+      <div id="vor-dash-feed-list">{% include "vor_archives/partials/dashboard/dash_feed_items.html" %}</div>
     </div>
   </section>
 </div>

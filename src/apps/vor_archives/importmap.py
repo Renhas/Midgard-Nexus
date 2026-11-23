@@ -25,7 +25,7 @@ _SHARED_IMPORTMAP_PATHS = {
 _PAGE_IMPORTMAP_MODULES = [
     "apps.vor_archives.artworks.importmap",
     "apps.vor_archives.attributes.importmap",
-    "apps.vor_archives.dashboard_importmap",
+    "apps.vor_archives.dashboard.importmap",
 ]
 
 IMPORTMAP_PATHS = build_importmap(

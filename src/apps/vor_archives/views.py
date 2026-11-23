@@ -1,24 +1,12 @@
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.urls import reverse
-from django.views.decorators.http import require_GET
 
+from .artworks.services import get_user_collection_trees
 from .constants import age_rating_options, status_options
-from .dashboard import (
-    attrs_payload,
-    feed_page,
-    heatmap_payload,
-    parse_heatmap_year,
-    stats_payload,
-)
-from .dashboard_catalog import DASHBOARD_TABS, DEFAULT_DASH_TAB, get_dash_tab
-from .registry import WORK_TYPE_REGISTRY
 from .models import Platform, Tag
+from .registry import WORK_TYPE_REGISTRY
 from .utils import module_base_context
-from .artworks.services import (
-    get_user_collection_trees,
-)
 
 
 @login_required
@@ -100,81 +88,4 @@ def index(request):
                 },
             },
         },
-    )
-
-
-@login_required
-def dashboard(request):
-    """Страница дашборда — редирект на вкладку статистики."""
-    return redirect("vor_archives:dashboard_tab", tab=DEFAULT_DASH_TAB)
-
-
-def _dashboard_shell(request, tab_kind, extra=None):
-    tab = get_dash_tab(tab_kind)
-    if tab is None:
-        raise Http404("Неизвестная вкладка дашборда")
-    context = {
-        **module_base_context("dashboard", hide_right=True),
-        "dash_kind": tab_kind,
-        "dash_tabs": DASHBOARD_TABS,
-        "dash_tab": tab,
-    }
-    if extra:
-        context.update(extra)
-    return render(request, "vor_archives/dashboard.html", context)
-
-
-@login_required
-def dashboard_tab(request, tab):
-    """Оболочка дашборда для выбранной вкладки."""
-    if get_dash_tab(tab) is None:
-        raise Http404("Неизвестная вкладка дашборда")
-    extra = {}
-    if tab == "stats":
-        extra.update(stats_payload(request.user))
-    elif tab == "attrs":
-        extra.update(attrs_payload(request.user))
-    elif tab == "activity":
-        items, has_more = feed_page(request.user)
-        extra.update(
-            {
-                "feed_items": items,
-                "feed_has_more": has_more,
-                "feed_next_offset": len(items),
-                "heatmap": heatmap_payload(
-                    request.user,
-                    year=parse_heatmap_year(request.GET.get("year")),
-                ),
-            }
-        )
-    return _dashboard_shell(request, tab, extra)
-
-
-@login_required
-@require_GET
-def dashboard_feed(request):
-    try:
-        offset = max(int(request.GET.get("offset") or 0), 0)
-    except (TypeError, ValueError):
-        offset = 0
-    items, has_more = feed_page(request.user, offset=offset)
-    return render(
-        request,
-        "vor_archives/partials/dashboard/dash_feed_items.html",
-        {
-            "feed_items": items,
-            "feed_has_more": has_more,
-            "feed_next_offset": offset + len(items),
-        },
-    )
-
-
-@login_required
-@require_GET
-def dashboard_heatmap(request):
-    year = parse_heatmap_year(request.GET.get("year"))
-    return render(
-        request,
-        "vor_archives/partials/dashboard/dash_heatmap.html",
-        {"heatmap": heatmap_payload(request.user, year=year)},
     )
