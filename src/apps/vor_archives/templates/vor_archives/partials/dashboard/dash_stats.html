@@ -2,11 +2,12 @@
 <div class="dash-page dash-stats" x-data="vorDashStats()">
   <section class="dash-toolbar">
     <h2 class="dash-segment-title">Фильтры</h2>
-    <div class="dash-type-filters">
+    <div class="dash-type-filters" role="group" aria-label="Типы произведений">
       {% for key, meta in stats_opts.type_meta.items %}
         <button type="button"
                 class="sidebar-btn sidebar-btn-type"
                 :class="{ 'sidebar-btn--active': workTypes.includes('{{ key }}') }"
+                :aria-pressed="workTypes.includes('{{ key }}')"
                 @click="toggleType('{{ key }}')"
                 title="{{ meta.label }}">
           <i class="{{ meta.icon }}"></i>
@@ -20,20 +21,8 @@
         <h2 class="dash-segment-title">Обзор</h2>
       </div>
       <div class="dash-cards">
-        <article class="dash-card dash-card--chart">
-          <div class="dash-card-title">Типы</div>
-          <div class="dash-chart-canvas-wrap">
-            <p class="dash-empty" x-show="!worksTotalCount" x-cloak>Нет данных для графика</p>
-            <canvas x-ref="pieTypes" x-show="worksTotalCount"></canvas>
-          </div>
-        </article>
-        <article class="dash-card dash-card--chart">
-          <div class="dash-card-title">Возрастной рейтинг</div>
-          <div class="dash-chart-canvas-wrap">
-            <p class="dash-empty" x-show="!workTypes.length" x-cloak>Нет данных для графика</p>
-            <canvas x-ref="pieAge" x-show="workTypes.length"></canvas>
-          </div>
-        </article>
+        {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Типы" ref="pieTypes" show_expr="worksTotalCount" %}
+        {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Возрастной рейтинг" ref="pieAge" show_expr="workTypes.length" %}
       </div>
     </section>
     <section class="dash-segment">
@@ -41,20 +30,8 @@
         <h2 class="dash-segment-title">Оценки</h2>
       </div>
       <div class="dash-cards">
-        <article class="dash-card dash-card--chart">
-          <div class="dash-card-title">Распределение</div>
-          <div class="dash-chart-canvas-wrap">
-            <p class="dash-empty" x-show="!workTypes.length" x-cloak>Нет данных для графика</p>
-            <canvas x-ref="pieRating" x-show="workTypes.length"></canvas>
-          </div>
-        </article>
-        <article class="dash-card dash-card--chart">
-          <div class="dash-card-title">Среднее</div>
-          <div class="dash-chart-canvas-wrap">
-            <p class="dash-empty" x-show="!worksTotalCount" x-cloak>Нет данных для графика</p>
-            <canvas x-ref="barRating" x-show="worksTotalCount"></canvas>
-          </div>
-        </article>
+        {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Распределение" ref="pieRating" show_expr="workTypes.length" %}
+        {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Среднее" ref="barRating" show_expr="worksTotalCount" %}
       </div>
     </section>
     <section class="dash-segment">
@@ -62,13 +39,7 @@
         <h2 class="dash-segment-title">Прогресс</h2>
       </div>
       <div class="dash-cards">
-        <article class="dash-card dash-card--chart">
-          <div class="dash-card-title">Статусы</div>
-          <div class="dash-chart-canvas-wrap">
-            <p class="dash-empty" x-show="!workTypes.length" x-cloak>Нет данных для графика</p>
-            <canvas x-ref="pieStatus" x-show="workTypes.length"></canvas>
-          </div>
-        </article>
+        {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Статусы" ref="pieStatus" show_expr="workTypes.length" %}
         <article class="dash-card">
           <div class="dash-card-title">Результаты</div>
           <div class="dash-progress-metrics">
