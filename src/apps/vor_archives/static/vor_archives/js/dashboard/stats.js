@@ -6,6 +6,7 @@ import {
   buildSpentItems,
   calcAverageRating,
   formatMetricNumber,
+  hasNonZeroItems,
   sumByRow,
 } from "@vor/dashboard/pure/metrics";
 
@@ -78,6 +79,26 @@ export function createDashStatsComponent() {
 
     get barRatingItems() {
       return buildBarRatingItems(this.typeMeta, this.ratingMatrix);
+    },
+
+    get hasPieTypesData() {
+      return hasNonZeroItems(this.pieTypesItems);
+    },
+
+    get hasPieStatusData() {
+      return hasNonZeroItems(this.pieStatusItems);
+    },
+
+    get hasPieAgeData() {
+      return hasNonZeroItems(this.pieAgeItems);
+    },
+
+    get hasPieRatingData() {
+      return hasNonZeroItems(this.pieRatingItems);
+    },
+
+    get hasBarRatingData() {
+      return hasNonZeroItems(this.barRatingItems);
     },
 
     toggleType(type) {
