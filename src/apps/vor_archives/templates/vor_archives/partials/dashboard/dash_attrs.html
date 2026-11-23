@@ -30,28 +30,28 @@
           <p class="vor-dash-empty" x-show="!hasItems('{{ kind.key }}')">Нет данных для графика</p>
           <canvas x-ref="bar-{{ kind.key }}" x-show="hasItems('{{ kind.key }}')"></canvas>
         </div>
-        <div class="vor-dash-attr-list" x-show="attrView === 'list'" x-cloak>
-          <p class="vor-dash-empty" x-show="!hasItems('{{ kind.key }}')">Нет данных для графика</p>
-          <template x-if="hasItems('{{ kind.key }}')">
-            <div>
-              <div class="vor-dash-attr-row vor-dash-attr-row--header">
-                <span>Название</span>
-                <span>Кол-во</span>
-                <span>Доля</span>
-              </div>
-              <div class="vor-dash-attr-body">
-                <template x-for="item in getItems('{{ kind.key }}')" :key="item.name">
-                  <div class="vor-dash-attr-row">
-                    <span class="vor-dash-attr-name" x-text="item.name"></span>
-                    <span class="vor-dash-attr-count" x-text="item.count"></span>
-                    <span class="vor-dash-attr-pct"
-                          x-text="formatPercent(calcAttrShare(item.count, '{{ kind.key }}'))"></span>
-                  </div>
-                </template>
-              </div>
+        <p class="vor-dash-empty"
+           x-show="attrView === 'list' && !hasItems('{{ kind.key }}')"
+           x-cloak>Нет данных для графика</p>
+        <template x-if="hasItems('{{ kind.key }}')">
+          <div class="vor-dash-attr-list" x-show="attrView === 'list'" x-cloak>
+            <div class="vor-dash-attr-row vor-dash-attr-row--header">
+              <span>Название</span>
+              <span>Кол-во</span>
+              <span>Доля</span>
             </div>
-          </template>
-        </div>
+            <div class="vor-dash-attr-body">
+              <template x-for="item in getItems('{{ kind.key }}')" :key="item.name">
+                <div class="vor-dash-attr-row">
+                  <span class="vor-dash-attr-name" x-text="item.name"></span>
+                  <span class="vor-dash-attr-count" x-text="item.count"></span>
+                  <span class="vor-dash-attr-pct"
+                        x-text="formatPercent(calcAttrShare(item.count, '{{ kind.key }}'))"></span>
+                </div>
+              </template>
+            </div>
+          </div>
+        </template>
       </article>
     {% endfor %}
   </section>
