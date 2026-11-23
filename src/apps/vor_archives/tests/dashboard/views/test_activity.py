@@ -88,7 +88,7 @@ def test_dashboard_feed_partial_returns_items(client_logged_in, user, book):
 
 
 def test_dashboard_feed_pagination_and_exact_page_boundary(client_logged_in, user):
-    for _ in range(30):
+    for _ in range(15):
         UserWorkFactory(user=user, work=BookFactory())
 
     exact_page = client_logged_in.get(reverse("vor_archives:dashboard:feed"))
@@ -123,7 +123,7 @@ def test_dashboard_feed_invalid_offset_falls_back_to_zero(
         reverse("vor_archives:dashboard:feed"), {"offset": bad_offset}
     )
     assert response.status_code == 200
-    assert len(response.context["feed_items"]) == 1
+    assert len(response.context["feed_items"]) == 2
 
 
 def test_dashboard_feed_isolates_other_user(client_logged_in, other_user, book):

@@ -49,7 +49,7 @@ def userwork_post_save(sender, instance, created, raw=False, **kwargs):
     new_status = instance.status
     old_status = instance._old_status
 
-    if old_status and new_status != old_status:
+    if new_status and new_status != old_status:
         vor_models.FeedItem.objects.create(
             user=instance.user,
             user_work=instance,
