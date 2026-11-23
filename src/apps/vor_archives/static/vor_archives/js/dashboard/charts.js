@@ -186,6 +186,11 @@ export function upsertBarChart(existingChart, canvas, items, { horizontal = fals
 
 export function upsertWordCloudChart(existingChart, canvas, items) {
   if (!canvas || !Chart) return null;
+  if (!hasNonZeroItems(items)) {
+    destroyChart(existingChart);
+    Chart.getChart(canvas)?.destroy();
+    return null;
+  }
   const labels = items.map((item) => item.label);
   const data = items.map((item) => item.size);
   const counts = items.map((item) => item.count);

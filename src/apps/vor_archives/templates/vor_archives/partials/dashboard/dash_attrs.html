@@ -23,26 +23,34 @@
           <h2 class="dash-card-title">{{ kind.label }}</h2>
         </div>
         <div class="dash-chart-canvas-wrap" x-show="attrView === 'cloud'" x-cloak>
-          <canvas x-ref="cloud-{{ kind.key }}"></canvas>
+          <p class="dash-empty" x-show="!hasItems('{{ kind.key }}')">Нет данных для графика</p>
+          <canvas x-ref="cloud-{{ kind.key }}" x-show="hasItems('{{ kind.key }}')"></canvas>
         </div>
         <div class="dash-chart-canvas-wrap" x-show="attrView === 'bar'" x-cloak>
-          <canvas x-ref="bar-{{ kind.key }}"></canvas>
+          <p class="dash-empty" x-show="!hasItems('{{ kind.key }}')">Нет данных для графика</p>
+          <canvas x-ref="bar-{{ kind.key }}" x-show="hasItems('{{ kind.key }}')"></canvas>
         </div>
         <div class="dash-attr-list" x-show="attrView === 'list'" x-cloak>
-          <div class="dash-attr-row dash-attr-row--header">
-            <span>Название</span>
-            <span>Кол-во</span>
-            <span>Доля</span>
-          </div>
-          <div class="dash-attr-body">
-            <template x-for="item in getItems('{{ kind.key }}')" :key="item.name">
-              <div class="dash-attr-row">
-                <span class="dash-attr-name" x-text="item.name"></span>
-                <span class="dash-attr-count" x-text="item.count"></span>
-                <span class="dash-attr-pct" x-text="formatPercent(calcAttrShare(item.count, '{{ kind.key }}'))"></span>
+          <p class="dash-empty" x-show="!hasItems('{{ kind.key }}')">Нет данных для графика</p>
+          <template x-if="hasItems('{{ kind.key }}')">
+            <div>
+              <div class="dash-attr-row dash-attr-row--header">
+                <span>Название</span>
+                <span>Кол-во</span>
+                <span>Доля</span>
               </div>
-            </template>
-          </div>
+              <div class="dash-attr-body">
+                <template x-for="item in getItems('{{ kind.key }}')" :key="item.name">
+                  <div class="dash-attr-row">
+                    <span class="dash-attr-name" x-text="item.name"></span>
+                    <span class="dash-attr-count" x-text="item.count"></span>
+                    <span class="dash-attr-pct"
+                          x-text="formatPercent(calcAttrShare(item.count, '{{ kind.key }}'))"></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </template>
         </div>
       </article>
     {% endfor %}
