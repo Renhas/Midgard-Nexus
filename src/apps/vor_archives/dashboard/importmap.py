@@ -5,6 +5,7 @@ from config.importmap import build_importmap
 _OWN_IMPORTMAP_PATHS = {
     "@vor/dashboard/charts": "vor_archives/js/dashboard/charts.js",
     "@vor/dashboard/dashboard": "vor_archives/js/dashboard/dashboard.js",
+    "@vor/dashboard/pure/metrics": "vor_archives/js/dashboard/pure/metrics.js",
 }
 
 _SUBMODULE_IMPORTMAP_MODULES: list[str] = []
