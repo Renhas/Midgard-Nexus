@@ -60,6 +60,7 @@
 }
 
 .dash-attr-row--header {
+  flex: 0 0 auto;
   overflow: hidden;
   font-size: 0.75rem;
   text-transform: uppercase;
