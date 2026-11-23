@@ -1,5 +1,5 @@
 import { Chart } from "@lib/chart";
-import { MIN_CLOUD_SIZE_PX, MAX_CLOUD_SIZE_PX, formatDashPercent } from "@vor/dashboard/pure/metrics";
+import { MIN_CLOUD_SIZE_PX, MAX_CLOUD_SIZE_PX, formatDashPercent, hasNonZeroItems } from "@vor/dashboard/pure/metrics";
 
 export { MIN_CLOUD_SIZE_PX as MIN_SIZE_PX, MAX_CLOUD_SIZE_PX as MAX_SIZE_PX, formatDashPercent };
 
@@ -92,7 +92,7 @@ export function destroyChartMap(chartMap) {
 export function renderDoughnutChart(canvas, items, { centerText = null } = {}) {
   if (!canvas || !Chart) return null;
   Chart.getChart(canvas)?.destroy();
-  if (!items.length) return null;
+  if (!hasNonZeroItems(items)) return null;
 
   return new Chart(canvas, {
     type: "doughnut",
@@ -124,6 +124,11 @@ export function renderDoughnutChart(canvas, items, { centerText = null } = {}) {
 
 export function upsertBarChart(existingChart, canvas, items, { horizontal = false, suggestedMax = undefined } = {}) {
   if (!canvas || !Chart) return null;
+  if (!hasNonZeroItems(items)) {
+    destroyChart(existingChart);
+    Chart.getChart(canvas)?.destroy();
+    return null;
+  }
   const labels = items.map((item) => item.label);
   const data = items.map((item) => item.count);
   const backgroundColor = chartPalette(items.length);
@@ -181,6 +186,11 @@ export function upsertBarChart(existingChart, canvas, items, { horizontal = fals
 
 export function upsertWordCloudChart(existingChart, canvas, items) {
   if (!canvas || !Chart) return null;
+  if (!hasNonZeroItems(items)) {
+    destroyChart(existingChart);
+    Chart.getChart(canvas)?.destroy();
+    return null;
+  }
   const labels = items.map((item) => item.label);
   const data = items.map((item) => item.size);
   const counts = items.map((item) => item.count);

@@ -5,7 +5,13 @@ import {
   upsertBarChart,
   upsertWordCloudChart,
 } from "@vor/dashboard/charts";
-import { buildCloudItems, buildHistItems, calcAttrShare, calcAttrTotals } from "@vor/dashboard/pure/metrics";
+import {
+  buildCloudItems,
+  buildHistItems,
+  calcAttrShare,
+  calcAttrTotals,
+  hasNonZeroItems,
+} from "@vor/dashboard/pure/metrics";
 
 export function createDashAttrsComponent() {
   const barCharts = Object.create(null);
@@ -33,6 +39,10 @@ export function createDashAttrsComponent() {
 
     getItems(attrKey) {
       return this.attrs[attrKey] || [];
+    },
+
+    hasItems(attrKey) {
+      return hasNonZeroItems(this.getItems(attrKey));
     },
 
     calcAttrShare(count, attrKey) {

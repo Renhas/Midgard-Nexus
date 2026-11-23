@@ -21,8 +21,8 @@
         <h2 class="dash-segment-title">Обзор</h2>
       </div>
       <div class="dash-cards">
-        {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Типы" ref="pieTypes" show_expr="worksTotalCount" %}
-        {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Возрастной рейтинг" ref="pieAge" show_expr="workTypes.length" %}
+        {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Типы" ref="pieTypes" show_expr="hasPieTypesData" %}
+        {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Возрастной рейтинг" ref="pieAge" show_expr="hasPieAgeData" %}
       </div>
     </section>
     <section class="dash-segment">
@@ -30,8 +30,8 @@
         <h2 class="dash-segment-title">Оценки</h2>
       </div>
       <div class="dash-cards">
-        {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Распределение" ref="pieRating" show_expr="workTypes.length" %}
-        {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Среднее" ref="barRating" show_expr="worksTotalCount" %}
+        {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Распределение" ref="pieRating" show_expr="hasPieRatingData" %}
+        {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Среднее" ref="barRating" show_expr="hasBarRatingData" %}
       </div>
     </section>
     <section class="dash-segment">
@@ -39,7 +39,7 @@
         <h2 class="dash-segment-title">Прогресс</h2>
       </div>
       <div class="dash-cards">
-        {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Статусы" ref="pieStatus" show_expr="workTypes.length" %}
+        {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Статусы" ref="pieStatus" show_expr="hasPieStatusData" %}
         <article class="dash-card">
           <div class="dash-card-title">Результаты</div>
           <div class="dash-progress-metrics">

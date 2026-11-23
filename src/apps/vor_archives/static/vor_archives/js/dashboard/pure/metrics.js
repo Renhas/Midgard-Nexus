@@ -115,3 +115,7 @@ export function buildCloudItems(items, minPx = MIN_CLOUD_SIZE_PX, maxPx = MAX_CL
     size: min === max ? (minPx + maxPx) / 2 : minPx + ((item.count - min) / (max - min)) * (maxPx - minPx),
   }));
 }
+
+export function hasNonZeroItems(items) {
+  return Array.isArray(items) && items.some((item) => Number(item?.count) > 0);
+}
