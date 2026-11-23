@@ -16,7 +16,8 @@
         {% for week in heatmap.weeks %}
           <div class="vor-dash-heatmap-week">
             {% for day in week %}
-              <div class="vor-dash-heat-cell level-{{ day.level }}{% if not day.in_range %} is-out{% endif %}"
+              <div class="vor-dash-heat-cell{% if not day.in_range %} vor-dash-heat-cell--out{% endif %}"
+                   data-level="{{ day.level }}"
                    title="{{ day.title }}"></div>
             {% endfor %}
           </div>

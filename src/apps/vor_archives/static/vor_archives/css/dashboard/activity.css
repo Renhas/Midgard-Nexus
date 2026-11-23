@@ -153,23 +153,23 @@
   background-color: var(--bg-input);
 }
 
-.vor-dash-heat-cell.level-1 {
+.vor-dash-heat-cell[data-level="1"] {
   background-color: rgb(from var(--accent-vor) r g b / 28%);
 }
 
-.vor-dash-heat-cell.level-2 {
+.vor-dash-heat-cell[data-level="2"] {
   background-color: rgb(from var(--accent-vor) r g b / 50%);
 }
 
-.vor-dash-heat-cell.level-3 {
+.vor-dash-heat-cell[data-level="3"] {
   background-color: rgb(from var(--accent-vor) r g b / 72%);
 }
 
-.vor-dash-heat-cell.level-4 {
+.vor-dash-heat-cell[data-level="4"] {
   background-color: var(--accent-vor);
 }
 
-.vor-dash-heat-cell.is-out {
+.vor-dash-heat-cell--out {
   opacity: 0.22;
 }
 
