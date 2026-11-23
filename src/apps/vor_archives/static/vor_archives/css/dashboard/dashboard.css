@@ -62,7 +62,16 @@
   color: var(--text-secondary);
 }
 
-/* --- Cards --- */
+/* --- Surfaces (Cards & Panes) --- */
+.dash-card,
+.dash-pane {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background-color: var(--bg-card);
+}
+
 .dash-cards {
   display: flex;
   flex-direction: column;
@@ -72,13 +81,8 @@
 
 .dash-card {
   position: relative;
-  display: flex;
-  flex-direction: column;
   gap: 0.2rem;
   padding: 0.7rem 0.85rem;
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  background-color: var(--bg-card);
   transition:
     transform 0.15s ease,
     border-color 0.15s ease,
@@ -89,9 +93,9 @@
 .dash-card:hover {
   transform: translateY(-5px);
   border-color: var(--accent-vor);
-  background-color: rgb(167 139 250 / 8%);
+  background-color: rgb(from var(--accent-vor) r g b / 8%);
   box-shadow:
-    0 0 0 1px rgb(167 139 250 / 20%),
+    0 0 0 1px rgb(from var(--accent-vor) r g b / 20%),
     0 6px 16px rgb(0 0 0 / 18%);
   z-index: 1;
 }
@@ -144,7 +148,6 @@
 }
 
 .dash-card-label {
-  gap: 0.35rem;
   color: var(--text-secondary);
   font-size: 1rem;
 }
@@ -153,25 +156,6 @@
   color: var(--text-primary);
   font-size: 1.65rem;
   font-weight: 700;
-}
-
-.dash-progress-star {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.2rem;
-  height: 32px;
-  min-width: 32px;
-  padding: 0 0.4rem;
-  box-sizing: border-box;
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-.dash-progress-star i {
-  font-size: 1.2rem;
-  color: #f5c518;
 }
 
 .dash-progress-metrics {
@@ -226,8 +210,6 @@
 }
 
 .dash-attr-grid .dash-card {
-  display: flex;
-  flex-direction: column;
   height: 100%;
   min-height: 0;
   overflow: hidden;
@@ -235,17 +217,6 @@
 
 .dash-attr-grid .dash-segment-head {
   flex: 0 0 auto;
-}
-
-.dash-attr-cloud {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  flex: 1 1 auto;
-  gap: 0.55rem 0.75rem;
-  min-height: 12rem;
-  padding: 0.5rem;
 }
 
 .dash-attr-list {
@@ -292,7 +263,6 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-secondary);
-  border-bottom: 1px solid var(--border);
   margin-bottom: 0.25rem;
   padding-inline: 0.5rem;
   scrollbar-gutter: stable both-edges;
@@ -312,15 +282,9 @@
 }
 
 /* --- Panes --- */
-.dash-chart-pane,
 .dash-pane {
-  display: flex;
-  flex-direction: column;
   min-height: 0;
   padding: 0.75rem 0.85rem;
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  background-color: var(--bg-card);
 }
 
 .dash-pane-body {
@@ -484,19 +448,19 @@
   width: 11px;
   height: 11px;
   border-radius: 2px;
-  background-color: #12192b;
+  background-color: var(--bg-input);
 }
 
 .dash-heat-cell.level-1 {
-  background-color: rgb(167 139 250 / 28%);
+  background-color: rgb(from var(--accent-vor) r g b / 28%);
 }
 
 .dash-heat-cell.level-2 {
-  background-color: rgb(167 139 250 / 50%);
+  background-color: rgb(from var(--accent-vor) r g b / 50%);
 }
 
 .dash-heat-cell.level-3 {
-  background-color: rgb(167 139 250 / 72%);
+  background-color: rgb(from var(--accent-vor) r g b / 72%);
 }
 
 .dash-heat-cell.level-4 {
