@@ -12,6 +12,7 @@ import {
   formatAverage,
   formatDashPercent,
   formatMetricNumber,
+  hasNonZeroItems,
   sumByCol,
   sumByRow,
   sumByRowWithCount,
@@ -109,5 +110,30 @@ describe("dashboard pure metrics", () => {
 
     expect(buildCloudItems([{ name: "solo", count: 5 }], 10, 50)).toEqual([{ label: "solo", count: 5, size: 30 }]);
     expect(buildCloudItems([])).toEqual([]);
+  });
+
+  it("detects whether dataset contains non-zero counts", () => {
+    expect(hasNonZeroItems([])).toBe(false);
+    expect(hasNonZeroItems(null)).toBe(false);
+    expect(hasNonZeroItems(undefined)).toBe(false);
+    expect(
+      hasNonZeroItems([
+        { label: "A", count: 0 },
+        { label: "B", count: 0 },
+      ]),
+    ).toBe(false);
+    expect(
+      hasNonZeroItems([
+        { label: "Книги", count: "0.0" },
+        { label: "Фильмы", count: "0.0" },
+      ]),
+    ).toBe(false);
+    expect(
+      hasNonZeroItems([
+        { label: "Книги", count: 0 },
+        { label: "Фильмы", count: 2 },
+      ]),
+    ).toBe(true);
+    expect(hasNonZeroItems([{ label: "Книги", count: "7.5" }])).toBe(true);
   });
 });
