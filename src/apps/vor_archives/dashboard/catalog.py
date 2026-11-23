@@ -21,7 +21,7 @@ class AttrKindOption(TypedDict):
 
 DASHBOARD_TABS: tuple[DashboardTab, ...] = (
     {"kind": "stats", "label": "Статистика", "icon": "bi bi-pie-chart"},
-    {"kind": "attrs", "label": "Аттрибуты", "icon": "bi bi-cloud"},
+    {"kind": "attrs", "label": "Атрибуты", "icon": "bi bi-cloud"},
     {"kind": "activity", "label": "Активность", "icon": "bi bi-calendar-date"},
 )
 
