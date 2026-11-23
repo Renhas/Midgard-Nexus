@@ -31,7 +31,7 @@ def test_attrs_context_and_template_structure(client_logged_in, user, book):
 
     content = response.content.decode()
     assert 'x-data="vorDashAttrs()"' in content
-    assert 'id="dash-attrs-opts"' in content
+    assert 'id="vor-dash-attrs-opts"' in content
     for view in ctx["view_types"]:
         assert f"setAttrView('{view['key']}')" in content
     for kind in ctx["attr_kinds"]:

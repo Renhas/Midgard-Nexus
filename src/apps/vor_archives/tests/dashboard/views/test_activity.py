@@ -24,8 +24,8 @@ def test_activity_tab_contains_heatmap_and_feed(client_logged_in, user, book):
     assert "heatmap" in ctx
 
     content = response.content.decode()
-    assert 'id="dash-heatmap"' in content
-    assert 'id="dash-feed-list"' in content
+    assert 'id="vor-dash-heatmap"' in content
+    assert 'id="vor-dash-feed-list"' in content
     assert reverse("vor_archives:dashboard:heatmap") in content
 
 
@@ -78,7 +78,7 @@ def test_dashboard_feed_partial_returns_items(client_logged_in, user, book):
     response = client_logged_in.get(reverse("vor_archives:dashboard:feed"))
     assert response.status_code == 200
     content = response.content.decode()
-    assert "dash-feed-item" in content
+    assert "vor-dash-feed-item" in content
     assert book.title in content
 
     item = response.context["feed_items"][0]
@@ -144,7 +144,7 @@ def test_dashboard_heatmap_partial_ok(client_logged_in, user, book):
     )
     assert response.status_code == 200
     assert response.context["heatmap"]["year"] == 2024
-    assert "dash-heatmap" in response.content.decode()
+    assert "vor-dash-heatmap" in response.content.decode()
 
 
 def test_dashboard_heatmap_isolates_other_user(client_logged_in, other_user, book):

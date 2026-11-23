@@ -1,11 +1,11 @@
-{{ stats_opts|json_script:"dash-stats-opts" }}
-<div class="dash-page dash-stats" x-data="vorDashStats()">
-  <section class="dash-toolbar">
-    <h2 class="dash-segment-title">Фильтры</h2>
-    <div class="dash-type-filters" role="group" aria-label="Типы произведений">
+{{ stats_opts|json_script:"vor-dash-stats-opts" }}
+<div class="vor-dash-page vor-dash-stats" x-data="vorDashStats()">
+  <section class="vor-dash-toolbar">
+    <h2 class="vor-dash-segment-title">Фильтры</h2>
+    <div class="vor-dash-type-filters" role="group" aria-label="Типы произведений">
       {% for key, meta in stats_opts.type_meta.items %}
         <button type="button"
-                class="sidebar-btn sidebar-btn-type"
+                class="sidebar-btn vor-dash-filter-btn"
                 :class="{ 'sidebar-btn--active': workTypes.includes('{{ key }}') }"
                 :aria-pressed="workTypes.includes('{{ key }}')"
                 @click="toggleType('{{ key }}')"
@@ -15,39 +15,39 @@
       {% endfor %}
     </div>
   </section>
-  <div class="dash-segments">
-    <section class="dash-segment">
-      <div class="dash-segment-head">
-        <h2 class="dash-segment-title">Обзор</h2>
+  <div class="vor-dash-segments">
+    <section class="vor-dash-segment">
+      <div class="vor-dash-segment-head">
+        <h2 class="vor-dash-segment-title">Обзор</h2>
       </div>
-      <div class="dash-cards">
+      <div class="vor-dash-cards">
         {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Типы" ref="pieTypes" show_expr="hasPieTypesData" %}
         {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Возрастной рейтинг" ref="pieAge" show_expr="hasPieAgeData" %}
       </div>
     </section>
-    <section class="dash-segment">
-      <div class="dash-segment-head">
-        <h2 class="dash-segment-title">Оценки</h2>
+    <section class="vor-dash-segment">
+      <div class="vor-dash-segment-head">
+        <h2 class="vor-dash-segment-title">Оценки</h2>
       </div>
-      <div class="dash-cards">
+      <div class="vor-dash-cards">
         {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Распределение" ref="pieRating" show_expr="hasPieRatingData" %}
         {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Среднее" ref="barRating" show_expr="hasBarRatingData" %}
       </div>
     </section>
-    <section class="dash-segment">
-      <div class="dash-segment-head">
-        <h2 class="dash-segment-title">Прогресс</h2>
+    <section class="vor-dash-segment">
+      <div class="vor-dash-segment-head">
+        <h2 class="vor-dash-segment-title">Прогресс</h2>
       </div>
-      <div class="dash-cards">
+      <div class="vor-dash-cards">
         {% include "vor_archives/partials/dashboard/dash_chart_card.html" with title="Статусы" ref="pieStatus" show_expr="hasPieStatusData" %}
-        <article class="dash-card">
-          <div class="dash-card-title">Результаты</div>
-          <div class="dash-progress-metrics">
+        <article class="vor-dash-card">
+          <div class="vor-dash-card-title">Результаты</div>
+          <div class="vor-dash-progress-metrics">
             <template x-for="item in spentProgressItems" :key="item.key">
-              <div class="dash-progress-metric">
+              <div class="vor-dash-progress-metric">
                 <i :class="item.icon"></i>
-                <span class="dash-card-value" x-text="formatNumber(item.count)"></span>
-                <span class="dash-card-label" x-text="item.unit"></span>
+                <span class="vor-dash-card-value" x-text="formatNumber(item.count)"></span>
+                <span class="vor-dash-card-label" x-text="item.unit"></span>
               </div>
             </template>
           </div>

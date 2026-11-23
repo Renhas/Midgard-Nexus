@@ -2,7 +2,7 @@
     VOR Archives — Dashboard Layout & Surfaces
     ============================================ */
 
-.dash-page {
+.vor-dash-page {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -15,7 +15,7 @@
   padding-inline: 0.75rem;
 }
 
-.dash-toolbar {
+.vor-dash-toolbar {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
@@ -23,8 +23,8 @@
   flex-wrap: wrap;
 }
 
-.dash-segment-head,
-.dash-pane-head {
+.vor-dash-segment-head,
+.vor-dash-pane-head {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -32,7 +32,7 @@
   flex-shrink: 0;
 }
 
-.dash-segment-title {
+.vor-dash-segment-title {
   margin: 0;
   font-size: 0.75rem;
   font-weight: 600;
@@ -41,7 +41,7 @@
   color: var(--text-secondary);
 }
 
-.dash-type-filters {
+.vor-dash-type-filters {
   display: flex;
   align-self: flex-start;
   flex-direction: row;
@@ -49,23 +49,23 @@
   gap: 0.3rem;
 }
 
-.dash-type-filters .sidebar-btn-type {
+.vor-dash-type-filters .vor-dash-filter-btn {
   width: 2.25rem;
   height: 2.25rem;
   padding: 0;
 }
 
 /* --- Surfaces (Cards & Panes) --- */
-.dash-card,
-.dash-pane {
+.vor-dash-card,
+.vor-dash-pane {
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border);
-  border-radius: 0.75rem;
+  border-radius: var(--radius-lg);
   background-color: var(--bg-card);
 }
 
-.dash-card {
+.vor-dash-card {
   position: relative;
   gap: 0.2rem;
   padding: 0.7rem 0.85rem;
@@ -76,17 +76,17 @@
     background-color 0.15s ease;
 }
 
-.dash-card:hover {
+.vor-dash-card:hover {
   transform: translateY(-5px);
   border-color: var(--accent-vor);
   background-color: rgb(from var(--accent-vor) r g b / 8%);
   box-shadow:
     0 0 0 1px rgb(from var(--accent-vor) r g b / 20%),
     0 6px 16px rgb(0 0 0 / 18%);
-  z-index: 1;
+  z-index: var(--z-base);
 }
 
-.dash-card-title {
+.vor-dash-card-title {
   align-self: stretch;
   text-align: center;
   margin: 0;
@@ -96,38 +96,38 @@
   color: var(--text-secondary);
 }
 
-.dash-card-title__icon {
+.vor-dash-card-title__icon {
   font-size: 0.9rem;
   color: var(--text-secondary);
 }
 
-.dash-chart-canvas-wrap {
+.vor-dash-chart-canvas-wrap {
   position: relative;
   flex: 1 1 0;
   min-height: 0;
   min-width: 0;
 }
 
-.dash-chart-canvas-wrap canvas {
+.vor-dash-chart-canvas-wrap canvas {
   position: absolute;
   inset: 0;
   width: 100% !important;
   height: 100% !important;
 }
 
-.dash-pane {
+.vor-dash-pane {
   min-height: 0;
   padding: 0.75rem 0.85rem;
 }
 
-.dash-pane-body {
+.vor-dash-pane-body {
   flex: 1;
   min-height: 0;
   overflow: auto;
   margin-top: 0.55rem;
 }
 
-.dash-empty {
+.vor-dash-empty {
   margin: 1.25rem 0 0;
   text-align: center;
   color: var(--text-secondary);

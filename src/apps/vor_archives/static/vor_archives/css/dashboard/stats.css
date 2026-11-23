@@ -2,11 +2,11 @@
     VOR Archives — Dashboard Stats Tab
     ============================================ */
 
-.dash-stats {
+.vor-dash-stats {
   justify-content: stretch;
 }
 
-.dash-segments {
+.vor-dash-segments {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.65rem;
@@ -15,36 +15,36 @@
   min-height: 0;
 }
 
-.dash-segment {
+.vor-dash-segment {
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
   min-width: 0;
 }
 
-.dash-cards {
+.vor-dash-cards {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
   flex: 0 0 auto;
 }
 
-.dash-card--chart {
+.vor-dash-card--chart {
   aspect-ratio: 4 / 3;
 }
 
-.dash-card-label {
+.vor-dash-card-label {
   color: var(--text-secondary);
   font-size: 1rem;
 }
 
-.dash-card-value {
+.vor-dash-card-value {
   color: var(--text-primary);
   font-size: 1.65rem;
   font-weight: 700;
 }
 
-.dash-progress-metrics {
+.vor-dash-progress-metrics {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   column-gap: 0.5rem;
@@ -53,7 +53,7 @@
   flex: 1;
 }
 
-.dash-progress-metric {
+.vor-dash-progress-metric {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -62,7 +62,7 @@
   min-width: 0;
 }
 
-.dash-progress-metric + .dash-progress-metric::before {
+.vor-dash-progress-metric + .vor-dash-progress-metric::before {
   content: "";
   position: absolute;
   left: calc(-0.25rem - 0.5px);
@@ -73,20 +73,20 @@
   background: var(--border);
 }
 
-.dash-progress-metric .dash-card-value {
+.vor-dash-progress-metric .vor-dash-card-value {
   font-size: 1.35rem;
 }
 
-.dash-progress-metric i {
+.vor-dash-progress-metric i {
   font-size: 1.5rem;
 }
 
-.dash-progress-metric .dash-card-label {
+.vor-dash-progress-metric .vor-dash-card-label {
   font-size: 0.8rem;
 }
 
 @media (width <= 1200px) {
-  .dash-segment {
+  .vor-dash-segment {
     flex: 1 1 auto;
   }
 }

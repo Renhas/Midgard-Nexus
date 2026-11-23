@@ -35,7 +35,7 @@ def test_stats_json_payload_keys_match_js_contract(client_logged_in, user, book)
     response = client_logged_in.get(
         reverse("vor_archives:dashboard:tab", kwargs={"tab": "stats"})
     )
-    payload = _extract_json_script(response.content.decode(), "dash-stats-opts")
+    payload = _extract_json_script(response.content.decode(), "vor-dash-stats-opts")
     for key in (
         "status_matrix",
         "age_matrix",
