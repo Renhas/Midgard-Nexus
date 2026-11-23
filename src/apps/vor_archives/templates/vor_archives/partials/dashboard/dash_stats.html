@@ -5,7 +5,7 @@
     <div class="vor-dash-type-filters" role="group" aria-label="Типы произведений">
       {% for key, meta in stats_opts.type_meta.items %}
         <button type="button"
-                class="sidebar-btn sidebar-btn-type"
+                class="sidebar-btn vor-dash-filter-btn"
                 :class="{ 'sidebar-btn--active': workTypes.includes('{{ key }}') }"
                 :aria-pressed="workTypes.includes('{{ key }}')"
                 @click="toggleType('{{ key }}')"
