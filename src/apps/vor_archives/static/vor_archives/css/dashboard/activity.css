@@ -1,0 +1,181 @@
+/* ============================================
+    VOR Archives — Dashboard Activity Tab
+    ============================================ */
+
+.dash-activity {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 0.85rem;
+  height: 100%;
+  min-width: 0;
+}
+
+.dash-year-select {
+  width: auto;
+  min-width: 11rem;
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+/* --- Feed --- */
+.dash-feed-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.55rem 0.15rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.dash-feed-icon {
+  margin-top: 0.15rem;
+  color: var(--accent-vor);
+}
+
+.dash-feed-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.dash-feed-text {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.5rem;
+  color: var(--text-primary);
+}
+
+.dash-feed-link {
+  color: var(--accent-vor);
+  text-decoration: none;
+}
+
+.dash-feed-link:hover {
+  text-decoration: underline;
+}
+
+.dash-feed-title {
+  color: var(--text-secondary);
+}
+
+.dash-feed-time {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.dash-feed-more-btn {
+  width: 100%;
+  margin: 0.65rem 0 0.25rem;
+}
+
+/* --- Heatmap --- */
+.dash-heatmap-inner {
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.dash-heatmap-year-select {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 10;
+}
+
+.dash-heatmap-wrap {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+}
+
+.dash-heatmap {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+}
+
+.dash-heatmap-months,
+.dash-heatmap-body {
+  display: flex;
+}
+
+.dash-heatmap-months {
+  gap: 3px;
+  margin-bottom: 0.25rem;
+}
+
+.dash-heatmap-wd-spacer,
+.dash-heatmap-wdays {
+  width: 1.4rem;
+  flex-shrink: 0;
+}
+
+.dash-heatmap-month {
+  width: 11px;
+  flex-shrink: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  padding-left: 2px;
+}
+
+.dash-heatmap-body {
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.dash-heatmap-wdays {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 0.62rem;
+  line-height: 11px;
+  color: var(--text-secondary);
+}
+
+.dash-heatmap-weeks {
+  display: flex;
+  gap: 3px;
+}
+
+.dash-heatmap-week {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.dash-heat-cell {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  background-color: var(--bg-input);
+}
+
+.dash-heat-cell.level-1 {
+  background-color: rgb(from var(--accent-vor) r g b / 28%);
+}
+
+.dash-heat-cell.level-2 {
+  background-color: rgb(from var(--accent-vor) r g b / 50%);
+}
+
+.dash-heat-cell.level-3 {
+  background-color: rgb(from var(--accent-vor) r g b / 72%);
+}
+
+.dash-heat-cell.level-4 {
+  background-color: var(--accent-vor);
+}
+
+.dash-heat-cell.is-out {
+  opacity: 0.22;
+}
+
+@media (width <= 1200px) {
+  .dash-activity {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}
