@@ -32,6 +32,12 @@ def test_feed_page_orders_and_paginates(user, book, movie):
     second = UserWorkFactory(user=user, work=movie)
     older = FeedItem.objects.filter(user_work=first, action_type="added").get()
     newer = FeedItem.objects.filter(user_work=second, action_type="added").get()
+    FeedItem.objects.filter(user_work=first, action_type="planning").update(
+        timestamp=timezone.now() - timedelta(hours=3)
+    )
+    FeedItem.objects.filter(user_work=second, action_type="planning").update(
+        timestamp=timezone.now() - timedelta(hours=4)
+    )
     _set_timestamp(older, timezone.now() - timedelta(hours=2))
     _set_timestamp(newer, timezone.now() - timedelta(hours=1))
 
@@ -50,7 +56,7 @@ def test_feed_page_orders_and_paginates(user, book, movie):
     assert rest[0]["detail_url"] == reverse(
         "vor_archives:artworks:detail", args=[first.pk]
     )
-    assert rest_more is False
+    assert rest_more is True
 
 
 @pytest.mark.django_db
@@ -59,6 +65,9 @@ def test_feed_page_tie_breaks_by_pk_desc(user, book, movie):
     second = UserWorkFactory(user=user, work=movie)
     item_a = FeedItem.objects.filter(user_work=first, action_type="added").get()
     item_b = FeedItem.objects.filter(user_work=second, action_type="added").get()
+    FeedItem.objects.filter(action_type="planning").update(
+        timestamp=timezone.now() - timedelta(hours=5)
+    )
 
     same_time = timezone.now() - timedelta(hours=1)
     _set_timestamp(item_a, same_time)
@@ -79,8 +88,9 @@ def test_feed_page_filters_by_user(user, book):
 
     page, has_more = feed_page(user)
 
-    assert len(page) == 1
-    assert page[0]["work_title"] == book.title
+    assert len(page) == 2
+    assert {item["work_title"] for item in page} == {book.title}
+    assert {item["action_type"] for item in page} == {"added", "planning"}
     assert has_more is False
 
 
@@ -99,9 +109,9 @@ def test_feed_item_payload_with_deleted_user_work(user, book):
 
     page, _ = feed_page(user)
 
-    assert len(page) == 1
-    assert page[0]["work_title"] == ""
-    assert page[0]["detail_url"] == ""
+    assert len(page) == 2
+    assert all(item["work_title"] == "" for item in page)
+    assert all(item["detail_url"] == "" for item in page)
 
 
 @pytest.mark.django_db
@@ -116,9 +126,9 @@ def test_heatmap_payload_grid_structure(user):
 @pytest.mark.django_db
 def test_heatmap_counts_days_in_selected_year(user, book):
     user_work = UserWorkFactory(user=user, work=book)
-    item = FeedItem.objects.filter(user_work=user_work).get()
     when = timezone.make_aware(datetime(2024, 3, 15, 12, 0))
-    _set_timestamp(item, when)
+    for item in FeedItem.objects.filter(user_work=user_work):
+        _set_timestamp(item, when)
 
     payload = heatmap_payload(user, year=2024)
     counted = [day for week in payload["weeks"] for day in week if day["count"]]
@@ -126,14 +136,15 @@ def test_heatmap_counts_days_in_selected_year(user, book):
     assert payload["year"] == 2024
     assert len(counted) == 1
     assert counted[0]["date"] == "2024-03-15"
-    assert counted[0]["count"] == 1
+    assert counted[0]["count"] == 2
 
 
 @pytest.mark.django_db
 def test_heatmap_payload_default_range_is_last_year(user, book):
     user_work = UserWorkFactory(user=user, work=book)
-    item = FeedItem.objects.get(user_work=user_work)
-    _set_timestamp(item, timezone.make_aware(datetime(2024, 3, 15, 12, 0)))
+    when = timezone.make_aware(datetime(2024, 3, 15, 12, 0))
+    for item in FeedItem.objects.filter(user_work=user_work):
+        _set_timestamp(item, when)
 
     payload = heatmap_payload(user, today=date(2024, 6, 1))
 
@@ -145,8 +156,9 @@ def test_heatmap_payload_default_range_is_last_year(user, book):
 @pytest.mark.django_db
 def test_heatmap_payload_excludes_other_years(user, book):
     user_work = UserWorkFactory(user=user, work=book)
-    item = FeedItem.objects.get(user_work=user_work)
-    _set_timestamp(item, timezone.make_aware(datetime(2023, 3, 15, 12, 0)))
+    when = timezone.make_aware(datetime(2023, 3, 15, 12, 0))
+    for item in FeedItem.objects.filter(user_work=user_work):
+        _set_timestamp(item, when)
 
     payload = heatmap_payload(user, year=2024)
     counted = [day for week in payload["weeks"] for day in week if day["count"]]
@@ -211,8 +223,9 @@ def test_activity_years_empty_defaults_to_current_year(user):
 @pytest.mark.django_db
 def test_heatmap_month_labels_and_cell_titles(user, book):
     user_work = UserWorkFactory(user=user, work=book)
-    item = FeedItem.objects.get(user_work=user_work)
-    _set_timestamp(item, timezone.make_aware(datetime(2025, 1, 10, 12, 0)))
+    when = timezone.make_aware(datetime(2025, 1, 10, 12, 0))
+    for item in FeedItem.objects.filter(user_work=user_work):
+        _set_timestamp(item, when)
 
     payload = heatmap_payload(user, year=2025)
 
@@ -247,7 +260,7 @@ def test_heatmap_month_labels_and_cell_titles(user, book):
     active_cell = next(
         day for week in payload["weeks"] for day in week if day["date"] == "2025-01-10"
     )
-    assert active_cell["title"] == "1 — 10.01.2025"
+    assert active_cell["title"] == "2 — 10.01.2025"
 
 
 @pytest.mark.django_db
@@ -256,9 +269,9 @@ def test_feed_page_exact_limit_has_no_more(user, book, movie, game):
     UserWorkFactory(user=user, work=movie)
     UserWorkFactory(user=user, work=game)
 
-    page, has_more = feed_page(user, offset=0, limit=3)
+    page, has_more = feed_page(user, offset=0, limit=6)
 
-    assert len(page) == 3
+    assert len(page) == 6
     assert has_more is False
 
 
