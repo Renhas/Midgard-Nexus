@@ -2,11 +2,12 @@
 <div class="dash-page" x-data="vorDashAttrs()">
   <section class="dash-toolbar">
     <h2 class="dash-segment-title">Вид</h2>
-    <div class="dash-type-filters">
+    <div class="dash-type-filters" role="group" aria-label="Режим отображения атрибутов">
       {% for type in view_types %}
         <button type="button"
                 class="sidebar-btn"
                 :class="{ 'sidebar-btn--active': attrView === '{{ type.key }}' }"
+                :aria-pressed="attrView === '{{ type.key }}'"
                 @click="setAttrView('{{ type.key }}')"
                 title="{{ type.label }}">
           <i class="{{ type.icon }}"></i>
@@ -16,7 +17,7 @@
   </section>
   <section class="dash-attr-grid">
     {% for kind in attr_kinds %}
-      <section class="dash-card">
+      <article class="dash-card">
         <div class="dash-segment-head">
           <i class="{{ kind.icon }} dash-card-title__icon"></i>
           <h2 class="dash-card-title">{{ kind.label }}</h2>
@@ -43,7 +44,7 @@
             </template>
           </div>
         </div>
-      </section>
+      </article>
     {% endfor %}
   </section>
 </div>

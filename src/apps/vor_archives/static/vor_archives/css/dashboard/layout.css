@@ -1,0 +1,134 @@
+/* ============================================
+    VOR Archives — Dashboard Layout & Surfaces
+    ============================================ */
+
+.dash-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 1500px;
+  width: 100%;
+  margin-inline: auto;
+  min-height: 0;
+  overflow-y: auto;
+  gap: 0.75rem;
+  padding-inline: 0.75rem;
+}
+
+.dash-toolbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.dash-segment-head,
+.dash-pane-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.dash-segment-title {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.dash-type-filters {
+  display: flex;
+  align-self: flex-start;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.dash-type-filters .sidebar-btn-type {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+}
+
+/* --- Surfaces (Cards & Panes) --- */
+.dash-card,
+.dash-pane {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background-color: var(--bg-card);
+}
+
+.dash-card {
+  position: relative;
+  gap: 0.2rem;
+  padding: 0.7rem 0.85rem;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.dash-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent-vor);
+  background-color: rgb(from var(--accent-vor) r g b / 8%);
+  box-shadow:
+    0 0 0 1px rgb(from var(--accent-vor) r g b / 20%),
+    0 6px 16px rgb(0 0 0 / 18%);
+  z-index: 1;
+}
+
+.dash-card-title {
+  align-self: stretch;
+  text-align: center;
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.dash-card-title__icon {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.dash-chart-canvas-wrap {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+}
+
+.dash-chart-canvas-wrap canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.dash-pane {
+  min-height: 0;
+  padding: 0.75rem 0.85rem;
+}
+
+.dash-pane-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  margin-top: 0.55rem;
+}
+
+.dash-empty {
+  margin: 1.25rem 0 0;
+  text-align: center;
+  color: var(--text-secondary);
+}

@@ -8,6 +8,7 @@
       <div class="dash-heatmap-year-select">
         <select class="form-select form-select-sm dash-year-select"
                 name="year"
+                aria-label="Год активности"
                 hx-get="{% url 'vor_archives:dashboard:heatmap' %}"
                 hx-target="#dash-heatmap"
                 hx-swap="innerHTML">
@@ -23,7 +24,7 @@
     <div class="dash-pane-head">
       <h2 class="dash-segment-title">История</h2>
     </div>
-    <div class="dash-pane-body" id="dash-feed-scroll">
+    <div class="dash-pane-body">
       <div id="dash-feed-list">{% include "vor_archives/partials/dashboard/dash_feed_items.html" %}</div>
     </div>
   </section>

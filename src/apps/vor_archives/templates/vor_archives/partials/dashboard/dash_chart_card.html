@@ -1,0 +1,7 @@
+<article class="dash-card dash-card--chart">
+  <div class="dash-card-title">{{ title }}</div>
+  <div class="dash-chart-canvas-wrap">
+    <p class="dash-empty" x-show="!({{ show_expr }})" x-cloak>Нет данных для графика</p>
+    <canvas x-ref="{{ ref }}" x-show="{{ show_expr }}"></canvas>
+  </div>
+</article>
