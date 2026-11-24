@@ -1,20 +1,20 @@
 <div class="vor-dash-heatmap">
-  <div class="vor-dash-heatmap-inner">
-    <div class="vor-dash-heatmap-months">
-      <span class="vor-dash-heatmap-wd-spacer"></span>
+  <div class="vor-dash-heatmap__inner">
+    <div class="vor-dash-heatmap__months">
+      <span class="vor-dash-heatmap__wd-spacer"></span>
       {% for label in heatmap.month_labels %}
-        <span class="vor-dash-heatmap-month">{{ label }}</span>
+        <span class="vor-dash-heatmap__month">{{ label }}</span>
       {% endfor %}
     </div>
-    <div class="vor-dash-heatmap-body">
-      <div class="vor-dash-heatmap-wdays">
+    <div class="vor-dash-heatmap__body">
+      <div class="vor-dash-heatmap__wdays">
         {% for label in heatmap.weekday_labels %}
           <span>{{ label }}</span>
         {% endfor %}
       </div>
-      <div class="vor-dash-heatmap-weeks">
+      <div class="vor-dash-heatmap__weeks">
         {% for week in heatmap.weeks %}
-          <div class="vor-dash-heatmap-week">
+          <div class="vor-dash-heatmap__week">
             {% for day in week %}
               <div class="vor-dash-heat-cell{% if not day.in_range %} vor-dash-heat-cell--out{% endif %}"
                    data-level="{{ day.level }}"

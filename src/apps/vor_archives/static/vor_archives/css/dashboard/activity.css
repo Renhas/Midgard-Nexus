@@ -10,7 +10,7 @@
   min-width: 0;
 }
 
-.vor-dash-year-select {
+.vor-dash__year-select {
   width: auto;
   min-width: 11rem;
   background-color: var(--bg-input);
@@ -19,7 +19,7 @@
 }
 
 /* --- Feed --- */
-.vor-dash-feed-item {
+.vor-dash-feed__item {
   display: flex;
   align-items: flex-start;
   gap: 0.65rem;
@@ -27,62 +27,62 @@
   border-bottom: 1px solid var(--border);
 }
 
-.vor-dash-feed-icon {
+.vor-dash-feed__icon {
   margin-top: 0.15rem;
   color: var(--accent-vor);
 }
 
-.vor-dash-feed-body {
+.vor-dash-feed__body {
   min-width: 0;
   flex: 1;
 }
 
-.vor-dash-feed-text {
+.vor-dash-feed__text {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem 0.5rem;
   color: var(--text-primary);
 }
 
-.vor-dash-feed-link {
+.vor-dash-feed__link {
   color: var(--accent-vor);
   text-decoration: none;
 }
 
-.vor-dash-feed-link:hover {
+.vor-dash-feed__link:hover {
   text-decoration: underline;
 }
 
-.vor-dash-feed-title {
+.vor-dash-feed__title {
   color: var(--text-secondary);
 }
 
-.vor-dash-feed-time {
+.vor-dash-feed__time {
   display: block;
   margin-top: 0.15rem;
   font-size: 0.75rem;
   color: var(--text-secondary);
 }
 
-.vor-dash-feed-more-btn {
+.vor-dash-feed__more-btn {
   width: 100%;
   margin: 0.65rem 0 0.25rem;
 }
 
 /* --- Heatmap --- */
-.vor-dash-heatmap-inner {
+.vor-dash-heatmap__inner {
   width: fit-content;
   margin: 0 auto;
 }
 
-.vor-dash-heatmap-year-select {
+.vor-dash-heatmap__year-select {
   position: absolute;
   right: 0;
   top: 0;
   z-index: var(--z-overlay-bar);
 }
 
-.vor-dash-heatmap-wrap {
+.vor-dash-heatmap__wrap {
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -95,23 +95,23 @@
   padding-bottom: 0.35rem;
 }
 
-.vor-dash-heatmap-months,
-.vor-dash-heatmap-body {
+.vor-dash-heatmap__months,
+.vor-dash-heatmap__body {
   display: flex;
 }
 
-.vor-dash-heatmap-months {
+.vor-dash-heatmap__months {
   gap: 3px;
   margin-bottom: 0.25rem;
 }
 
-.vor-dash-heatmap-wd-spacer,
-.vor-dash-heatmap-wdays {
+.vor-dash-heatmap__wd-spacer,
+.vor-dash-heatmap__wdays {
   width: 1.4rem;
   flex-shrink: 0;
 }
 
-.vor-dash-heatmap-month {
+.vor-dash-heatmap__month {
   width: 11px;
   flex-shrink: 0;
   text-overflow: ellipsis;
@@ -121,12 +121,12 @@
   padding-left: 2px;
 }
 
-.vor-dash-heatmap-body {
+.vor-dash-heatmap__body {
   align-items: flex-start;
   gap: 0.35rem;
 }
 
-.vor-dash-heatmap-wdays {
+.vor-dash-heatmap__wdays {
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -135,12 +135,12 @@
   color: var(--text-secondary);
 }
 
-.vor-dash-heatmap-weeks {
+.vor-dash-heatmap__weeks {
   display: flex;
   gap: 3px;
 }
 
-.vor-dash-heatmap-week {
+.vor-dash-heatmap__week {
   display: flex;
   flex-direction: column;
   gap: 3px;

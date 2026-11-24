@@ -1,7 +1,7 @@
 <article class="vor-dash-card vor-dash-card--chart">
-  <div class="vor-dash-card-title">{{ title }}</div>
-  <div class="vor-dash-chart-canvas-wrap">
-    <p class="vor-dash-empty" x-show="!({{ show_expr }})" x-cloak>Нет данных для графика</p>
+  <div class="vor-dash-card__title">{{ title }}</div>
+  <div class="vor-dash-card__chart-wrap">
+    <p class="vor-dash__empty" x-show="!({{ show_expr }})" x-cloak>Нет данных для графика</p>
     <canvas x-ref="{{ ref }}" x-show="{{ show_expr }}"></canvas>
   </div>
 </article>

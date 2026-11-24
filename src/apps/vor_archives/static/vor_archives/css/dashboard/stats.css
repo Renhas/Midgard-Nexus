@@ -6,7 +6,7 @@
   justify-content: stretch;
 }
 
-.vor-dash-segments {
+.vor-dash__segments {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.65rem;
@@ -22,7 +22,7 @@
   min-width: 0;
 }
 
-.vor-dash-cards {
+.vor-dash__cards {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
@@ -33,18 +33,18 @@
   aspect-ratio: 4 / 3;
 }
 
-.vor-dash-card-label {
+.vor-dash-card__label {
   color: var(--text-secondary);
   font-size: 1rem;
 }
 
-.vor-dash-card-value {
+.vor-dash-card__value {
   color: var(--text-primary);
   font-size: 1.65rem;
   font-weight: 700;
 }
 
-.vor-dash-progress-metrics {
+.vor-dash-progress__metrics {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   column-gap: 0.5rem;
@@ -53,7 +53,7 @@
   flex: 1;
 }
 
-.vor-dash-progress-metric {
+.vor-dash-progress__metric {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -62,7 +62,7 @@
   min-width: 0;
 }
 
-.vor-dash-progress-metric + .vor-dash-progress-metric::before {
+.vor-dash-progress__metric + .vor-dash-progress__metric::before {
   content: "";
   position: absolute;
   left: calc(-0.25rem - 0.5px);
@@ -73,15 +73,15 @@
   background: var(--border);
 }
 
-.vor-dash-progress-metric .vor-dash-card-value {
+.vor-dash-progress__metric .vor-dash-card__value {
   font-size: 1.35rem;
 }
 
-.vor-dash-progress-metric i {
+.vor-dash-progress__metric i {
   font-size: 1.5rem;
 }
 
-.vor-dash-progress-metric .vor-dash-card-label {
+.vor-dash-progress__metric .vor-dash-card__label {
   font-size: 0.8rem;
 }
 
