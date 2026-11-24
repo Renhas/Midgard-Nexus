@@ -1,17 +1,17 @@
 <div class="vor-backdrop" x-data @click.self="$dispatch('vor:close-modal')">
   <div class="vor-panel vor-modal" @click.stop>
-    <h3 class="vor-modal-title">Удалить коллекцию</h3>
-    <p class="vor-modal-text">Коллекция «{{ collection.name }}» будет удалена.</p>
+    <h3 class="vor-modal__title">Удалить коллекцию</h3>
+    <p class="vor-modal__text">Коллекция «{{ collection.name }}» будет удалена.</p>
     {% if child_count %}
-      <div class="vor-modal-warning">
+      <div class="vor-modal__warning">
         Вместе с ней будут удалены вложенные коллекции ({{ child_count }}).
         Произведения останутся в медиатеке.
       </div>
     {% endif %}
-    <form class="vor-modal-actions" hx-post="{% url 'vor_archives:collections:delete' collection.pk %}" hx-swap="none">
+    <form class="vor-modal__actions" hx-post="{% url 'vor_archives:collections:delete' collection.pk %}" hx-swap="none">
       {% csrf_token %}
       <button type="button" class="sidebar-btn" @click="$dispatch('vor:close-modal')">Отмена</button>
-      <button type="submit" class="sidebar-btn sidebar-btn-delete">Удалить</button>
+      <button type="submit" class="sidebar-btn sidebar-btn--delete">Удалить</button>
     </form>
   </div>
 </div>

@@ -1,6 +1,6 @@
 {% if work.platforms.all %}
   <div class="vor-view-row vor-view-labeled vor-view-attrs" x-show="!editing">
-    <span class="vor-field-label">Платформы:</span>
+    <span class="vor-field__label">Платформы:</span>
     <div class="vor-chip-list" x-data="vorChipOverflow()" :class="{ 'is-open': popupOpen }">
       {% for platform in work.platforms.all %}
         <button type="button"

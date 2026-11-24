@@ -2,7 +2,7 @@
   <div class="vor-relations-head">
     <div class="vor-relations-head-side">
       <button type="button"
-              class="sidebar-btn sidebar-btn-icon vor-relations-head-btn"
+              class="sidebar-btn sidebar-btn--icon vor-relations-head-btn"
               x-show="relationsEditable() && relAdding"
               x-cloak
               title="Назад"
@@ -13,7 +13,7 @@
     <h3 class="vor-relations-title" x-text="relAdding ? 'Добавление' : 'Связи'">Связи</h3>
     <div class="vor-relations-head-side">
       <button type="button"
-              class="sidebar-btn sidebar-btn-add sidebar-btn-icon vor-relations-head-btn"
+              class="sidebar-btn sidebar-btn--add sidebar-btn--icon vor-relations-head-btn"
               x-show="relationsEditable() && !relAdding"
               x-cloak
               title="Добавить связь"
@@ -21,7 +21,7 @@
         <i class="bi bi-plus-lg"></i>
       </button>
       <button type="button"
-              class="sidebar-btn sidebar-btn-add sidebar-btn-icon vor-relations-head-btn"
+              class="sidebar-btn sidebar-btn--add sidebar-btn--icon vor-relations-head-btn"
               x-show="relationsEditable() && relAdding"
               x-cloak
               title="Сохранить связь"
@@ -108,7 +108,7 @@
     </div>
     <div class="vor-relation-add-type" x-show="relPick">
       <div class="vor-relation-add-type-head">
-        <span class="vor-field-label">Тип связи</span>
+        <span class="vor-field__label">Тип связи</span>
         <span class="vor-relation-add-hint">(текущее → выбранное)</span>
       </div>
       <div class="vor-relation-type-choices">

@@ -145,7 +145,7 @@ button.vor-relation-item,
   gap: 0.15rem;
 }
 
-.vor-relation-add-type-head .vor-field-label {
+.vor-relation-add-type-head .vor-field__label {
   margin: 0;
 }
 

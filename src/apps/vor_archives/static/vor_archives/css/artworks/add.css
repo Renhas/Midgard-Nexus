@@ -348,7 +348,7 @@
   margin-top: 0.45rem;
 }
 
-.vor-add-attrs .sidebar-accordion-body {
+.vor-add-attrs .sidebar-accordion__body {
   max-height: 220px;
   overflow-y: auto;
 }
@@ -365,7 +365,7 @@
   position: relative;
 }
 
-.vor-add-field .vor-field-label {
+.vor-add-field .vor-field__label {
   flex: 0 0 7.5rem;
   color: var(--text-secondary);
   font-size: 0.9rem;

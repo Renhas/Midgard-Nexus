@@ -1,15 +1,15 @@
 <div class="vor-backdrop vor-leave-confirm" x-show="leaveConfirmOpen" x-cloak @click.self="leaveConfirmOpen = false">
   <div class="vor-panel vor-modal" @click.stop>
-    <h3 class="vor-modal-title">Несохранённые изменения</h3>
-    <p class="vor-modal-text">При переходе будут потеряны изменения в полях:</p>
+    <h3 class="vor-modal__title">Несохранённые изменения</h3>
+    <p class="vor-modal__text">При переходе будут потеряны изменения в полях:</p>
     <ul class="vor-leave-list">
       <template x-for="field in leaveChanges" :key="field">
         <li x-text="field"></li>
       </template>
     </ul>
-    <div class="vor-modal-actions">
+    <div class="vor-modal__actions">
       <button type="button" class="sidebar-btn" @click="leaveConfirmOpen = false">Остаться</button>
-      <button type="button" class="sidebar-btn sidebar-btn-delete" @click="confirmLeave()">Уйти</button>
+      <button type="button" class="sidebar-btn sidebar-btn--delete" @click="confirmLeave()">Уйти</button>
     </div>
   </div>
 </div>

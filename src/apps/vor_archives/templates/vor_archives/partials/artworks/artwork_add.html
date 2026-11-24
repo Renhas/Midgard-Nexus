@@ -56,21 +56,21 @@
           <h3>Общая информация</h3>
           <div class="vor-add-info-fields">
             <div class="vor-add-field">
-              <span class="vor-field-label">Релиз</span>
+              <span class="vor-field__label">Релиз</span>
               {% include "vor_archives/partials/artworks/widgets/artwork_date_picker.html" with is_add=True %}
             </div>
             <div class="vor-add-field">
-              <span class="vor-field-label">Возраст</span>
+              <span class="vor-field__label">Возраст</span>
               {% include "vor_archives/partials/artworks/widgets/artwork_age_picker.html" with is_add=True %}
             </div>
             <div class="vor-add-field">
-              <span class="vor-field-label">Ссылка</span>
+              <span class="vor-field__label">Ссылка</span>
               <input class="vor-link-input vor-add-link" type="url" x-model="externalLink" placeholder="https://">
             </div>
             <div class="vor-add-field"
                  x-show="workType === 'book'"
                  :title="showRequired('pages') ? 'Обязательное поле' : ''">
-              <span class="vor-field-label">Страницы<span class="vor-req-star"
+              <span class="vor-field__label">Страницы<span class="vor-req-star"
       x-show="showRequired('pages')"
       x-cloak>*</span></span>
               <div class="vor-add-field-control">
@@ -84,7 +84,7 @@
               </div>
             </div>
             <div class="vor-add-field" x-show="workType === 'film'">
-              <span class="vor-field-label">Тип</span>
+              <span class="vor-field__label">Тип</span>
               <select class="sidebar-select vor-add-select" x-model="filmType" @wheel.prevent="onFilmTypeWheel($event)">
                 <option value="movie">Фильм</option>
                 <option value="tv_show">Сериал</option>
@@ -93,7 +93,7 @@
             <div class="vor-add-field"
                  x-show="workType === 'film'"
                  :title="showRequired('duration_minutes') ? 'Обязательное поле' : ''">
-              <span class="vor-field-label">
+              <span class="vor-field__label">
                 <span x-text="filmType === 'tv_show' ? 'Длительность эпизода' : 'Длительность'"></span><span class="vor-req-star"
       x-show="showRequired('duration_minutes')"
       x-cloak>*</span>
@@ -118,7 +118,7 @@
                  x-show="workType === 'film' && filmType === 'tv_show'"
                  x-cloak
                  :title="showRequired('episode_count') ? 'Обязательное поле' : ''">
-              <span class="vor-field-label">Эпизоды<span class="vor-req-star"
+              <span class="vor-field__label">Эпизоды<span class="vor-req-star"
       x-show="showRequired('episode_count')"
       x-cloak>*</span></span>
               <div class="vor-add-field-control">
@@ -155,7 +155,7 @@
         </div>
       </div>
       <div class="vor-add-footer">
-        <button type="submit" class="sidebar-btn sidebar-btn-add vor-add-save" :disabled="saving">
+        <button type="submit" class="sidebar-btn sidebar-btn--add vor-add-save" :disabled="saving">
           <i class="bi bi-floppy2"></i>
           <span>Сохранить</span>
         </button>
@@ -166,12 +166,12 @@
     <div class="vor-panel vor-modal" @click.stop>
       <template x-if="phase === 'choice'">
         <div>
-          <h3 class="vor-modal-title">Произведение сохранено</h3>
-          <p class="vor-modal-text">Продолжить без добавления в список или добавить к себе?</p>
-          <div class="vor-modal-actions vor-modal-actions-center">
+          <h3 class="vor-modal__title">Произведение сохранено</h3>
+          <p class="vor-modal__text">Продолжить без добавления в список или добавить к себе?</p>
+          <div class="vor-modal__actions vor-modal__actions--center">
             <button type="button" class="sidebar-btn" @click="finishCreate()">Продолжить</button>
             <button type="button"
-                    class="sidebar-btn sidebar-btn-add"
+                    class="sidebar-btn sidebar-btn--add"
                     @click="phase = 'attach'">Добавить в список</button>
           </div>
         </div>
@@ -183,11 +183,11 @@
       </template>
       <template x-if="phase === 'done'">
         <div>
-          <h3 class="vor-modal-title">Готово</h3>
-          <p class="vor-modal-text" x-text="doneMessage"></p>
-          <div class="vor-modal-actions vor-modal-actions-center">
+          <h3 class="vor-modal__title">Готово</h3>
+          <p class="vor-modal__text" x-text="doneMessage"></p>
+          <div class="vor-modal__actions vor-modal__actions--center">
             <button type="button" class="sidebar-btn" @click="goToList()">К списку</button>
-            <button type="button" class="sidebar-btn sidebar-btn-add" @click="resetForm()">Создать ещё</button>
+            <button type="button" class="sidebar-btn sidebar-btn--add" @click="resetForm()">Создать ещё</button>
           </div>
         </div>
       </template>

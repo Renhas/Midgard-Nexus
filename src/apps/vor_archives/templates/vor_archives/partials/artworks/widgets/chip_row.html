@@ -1,6 +1,6 @@
 {% if items %}
   <div class="vor-view-row vor-view-labeled vor-view-attrs">
-    <span class="vor-field-label">{{ label }}</span>
+    <span class="vor-field__label">{{ label }}</span>
     <div class="vor-chip-list" x-data="vorChipOverflow()" :class="{ 'is-open': popupOpen }">
       {% for item in items %}
         <span class="vor-chip" data-chip @mouseenter="placeTip($el)">

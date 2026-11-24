@@ -191,10 +191,10 @@
   flex: 0 0 auto;
 }
 
-.vor-view-info .vor-field-label,
+.vor-view-info .vor-field__label,
 .vor-view-info .vor-field-value,
 .vor-view-type,
-.vor-progress-row .vor-field-label,
+.vor-progress-row .vor-field__label,
 .vor-progress,
 .vor-progress-value,
 .vor-progress-input,
@@ -210,12 +210,12 @@
   white-space: nowrap;
 }
 
-.vor-view-info .vor-field-label,
-.vor-progress-row .vor-field-label {
+.vor-view-info .vor-field__label,
+.vor-progress-row .vor-field__label {
   margin-bottom: 2px;
 }
 
-.vor-view-attrs > .vor-field-label {
+.vor-view-attrs > .vor-field__label {
   margin-bottom: 4px;
 }
 
@@ -224,7 +224,7 @@
   align-items: center;
 }
 
-.vor-view-labeled > .vor-field-label,
+.vor-view-labeled > .vor-field__label,
 .vor-view-labeled > .vor-field-value {
   flex: 0 0 auto;
 }
@@ -296,7 +296,7 @@
   width: 100%;
 }
 
-.vor-progress-row .vor-field-label {
+.vor-progress-row .vor-field__label {
   flex: 0 0 auto;
 }
 

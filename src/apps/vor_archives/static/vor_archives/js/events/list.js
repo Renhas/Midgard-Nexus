@@ -97,11 +97,11 @@ document.addEventListener("click", (event) => {
   if (!store) {
     return;
   }
-  const sidebar = document.getElementById("sidebar-collections-list");
-  const toggle = event.target.closest(".vor-collection-toggle");
+  const sidebar = document.getElementById("sidebar-collections__list");
+  const toggle = event.target.closest(".vor-collection-tree__toggle");
   if (toggle && sidebar?.contains(toggle)) {
     store.closeMenu();
-    const id = toggle.closest(".vor-collection-tree-node")?.dataset.collectionId;
+    const id = toggle.closest(".vor-collection-tree__node")?.dataset.collectionId;
     if (id) {
       store.toggleCollectionExpanded(id);
     }
@@ -137,7 +137,7 @@ window.addEventListener(
 document.body.addEventListener("htmx:afterSwap", (event) => {
   const el = event.detail.elt;
   const isList = el?.id === "vor-artwork-list-body" || el?.id === "vor-artwork-list";
-  const isTree = el?.id === "sidebar-collections-list";
+  const isTree = el?.id === "sidebar-collections__list";
   if (!isList && !isTree) return;
   const store = getAlpine()?.store("vorArtworks");
   if (!store) return;

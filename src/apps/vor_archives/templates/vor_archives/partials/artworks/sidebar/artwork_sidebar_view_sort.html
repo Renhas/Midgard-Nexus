@@ -1,14 +1,14 @@
 {# ========== ОТОБРАЖЕНИЕ ============ #}
-<div class="sidebar-nav-row">
+<div class="sidebar-nav__row">
   <button type="button"
-          class="sidebar-btn sidebar-btn-display"
+          class="sidebar-btn sidebar-btn--display"
           :class="{ 'sidebar-btn--active': $store.vorArtworks.viewMode === 'list' }"
           @click="$store.vorArtworks.setViewMode('list')"
           title="Список">
     <i class="bi bi-list-ul"></i>
   </button>
   <button type="button"
-          class="sidebar-btn sidebar-btn-display"
+          class="sidebar-btn sidebar-btn--display"
           :class="{ 'sidebar-btn--active': $store.vorArtworks.viewMode === 'grid' }"
           @click="$store.vorArtworks.setViewMode('grid')"
           title="Плитки">
@@ -16,9 +16,9 @@
   </button>
 </div>
 {# ========== СОРТИРОВКА ============ #}
-<div class="sidebar-nav-row">
+<div class="sidebar-nav__row">
   <button type="button"
-          class="sidebar-btn sidebar-btn-icon"
+          class="sidebar-btn sidebar-btn--icon"
           @click="$store.vorArtworks.toggleSortDir()"
           title="Изменить направление">
     <i class="bi" :class="$store.vorArtworks.sortAsc ? 'bi-sort-down-alt' : 'bi-sort-up-alt'"></i>

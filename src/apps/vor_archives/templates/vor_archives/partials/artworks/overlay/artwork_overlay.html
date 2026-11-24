@@ -9,7 +9,7 @@
     <div class="vor-overlay-bar-right">
       {% if is_staff %}
         <button type="button"
-                class="sidebar-btn sidebar-btn-icon"
+                class="sidebar-btn sidebar-btn--icon"
                 x-show="!editing"
                 title="Редактировать"
                 @click="startEdit()">
@@ -20,7 +20,7 @@
           <span>Отмена</span>
         </button>
         <button type="button"
-                class="sidebar-btn sidebar-btn-add"
+                class="sidebar-btn sidebar-btn--add"
                 x-show="editing"
                 x-cloak
                 title="Сохранить"
@@ -70,7 +70,7 @@
       <input type="hidden" name="platforms" :value="id">
     </template>
     {% if work_form.non_field_errors %}
-      <div class="vor-field-errors">{{ work_form.non_field_errors }}</div>
+      <div class="vor-field__errors">{{ work_form.non_field_errors }}</div>
     {% endif %}
     <h1 class="vor-view-title" x-show="!editing">{{ work.title }}</h1>
     <input class="vor-view-title vor-inline-title"
@@ -90,7 +90,7 @@
           </span>
           {% include "vor_archives/partials/artworks/widgets/artwork_age_picker.html" with is_add=False %}
           <span class="vor-release" x-show="editing || releaseDate || externalLink">
-            <span class="vor-field-label" x-show="editing || releaseDate">Релиз:</span>
+            <span class="vor-field__label" x-show="editing || releaseDate">Релиз:</span>
             <span class="vor-field-value" x-show="!editing && releaseDate" x-text="formatDate(releaseDate)">
               {% if work.release_date %}{{ work.release_date|date:'d.m.Y' }}{% endif %}
             </span>
@@ -122,7 +122,7 @@
           {% include "vor_archives/partials/artworks/widgets/artwork_platform_chips.html" %}
         {% elif work_type == "book" %}
           <div class="vor-view-row vor-view-labeled" x-show="editing || pages">
-            <span class="vor-field-label">Страницы:</span>
+            <span class="vor-field__label">Страницы:</span>
             <span class="vor-field-value" x-show="!editing" x-text="pages">{{ work.pages }}</span>
             <input class="vor-inline-number"
                    type="number"
@@ -135,7 +135,7 @@
           </div>
         {% elif work_type == "film" %}
           <div class="vor-view-row vor-view-labeled" x-show="editing || durationMinutes">
-            <span class="vor-field-label">
+            <span class="vor-field__label">
               {% if work.film_type == "tv_show" %}Длительность эпизода:{% else %}Длительность фильма:{% endif %}
             </span>
             <span class="vor-field-value" x-show="!editing">
@@ -153,7 +153,7 @@
           </div>
           {% if work.film_type == "tv_show" %}
             <div class="vor-view-row vor-view-labeled" x-show="editing || episodeCount">
-              <span class="vor-field-label">Эпизоды:</span>
+              <span class="vor-field__label">Эпизоды:</span>
               <span class="vor-field-value" x-show="!editing" x-text="episodeCount">{{ work.episode_count }}</span>
               <input class="vor-inline-number"
                      type="number"
@@ -211,18 +211,18 @@
           </div>
           <label class="vor-switch">
             <input type="checkbox"
-                   class="vor-switch-input"
+                   class="vor-switch__input"
                    x-model="isHidden"
                    @change="saveField('is_hidden', isHidden ? '1' : '0')">
-            <span class="vor-switch-track" aria-hidden="true">
-              <span class="vor-switch-thumb"></span>
+            <span class="vor-switch__track" aria-hidden="true">
+              <span class="vor-switch__thumb"></span>
             </span>
             <span>Приватное</span>
           </label>
         </div>
       {% else %}
         <div class="vor-view-cover-controls">
-          <button type="button" class="sidebar-btn sidebar-btn-add vor-add-to-list" @click="startAttach()">
+          <button type="button" class="sidebar-btn sidebar-btn--add vor-add-to-list" @click="startAttach()">
             Добавить к себе
           </button>
         </div>

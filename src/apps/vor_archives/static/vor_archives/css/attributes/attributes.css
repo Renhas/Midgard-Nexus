@@ -16,7 +16,7 @@
   min-width: 0;
 }
 
-.vor-attr-toolbar .sidebar-btn-icon {
+.vor-attr-toolbar .sidebar-btn--icon {
   --vor-attr-btn-size: calc(1.5em + 0.75rem + 2px);
 
   width: var(--vor-attr-btn-size);
@@ -26,7 +26,7 @@
   aspect-ratio: 1 / 1;
 }
 
-.vor-attr-toolbar .sidebar-btn-icon i {
+.vor-attr-toolbar .sidebar-btn--icon i {
   font-size: 1.15rem;
 }
 

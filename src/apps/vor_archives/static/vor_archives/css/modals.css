@@ -3,7 +3,7 @@
     ============================================ */
 
 /* --- Collection form --- */
-.vor-modal-input {
+.vor-modal__input {
   width: 100%;
   margin-bottom: 1rem;
   padding: 0.5rem 0.7rem;
@@ -13,19 +13,19 @@
   color: var(--text-primary);
 }
 
-.vor-modal-input:focus {
+.vor-modal__input:focus {
   outline: none;
   border-color: var(--accent-vor);
 }
 
-.vor-modal-error {
+.vor-modal__error {
   color: var(--action-delete);
   font-size: 0.875rem;
   margin-bottom: 0.65rem;
 }
 
 /* --- Backdrop and shell --- */
-.vor-modal-actions-center {
+.vor-modal__actions--center {
   justify-content: center;
 }
 
@@ -47,17 +47,17 @@
   box-shadow: var(--shadow-lg);
 }
 
-.vor-modal-title {
+.vor-modal__title {
   font-size: 1.1rem;
   margin-bottom: 0.65rem;
 }
 
-.vor-modal-text {
+.vor-modal__text {
   color: var(--text-secondary);
   margin-bottom: 0.75rem;
 }
 
-.vor-modal-warning {
+.vor-modal__warning {
   border: 1px solid var(--action-delete);
   background-color: rgb(from var(--action-delete) r g b / 8%);
   border-radius: var(--radius-sm);
@@ -74,41 +74,41 @@
   padding-left: 1.15rem;
 }
 
-.vor-modal-actions {
+.vor-modal__actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
 }
 
 /* --- Library search --- */
-.vor-search-panel {
+.vor-search__panel {
   width: min(560px, 100%);
   transition:
     transform 0.2s ease,
     margin 0.2s ease;
 }
 
-.vor-search-panel--with-query {
+.vor-search__panel--with-query {
   align-self: flex-start;
   margin-top: 12vh;
 }
 
-.vor-search--modal .vor-search-icon {
+.vor-search--modal .vor-search__icon {
   left: 1rem;
 }
 
-.vor-search--modal .vor-search-input {
+.vor-search--modal .vor-search__input {
   padding: 0.85rem 1rem 0.85rem 2.75rem;
   border-radius: var(--radius-md);
   text-align: center;
 }
 
-.vor-search-segment {
+.vor-search__segment {
   margin-top: 0.85rem;
   padding: 0.65rem 0.75rem;
 }
 
-.vor-search-segment-title {
+.vor-search__segment-title {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -116,7 +116,7 @@
   margin: 0 0 0.45rem;
 }
 
-.vor-search-results {
+.vor-search__results {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -127,13 +127,13 @@
   overflow-y: auto;
 }
 
-.vor-search-result {
+.vor-search__result {
   display: flex;
   align-items: center;
   gap: 0.35rem;
 }
 
-.vor-search-result-main {
+.vor-search__result-main {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -148,11 +148,11 @@
   cursor: pointer;
 }
 
-.vor-search-result-main:hover {
+.vor-search__result-main:hover {
   background-color: rgb(from var(--accent-vor) r g b / 12%);
 }
 
-.vor-search-cover {
+.vor-search__cover {
   width: 28px;
   height: 42px;
   object-fit: cover;
@@ -160,7 +160,7 @@
   flex-shrink: 0;
 }
 
-.vor-search-cover-empty {
+.vor-search__cover-empty {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -169,7 +169,7 @@
   font-size: 0.75rem;
 }
 
-.vor-search-result-title {
+.vor-search__result-title {
   flex: 1;
   min-width: 0;
   white-space: nowrap;
@@ -177,7 +177,7 @@
   text-overflow: ellipsis;
 }
 
-.vor-search-empty {
+.vor-search__empty {
   margin-top: 0.85rem;
   text-align: center;
   color: var(--text-secondary);
