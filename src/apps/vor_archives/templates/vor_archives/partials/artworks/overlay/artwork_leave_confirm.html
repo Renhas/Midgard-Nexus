@@ -2,7 +2,7 @@
   <div class="vor-panel vor-modal" @click.stop>
     <h3 class="vor-modal__title">Несохранённые изменения</h3>
     <p class="vor-modal__text">При переходе будут потеряны изменения в полях:</p>
-    <ul class="vor-leave-list">
+    <ul class="vor-leave-confirm__list">
       <template x-for="field in leaveChanges" :key="field">
         <li x-text="field"></li>
       </template>

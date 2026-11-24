@@ -30,7 +30,7 @@
     {% else %}
       {% if searchable %}
         <div class="sidebar-accordion__search-row">
-          <input class="vor-chip-picker-search sidebar-accordion__search"
+          <input class="vor-chip-picker__search sidebar-accordion__search"
                  type="text"
                  placeholder="Поиск"
                  x-model="query"
@@ -57,7 +57,7 @@
         </label>
       {% endfor %}
       {% if searchable %}
-        <div class="vor-chip-picker-empty" x-show="query.trim() && !matchedCount()" x-cloak>Ничего не найдено</div>
+        <div class="vor-chip-picker__empty" x-show="query.trim() && !matchedCount()" x-cloak>Ничего не найдено</div>
       {% endif %}
     {% endif %}
   </div>

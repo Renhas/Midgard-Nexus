@@ -6,7 +6,7 @@
   flex: 0 0 auto;
 }
 
-.vor-status-select {
+.vor-status-dropdown__select {
   width: 100%;
   min-width: 0;
   flex: 0 0 auto;
@@ -14,7 +14,7 @@
   text-align: left;
 }
 
-.vor-status-menu {
+.vor-status-dropdown__menu {
   position: absolute;
   top: calc(100% + 0.25rem);
   left: 0;
@@ -27,7 +27,7 @@
   box-shadow: var(--shadow-sm);
 }
 
-.vor-status-option {
+.vor-status-dropdown__option {
   display: block;
   width: 100%;
   padding: 0.35rem 0.65rem;
@@ -40,8 +40,8 @@
   cursor: pointer;
 }
 
-.vor-status-option:hover,
-.vor-status-option--current {
+.vor-status-dropdown__option:hover,
+.vor-status-dropdown__option--current {
   background-color: rgb(from var(--accent-hover) r g b / 15%);
 }
 
@@ -54,13 +54,13 @@
   --progress-ch: 4ch;
 }
 
-.vor-progress-text {
+.vor-progress__text {
   display: inline-flex;
   align-items: baseline;
   gap: 0;
 }
 
-.vor-progress-btn {
+.vor-progress__btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -76,17 +76,17 @@
   cursor: pointer;
 }
 
-.vor-progress-btn-plus {
+.vor-progress__btn--plus {
   text-indent: -1px;
 }
 
-.vor-progress-btn:hover {
+.vor-progress__btn:hover {
   color: var(--text-primary);
   border-color: var(--accent-hover);
 }
 
-.vor-progress-value,
-.vor-progress-input {
+.vor-progress__value,
+.vor-progress__input {
   box-sizing: content-box;
   text-align: right;
   font: inherit;
@@ -99,7 +99,7 @@
   background: transparent;
 }
 
-.vor-progress-value {
+.vor-progress__value {
   width: auto;
   min-width: 0;
   cursor: text;
@@ -107,18 +107,18 @@
   font-family: inherit;
 }
 
-.vor-progress-input {
+.vor-progress__input {
   width: var(--progress-ch);
   min-width: var(--progress-ch);
 }
 
-.vor-progress-value.is-hot,
-.vor-progress--editing .vor-progress-input {
+.vor-progress__value--hot,
+.vor-progress--editing .vor-progress__input {
   color: var(--text-primary);
   border-bottom-color: var(--text-primary);
 }
 
-.vor-progress-input:focus {
+.vor-progress__input:focus {
   outline: none;
 }
 
@@ -136,7 +136,7 @@
   border-radius: var(--radius-xs);
 }
 
-.vor-rating-number {
+.vor-stars__rating-number {
   display: inline-flex;
   align-items: center;
   margin-left: 0.35rem;
@@ -158,11 +158,11 @@
   line-height: 1;
 }
 
-.vor-star-empty {
+.vor-star__empty {
   color: var(--rating-star-empty);
 }
 
-.vor-star-fill {
+.vor-star__fill {
   position: absolute;
   left: 0;
   top: 0;
@@ -170,15 +170,15 @@
   clip-path: inset(0 100% 0 0);
 }
 
-.vor-star--full .vor-star-fill {
+.vor-star--full .vor-star__fill {
   clip-path: inset(0 0 0 0);
 }
 
-.vor-star--half .vor-star-fill {
+.vor-star--half .vor-star__fill {
   clip-path: inset(0 50% 0 0);
 }
 
-.vor-star-hit {
+.vor-star__hit {
   position: absolute;
   top: 0;
   width: 50%;
@@ -189,11 +189,11 @@
   cursor: pointer;
 }
 
-.vor-star-hit.left {
+.vor-star__hit.left {
   left: 0;
 }
 
-.vor-star-hit.right {
+.vor-star__hit.right {
   right: 0;
 }
 
@@ -245,12 +245,12 @@
   display: none;
 }
 
-.vor-chip-more-wrap {
+.vor-chip-list__more-wrap {
   position: relative;
   flex-shrink: 0;
 }
 
-.vor-chip-more {
+.vor-chip--more {
   cursor: pointer;
 }
 
@@ -275,7 +275,7 @@
   bottom: calc(100% + 4px);
 }
 
-.vor-chip-popup-body {
+.vor-chip-popup__body {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
@@ -283,7 +283,7 @@
   overflow: hidden auto;
 }
 
-.vor-chip-tip {
+.vor-chip__tip {
   display: none;
   position: fixed;
   left: var(--tip-left, 0);
@@ -303,11 +303,11 @@
   transform: translateY(calc(-50% + var(--tip-shift-y, 0px)));
 }
 
-.vor-chip:hover .vor-chip-tip {
+.vor-chip:hover .vor-chip__tip {
   display: block;
 }
 
-.vor-chip-tip--below {
+.vor-chip__tip--below {
   transform: none;
 }
 
@@ -315,7 +315,7 @@
   flex-wrap: wrap;
 }
 
-.vor-chip-remove {
+.vor-chip__remove {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -331,7 +331,7 @@
   cursor: pointer;
 }
 
-.vor-chip-add {
+.vor-chip-list__add {
   background-color: var(--action-add);
   color: var(--bg-primary);
   width: 2rem;
@@ -339,7 +339,7 @@
   cursor: pointer;
 }
 
-.vor-chip-add:hover {
+.vor-chip-list__add:hover {
   background-color: var(--action-add-hover);
   color: var(--bg-primary);
 }
@@ -349,12 +349,12 @@
   max-width: 18rem;
 }
 
-.vor-chip-picker-search {
+.vor-chip-picker__search {
   width: 100%;
   margin-bottom: 0.4rem;
 }
 
-.vor-chip-picker-list {
+.vor-chip-picker__list {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -362,7 +362,7 @@
   overflow-y: auto;
 }
 
-.vor-chip-picker-item {
+.vor-chip-picker__item {
   display: flex;
   align-items: center;
   width: 100%;
@@ -376,11 +376,11 @@
   cursor: pointer;
 }
 
-.vor-chip-picker-item:hover {
+.vor-chip-picker__item:hover {
   background-color: rgb(from var(--accent-vor) r g b / 12%);
 }
 
-.vor-chip-picker-empty {
+.vor-chip-picker__empty {
   color: var(--text-secondary);
   font-size: 0.75rem;
   padding: 0.35rem 0.15rem;

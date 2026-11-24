@@ -1,25 +1,25 @@
-<div class="vor-age-wrap"
+<div class="vor-age__wrap"
      {% if not is_add %}x-show="editing || ageRating"{% endif %}
      @click.outside="ageOpen = false"
      @wheel.prevent="{% if not is_add %}editing && {% endif %}onAgeWheel($event)">
   <button type="button"
-          class="vor-age-badge"
+          class="vor-age__badge"
           :data-age="ageRating"
           {% if not is_add %}:disabled="!editing" :title="ageLabel()"{% endif %}
           @click="{% if not is_add %}editing && {% endif %}(ageOpen = !ageOpen)">
     <span x-text="ageRating || '—'">{% if not is_add and work.age_rating %}{{ work.age_rating }}{% endif %}</span>
   </button>
-  <div class="vor-panel vor-age-menu" x-show="{% if not is_add %}editing && {% endif %}ageOpen" x-cloak>
+  <div class="vor-panel vor-age__menu" x-show="{% if not is_add %}editing && {% endif %}ageOpen" x-cloak>
     <button type="button"
-            class="vor-age-option"
+            class="vor-age__option"
             data-age=""
-            :class="{ 'vor-age-option--current': !ageRating }"
+            :class="{ 'vor-age__option--current': !ageRating }"
             @click="setAgeRating('')">—</button>
     <template x-for="opt in ageChoices" :key="opt.value">
       <button type="button"
-              class="vor-age-option"
+              class="vor-age__option"
               :data-age="opt.value"
-              :class="{ 'vor-age-option--current': ageRating === opt.value }"
+              :class="{ 'vor-age__option--current': ageRating === opt.value }"
               @click="setAgeRating(opt.value)"
               x-text="opt.label"></button>
     </template>

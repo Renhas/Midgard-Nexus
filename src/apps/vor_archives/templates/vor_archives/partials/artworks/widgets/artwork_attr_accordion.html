@@ -8,7 +8,7 @@
     <i class="bi bi-chevron-right" :class="{ 'bi-rotate-90': openAttrAccordion === '{{ kind }}' }"></i>
   </button>
   <div id="attr-body-{{ kind }}" class="sidebar-accordion__body" x-show="openAttrAccordion === '{{ kind }}'" x-cloak>
-    <input class="vor-chip-picker-search sidebar-accordion__search"
+    <input class="vor-chip-picker__search sidebar-accordion__search"
            type="text"
            placeholder="Поиск"
            x-model="query"
@@ -20,7 +20,7 @@
         <span x-text="opt.name"></span>
       </label>
     </template>
-    <div class="vor-chip-picker-empty" x-show="query.trim() && !filterCatalog('{{ kind }}', query).length" x-cloak>
+    <div class="vor-chip-picker__empty" x-show="query.trim() && !filterCatalog('{{ kind }}', query).length" x-cloak>
       Ничего не найдено
     </div>
   </div>
