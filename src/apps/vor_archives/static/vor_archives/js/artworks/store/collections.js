@@ -167,9 +167,9 @@ export const collectionsMixin = {
           invertSwapThreshold: 0.45,
           swapThreshold: 0.65,
           emptyInsertThreshold: 6,
-          ghostClass: "is-sortable-ghost",
-          chosenClass: "is-sortable-chosen",
-          dragClass: "is-sortable-drag",
+          ghostClass: "vor-collection-tree__node--ghost",
+          chosenClass: "vor-collection-tree__node--chosen",
+          dragClass: "vor-collection-tree__node--drag",
           filter: ".vor-collection-tree__toggle",
           preventOnFilter: false,
           onMove: (evt, originalEvent) => {
@@ -257,9 +257,11 @@ export const collectionsMixin = {
     if (dragged) {
       blockers.push(dragged);
     }
-    document.querySelectorAll(".is-sortable-ghost, .is-sortable-drag, .sortable-fallback").forEach((node) => {
-      blockers.push(node);
-    });
+    document
+      .querySelectorAll(".vor-collection-tree__node--ghost, .vor-collection-tree__node--drag, .sortable-fallback")
+      .forEach((node) => {
+        blockers.push(node);
+      });
     const prev = blockers.map((node) => node.style.pointerEvents);
     blockers.forEach((node) => {
       node.style.pointerEvents = "none";
