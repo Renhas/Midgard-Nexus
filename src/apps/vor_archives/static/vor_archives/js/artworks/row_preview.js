@@ -87,8 +87,8 @@ function fillPreview(item) {
 }
 
 function getSafeBoundary() {
-  const sidebar = document.querySelector(".sidebar-right");
-  if (!sidebar || sidebar.classList.contains("collapsed")) {
+  const sidebar = document.querySelector(".sidebar--right");
+  if (!sidebar || sidebar.classList.contains("sidebar--collapsed")) {
     return { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight };
   }
   const rect = sidebar.getBoundingClientRect();

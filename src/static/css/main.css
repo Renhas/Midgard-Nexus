@@ -185,7 +185,7 @@ body {
   animation-delay: 0.5s;
 }
 
-.circle-icon {
+.module-card__icon {
   width: 64px;
   height: 64px;
   border-radius: 50%;
@@ -198,7 +198,7 @@ body {
 /* ============================================
    Navbar overrides
    ============================================ */
-.navbar-spacer {
+.navbar__spacer {
   height: var(--header-height);
 }
 
@@ -214,7 +214,7 @@ body {
   position: relative;
 }
 
-.navbar-center {
+.navbar__center {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -294,12 +294,12 @@ body {
   background-color: rgb(167 145 255 / 10%);
 }
 
-.nav-btn .header-icon {
+.nav-btn__icon {
   font-size: var(--header-icon-size);
   line-height: 1;
 }
 
-.nav-btn .header-icon + span {
+.nav-btn__icon + span {
   font-weight: 500;
 }
 
@@ -314,7 +314,7 @@ body {
   color: var(--text-primary);
 }
 
-.nav-btn.icon-only {
+.nav-btn--icon-only {
   padding: 0.4rem 0.5rem;
   aspect-ratio: 1 / 1;
 }
