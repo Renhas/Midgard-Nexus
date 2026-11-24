@@ -77,8 +77,8 @@ export const menuMixin = {
     this.menu.kind = "artwork";
     this.menu.uwId = Number(item.dataset.uwId);
     this.menu.detailUrl = item.dataset.detailUrl || "";
-    const nested = Boolean(item.closest(".vor-artwork-list-items-nested"));
-    const list = document.getElementById("vor-artwork-list-items");
+    const nested = Boolean(item.closest(".vor-artwork-list__items--nested"));
+    const list = document.getElementById("vor-artwork-list__items");
     const items = list ? [...list.querySelectorAll(":scope > .vor-artwork-item")] : [];
     const index = items.indexOf(item);
     const canNudge = !nested && this.canReorder() && index >= 0;
@@ -92,9 +92,9 @@ export const menuMixin = {
   },
   nudgeArtwork(delta) {
     const item = document.querySelector(`.vor-artwork-item[data-uw-id="${this.menu.uwId}"]`);
-    const list = document.getElementById("vor-artwork-list-items");
+    const list = document.getElementById("vor-artwork-list__items");
     this.closeMenu();
-    if (!item || !list || item.closest(".vor-artwork-list-items-nested")) {
+    if (!item || !list || item.closest(".vor-artwork-list__items--nested")) {
       return;
     }
     const items = [...list.querySelectorAll(":scope > .vor-artwork-item")];
@@ -168,7 +168,7 @@ export const menuMixin = {
     this.cancelCloseFlyout();
     this.menu.flyout = true;
     const menu = document.getElementById("vor-context-menu");
-    const trigger = menu?.querySelector(".has-submenu");
+    const trigger = menu?.querySelector(".vor-context-item--with-submenu");
     const rect = (trigger || menu)?.getBoundingClientRect();
     if (!rect) {
       return;

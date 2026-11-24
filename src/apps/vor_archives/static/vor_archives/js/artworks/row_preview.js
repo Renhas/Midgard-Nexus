@@ -19,13 +19,13 @@ function ensurePreview() {
   preview.id = "vor-artwork-row-preview";
   preview.className = "vor-panel vor-artwork-row-preview";
   preview.innerHTML = `
-            <div class="vor-artwork-row-preview-cover">
+            <div class="vor-artwork-row-preview__cover">
                 <img alt="">
-                <div class="vor-artwork-row-preview-cover-empty"><i></i></div>
+                <div class="vor-artwork-row-preview__cover-empty"><i></i></div>
             </div>
-            <div class="vor-artwork-row-preview-body">
-                <div class="vor-artwork-row-preview-title"></div>
-                <div class="vor-artwork-row-preview-desc"></div>
+            <div class="vor-artwork-row-preview__body">
+                <div class="vor-artwork-row-preview__title"></div>
+                <div class="vor-artwork-row-preview__desc"></div>
             </div>
         `;
   document.body.appendChild(preview);
@@ -51,7 +51,7 @@ function canShow(row) {
     return false;
   }
   const list = row.closest(".vor-artwork-list");
-  if (!list || list.classList.contains("is-grid")) {
+  if (!list || list.dataset.view === "grid") {
     return false;
   }
   if (getAlpine()?.store("vorArtworks")?.searchOpen) {
@@ -67,8 +67,8 @@ function fillPreview(item) {
   const el = ensurePreview();
   const title = item.dataset.previewTitle || "";
   const cover = item.dataset.previewCover || "";
-  el.querySelector(".vor-artwork-row-preview-title").textContent = title;
-  el.querySelector(".vor-artwork-row-preview-desc").textContent = (item.dataset.previewDesc || "")
+  el.querySelector(".vor-artwork-row-preview__title").textContent = title;
+  el.querySelector(".vor-artwork-row-preview__desc").textContent = (item.dataset.previewDesc || "")
     .replace(/\s+/g, " ")
     .trim();
   const img = el.querySelector("img");
@@ -79,7 +79,7 @@ function fillPreview(item) {
   } else {
     img.removeAttribute("src");
     el.classList.add("vor-artwork-row-preview--empty");
-    const icon = el.querySelector(".vor-artwork-row-preview-cover-empty i");
+    const icon = el.querySelector(".vor-artwork-row-preview__cover-empty i");
     if (icon) {
       icon.className = item.dataset.previewIcon || "";
     }

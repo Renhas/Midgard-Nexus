@@ -65,7 +65,7 @@ export const dragMixin = {
           ghostClass: "vor-artwork-item--ghost",
           chosenClass: "vor-artwork-item--chosen",
           dragClass: "vor-artwork-item--drag",
-          filter: ".vor-artwork-row-delete, .vor-artwork-tile-delete, .vor-delete-check",
+          filter: ".vor-artwork-row__delete, .vor-artwork-tile__delete, .vor-delete-check",
           preventOnFilter: true,
           onStart: () => {
             this.setArtworkDragState(true);
@@ -82,7 +82,7 @@ export const dragMixin = {
               this.addWorkToCollection(collectionId, evt.item?.dataset?.uwId);
               return;
             }
-            const direct = document.getElementById("vor-artwork-list-items");
+            const direct = document.getElementById("vor-artwork-list__items");
             if (allowSort && this.canReorder() && evt.from === direct && evt.to === direct) {
               this.saveOrder();
               return;
@@ -94,11 +94,11 @@ export const dragMixin = {
         }),
       );
     };
-    const direct = document.getElementById("vor-artwork-list-items");
+    const direct = document.getElementById("vor-artwork-list__items");
     if (direct) {
       bindArtworkSortable(direct, this.canReorder());
     }
-    document.querySelectorAll(".vor-artwork-list-items-nested").forEach((container) => {
+    document.querySelectorAll(".vor-artwork-list__items--nested").forEach((container) => {
       bindArtworkSortable(container, false);
     });
   },
@@ -114,7 +114,7 @@ export const dragMixin = {
     evt.from.insertBefore(evt.item, siblings[evt.oldIndex]);
   },
   async saveOrder() {
-    const container = document.getElementById("vor-artwork-list-items");
+    const container = document.getElementById("vor-artwork-list__items");
     if (!container) {
       return;
     }

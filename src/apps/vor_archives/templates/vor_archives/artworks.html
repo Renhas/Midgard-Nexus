@@ -18,15 +18,15 @@
   {% include "vor_archives/partials/artworks/sidebar/artwork_sidebar_left.html" %}
 {% endblock %}
 {% block vor_content %}
-  <div class="vor-artwork-library-title" x-data>
+  <div class="vor-artwork-library__title" x-data>
     <span x-show="!$store.vorArtworks.collectionId">Медиатека</span>
-    <nav class="vor-artwork-library-path" x-show="$store.vorArtworks.collectionId" x-cloak>
+    <nav class="vor-artwork-library__path" x-show="$store.vorArtworks.collectionId" x-cloak>
       <template x-for="(part, index) in ($store.vorArtworks.collectionPath || [])" :key="'crumb-' + part.id">
-        <span class="vor-artwork-library-path-item">
-          <span class="vor-artwork-library-path-sep" x-text="index > 0 ? '/' : ''"></span>
+        <span class="vor-artwork-library__path-item">
+          <span class="vor-artwork-library__path-sep" x-text="index > 0 ? '/' : ''"></span>
           <button type="button"
-                  class="vor-artwork-library-path-link"
-                  :class="{ 'is-current': index === $store.vorArtworks.collectionPath.length - 1 }"
+                  class="vor-artwork-library__path-link"
+                  :class="{ 'vor-artwork-library__path-link--current': index === $store.vorArtworks.collectionPath.length - 1 }"
                   :disabled="index === $store.vorArtworks.collectionPath.length - 1"
                   x-text="part.name"
                   @click="index < $store.vorArtworks.collectionPath.length - 1 && $store.vorArtworks.selectCollection(part.id, part.name)">

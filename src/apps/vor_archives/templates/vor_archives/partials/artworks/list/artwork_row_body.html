@@ -10,28 +10,28 @@
   <div class="vor-delete-check">
     <span class="vor-checkbox"></span>
   </div>
-  <div class="vor-artwork-row-type">
+  <div class="vor-artwork-row__type">
     <i class="{{ user_work|get_work_type_icon }}"></i>
   </div>
-  <div class="vor-artwork-row-title">{{ user_work.work.title }}</div>
-  <div class="vor-artwork-row-year">
+  <div class="vor-artwork-row__title">{{ user_work.work.title }}</div>
+  <div class="vor-artwork-row__year">
     {% if user_work.work.release_date %}
       {{ user_work.work.release_date|date:'Y' }}
     {% endif %}
   </div>
-  <div class="vor-artwork-row-status status-{{ user_work.status }}">{{ user_work.get_status_display }}</div>
-  <div class="vor-artwork-row-rating">
+  <div class="vor-artwork-row__status status-{{ user_work.status }}">{{ user_work.get_status_display }}</div>
+  <div class="vor-artwork-row__rating">
     {% if user_work.rating %}
       {{ user_work.rating }}
     {% else %}
       —
     {% endif %}
   </div>
-  <div class="vor-artwork-row-progress">{{ user_work|format_progress }}</div>
+  <div class="vor-artwork-row__progress">{{ user_work|format_progress }}</div>
 </div>
-<div class="vor-artwork-row-delete-slot">
+<div class="vor-artwork-row__delete-slot">
   <button type="button"
-          class="sidebar-btn sidebar-btn--delete sidebar-btn--icon vor-artwork-row-delete"
+          class="sidebar-btn sidebar-btn--delete sidebar-btn--icon vor-artwork-row__delete"
           tabindex="-1"
           title="Удалить"
           @click.stop

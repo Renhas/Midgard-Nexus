@@ -27,7 +27,7 @@ document.addEventListener(
       return;
     }
     const item = event.target.closest(".vor-artwork-item");
-    if (!item || event.target.closest(".vor-artwork-row-delete, .vor-artwork-tile-delete")) {
+    if (!item || event.target.closest(".vor-artwork-row__delete, .vor-artwork-tile__delete")) {
       return;
     }
     event.preventDefault();
