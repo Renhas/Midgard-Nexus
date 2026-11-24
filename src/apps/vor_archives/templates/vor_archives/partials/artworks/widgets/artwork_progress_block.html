@@ -1,30 +1,30 @@
-<div class="vor-progress-row">
-  <span class="vor-field-label">Прогресс:</span>
+<div class="vor-progress__row">
+  <span class="vor-field__label">Прогресс:</span>
   <div class="vor-progress"
        :class="{ 'vor-progress--editing': progressEditing }"
        :style="{ '--progress-ch': progressCh() + 'ch' }">
-    <span class="vor-progress-text">
+    <span class="vor-progress__text">
       <button type="button"
-              class="vor-progress-value"
+              class="vor-progress__value"
               x-show="!progressEditing"
-              :class="{ 'vor-progress-value--hot': progressHover || progressEditing }"
+              :class="{ 'vor-progress__value--hot': progressHover || progressEditing }"
               @mouseenter="progressHover = true"
               @mouseleave="progressHover = false"
               @click="startProgressEdit()"
               x-text="progressValueLabel()"></button>
-      <input class="vor-progress-input"
+      <input class="vor-progress__input"
              x-show="progressEditing"
              x-ref="progressInput"
              x-model="progressDraft"
              @keydown.enter.prevent="commitProgress()"
              @keydown.escape.prevent="cancelProgressEdit()"
              @blur="commitProgress()">
-      <span class="vor-progress-suffix" x-text="progressSuffix()"></span>
+      <span class="vor-progress__suffix" x-text="progressSuffix()"></span>
     </span>
     <button type="button"
-            class="vor-progress-btn vor-progress-btn-plus"
+            class="vor-progress__btn vor-progress__btn--plus"
             @click="nudgeProgress(1)"
             title="Увеличить">+</button>
-    <button type="button" class="vor-progress-btn" @click="nudgeProgress(-1)" title="Уменьшить">−</button>
+    <button type="button" class="vor-progress__btn" @click="nudgeProgress(-1)" title="Уменьшить">−</button>
   </div>
 </div>

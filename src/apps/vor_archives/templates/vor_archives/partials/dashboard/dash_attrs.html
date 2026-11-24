@@ -1,8 +1,8 @@
 {{ attrs_opts|json_script:"vor-dash-attrs-opts" }}
 <div class="vor-dash-page" x-data="vorDashAttrs()">
-  <section class="vor-dash-toolbar">
-    <h2 class="vor-dash-segment-title">Вид</h2>
-    <div class="vor-dash-type-filters" role="group" aria-label="Режим отображения атрибутов">
+  <section class="vor-dash__toolbar">
+    <h2 class="vor-dash-segment__title">Вид</h2>
+    <div class="vor-dash__type-filters" role="group" aria-label="Режим отображения атрибутов">
       {% for type in view_types %}
         <button type="button"
                 class="sidebar-btn"
@@ -18,19 +18,19 @@
   <section class="vor-dash-attr-grid">
     {% for kind in attr_kinds %}
       <article class="vor-dash-card">
-        <div class="vor-dash-segment-head">
-          <i class="{{ kind.icon }} vor-dash-card-title__icon"></i>
-          <h2 class="vor-dash-card-title">{{ kind.label }}</h2>
+        <div class="vor-dash-segment__head">
+          <i class="{{ kind.icon }} vor-dash-card__title-icon"></i>
+          <h2 class="vor-dash-card__title">{{ kind.label }}</h2>
         </div>
-        <div class="vor-dash-chart-canvas-wrap" x-show="attrView === 'cloud'" x-cloak>
-          <p class="vor-dash-empty" x-show="!hasItems('{{ kind.key }}')">Нет данных для графика</p>
+        <div class="vor-dash-card__chart-wrap" x-show="attrView === 'cloud'" x-cloak>
+          <p class="vor-dash__empty" x-show="!hasItems('{{ kind.key }}')">Нет данных для графика</p>
           <canvas x-ref="cloud-{{ kind.key }}" x-show="hasItems('{{ kind.key }}')"></canvas>
         </div>
-        <div class="vor-dash-chart-canvas-wrap" x-show="attrView === 'bar'" x-cloak>
-          <p class="vor-dash-empty" x-show="!hasItems('{{ kind.key }}')">Нет данных для графика</p>
+        <div class="vor-dash-card__chart-wrap" x-show="attrView === 'bar'" x-cloak>
+          <p class="vor-dash__empty" x-show="!hasItems('{{ kind.key }}')">Нет данных для графика</p>
           <canvas x-ref="bar-{{ kind.key }}" x-show="hasItems('{{ kind.key }}')"></canvas>
         </div>
-        <p class="vor-dash-empty"
+        <p class="vor-dash__empty"
            x-show="attrView === 'list' && !hasItems('{{ kind.key }}')"
            x-cloak>Нет данных для графика</p>
         <template x-if="hasItems('{{ kind.key }}')">
@@ -40,12 +40,12 @@
               <span>Кол-во</span>
               <span>Доля</span>
             </div>
-            <div class="vor-dash-attr-body">
+            <div class="vor-dash-attr-list__body">
               <template x-for="item in getItems('{{ kind.key }}')" :key="item.name">
                 <div class="vor-dash-attr-row">
-                  <span class="vor-dash-attr-name" x-text="item.name"></span>
-                  <span class="vor-dash-attr-count" x-text="item.count"></span>
-                  <span class="vor-dash-attr-pct"
+                  <span class="vor-dash-attr-row__name" x-text="item.name"></span>
+                  <span class="vor-dash-attr-row__count" x-text="item.count"></span>
+                  <span class="vor-dash-attr-row__pct"
                         x-text="formatPercent(calcAttrShare(item.count, '{{ kind.key }}'))"></span>
                 </div>
               </template>

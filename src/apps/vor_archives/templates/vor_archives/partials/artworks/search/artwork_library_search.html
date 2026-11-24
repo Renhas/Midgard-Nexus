@@ -1,10 +1,10 @@
 <div class="vor-backdrop" x-show="$store.vorArtworks.searchOpen" x-cloak @click.self="$store.vorArtworks.closeSearch()">
-  <div class="vor-search-panel"
-       :class="{ 'vor-search-panel--with-query': String($store.vorArtworks.searchQuery || '').trim() }">
+  <div class="vor-search__panel"
+       :class="{ 'vor-search__panel--with-query': String($store.vorArtworks.searchQuery || '').trim() }">
     <div class="vor-search vor-search--modal">
-      <i class="bi bi-search vor-search-icon"></i>
+      <i class="bi bi-search vor-search__icon"></i>
       <input id="vor-library-search-input"
-             class="form-control vor-search-input"
+             class="form-control vor-search__input"
              type="search"
              x-model="$store.vorArtworks.searchQuery"
              @input="$store.vorArtworks.onSearchInput()"

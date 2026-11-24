@@ -1,5 +1,5 @@
-<div class="vor-date-wrap" {% if not is_add %}x-show="editing" x-cloak{% endif %} @click.outside="closeDatePopup()">
-  <button type="button" class="vor-date-trigger" @click="toggleDateOpen()">
+<div class="vor-date__wrap" {% if not is_add %}x-show="editing" x-cloak{% endif %} @click.outside="closeDatePopup()">
+  <button type="button" class="vor-date__trigger" @click="toggleDateOpen()">
     <span x-text="releaseDate ? formatDate(releaseDate) : 'Выбрать'"></span>
     <i class="bi bi-calendar3"></i>
   </button>

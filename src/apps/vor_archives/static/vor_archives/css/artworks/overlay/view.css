@@ -1,5 +1,5 @@
 /* --- View --- */
-.vor-view-title {
+.vor-view__title {
   text-align: center;
   font-size: 1.75rem;
   font-weight: 600;
@@ -8,7 +8,7 @@
   overflow-wrap: anywhere;
 }
 
-.vor-view-hero {
+.vor-view__hero {
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr) 330px;
   grid-template-rows: 390px auto;
@@ -17,7 +17,7 @@
   margin-bottom: 1.5rem;
 }
 
-.vor-cover-wrap {
+.vor-cover__wrap {
   grid-column: 1;
   grid-row: 1;
   position: relative;
@@ -25,19 +25,19 @@
   height: 390px;
 }
 
-.vor-view-cover {
+.vor-view__cover {
   width: 260px;
   height: 390px;
   object-fit: cover;
   border-radius: var(--radius-sm);
 }
 
-.vor-cover-wrap .vor-view-cover {
+.vor-cover__wrap .vor-view__cover {
   width: 100%;
   height: 100%;
 }
 
-.vor-view-cover-controls {
+.vor-view__cover-controls {
   grid-column: 1;
   grid-row: 2;
   width: 260px;
@@ -46,13 +46,13 @@
   gap: 0.65rem;
 }
 
-.vor-view-cover-controls .vor-status-dropdown,
-.vor-view-cover-controls .vor-status-select {
+.vor-view__cover-controls .vor-status-dropdown,
+.vor-view__cover-controls .vor-status-dropdown__select {
   width: 100%;
   min-width: 0;
 }
 
-.vor-view-cover-empty {
+.vor-view__cover-empty {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -61,7 +61,7 @@
   font-size: 2rem;
 }
 
-.vor-view-meta {
+.vor-view__meta {
   font-size: 0.75rem;
   color: var(--text-secondary);
   display: flex;
@@ -69,7 +69,7 @@
   gap: 0.25rem;
 }
 
-.vor-view-counter {
+.vor-view__counter {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -86,14 +86,14 @@
   transition: all 0.2s ease;
 }
 
-.vor-view-counter:hover,
-.vor-view-counter.is-hot {
+.vor-view__counter:hover,
+.vor-view__counter--hot {
   color: var(--text-primary);
   background-color: rgb(from var(--accent-vor) r g b / 10%);
   border-color: var(--accent-hover);
 }
 
-.vor-view-counter-input {
+.vor-view__counter-input {
   width: 2ch;
   min-width: 1.5ch;
   border: 0;
@@ -104,11 +104,11 @@
   text-align: center;
 }
 
-.vor-view-counter-input:focus {
+.vor-view__counter-input:focus {
   outline: none;
 }
 
-.vor-view-info {
+.vor-view__info {
   grid-column: 2;
   grid-row: 1;
   height: 390px;
@@ -121,16 +121,16 @@
   z-index: var(--z-raised);
 }
 
-.vor-view-info.is-editing {
+.vor-view__info--editing {
   height: auto;
   min-height: 390px;
 }
 
-.vor-view-info-group {
+.vor-view__info-group {
   display: contents;
 }
 
-.vor-view-row {
+.vor-view__row {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -139,13 +139,13 @@
   font-size: 0.95rem;
 }
 
-.vor-view-type {
+.vor-view__type {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
 }
 
-.vor-age-badge {
+.vor-age__badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -159,24 +159,24 @@
   color: var(--age-fg);
 }
 
-.vor-age-badge[data-age="0+"],
-.vor-age-badge[data-age="6+"] {
+.vor-age__badge[data-age="0+"],
+.vor-age__badge[data-age="6+"] {
   background-color: var(--age-ok-bg);
   border-color: var(--age-ok-bg);
 }
 
-.vor-age-badge[data-age="12+"],
-.vor-age-badge[data-age="16+"] {
+.vor-age__badge[data-age="12+"],
+.vor-age__badge[data-age="16+"] {
   background-color: var(--age-warning-bg);
   border-color: var(--age-warning-bg);
 }
 
-.vor-age-badge[data-age="18+"] {
+.vor-age__badge[data-age="18+"] {
   background-color: var(--age-restricted-bg);
   border-color: var(--age-restricted-bg);
 }
 
-.vor-view-topline {
+.vor-view__topline {
   flex-wrap: nowrap;
   align-items: center;
   height: 32px;
@@ -191,14 +191,14 @@
   flex: 0 0 auto;
 }
 
-.vor-view-info .vor-field-label,
-.vor-view-info .vor-field-value,
-.vor-view-type,
-.vor-progress-row .vor-field-label,
+.vor-view__info .vor-field__label,
+.vor-view__info .vor-field-value,
+.vor-view__type,
+.vor-progress__row .vor-field__label,
 .vor-progress,
-.vor-progress-value,
-.vor-progress-input,
-.vor-progress-suffix {
+.vor-progress__value,
+.vor-progress__input,
+.vor-progress__suffix {
   display: inline-flex;
   align-items: center;
   margin: 0;
@@ -210,26 +210,26 @@
   white-space: nowrap;
 }
 
-.vor-view-info .vor-field-label,
-.vor-progress-row .vor-field-label {
+.vor-view__info .vor-field__label,
+.vor-progress__row .vor-field__label {
   margin-bottom: 2px;
 }
 
-.vor-view-attrs > .vor-field-label {
+.vor-view__attrs > .vor-field__label {
   margin-bottom: 4px;
 }
 
-.vor-view-labeled {
+.vor-view__labeled {
   flex-wrap: nowrap;
   align-items: center;
 }
 
-.vor-view-labeled > .vor-field-label,
-.vor-view-labeled > .vor-field-value {
+.vor-view__labeled > .vor-field__label,
+.vor-view__labeled > .vor-field-value {
   flex: 0 0 auto;
 }
 
-.vor-view-attrs {
+.vor-view__attrs {
   align-items: center;
 }
 
@@ -248,7 +248,7 @@
   z-index: var(--z-popover-host);
 }
 
-.vor-view-link {
+.vor-view__link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -260,11 +260,11 @@
   cursor: pointer;
 }
 
-.vor-view-link:hover {
+.vor-view__link:hover {
   color: var(--accent-vor);
 }
 
-.vor-view-platforms {
+.vor-view__platforms {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -279,16 +279,16 @@
   border-radius: var(--radius-pill);
 }
 
-.vor-platform.is-owned {
+.vor-platform--owned {
   color: var(--success);
 }
 
-.vor-platform.is-other {
+.vor-platform--other {
   color: var(--text-secondary);
   opacity: 0.55;
 }
 
-.vor-progress-row {
+.vor-progress__row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -296,15 +296,15 @@
   width: 100%;
 }
 
-.vor-progress-row .vor-field-label {
+.vor-progress__row .vor-field__label {
   flex: 0 0 auto;
 }
 
-.vor-progress-row .vor-progress {
+.vor-progress__row .vor-progress {
   margin-left: auto;
 }
 
-.vor-view-desc {
+.vor-view__desc {
   grid-column: 2 / 4;
   grid-row: 2;
   text-align: left;
@@ -316,17 +316,17 @@
 }
 
 /* --- Cover upload --- */
-.vor-cover-file {
+.vor-cover__file {
   display: none;
 }
 
-.vor-cover-actions {
+.vor-cover__actions {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-.vor-cover-btn {
+.vor-cover__btn {
   pointer-events: auto;
   display: inline-flex;
   align-items: center;
@@ -340,18 +340,18 @@
   cursor: pointer;
 }
 
-.vor-cover-btn:hover {
+.vor-cover__btn:hover {
   border-color: var(--accent-hover);
   color: var(--text-primary);
 }
 
-.vor-cover-btn-edit {
+.vor-cover__btn--edit {
   position: absolute;
   top: 0.45rem;
   left: 0.45rem;
 }
 
-.vor-cover-btn-clear {
+.vor-cover__btn--clear {
   position: absolute;
   top: 0.45rem;
   right: 0.45rem;
@@ -359,7 +359,7 @@
   border-color: var(--action-delete);
 }
 
-.vor-cover-btn-upload {
+.vor-cover__btn--upload {
   width: 3rem;
   height: 3rem;
   font-size: 1.35rem;
@@ -368,7 +368,7 @@
   color: var(--text-secondary);
 }
 
-.vor-cover-warning {
+.vor-cover__warning {
   position: absolute;
   left: 0.4rem;
   right: 0.4rem;

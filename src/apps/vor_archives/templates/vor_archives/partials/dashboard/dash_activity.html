@@ -1,12 +1,12 @@
 <div class="vor-dash-page vor-dash-activity">
   <section class="vor-dash-pane">
-    <div class="vor-dash-pane-head">
-      <h2 class="vor-dash-segment-title">Активность</h2>
+    <div class="vor-dash-pane__head">
+      <h2 class="vor-dash-segment__title">Активность</h2>
     </div>
-    <div class="vor-dash-pane-body vor-dash-heatmap-wrap">
+    <div class="vor-dash-pane__body vor-dash-heatmap__wrap">
       <div id="vor-dash-heatmap">{% include "vor_archives/partials/dashboard/dash_heatmap.html" %}</div>
-      <div class="vor-dash-heatmap-year-select">
-        <select class="form-select form-select-sm vor-dash-year-select"
+      <div class="vor-dash-heatmap__year-select">
+        <select class="form-select form-select-sm vor-dash__year-select"
                 name="year"
                 aria-label="Год активности"
                 hx-get="{% url 'vor_archives:dashboard:heatmap' %}"
@@ -21,10 +21,10 @@
     </div>
   </section>
   <section class="vor-dash-pane">
-    <div class="vor-dash-pane-head">
-      <h2 class="vor-dash-segment-title">История</h2>
+    <div class="vor-dash-pane__head">
+      <h2 class="vor-dash-segment__title">История</h2>
     </div>
-    <div class="vor-dash-pane-body">
+    <div class="vor-dash-pane__body">
       <div id="vor-dash-feed-list">{% include "vor_archives/partials/dashboard/dash_feed_items.html" %}</div>
     </div>
   </section>

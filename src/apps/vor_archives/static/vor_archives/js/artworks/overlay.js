@@ -195,7 +195,7 @@ document.addEventListener("alpine:init", () => {
       if (!tip) {
         return;
       }
-      const tipEl = el.querySelector(".vor-chip-tip");
+      const tipEl = el.querySelector(".vor-chip__tip");
       if (!tipEl) {
         return;
       }

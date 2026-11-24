@@ -1,8 +1,8 @@
-<div class="vor-attr-toolbar">
-  <div class="vor-search vor-attr-search-wrap">
-    <i class="bi bi-search vor-search-icon"></i>
+<div class="vor-attr-page__toolbar">
+  <div class="vor-search vor-attr-page__search-wrap">
+    <i class="bi bi-search vor-search__icon"></i>
     <input id="attr-search"
-           class="form-control vor-search-input"
+           class="form-control vor-search__input"
            type="search"
            name="q"
            placeholder="{{ search_placeholder }}"
@@ -14,7 +14,7 @@
   </div>
   {% if is_staff %}
     <button type="button"
-            class="sidebar-btn sidebar-btn-add sidebar-btn-icon"
+            class="sidebar-btn sidebar-btn--add sidebar-btn--icon"
             title="Создать"
             x-show="!$store.vorAttributes.deleteMode"
             hx-get="{% url 'vor_archives:attributes:new' attr_kind %}"
@@ -23,7 +23,7 @@
       <i class="bi bi-plus-circle"></i>
     </button>
     <button type="button"
-            class="sidebar-btn sidebar-btn-add sidebar-btn-icon"
+            class="sidebar-btn sidebar-btn--add sidebar-btn--icon"
             title="Отменить"
             x-show="$store.vorAttributes.deleteMode"
             x-cloak
@@ -31,14 +31,14 @@
       <i class="bi bi-x-circle"></i>
     </button>
     <button type="button"
-            class="sidebar-btn sidebar-btn-delete sidebar-btn-icon"
+            class="sidebar-btn sidebar-btn--delete sidebar-btn--icon"
             title="Удалить"
             x-show="!$store.vorAttributes.deleteMode"
             @click="$store.vorAttributes.enterDeleteMode()">
       <i class="bi bi-trash"></i>
     </button>
     <button type="button"
-            class="sidebar-btn sidebar-btn-delete sidebar-btn-icon"
+            class="sidebar-btn sidebar-btn--delete sidebar-btn--icon"
             title="Подтвердить"
             x-show="$store.vorAttributes.deleteMode"
             x-cloak

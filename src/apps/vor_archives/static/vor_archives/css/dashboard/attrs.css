@@ -17,7 +17,7 @@
   overflow: hidden;
 }
 
-.vor-dash-attr-grid .vor-dash-segment-head {
+.vor-dash-attr-grid .vor-dash-segment__head {
   flex: 0 0 auto;
 }
 
@@ -29,7 +29,7 @@
   gap: 0.35rem;
 }
 
-.vor-dash-attr-body {
+.vor-dash-attr-list__body {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
@@ -71,15 +71,15 @@
   scrollbar-gutter: stable both-edges;
 }
 
-.vor-dash-attr-name {
+.vor-dash-attr-row__name {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.vor-dash-attr-count,
-.vor-dash-attr-pct {
+.vor-dash-attr-row__count,
+.vor-dash-attr-row__pct {
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }

@@ -3,7 +3,13 @@
   "defaultSeverity": "warning",
   "rules": {
     "declaration-no-important": [true, { "severity": "warning" }],
-    "selector-class-pattern": null,
+    "selector-class-pattern": [
+      "^(?:status-[a-z_]+|[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__[a-z0-9]+(?:-[a-z0-9]+)*)?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?)$",
+      {
+        "resolveNestedSelectors": true,
+        "message": "Expected class selector to match BEM (block__element--modifier)"
+      }
+    ],
     "no-descending-specificity": [true, { "severity": "warning" }]
   }
 }

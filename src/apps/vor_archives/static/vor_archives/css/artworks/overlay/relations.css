@@ -1,5 +1,5 @@
 /* --- Relations --- */
-.vor-view-relations {
+.vor-view__relations {
   grid-column: 3;
   grid-row: 1;
   width: 330px;
@@ -11,7 +11,7 @@
   z-index: var(--z-base);
 }
 
-.vor-relations-head {
+.vor-relations__head {
   display: grid;
   grid-template-columns: 1.7rem 1fr 1.7rem;
   align-items: center;
@@ -20,18 +20,18 @@
   border-bottom: 1px solid var(--border);
 }
 
-.vor-relations-head-side {
+.vor-relations__head-side {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 1.7rem;
 }
 
-.vor-relations-head-side:last-child {
+.vor-relations__head-side:last-child {
   justify-content: flex-end;
 }
 
-.vor-relations-title {
+.vor-relations__title {
   margin: 0;
   padding: 0;
   text-align: center;
@@ -40,14 +40,14 @@
   border: 0;
 }
 
-.vor-relations-head-btn {
+.vor-relations__head-btn {
   width: 1.7rem;
   height: 1.7rem;
   padding: 0;
   flex-shrink: 0;
 }
 
-.vor-relations-list {
+.vor-relations__list {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -61,12 +61,12 @@
   position: relative;
 }
 
-.vor-relation-pick--selected {
+.vor-relation-item--selected {
   background-color: rgb(from var(--accent-vor) r g b / 12%);
 }
 
 button.vor-relation-item,
-.vor-relation-pick {
+.vor-relation-item--pick {
   width: 100%;
   border: 0;
   background-color: transparent;
@@ -74,22 +74,22 @@ button.vor-relation-item,
   text-align: left;
 }
 
-.vor-relation-pick .vor-relation-title {
+.vor-relation-item--pick .vor-relation-item__title {
   color: var(--text-primary);
 }
 
-.vor-relation-edit {
+.vor-relation-item__edit {
   position: absolute;
   top: 0.15rem;
   right: 0.15rem;
 }
 
-.vor-relation-actions {
+.vor-relation-item__actions {
   display: flex;
   gap: 0.15rem;
 }
 
-.vor-relation-action {
+.vor-relation-item__action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -103,7 +103,7 @@ button.vor-relation-item,
   cursor: pointer;
 }
 
-.vor-relation-action-delete {
+.vor-relation-item__action--delete {
   color: var(--action-delete);
   border-color: var(--action-delete);
 }
@@ -123,7 +123,7 @@ button.vor-relation-item,
   padding: 0.55rem;
 }
 
-.vor-relation-add-list {
+.vor-relation-add__list {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -132,36 +132,36 @@ button.vor-relation-item,
   gap: 0.4rem;
 }
 
-.vor-relation-add-type {
+.vor-relation-add__type {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
 }
 
-.vor-relation-add-type-head {
+.vor-relation-add__type-head {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.15rem;
 }
 
-.vor-relation-add-type-head .vor-field-label {
+.vor-relation-add__type-head .vor-field__label {
   margin: 0;
 }
 
-.vor-relation-add-hint {
+.vor-relation-add__hint {
   font-size: 0.7rem;
   color: var(--text-secondary);
   white-space: nowrap;
 }
 
-.vor-relation-type-choices {
+.vor-relation-add__choices {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.3rem;
 }
 
-.vor-relation-type-choices .vor-relation-type-option {
+.vor-relation-add__choices .vor-relation-type-menu__option {
   padding: 0.25rem 0.35rem;
   font-size: 0.75rem;
 }
@@ -187,7 +187,7 @@ a.vor-relation-item:hover {
   background-color: rgb(from var(--accent-vor) r g b / 10%);
 }
 
-.vor-relation-cover {
+.vor-relation-item__cover {
   width: 40px;
   height: 60px;
   object-fit: cover;
@@ -196,7 +196,7 @@ a.vor-relation-item:hover {
   background-color: var(--bg-input);
 }
 
-.vor-relation-cover-empty {
+.vor-relation-item__cover-empty {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -204,23 +204,23 @@ a.vor-relation-item:hover {
   font-size: 1rem;
 }
 
-.vor-relation-meta {
+.vor-relation-item__meta {
   min-width: 0;
 }
 
-.vor-relation-title {
+.vor-relation-item__title {
   font-size: 0.8125rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.vor-relation-type {
+.vor-relation-item__type {
   font-size: 0.7rem;
   color: var(--text-secondary);
 }
 
-.vor-relations-empty {
+.vor-relations__empty {
   color: var(--text-secondary);
   font-size: 0.8125rem;
   text-align: center;

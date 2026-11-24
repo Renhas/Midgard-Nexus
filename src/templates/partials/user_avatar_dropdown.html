@@ -5,7 +5,7 @@
             @click="open =!open"
             @click.outside="open = false"
             :aria-expanded="open">
-      <i class="bi bi-person-circle header-icon"></i>
+      <i class="bi bi-person-circle nav-btn__icon"></i>
       <span class="d-none d-sm-inline">{{ user.get_full_name|default:user.username }}</span>
     </button>
     <ul class="dropdown-menu dropdown-menu-end" style="left: auto !important; right: 0;" :class="{ 'show': open }">
@@ -29,7 +29,7 @@
   </div>
 {% else %}
   <a href="{% url 'users:login' %}" class="nav-btn d-flex align-items-center gap-2">
-    <i class="bi bi-person-circle header-icon"></i>
+    <i class="bi bi-person-circle nav-btn__icon"></i>
     <span class="d-none d-sm-inline">Войти</span>
   </a>
 {% endif %}

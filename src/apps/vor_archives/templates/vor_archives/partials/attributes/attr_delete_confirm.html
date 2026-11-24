@@ -1,9 +1,9 @@
 <div class="vor-backdrop" @click.self="$dispatch('vor:close-modal')">
   <div class="vor-panel vor-modal">
-    <h3 class="vor-modal-title">Подтверждение удаления</h3>
-    <p class="vor-modal-text">{{ delete_text }}</p>
+    <h3 class="vor-modal__title">Подтверждение удаления</h3>
+    <p class="vor-modal__text">{{ delete_text }}</p>
     {% if linked_count %}
-      <div class="vor-modal-warning">
+      <div class="vor-modal__warning">
         <p>
           Связи с произведениями будут сняты, сами произведения останутся.
           Затронуто произведений: {{ linked_count }}.
@@ -17,13 +17,13 @@
         </ul>
       </div>
     {% endif %}
-    <form class="vor-modal-actions" hx-post="{{ delete_url }}" hx-target="#attr-detail" hx-swap="innerHTML">
+    <form class="vor-modal__actions" hx-post="{{ delete_url }}" hx-target="#attr-detail" hx-swap="innerHTML">
       {% csrf_token %}
       {% for item in items %}
         <input type="hidden" name="ids" value="{{ item.key }}">
       {% endfor %}
       <button type="button" class="sidebar-btn" @click="$dispatch('vor:close-modal')">Отмена</button>
-      <button type="submit" class="sidebar-btn sidebar-btn-delete">Удалить</button>
+      <button type="submit" class="sidebar-btn sidebar-btn--delete">Удалить</button>
     </form>
   </div>
 </div>

@@ -78,7 +78,7 @@ def test_dashboard_feed_partial_returns_items(client_logged_in, user, book):
     response = client_logged_in.get(reverse("vor_archives:dashboard:feed"))
     assert response.status_code == 200
     content = response.content.decode()
-    assert "vor-dash-feed-item" in content
+    assert "vor-dash-feed__item" in content
     assert book.title in content
 
     item = response.context["feed_items"][0]

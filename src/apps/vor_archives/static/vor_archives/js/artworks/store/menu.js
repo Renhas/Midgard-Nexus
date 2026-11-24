@@ -60,12 +60,12 @@ export const menuMixin = {
     this.menu.kind = "collection";
     this.menu.collectionId = Number(el.dataset.collectionId);
     this.menu.collectionName = el.dataset.collectionName || "";
-    const node = el.closest(".vor-collection-tree-node");
+    const node = el.closest(".vor-collection-tree__node");
     const siblings = this.collectionSiblings(node);
     const index = siblings.indexOf(node);
     this.menu.canNudgeUp = index > 0;
     this.menu.canNudgeDown = index >= 0 && index < siblings.length - 1;
-    this.menu.canLevelUp = Boolean(node?.parentElement?.closest(".vor-collection-tree-node"));
+    this.menu.canLevelUp = Boolean(node?.parentElement?.closest(".vor-collection-tree__node"));
     this.menu.canLevelDown = index > 0;
     this.placeMenu(event.clientX, event.clientY);
   },
@@ -77,8 +77,8 @@ export const menuMixin = {
     this.menu.kind = "artwork";
     this.menu.uwId = Number(item.dataset.uwId);
     this.menu.detailUrl = item.dataset.detailUrl || "";
-    const nested = Boolean(item.closest(".vor-artwork-list-items-nested"));
-    const list = document.getElementById("vor-artwork-list-items");
+    const nested = Boolean(item.closest(".vor-artwork-list__items--nested"));
+    const list = document.getElementById("vor-artwork-list__items");
     const items = list ? [...list.querySelectorAll(":scope > .vor-artwork-item")] : [];
     const index = items.indexOf(item);
     const canNudge = !nested && this.canReorder() && index >= 0;
@@ -92,9 +92,9 @@ export const menuMixin = {
   },
   nudgeArtwork(delta) {
     const item = document.querySelector(`.vor-artwork-item[data-uw-id="${this.menu.uwId}"]`);
-    const list = document.getElementById("vor-artwork-list-items");
+    const list = document.getElementById("vor-artwork-list__items");
     this.closeMenu();
-    if (!item || !list || item.closest(".vor-artwork-list-items-nested")) {
+    if (!item || !list || item.closest(".vor-artwork-list__items--nested")) {
       return;
     }
     const items = [...list.querySelectorAll(":scope > .vor-artwork-item")];
@@ -139,7 +139,7 @@ export const menuMixin = {
     const index = siblings.indexOf(node);
     if (direction > 0) {
       const prev = index > 0 ? siblings[index - 1] : null;
-      const children = prev?.querySelector(":scope > .vor-collection-children");
+      const children = prev?.querySelector(":scope > .vor-collection-tree__children");
       if (!prev || !children) {
         return;
       }
@@ -148,7 +148,7 @@ export const menuMixin = {
       this.postCollectionMove(node);
       return;
     }
-    const parentNode = node.parentElement?.closest(".vor-collection-tree-node");
+    const parentNode = node.parentElement?.closest(".vor-collection-tree__node");
     if (!parentNode) {
       return;
     }
@@ -168,7 +168,7 @@ export const menuMixin = {
     this.cancelCloseFlyout();
     this.menu.flyout = true;
     const menu = document.getElementById("vor-context-menu");
-    const trigger = menu?.querySelector(".has-submenu");
+    const trigger = menu?.querySelector(".vor-context-item--with-submenu");
     const rect = (trigger || menu)?.getBoundingClientRect();
     if (!rect) {
       return;

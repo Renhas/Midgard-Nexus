@@ -1,8 +1,8 @@
-<section class="vor-panel {% if is_add %}vor-overlay-section vor-add-relations{% else %}vor-view-relations{% endif %}">
-  <div class="vor-relations-head">
-    <div class="vor-relations-head-side">
+<section class="vor-panel {% if is_add %}vor-overlay__section vor-add__relations{% else %}vor-view__relations{% endif %}">
+  <div class="vor-relations__head">
+    <div class="vor-relations__head-side">
       <button type="button"
-              class="sidebar-btn sidebar-btn-icon vor-relations-head-btn"
+              class="sidebar-btn sidebar-btn--icon vor-relations__head-btn"
               x-show="relationsEditable() && relAdding"
               x-cloak
               title="Назад"
@@ -10,10 +10,10 @@
         <i class="bi bi-arrow-left"></i>
       </button>
     </div>
-    <h3 class="vor-relations-title" x-text="relAdding ? 'Добавление' : 'Связи'">Связи</h3>
-    <div class="vor-relations-head-side">
+    <h3 class="vor-relations__title" x-text="relAdding ? 'Добавление' : 'Связи'">Связи</h3>
+    <div class="vor-relations__head-side">
       <button type="button"
-              class="sidebar-btn sidebar-btn-add sidebar-btn-icon vor-relations-head-btn"
+              class="sidebar-btn sidebar-btn--add sidebar-btn--icon vor-relations__head-btn"
               x-show="relationsEditable() && !relAdding"
               x-cloak
               title="Добавить связь"
@@ -21,7 +21,7 @@
         <i class="bi bi-plus-lg"></i>
       </button>
       <button type="button"
-              class="sidebar-btn sidebar-btn-add sidebar-btn-icon vor-relations-head-btn"
+              class="sidebar-btn sidebar-btn--add sidebar-btn--icon vor-relations__head-btn"
               x-show="relationsEditable() && relAdding"
               x-cloak
               title="Сохранить связь"
@@ -30,36 +30,36 @@
       </button>
     </div>
   </div>
-  <div class="vor-relations-list" x-show="!relAdding">
+  <div class="vor-relations__list" x-show="!relAdding">
     <template x-for="item in relations" :key="item.id || (item.type_key + '-' + item.work_id)">
       <div class="vor-relation-item"
            :class="{ 'vor-relation-item--static': {% if allow_click_related %}editing{% else %}true{% endif %} }"
            {% if allow_click_related %}@click="!editing && openRelated(item)"{% endif %}>
         <template x-if="item.cover_url">
-          <img class="vor-relation-cover" :src="item.cover_url" :alt="item.title">
+          <img class="vor-relation-item__cover" :src="item.cover_url" :alt="item.title">
         </template>
         <template x-if="!item.cover_url">
-          <div class="vor-relation-cover vor-relation-cover-empty">
+          <div class="vor-relation-item__cover vor-relation-item__cover-empty">
             <i :class="item.icon"></i>
           </div>
         </template>
-        <div class="vor-relation-meta">
-          <div class="vor-relation-title" :title="item.title" x-text="item.title"></div>
-          <div class="vor-relation-type" x-text="item.label"></div>
+        <div class="vor-relation-item__meta">
+          <div class="vor-relation-item__title" :title="item.title" x-text="item.title"></div>
+          <div class="vor-relation-item__type" x-text="item.label"></div>
         </div>
-        <div class="vor-relation-edit"
+        <div class="vor-relation-item__edit"
              {% if not is_add %}x-show="editing"{% endif %}
              x-cloak
              @click.outside="relTypeEdit = null">
-          <div class="vor-relation-actions">
+          <div class="vor-relation-item__actions">
             <button type="button"
-                    class="vor-relation-action"
+                    class="vor-relation-item__action"
                     title="Изменить тип связи"
                     @click.stop="toggleRelationType(item)">
               <i class="bi bi-pencil"></i>
             </button>
             <button type="button"
-                    class="vor-relation-action vor-relation-action-delete"
+                    class="vor-relation-item__action vor-relation-item__action--delete"
                     title="Удалить связь"
                     @click.stop="removeRelation(item)">
               <i class="bi bi-x"></i>
@@ -68,8 +68,8 @@
           <div class="vor-panel vor-relation-type-menu" x-show="relTypeEdit === relationKey(item)" x-cloak>
             <template x-for="opt in allowedRelationTypes(item.type_key)" :key="opt.value">
               <button type="button"
-                      class="vor-relation-type-option"
-                      :class="{ 'vor-relation-type-option--current': item.relation_type === opt.value }"
+                      class="vor-relation-type-menu__option"
+                      :class="{ 'vor-relation-type-menu__option--current': item.relation_type === opt.value }"
                       @click.stop="setRelationType(item, opt.value)"
                       x-text="opt.label"></button>
             </template>
@@ -77,45 +77,45 @@
         </div>
       </div>
     </template>
-    <div class="vor-relations-empty" x-show="!relations.length">Нет связей</div>
+    <div class="vor-relations__empty" x-show="!relations.length">Нет связей</div>
   </div>
   <div class="vor-relation-add" x-show="relAdding" x-cloak>
-    <input class="vor-chip-picker-search"
+    <input class="vor-chip-picker__search"
            type="text"
            placeholder="Поиск произведения"
            x-model="relQuery"
            @input.debounce.250ms="searchRelatedWorks()">
-    <div class="vor-relation-add-list">
+    <div class="vor-relation-add__list">
       <template x-for="hit in relResults" :key="hit.type_key + '-' + hit.work_id">
         <button type="button"
-                class="vor-relation-item vor-relation-pick"
-                :class="{ 'vor-relation-pick--selected': relPick && relPick.work_id === hit.work_id && relPick.type_key === hit.type_key }"
+                class="vor-relation-item vor-relation-item--pick"
+                :class="{ 'vor-relation-item--selected': relPick && relPick.work_id === hit.work_id && relPick.type_key === hit.type_key }"
                 @click="relPick = hit">
           <template x-if="hit.cover_url">
-            <img class="vor-relation-cover" :src="hit.cover_url" :alt="hit.title">
+            <img class="vor-relation-item__cover" :src="hit.cover_url" :alt="hit.title">
           </template>
           <template x-if="!hit.cover_url">
-            <div class="vor-relation-cover vor-relation-cover-empty">
+            <div class="vor-relation-item__cover vor-relation-item__cover-empty">
               <i :class="hit.icon"></i>
             </div>
           </template>
-          <div class="vor-relation-meta">
-            <div class="vor-relation-title" x-text="hit.title"></div>
+          <div class="vor-relation-item__meta">
+            <div class="vor-relation-item__title" x-text="hit.title"></div>
           </div>
         </button>
       </template>
-      <div class="vor-relations-empty" x-show="relQuery && !relResults.length">Ничего не найдено</div>
+      <div class="vor-relations__empty" x-show="relQuery && !relResults.length">Ничего не найдено</div>
     </div>
-    <div class="vor-relation-add-type" x-show="relPick">
-      <div class="vor-relation-add-type-head">
-        <span class="vor-field-label">Тип связи</span>
-        <span class="vor-relation-add-hint">(текущее → выбранное)</span>
+    <div class="vor-relation-add__type" x-show="relPick">
+      <div class="vor-relation-add__type-head">
+        <span class="vor-field__label">Тип связи</span>
+        <span class="vor-relation-add__hint">(текущее → выбранное)</span>
       </div>
-      <div class="vor-relation-type-choices">
+      <div class="vor-relation-add__choices">
         <template x-for="opt in allowedRelationTypes(relPick && relPick.type_key)" :key="opt.value">
           <button type="button"
-                  class="vor-relation-type-option"
-                  :class="{ 'vor-relation-type-option--current': relPickType === opt.value }"
+                  class="vor-relation-type-menu__option"
+                  :class="{ 'vor-relation-type-menu__option--current': relPickType === opt.value }"
                   @click="relPickType = opt.value"
                   x-text="opt.label"></button>
         </template>

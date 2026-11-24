@@ -17,51 +17,51 @@
     <a href="{% url 'vor_archives:index' %}"
        class="nav-btn{% if active_section == 'artworks' %} nav-btn--active{% endif %}"
        title="Произведения">
-      <i class="bi bi-collection header-icon"></i>
+      <i class="bi bi-collection nav-btn__icon"></i>
       <span class="vor-nav-label">Произведения</span>
     </a>
     <a href="{% url 'vor_archives:attributes:index' %}"
        class="nav-btn{% if active_section == 'attributes' %} nav-btn--active{% endif %}"
        title="Аттрибуты">
-      <i class="bi bi-tags header-icon"></i>
+      <i class="bi bi-tags nav-btn__icon"></i>
       <span class="vor-nav-label">Аттрибуты</span>
     </a>
     <a href="{% url 'vor_archives:dashboard:index' %}"
        class="nav-btn{% if active_section == 'dashboard' %} nav-btn--active{% endif %}"
        title="Дашборд">
-      <i class="bi bi-bar-chart-line header-icon"></i>
+      <i class="bi bi-bar-chart-line nav-btn__icon"></i>
       <span class="vor-nav-label">Дашборд</span>
     </a>
   </div>
 {% endblock %}
 {% block content %}
-  <div class="layout{% if hide_right %} layout-no-right{% endif %}"
+  <div class="layout{% if hide_right %} layout--no-right{% endif %}"
        x-data="{ leftOpen: true, rightOpen: {% if hide_right %}false{% else %}true{% endif %} }">
     <!-- Left sidebar (15 %) -->
-    <aside class="sidebar sidebar-left" :class="{ collapsed: !leftOpen }">
-      <div class="sidebar-body">
+    <aside class="sidebar sidebar--left" :class="{ 'sidebar--collapsed': !leftOpen }">
+      <div class="sidebar__body">
         {% block left_content %}{% endblock %}
       </div>
     </aside>
     <button type="button"
-            class="sidebar-handle handle-left"
+            class="sidebar-handle sidebar-handle--left"
             @click="leftOpen = !leftOpen"
             :title="leftOpen ? 'Скрыть панель' : 'Показать панель'">
       <i class="bi" :class="leftOpen ? 'bi-chevron-left' : 'bi-chevron-right'"></i>
     </button>
     <!-- Center content (70 %) -->
-    <div class="center" :class="{ 'left-collapsed': !leftOpen, 'right-collapsed': !rightOpen }">
+    <div class="center" :class="{ 'center--left-collapsed': !leftOpen, 'center--right-collapsed': !rightOpen }">
       {% block vor_content %}{% endblock %}
     </div>
     {% if not hide_right %}
       <!-- Right sidebar (15 %) -->
-      <aside class="sidebar sidebar-right" :class="{ collapsed: !rightOpen }">
-        <div class="sidebar-body">
+      <aside class="sidebar sidebar--right" :class="{ 'sidebar--collapsed': !rightOpen }">
+        <div class="sidebar__body">
           {% block right_content %}{% endblock %}
         </div>
       </aside>
       <button type="button"
-              class="sidebar-handle handle-right"
+              class="sidebar-handle sidebar-handle--right"
               @click="rightOpen = !rightOpen"
               :title="rightOpen ? 'Скрыть панель' : 'Показать панель'">
         <i class="bi" :class="rightOpen ? 'bi-chevron-right' : 'bi-chevron-left'"></i>

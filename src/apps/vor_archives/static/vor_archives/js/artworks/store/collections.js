@@ -85,9 +85,9 @@ export const collectionsMixin = {
     this.applyCollectionExpandState();
   },
   applyCollectionExpandState() {
-    document.querySelectorAll(".vor-collection-tree-node").forEach((node) => {
+    document.querySelectorAll(".vor-collection-tree__node").forEach((node) => {
       const expanded = this.isCollectionExpanded(node.dataset.collectionId);
-      node.classList.toggle("vor-collection-tree-node--expanded", expanded);
+      node.classList.toggle("vor-collection-tree__node--expanded", expanded);
       node.querySelector(":scope > .vor-collection-item .bi-chevron-right")?.classList.toggle("bi-rotate-90", expanded);
     });
   },
@@ -105,17 +105,17 @@ export const collectionsMixin = {
       return;
     }
     htmx.ajax("GET", this.collectionTreeUrl, {
-      target: "#sidebar-collections-list",
+      target: "#sidebar-collections__list",
       swap: "innerHTML",
     });
   },
   pruneExpandedCollections() {
     this.expandedCollectionIds = this.expandedCollectionIds.filter((id) => {
-      const node = document.querySelector(`.vor-collection-tree-node[data-collection-id="${id}"]`);
+      const node = document.querySelector(`.vor-collection-tree__node[data-collection-id="${id}"]`);
       if (!node) {
         return false;
       }
-      return Boolean(node.querySelector(":scope > .vor-collection-children > .vor-collection-tree-node"));
+      return Boolean(node.querySelector(":scope > .vor-collection-tree__children > .vor-collection-tree__node"));
     });
   },
   collectionNode(id) {
@@ -151,13 +151,13 @@ export const collectionsMixin = {
     if (!root) {
       return;
     }
-    const containers = [root, ...root.querySelectorAll(".vor-collection-children")];
+    const containers = [root, ...root.querySelectorAll(".vor-collection-tree__children")];
     containers.forEach((container) => {
       this._collectionSortables.push(
         Sortable.create(container, {
           group: "vor-collections",
           animation: 150,
-          draggable: ".vor-collection-tree-node",
+          draggable: ".vor-collection-tree__node",
           handle: ".vor-collection-item",
           direction: "vertical",
           forceFallback: true,
@@ -167,14 +167,14 @@ export const collectionsMixin = {
           invertSwapThreshold: 0.45,
           swapThreshold: 0.65,
           emptyInsertThreshold: 6,
-          ghostClass: "is-sortable-ghost",
-          chosenClass: "is-sortable-chosen",
-          dragClass: "is-sortable-drag",
-          filter: ".vor-collection-toggle",
+          ghostClass: "vor-collection-tree__node--ghost",
+          chosenClass: "vor-collection-tree__node--chosen",
+          dragClass: "vor-collection-tree__node--drag",
+          filter: ".vor-collection-tree__toggle",
           preventOnFilter: false,
           onMove: (evt, originalEvent) => {
             const target = evt.to;
-            if (target?.classList.contains("vor-collection-children")) {
+            if (target?.classList.contains("vor-collection-tree__children")) {
               const parentId = target.dataset.parentId;
               if (parentId && !this.isCollectionExpanded(parentId)) {
                 return false;
@@ -257,9 +257,11 @@ export const collectionsMixin = {
     if (dragged) {
       blockers.push(dragged);
     }
-    document.querySelectorAll(".is-sortable-ghost, .is-sortable-drag, .sortable-fallback").forEach((node) => {
-      blockers.push(node);
-    });
+    document
+      .querySelectorAll(".vor-collection-tree__node--ghost, .vor-collection-tree__node--drag, .sortable-fallback")
+      .forEach((node) => {
+        blockers.push(node);
+      });
     const prev = blockers.map((node) => node.style.pointerEvents);
     blockers.forEach((node) => {
       node.style.pointerEvents = "none";
@@ -302,7 +304,7 @@ export const collectionsMixin = {
       return false;
     }
     const targetNode = this.collectionNode(targetId);
-    const children = targetNode?.querySelector(":scope > .vor-collection-children");
+    const children = targetNode?.querySelector(":scope > .vor-collection-tree__children");
     if (!targetNode || !children || item.contains(targetNode)) {
       return false;
     }

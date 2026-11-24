@@ -1,20 +1,20 @@
 <div class="sidebar-nav">
-  <div class="sidebar-nav-row">
+  <div class="sidebar-nav__row">
     <button type="button"
-            class="sidebar-btn sidebar-btn-primary"
+            class="sidebar-btn sidebar-btn--primary"
             title="Медиатека"
             :class="{ 'sidebar-btn--active': !$store.vorArtworks.collectionId }"
             @click="$store.vorArtworks.selectLibrary()">
       <i class="bi bi-collection"></i>
       <span>Медиатека</span>
     </button>
-    <button type="button" class="sidebar-btn sidebar-btn-icon" title="Поиск" @click="$store.vorArtworks.openSearch()">
+    <button type="button" class="sidebar-btn sidebar-btn--icon" title="Поиск" @click="$store.vorArtworks.openSearch()">
       <i class="bi bi-search"></i>
     </button>
   </div>
-  <div class="sidebar-nav-row">
+  <div class="sidebar-nav__row">
     <button type="button"
-            class="sidebar-btn sidebar-btn-add"
+            class="sidebar-btn sidebar-btn--add"
             title="Добавить"
             x-show="!$store.vorArtworks.deleteMode"
             hx-get="{% url 'vor_archives:artworks:add' %}"
@@ -23,7 +23,7 @@
       <i class="bi bi-plus-circle"></i>
     </button>
     <button type="button"
-            class="sidebar-btn sidebar-btn-add"
+            class="sidebar-btn sidebar-btn--add"
             title="Отменить"
             x-show="$store.vorArtworks.deleteMode"
             x-cloak
@@ -31,14 +31,14 @@
       <i class="bi bi-x-circle"></i>
     </button>
     <button type="button"
-            class="sidebar-btn sidebar-btn-delete"
+            class="sidebar-btn sidebar-btn--delete"
             title="Удалить"
             x-show="!$store.vorArtworks.deleteMode"
             @click="$store.vorArtworks.enterDeleteMode()">
       <i class="bi bi-trash"></i>
     </button>
     <button type="button"
-            class="sidebar-btn sidebar-btn-delete"
+            class="sidebar-btn sidebar-btn--delete"
             title="Подтвердить"
             x-show="$store.vorArtworks.deleteMode"
             x-cloak
@@ -49,14 +49,14 @@
   </div>
   <hr class="sidebar-divider">
   <div class="sidebar-collections">
-    <div class="sidebar-collections-header">
+    <div class="sidebar-collections__header">
       <span>Коллекции</span>
     </div>
-    <div id="sidebar-collections-list" class="sidebar-collections-list">
+    <div id="sidebar-collections__list" class="sidebar-collections__list">
       {% include "vor_archives/partials/collections/collection_tree.html" %}
     </div>
     <button type="button"
-            class="sidebar-btn sidebar-btn-add sidebar-btn-full"
+            class="sidebar-btn sidebar-btn--add sidebar-btn--full"
             title="Добавить коллекцию"
             hx-get="{% url 'vor_archives:collections:new' %}"
             hx-target="#vor-modal"

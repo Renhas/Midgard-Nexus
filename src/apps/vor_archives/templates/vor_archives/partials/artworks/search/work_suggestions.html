@@ -1,7 +1,7 @@
 {% load vor_archives_extras %}
 <div hidden x-init="onSuggestionsLoaded({{ already_owned|yesno:'true,false' }})"></div>
 {% if works %}
-  <ul class="vor-suggestions-list">
+  <ul class="vor-suggestions__list">
     {% for work in works %}
       <li>
         <button type="button"
@@ -9,9 +9,9 @@
                 data-work-id="{{ work.pk }}"
                 data-preview-url="{% url 'vor_archives:artworks:preview' %}?type={{ work_type }}&work_id={{ work.pk }}">
           <i class="{{ work|get_model_icon }}"></i>
-          <span class="vor-suggestion-title">{{ work.title }}</span>
+          <span class="vor-suggestion-item__title">{{ work.title }}</span>
           {% if work.release_date %}
-            <span class="vor-suggestion-year">{{ work.release_date|date:'Y' }}</span>
+            <span class="vor-suggestion-item__year">{{ work.release_date|date:'Y' }}</span>
           {% endif %}
         </button>
       </li>

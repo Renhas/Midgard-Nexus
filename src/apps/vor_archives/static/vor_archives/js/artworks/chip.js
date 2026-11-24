@@ -100,7 +100,7 @@ document.addEventListener("alpine:init", () => {
       return moreWidth;
     },
     placeTip(chip) {
-      const tip = chip.querySelector(".vor-chip-tip");
+      const tip = chip.querySelector(".vor-chip__tip");
       if (!tip) {
         return;
       }

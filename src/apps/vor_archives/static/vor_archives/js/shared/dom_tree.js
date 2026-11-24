@@ -1,7 +1,7 @@
 export function getCollectionPathFromTree(id) {
   const item = document.querySelector(`.vor-collection-item[data-collection-id="${id}"]`);
   const path = [];
-  let node = item?.closest(".vor-collection-tree-node");
+  let node = item?.closest(".vor-collection-tree__node");
   while (node) {
     const row = node.querySelector(":scope > .vor-collection-item");
     if (row?.dataset.collectionId) {
@@ -10,13 +10,13 @@ export function getCollectionPathFromTree(id) {
         name: row.dataset.collectionName || "",
       });
     }
-    node = node.parentElement?.closest(".vor-collection-tree-node") || null;
+    node = node.parentElement?.closest(".vor-collection-tree__node") || null;
   }
   return path;
 }
 
 export function getCollectionNode(id) {
-  return document.querySelector(`.vor-collection-tree-node[data-collection-id="${id}"]`);
+  return document.querySelector(`.vor-collection-tree__node[data-collection-id="${id}"]`);
 }
 
 export function getCollectionSiblings(node) {
@@ -24,5 +24,5 @@ export function getCollectionSiblings(node) {
   if (!parent) {
     return [];
   }
-  return [...parent.querySelectorAll(":scope > .vor-collection-tree-node")];
+  return [...parent.querySelectorAll(":scope > .vor-collection-tree__node")];
 }

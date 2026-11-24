@@ -1,13 +1,13 @@
-<div class="vor-attr-list-header">{{ tab.count_label }}: {{ total_count }}</div>
+<div class="vor-attr-list__header">{{ tab.count_label }}: {{ total_count }}</div>
 {% if groups %}
   {% for group in groups %}
     {% if group.items %}
       <div class="vor-attr-group" x-data="{ expanded: true }">
-        <button type="button" class="vor-attr-group-toggle" @click="expanded = !expanded">
+        <button type="button" class="vor-attr-group__toggle" @click="expanded = !expanded">
           <span>{{ group.label }} ({{ group.items|length }})</span>
           <i class="bi" :class="expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
         </button>
-        <div class="vor-attr-group-body" x-show="expanded">
+        <div class="vor-attr-group__body" x-show="expanded">
           {% for item in group.items %}
             {% include "vor_archives/partials/attributes/attr_list_item.html" with item=item %}
           {% endfor %}
@@ -21,5 +21,5 @@
   {% endfor %}
 {% endif %}
 {% if not has_items %}
-  <div class="vor-attr-list-empty">{% if total_count %}Ничего не найдено{% else %}{{ tab.none_yet }}{% endif %}</div>
+  <div class="vor-attr-list__empty">{% if total_count %}Ничего не найдено{% else %}{{ tab.none_yet }}{% endif %}</div>
 {% endif %}

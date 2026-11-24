@@ -1,27 +1,27 @@
 /* --- Responsive --- */
 @media (width <= 900px) {
-  .vor-view-hero {
+  .vor-view__hero {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
   }
 
-  .vor-cover-wrap,
-  .vor-view-cover,
-  .vor-view-info,
-  .vor-view-relations,
-  .vor-view-cover-controls,
-  .vor-view-desc {
+  .vor-cover__wrap,
+  .vor-view__cover,
+  .vor-view__info,
+  .vor-view__relations,
+  .vor-view__cover-controls,
+  .vor-view__desc {
     grid-column: 1;
     grid-row: auto;
     width: 100%;
     height: auto;
   }
 
-  .vor-view-info {
+  .vor-view__info {
     min-height: 0;
   }
 
-  .vor-view-relations {
+  .vor-view__relations {
     min-height: 220px;
     max-height: 320px;
   }

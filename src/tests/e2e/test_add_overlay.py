@@ -14,7 +14,7 @@ def test_add_overlay_accordions_exclusive_and_relations_visible(
     authenticated_page.set_viewport_size({"width": 1280, "height": 720})
     authenticated_page.goto(f"{live_server.url}/library/")
 
-    add_button = authenticated_page.locator(".sidebar-btn-add").first
+    add_button = authenticated_page.locator(".sidebar-btn--add").first
     add_button.click()
 
     overlay = authenticated_page.locator(".vor-overlay--add")
@@ -23,7 +23,7 @@ def test_add_overlay_accordions_exclusive_and_relations_visible(
     authors_btn = overlay.get_by_role("button", name="Авторы")
     genres_btn = overlay.get_by_role("button", name="Жанры")
     tags_btn = overlay.get_by_role("button", name="Теги")
-    relations_panel = overlay.locator(".vor-add-relations")
+    relations_panel = overlay.locator(".vor-add__relations")
 
     authors_body = overlay.locator("#attr-body-authors")
     genres_body = overlay.locator("#attr-body-genres")
