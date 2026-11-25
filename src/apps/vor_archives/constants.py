@@ -1,4 +1,5 @@
 from typing import NamedTuple
+from enum import StrEnum
 
 from django.db import models
 
@@ -122,7 +123,17 @@ RELATION_LABELS = {
     WorkRelationTypeChoices.OTHER: ("Связано", "Связано"),
 }
 
-RELATION_TYPE_OPTIONS = [
-    {"value": rel_type, "label": labels[0]}
-    for rel_type, labels in RELATION_LABELS.items()
-]
+
+class RelationScope(StrEnum):
+    ANY = "any"
+    SAME = "same"
+    DIFFERENT = "different"
+
+
+RELATION_SCOPES: dict[WorkRelationTypeChoices, RelationScope] = {
+    WorkRelationTypeChoices.OTHER: RelationScope.ANY,
+    WorkRelationTypeChoices.ADAPTATION: RelationScope.DIFFERENT,
+    WorkRelationTypeChoices.SEQUEL: RelationScope.SAME,
+    WorkRelationTypeChoices.SPIN_OFF: RelationScope.SAME,
+    WorkRelationTypeChoices.REMAKE: RelationScope.SAME,
+}

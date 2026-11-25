@@ -7,15 +7,9 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from apps.vor_archives.constants import (
-    RELATION_TYPE_OPTIONS,
-    age_rating_options,
-    status_options,
-)
 from apps.vor_archives.registry import WORK_MODELS, WORK_TYPE_REGISTRY
 from apps.vor_archives.models import UserWork
 from apps.vor_archives.artworks.forms import (
-    WORK_REQUIRED_FIELDS,
     RelationsForm,
     UserWorkEditForm,
 )
@@ -123,18 +117,13 @@ def artwork_add(request):
         "vor_archives/partials/artworks/artwork_add.html",
         {
             "add_opts": {
-                "workType": "book",
                 "saveUrl": reverse("vor_archives:artworks:add"),
                 "searchUrl": reverse("vor_archives:artworks:search"),
                 "previewUrl": reverse("vor_archives:artworks:preview"),
                 "attachUrl": reverse("vor_archives:artworks:attach"),
                 "listUrl": reverse("vor_archives:artworks:list"),
                 "relationSearchUrl": reverse("vor_archives:artworks:relation_search"),
-                "relationTypes": RELATION_TYPE_OPTIONS,
                 "catalogs": all_attr_catalogs(),
-                "ageChoices": age_rating_options(),
-                "statusChoices": status_options(),
-                "requiredFields": WORK_REQUIRED_FIELDS,
             },
             "work_types": WORK_TYPE_REGISTRY.values(),
         },

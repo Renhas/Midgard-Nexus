@@ -1,5 +1,6 @@
 {% extends "base_app.html" %}
 {% load static %}
+{% load vor_archives_extras %}
 {% block title %}{{ module_name }}{% endblock %}
 {% block extra_head %}
   {{ block.super }}
@@ -69,5 +70,6 @@
     {% endif %}
     <!-- Page-level notifications -->
     {% block page_notifications %}{% endblock %}
+    {% vor_domain_config %}
   </div>
 {% endblock %}

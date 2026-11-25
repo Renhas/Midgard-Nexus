@@ -1,13 +1,16 @@
+import { getDomainConfig } from "@vor/shared/domain";
 import { fieldIsEmpty, isRequiredField } from "@vor/artworks/pure/form_state";
 
-export function getValidationMixin({ requiredFieldsByType = {} } = {}) {
+export function getValidationMixin() {
+  const validationConfig = getDomainConfig().validation;
+  const fieldToState = validationConfig.fieldToState;
+
   return {
-    requiredFieldsByType,
     isRequired(name) {
-      return isRequiredField(this, name, this.requiredFieldsByType);
+      return isRequiredField(this, name, validationConfig);
     },
     isEmpty(name) {
-      return fieldIsEmpty(this, name);
+      return fieldIsEmpty(this, name, fieldToState);
     },
     showRequired(name) {
       return this.isRequired(name) && this.isEmpty(name);

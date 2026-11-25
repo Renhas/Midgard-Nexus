@@ -1,10 +1,12 @@
 import { VorApi } from "@vor/artworks/api";
+import { getDomainConfig } from "@vor/shared/domain";
 
 export function getAttachMixin({ attachUrl = "" } = {}) {
+  const defaultStatus = getDomainConfig().statuses.default;
   return {
     attachUrl,
     resetAttachFields() {
-      this.status = "planning";
+      this.status = defaultStatus;
       this.statusOpen = false;
       this.rating = 0;
       this.hoverRating = 0;
@@ -21,7 +23,7 @@ export function getAttachMixin({ attachUrl = "" } = {}) {
         const data = await VorApi.attachWork(this.attachUrl, {
           work_type: this.createdWorkType || this.workType,
           work_id: wId,
-          status: this.status || "planning",
+          status: this.status || defaultStatus,
           rating: this.rating || "",
           progress: this.progress || 0,
         });

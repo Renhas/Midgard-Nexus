@@ -29,17 +29,13 @@ def test_add_get_context(client_logged_in):
     response = client_logged_in.get(reverse("vor_archives:artworks:add"))
     assert response.status_code == 200
     add_opts = response.context["add_opts"]
-    assert add_opts["workType"] == "book"
     assert "saveUrl" in add_opts
     assert "searchUrl" in add_opts
     assert "previewUrl" in add_opts
     assert "attachUrl" in add_opts
     assert "listUrl" in add_opts
     assert "relationSearchUrl" in add_opts
-    assert "relationTypes" in add_opts
     assert "catalogs" in add_opts
-    assert "ageChoices" in add_opts
-    assert "statusChoices" in add_opts
 
 
 def test_add_post_unknown_type_400(client_logged_in):

@@ -1,5 +1,7 @@
 from django import template
+from django.utils.html import json_script
 
+from apps.vor_archives.domain import get_domain_config
 from apps.vor_archives.progress import get_progress_info
 from apps.vor_archives.constants import (
     FEED_ACTION_ICONS,
@@ -87,3 +89,8 @@ def render_filter_accordion(section):
         "searchable": section.get("searchable", False),
         "show_condition": section.get("show_condition"),
     }
+
+
+@register.simple_tag
+def vor_domain_config():
+    return json_script(get_domain_config(), "vor-domain-config")

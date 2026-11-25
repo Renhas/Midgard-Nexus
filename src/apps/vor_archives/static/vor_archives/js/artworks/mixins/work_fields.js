@@ -1,6 +1,8 @@
+import { getDomainConfig } from "@vor/shared/domain";
+
 export const BASE_DEFAULTS = {
   workType: "",
-  filmType: "movie",
+  filmType: "",
   title: "",
   description: "",
   releaseDate: "",
@@ -30,9 +32,12 @@ function cloneFields(source) {
 }
 
 export function getWorkFieldsMixin(source = {}) {
+  const domainDefaults = {
+    filmType: getDomainConfig().filmTypes.default,
+  };
   const initial = {};
   WORK_FIELD_KEYS.forEach((key) => {
-    initial[key] = cloneValue(source[key] ?? BASE_DEFAULTS[key]);
+    initial[key] = cloneValue(source[key] ?? domainDefaults[key] ?? BASE_DEFAULTS[key]);
   });
   return {
     ...cloneFields(initial),

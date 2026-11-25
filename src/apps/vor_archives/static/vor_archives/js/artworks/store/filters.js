@@ -1,13 +1,17 @@
 import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
+import { getDomainConfig } from "@vor/shared/domain";
 import { mergeFilterSelection } from "@vor/artworks/pure/filter_selection";
 
-const ALL_WORK_TYPES = ["book", "film", "game"];
 const FILTER_KEYS = ["status", "age_rating", "tags", "genre_book", "genre_film", "genre_game", "platform"];
 const SIDEBAR_STORAGE_KEY = "vor.artworks.sidebar";
 
+function allWorkTypes() {
+  return getDomainConfig().workTypes.keys;
+}
+
 export const filtersMixin = {
-  workTypes: [...ALL_WORK_TYPES],
+  workTypes: [],
   showHidden: true,
   viewMode: "list",
   sortField: "custom",
@@ -42,11 +46,15 @@ export const filtersMixin = {
     } catch (error) {
       saved = null;
     }
+    const allowedTypes = allWorkTypes();
     if (!saved) {
+      this.workTypes = [...allowedTypes];
       return;
     }
     if (Array.isArray(saved.workTypes)) {
-      this.workTypes = saved.workTypes.filter((type) => ALL_WORK_TYPES.includes(type));
+      this.workTypes = saved.workTypes.filter((type) => allowedTypes.includes(type));
+    } else {
+      this.workTypes = [...allowedTypes];
     }
     if (typeof saved.showHidden === "boolean") {
       this.showHidden = saved.showHidden;

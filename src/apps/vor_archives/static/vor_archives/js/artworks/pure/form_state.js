@@ -1,20 +1,13 @@
-export const FIELD_TO_STATE = {
-  title: { key: "title", trim: true },
-  pages: { key: "pages" },
-  duration_minutes: { key: "durationMinutes" },
-  episode_count: { key: "episodeCount" },
-};
-
-export function fieldValue(state, name) {
-  const spec = FIELD_TO_STATE[name];
+export function fieldValue(state, name, fieldToState = {}) {
+  const spec = fieldToState[name];
   if (!spec) {
     return undefined;
   }
   return state[spec.key];
 }
 
-export function fieldIsEmpty(state, name) {
-  const spec = FIELD_TO_STATE[name];
+export function fieldIsEmpty(state, name, fieldToState = {}) {
+  const spec = fieldToState[name];
   if (!spec) {
     return false;
   }
@@ -25,12 +18,23 @@ export function fieldIsEmpty(state, name) {
   return value === "" || value == null;
 }
 
-export function collectRequiredFields(requiredByType, workType, filmType) {
-  const base = (requiredByType && requiredByType[workType]) || [];
-  const extras = workType === "film" && filmType === "tv_show" ? ["episode_count"] : [];
+function matchesCondition(state, when) {
+  if (!when || typeof when !== "object") {
+    return false;
+  }
+  return Object.entries(when).every(([key, expected]) => state[key] === expected);
+}
+
+export function collectRequiredFields(state, validationConfig = {}) {
+  const requiredByType = validationConfig.requiredByType || {};
+  const conditionalRequired = validationConfig.conditionalRequired || [];
+  const base = requiredByType[state.workType] || [];
+  const extras = conditionalRequired
+    .filter((rule) => rule.workType === state.workType && matchesCondition(state, rule.when))
+    .flatMap((rule) => rule.fields || []);
   return [...base, ...extras];
 }
 
-export function isRequiredField(state, name, requiredByType) {
-  return collectRequiredFields(requiredByType, state.workType, state.filmType).includes(name);
+export function isRequiredField(state, name, validationConfig = {}) {
+  return collectRequiredFields(state, validationConfig).includes(name);
 }

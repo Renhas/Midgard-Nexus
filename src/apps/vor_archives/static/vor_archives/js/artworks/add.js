@@ -13,6 +13,7 @@ import { getNumberWheelMixin } from "@vor/artworks/mixins/number_wheel";
 import { getAttributeMixin } from "@vor/artworks/mixins/attributes";
 import { getWorkFieldsMixin } from "@vor/artworks/mixins/work_fields";
 import { getValidationMixin } from "@vor/artworks/mixins/validation";
+import { getDomainConfig } from "@vor/shared/domain";
 import { wheelDirection } from "@vor/shared/pure/wheel";
 import { VorApi } from "@vor/artworks/api";
 
@@ -34,14 +35,14 @@ document.addEventListener("alpine:init", () => {
     ...getDatePickerMixin({ dateCursor: new Date() }),
     searchTimer: null,
     ...getCoverMixin(),
-    ...getStatusMixin({ choices: opts.statusChoices }),
+    ...getStatusMixin(),
     ...getRatingMixin(),
     ...getProgressMixin(),
-    ...getRelationsMixin({ relationTypes: opts.relationTypes, isAdd: true }),
+    ...getRelationsMixin({ isAdd: true }),
     ...getAttachMixin({ attachUrl: opts.attachUrl }),
-    ...getWorkFieldsMixin({ workType: opts.workType || "book" }),
-    ...getAgePickerMixin({ ageChoices: opts.ageChoices }),
-    ...getValidationMixin({ requiredFieldsByType: opts.requiredFields }),
+    ...getWorkFieldsMixin({ workType: opts.workType || getDomainConfig().workTypes.default }),
+    ...getAgePickerMixin(),
+    ...getValidationMixin(),
     ...getNumberWheelMixin(),
     ...getAttributeMixin({ catalogs: opts.catalogs }),
     ...getOverlayLifecycleMixin(),
@@ -275,8 +276,9 @@ document.addEventListener("alpine:init", () => {
       if (!direction) {
         return;
       }
-      const options = ["movie", "tv_show"];
-      const index = Math.max(0, options.indexOf(this.filmType || "movie"));
+      const { default: defaultFilmType, options: filmOptions } = getDomainConfig().filmTypes;
+      const options = filmOptions.map((item) => item.value);
+      const index = Math.max(0, options.indexOf(this.filmType || defaultFilmType));
       const next = Math.max(0, Math.min(options.length - 1, index + direction));
       this.filmType = options[next];
     },

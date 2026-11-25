@@ -6,10 +6,10 @@ function mount(source) {
 }
 
 describe("getWorkFieldsMixin", () => {
-  it("uses base defaults for missing fields", () => {
+  it("uses base and domain defaults for missing fields", () => {
     const ctx = mount({});
     expect(ctx.workType).toBe("");
-    expect(ctx.filmType).toBe("movie");
+    expect(ctx.filmType).toBe("sub_default");
     expect(ctx.title).toBe("");
     expect(ctx.pages).toBe("");
     expect(ctx.ageRating).toBe("");
@@ -24,7 +24,7 @@ describe("getWorkFieldsMixin", () => {
   it("falls back to default for null source values", () => {
     const ctx = mount({ workType: null, filmType: null, title: null });
     expect(ctx.workType).toBe("");
-    expect(ctx.filmType).toBe("movie");
+    expect(ctx.filmType).toBe("sub_default");
     expect(ctx.title).toBe("");
   });
   it("keeps zero and empty-string source values", () => {

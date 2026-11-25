@@ -60,10 +60,26 @@ class UserWorkForm(StyledModelForm):
 
 
 class WorkBaseForm(StyledModelForm):
+    CONDITIONAL_REQUIRED: tuple[dict[str, object], ...] = ()
+    CONDITIONAL_REQUIRED_MESSAGES: dict[str, str] = {}
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if "release_date" in self.fields:
             self.fields["release_date"].input_formats = ["%Y-%m-%d"]
+
+    def clean(self):
+        cleaned = super().clean()
+        for rule in self.CONDITIONAL_REQUIRED:
+            when = rule.get("when", {})
+            if all(cleaned.get(field) == expected for field, expected in when.items()):
+                for field_name in rule.get("fields", ()):
+                    if not cleaned.get(field_name):
+                        msg = self.CONDITIONAL_REQUIRED_MESSAGES.get(
+                            field_name, "Обязательное поле"
+                        )
+                        self.add_error(field_name, msg)
+        return cleaned
 
     class Meta:
         fields = (
@@ -142,14 +158,20 @@ class FilmForm(WorkBaseForm):
             "duration_minutes": {"required": "Укажите длительность"},
         }
 
+    CONDITIONAL_REQUIRED = (
+        {
+            "when": {"film_type": str(FilmTypeChoices.TV_SHOW)},
+            "fields": ["episode_count"],
+        },
+    )
+    CONDITIONAL_REQUIRED_MESSAGES = {
+        "episode_count": "Укажите количество эпизодов",
+    }
+
     def clean_episode_count(self):
-        value = self.cleaned_data.get("episode_count")
-        film_type = self.cleaned_data.get("film_type")
-        if film_type == FilmTypeChoices.MOVIE:
+        if self.cleaned_data.get("film_type") != FilmTypeChoices.TV_SHOW:
             return None
-        if film_type == FilmTypeChoices.TV_SHOW and not value:
-            raise forms.ValidationError("Укажите количество эпизодов")
-        return value
+        return self.cleaned_data.get("episode_count")
 
 
 class GameForm(WorkBaseForm):
@@ -191,6 +213,15 @@ WORK_REQUIRED_FIELDS = {
     type_key: required_field_names(form_class)
     for type_key, form_class in WORK_FORMS.items()
 }
+
+WORK_CONDITIONAL_REQUIRED = [
+    {
+        "workType": type_key,
+        **rule,
+    }
+    for type_key, form_class in WORK_FORMS.items()
+    for rule in getattr(form_class, "CONDITIONAL_REQUIRED", ())
+]
 
 
 class AttachWorkForm(forms.Form):

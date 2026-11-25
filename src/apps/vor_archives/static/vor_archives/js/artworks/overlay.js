@@ -18,23 +18,8 @@ import {
   restoreQuickState as restoreQuickStatePure,
   applyQuickResult as applyQuickResultPure,
 } from "@vor/artworks/pure/quick_state";
+import { getDomainConfig } from "@vor/shared/domain";
 import { VorApi } from "@vor/artworks/api";
-
-const DRAFT_FIELD_LABELS = {
-  title: "Название",
-  description: "Описание",
-  releaseDate: "Дата релиза",
-  ageRating: "Возрастной рейтинг",
-  externalLink: "Ссылка",
-  pages: "Страницы",
-  durationMinutes: "Длительность",
-  episodeCount: "Эпизоды",
-  authors: "Авторы",
-  genres: "Жанры",
-  tags: "Теги",
-  platforms: "Платформы",
-  relations: "Связи",
-};
 
 document.addEventListener("alpine:init", () => {
   getAlpine().data("vorDetailOverlay", (opts = {}) => ({
@@ -64,7 +49,7 @@ document.addEventListener("alpine:init", () => {
     serverQuickState: null,
     workUrl: opts.workUrl || "",
     ...getCoverMixin({ coverPreview: opts.coverUrl || "" }),
-    ...getStatusMixin({ status: opts.status || "planning", choices: opts.statusChoices }),
+    ...getStatusMixin({ status: opts.status }),
     ...getRatingMixin({ rating: Number(opts.rating || 0) }),
     ...getProgressMixin({
       progress: Number(opts.progress || 0),
@@ -72,13 +57,10 @@ document.addEventListener("alpine:init", () => {
       progressUnit: opts.progressUnit || "",
       progressStep: Number(opts.progressStep || 1),
     }),
-    ...getRelationsMixin({
-      relations: opts.relations,
-      relationTypes: opts.relationTypes,
-    }),
+    ...getRelationsMixin({ relations: opts.relations }),
     ...getAttachMixin({ attachUrl: opts.attachUrl }),
     ...getWorkFieldsMixin(opts),
-    ...getAgePickerMixin({ ageChoices: opts.ageChoices }),
+    ...getAgePickerMixin(),
     ...getNumberWheelMixin(),
     ...getAttributeMixin({ catalogs: { [opts.workType]: opts.catalog || {} } }),
     ...getOverlayLifecycleMixin(),
@@ -118,7 +100,8 @@ document.addEventListener("alpine:init", () => {
       }
       const before = parseDraft(this.snapshot);
       const after = parseDraft(this.buildSnapshot());
-      return dirtyChangesPure(before, after, DRAFT_FIELD_LABELS, Boolean(this.coverFile || this.coverCleared));
+      const draftLabels = getDomainConfig().validation.draftLabels;
+      return dirtyChangesPure(before, after, draftLabels, Boolean(this.coverFile || this.coverCleared));
     },
     tryLeave(proceed) {
       const changes = this.dirtyChanges();

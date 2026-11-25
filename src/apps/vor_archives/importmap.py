@@ -15,6 +15,7 @@ _SHARED_IMPORTMAP_PATHS = {
     "@vor/shared/pure/wheel": "vor_archives/js/shared/pure/wheel.js",
     "@vor/shared/csrf": "vor_archives/js/shared/csrf.js",
     "@vor/shared/cover": "vor_archives/js/shared/cover.js",
+    "@vor/shared/domain": "vor_archives/js/shared/domain.js",
     "@vor/shared/dom": "vor_archives/js/shared/dom.js",
     "@vor/shared/dom_tree": "vor_archives/js/shared/dom_tree.js",
     "@vor/shared/overlay_lifecycle": "vor_archives/js/shared/overlay_lifecycle.js",

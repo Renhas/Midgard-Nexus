@@ -1,3 +1,4 @@
+import { getDomainConfig } from "@vor/shared/domain";
 import {
   progressValueLabel as pureProgressValueLabel,
   progressSuffix as pureProgressSuffix,
@@ -7,6 +8,7 @@ import {
 } from "@vor/artworks/pure/progress";
 
 export function getProgressMixin({ progress = 0, progressMax = null, progressUnit = "", progressStep = 1 } = {}) {
+  const completedStatus = getDomainConfig().statuses.completed;
   return {
     progress,
     progressMax,
@@ -48,7 +50,7 @@ export function getProgressMixin({ progress = 0, progressMax = null, progressUni
     applyProgress(value) {
       this.progress = pureClampProgress(value, this.progressMax);
       if (this.progressMax != null && this.progress >= this.progressMax) {
-        this.status = "completed";
+        this.status = completedStatus;
       }
       if (typeof this.saveField === "function") {
         this.saveField("progress", this.progress);

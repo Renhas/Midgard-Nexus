@@ -1,9 +1,10 @@
+import { getDomainConfig } from "@vor/shared/domain";
 import { wheelDirection } from "@vor/shared/pure/wheel";
 
-export function getAgePickerMixin({ ageChoices = [] } = {}) {
+export function getAgePickerMixin() {
   return {
     ageOpen: false,
-    ageChoices,
+    ageChoices: getDomainConfig().ageRatings.options,
     setAgeRating(value) {
       this.ageRating = value;
       this.ageOpen = false;
