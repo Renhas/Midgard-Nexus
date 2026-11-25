@@ -130,9 +130,9 @@ RELATION_TYPE_OPTIONS = [
 
 
 class RelationScope(StrEnum):
-    ANY = ("any", "Any")
-    SAME = ("same", "Same")
-    DIFFERENT = ("different", "Different")
+    ANY = "any"
+    SAME = "same"
+    DIFFERENT = "different"
 
 
 RELATION_SCOPES: dict[WorkRelationTypeChoices, RelationScope] = {
