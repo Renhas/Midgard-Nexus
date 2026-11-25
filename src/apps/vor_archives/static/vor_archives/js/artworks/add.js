@@ -40,7 +40,7 @@ document.addEventListener("alpine:init", () => {
     ...getProgressMixin(),
     ...getRelationsMixin({ isAdd: true }),
     ...getAttachMixin({ attachUrl: opts.attachUrl }),
-    ...getWorkFieldsMixin({ workType: opts.workType || "book" }),
+    ...getWorkFieldsMixin({ workType: opts.workType || getDomainConfig().workTypes.default }),
     ...getAgePickerMixin(),
     ...getValidationMixin(),
     ...getNumberWheelMixin(),

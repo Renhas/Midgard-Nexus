@@ -29,7 +29,6 @@ def test_add_get_context(client_logged_in):
     response = client_logged_in.get(reverse("vor_archives:artworks:add"))
     assert response.status_code == 200
     add_opts = response.context["add_opts"]
-    assert add_opts["workType"] == "book"
     assert "saveUrl" in add_opts
     assert "searchUrl" in add_opts
     assert "previewUrl" in add_opts

@@ -117,7 +117,6 @@ def artwork_add(request):
         "vor_archives/partials/artworks/artwork_add.html",
         {
             "add_opts": {
-                "workType": "book",
                 "saveUrl": reverse("vor_archives:artworks:add"),
                 "searchUrl": reverse("vor_archives:artworks:search"),
                 "previewUrl": reverse("vor_archives:artworks:preview"),

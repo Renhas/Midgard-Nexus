@@ -21,6 +21,7 @@ from apps.vor_archives.registry import WORK_TYPES, WORK_TYPE_REGISTRY
 
 FIELD_TO_STATE: dict[str, dict[str, Any]] = {
     "title": {"key": "title", "trim": True},
+    "film_type": {"key": "filmType"},
     "pages": {"key": "pages"},
     "duration_minutes": {"key": "durationMinutes"},
     "episode_count": {"key": "episodeCount"},
@@ -70,9 +71,26 @@ def _build_work_types() -> dict[str, Any]:
     ]
     return {
         "keys": list(WORK_TYPES),
-        "default": WORK_TYPES,
+        "default": WORK_TYPES[0],
         "items": items,
     }
+
+
+def _serialize_conditional_rules() -> list[dict[str, Any]]:
+    serialized = []
+    for rule in WORK_CONDITIONAL_REQUIRED:
+        when = {
+            FIELD_TO_STATE[field]["key"] if field in FIELD_TO_STATE else field: value
+            for field, value in rule["when"].items()
+        }
+        serialized.append(
+            {
+                "workType": rule["workType"],
+                "when": when,
+                "fields": list(rule["fields"]),
+            }
+        )
+    return serialized
 
 
 def _build_validation() -> dict[str, Any]:
@@ -82,7 +100,7 @@ def _build_validation() -> dict[str, Any]:
             for type_key, fields in WORK_REQUIRED_FIELDS.items()
             if type_key in WORK_FORMS
         },
-        "conditionalRequired": WORK_CONDITIONAL_REQUIRED,
+        "conditionalRequired": _serialize_conditional_rules(),
         "fieldToState": FIELD_TO_STATE,
         "draftLabels": DRAFT_FIELD_LABELS,
     }

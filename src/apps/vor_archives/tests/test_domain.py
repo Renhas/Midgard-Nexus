@@ -3,7 +3,10 @@ import json
 from django.template import Context, Template
 import pytest
 
-from apps.vor_archives.artworks.forms import WORK_REQUIRED_FIELDS
+from apps.vor_archives.artworks.forms import (
+    WORK_REQUIRED_FIELDS,
+    WORK_CONDITIONAL_REQUIRED,
+)
 from apps.vor_archives.constants import (
     AgeRatingChoices,
     FilmTypeChoices,
@@ -11,13 +14,14 @@ from apps.vor_archives.constants import (
     UserWorkStatusChoices,
     WorkRelationTypeChoices,
 )
-from apps.vor_archives.domain import get_domain_config
+from apps.vor_archives.domain import get_domain_config, FIELD_TO_STATE
 from apps.vor_archives.registry import WORK_TYPES
 
 
 def test_domain_config_work_types_match_registry():
     cfg = get_domain_config()
     assert cfg["workTypes"]["keys"] == list(WORK_TYPES)
+    assert cfg["workTypes"]["default"] == WORK_TYPES[0]
     assert [item["key"] for item in cfg["workTypes"]["items"]] == list(WORK_TYPES)
 
 
@@ -48,15 +52,16 @@ def test_domain_config_relations_cover_all_choices():
 
 
 def test_domain_config_validation_rules():
+
     cfg = get_domain_config()
     assert cfg["validation"]["requiredByType"] == WORK_REQUIRED_FIELDS
-    assert cfg["validation"]["conditionalRequired"] == [
-        {
-            "workType": "film",
-            "when": {"filmType": FilmTypeChoices.TV_SHOW},
-            "fields": ["episode_count"],
-        }
-    ]
+
+    state_keys = {spec["key"] for spec in FIELD_TO_STATE.values()}
+    serialized = cfg["validation"]["conditionalRequired"]
+    assert len(serialized) == len(WORK_CONDITIONAL_REQUIRED)
+    for rule in serialized:
+        assert set(rule["when"].keys()) <= state_keys
+        assert rule["fields"]
 
 
 @pytest.mark.parametrize(

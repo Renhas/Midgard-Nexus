@@ -1,31 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { getStatusMixin } from "@vor/artworks/mixins/status";
-import { resetDomainConfigCache } from "@vor/shared/domain";
 
 describe("getStatusMixin", () => {
-  beforeEach(() => {
-    resetDomainConfigCache();
-    const script = document.createElement("script");
-    script.id = "vor-domain-config";
-    script.type = "application/json";
-    script.textContent = JSON.stringify({
-      statuses: {
-        default: "st_a",
-        completed: "st_done",
-        options: [
-          { value: "st_a", label: "State A" },
-          { value: "st_b", label: "State B" },
-        ],
-      },
-    });
-    document.body.appendChild(script);
-  });
-
-  afterEach(() => {
-    resetDomainConfigCache();
-    document.body.innerHTML = "";
-  });
-
   it("uses default status and options from domain config", () => {
     const ctx = getStatusMixin();
     expect(ctx.status).toBe("st_a");
