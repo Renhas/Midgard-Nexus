@@ -1,20 +1,24 @@
 import { VorApi } from "@vor/artworks/api";
+import { getDomainConfig } from "@vor/shared/domain";
 import {
   allowedRelationTypes as pureAllowedRelationTypes,
   relationKey as pureRelationKey,
   relationLabelFor as pureRelationLabelFor,
 } from "@vor/artworks/pure/relations";
 
-export function getRelationsMixin({ relations = [], relationTypes = [], isAdd = false } = {}) {
+export function getRelationsMixin({ relations = [], relationTypes, isAdd = false } = {}) {
+  const domainRelations = getDomainConfig().relations || {};
+  const resolvedTypes = relationTypes ?? domainRelations.types ?? [];
+  const defaultType = domainRelations.default || "other";
   return {
     relations,
-    relationTypes,
+    relationTypes: resolvedTypes,
     isAdd: Boolean(isAdd),
     relAdding: false,
     relQuery: "",
     relResults: [],
     relPick: null,
-    relPickType: "other",
+    relPickType: defaultType,
     relTypeEdit: null,
     relationsEditable() {
       return this.isAdd || this.editing === true;
@@ -45,7 +49,7 @@ export function getRelationsMixin({ relations = [], relationTypes = [], isAdd = 
       this.relQuery = "";
       this.relResults = [];
       this.relPick = null;
-      this.relPickType = "other";
+      this.relPickType = defaultType;
     },
     cancelRelationAdd() {
       this.relAdding = false;

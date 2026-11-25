@@ -2,78 +2,73 @@ import { describe, expect, it } from "vitest";
 import { allowedRelationTypes, relationKey, relationLabelFor } from "@vor/artworks/pure/relations";
 
 describe("allowedRelationTypes", () => {
-  const types = [
-    { value: "other", label: "Другое" },
-    { value: "sequel", label: "Продолжение" },
-    { value: "adaptation", label: "Адаптация" },
-    { value: "spin_off", label: "Спин-офф" },
+  const rules = [
+    { value: "rel_any", label: "Any", reverseLabel: "Any", scope: "any" },
+    { value: "rel_same", label: "Same", reverseLabel: "SameRev", scope: "same" },
+    { value: "rel_diff", label: "Diff", reverseLabel: "DiffRev", scope: "different" },
   ];
 
-  it("always includes other", () => {
-    expect(allowedRelationTypes(types, "game", "book").some((t) => t.value === "other")).toBe(true);
+  it("includes scope 'any' regardless of work types", () => {
+    expect(allowedRelationTypes(rules, "type_a", "type_b").map((t) => t.value)).toContain("rel_any");
+    expect(allowedRelationTypes(rules, "type_a", "type_a").map((t) => t.value)).toContain("rel_any");
   });
-  it("adaptation only for different types", () => {
-    const same = allowedRelationTypes(types, "book", "book");
-    expect(same.find((t) => t.value === "adaptation")).toBeUndefined();
-    const diff = allowedRelationTypes(types, "film", "book");
-    expect(diff.find((t) => t.value === "adaptation")).toBeDefined();
+
+  it("includes scope 'different' only when work types differ", () => {
+    const same = allowedRelationTypes(rules, "type_a", "type_a").map((t) => t.value);
+    const diff = allowedRelationTypes(rules, "type_a", "type_b").map((t) => t.value);
+    expect(same).not.toContain("rel_diff");
+    expect(diff).toContain("rel_diff");
   });
-  it("sequel and spin_off only for same type", () => {
-    const same = allowedRelationTypes(types, "book", "book");
-    expect(same.find((t) => t.value === "sequel")).toBeDefined();
-    const diff = allowedRelationTypes(types, "film", "book");
-    expect(diff.find((t) => t.value === "sequel")).toBeUndefined();
+
+  it("includes scope 'same' only when work types match", () => {
+    const same = allowedRelationTypes(rules, "type_a", "type_a").map((t) => t.value);
+    const diff = allowedRelationTypes(rules, "type_a", "type_b").map((t) => t.value);
+    expect(same).toContain("rel_same");
+    expect(diff).not.toContain("rel_same");
   });
-  it("handles empty otherType", () => {
-    const result = allowedRelationTypes(types, "", "book");
-    expect(result.find((t) => t.value === "other")).toBeDefined();
-    expect(result.find((t) => t.value === "adaptation")).toBeUndefined();
-    expect(result.find((t) => t.value === "sequel")).toBeUndefined();
+
+  it("excludes 'same' and 'different' when one of work types is empty", () => {
+    const result = allowedRelationTypes(rules, "", "type_a").map((t) => t.value);
+    expect(result).toEqual(["rel_any"]);
   });
-  it("handles missing relationTypes list", () => {
-    expect(allowedRelationTypes(undefined, "book", "book")).toEqual([]);
+
+  it("handles missing rules list", () => {
+    expect(allowedRelationTypes(undefined, "type_a", "type_a")).toEqual([]);
   });
 });
 
 describe("relationKey", () => {
   it("uses id when present", () => {
-    expect(relationKey({ id: 5, type_key: "book", work_id: 10 })).toBe("5-book-10");
+    expect(relationKey({ id: 5, type_key: "type_a", work_id: 10 })).toBe("5-type_a-10");
   });
-  it("uses 'new' when id is null", () => {
-    expect(relationKey({ id: null, type_key: "book", work_id: 10 })).toBe("new-book-10");
-  });
-  it("uses 'new' when id is undefined", () => {
-    expect(relationKey({ type_key: "book", work_id: 10 })).toBe("new-book-10");
-  });
-  it("uses 'new' when id is 0", () => {
-    expect(relationKey({ id: 0, type_key: "book", work_id: 10 })).toBe("new-book-10");
+
+  it("uses 'new' when id is missing or falsy", () => {
+    expect(relationKey({ id: null, type_key: "type_a", work_id: 10 })).toBe("new-type_a-10");
+    expect(relationKey({ type_key: "type_a", work_id: 10 })).toBe("new-type_a-10");
+    expect(relationKey({ id: 0, type_key: "type_a", work_id: 10 })).toBe("new-type_a-10");
   });
 });
 
 describe("relationLabelFor", () => {
-  const types = [
-    { value: "sequel", label: "Продолжение" },
-    { value: "spin_off", label: "Спин-офф" },
-    { value: "adaptation", label: "Адаптация" },
-    { value: "remake", label: "Ремейк" },
-    { value: "custom", label: "Своё" },
+  const rules = [
+    { value: "rel_bidirectional", label: "Forward", reverseLabel: "Backward", scope: "same" },
+    { value: "rel_symmetric", label: "Symmetric", scope: "any" },
   ];
-  it("sequel out = Продолжение", () => {
-    expect(relationLabelFor(types, "sequel", "out")).toBe("Продолжение");
+
+  it("returns label for outgoing direction", () => {
+    expect(relationLabelFor(rules, "rel_bidirectional", "out")).toBe("Forward");
   });
-  it("sequel in = Предыстория", () => {
-    expect(relationLabelFor(types, "sequel", "in")).toBe("Предыстория");
+
+  it("returns reverseLabel for incoming direction", () => {
+    expect(relationLabelFor(rules, "rel_bidirectional", "in")).toBe("Backward");
   });
-  it("adaptation out = Адаптация", () => {
-    expect(relationLabelFor(types, "adaptation", "out")).toBe("Адаптация");
+
+  it("falls back to label when reverseLabel is omitted", () => {
+    expect(relationLabelFor(rules, "rel_symmetric", "in")).toBe("Symmetric");
   });
-  it("adaptation in = Первоисточник", () => {
-    expect(relationLabelFor(types, "adaptation", "in")).toBe("Первоисточник");
-  });
-  it("unknown type falls back to catalog label", () => {
-    expect(relationLabelFor(types, "custom", "out")).toBe("Своё");
-  });
-  it("unknown type with empty catalog falls back to 'Связано'", () => {
-    expect(relationLabelFor([], "custom", "out")).toBe("Связано");
+
+  it("falls back to default label when type is unknown", () => {
+    expect(relationLabelFor(rules, "unknown", "out")).toBe("Связано");
+    expect(relationLabelFor([], "rel_bidirectional", "out")).toBe("Связано");
   });
 });
