@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.contrib.contenttypes.models import ContentType
 
-from ..constants import WorkRelationTypeChoices
+from ..constants import RELATION_SCOPES, RelationScope, WorkRelationTypeChoices
 
 
 def validate_gfk(ct: ContentType | None, obj_id: int | None) -> None:
@@ -23,20 +23,19 @@ def validate_relation_type(
     relation_type: WorkRelationTypeChoices | str,
 ) -> None:
     """
-    Проверяет, допустима ли связь между типами произведений для данного relation_type.
-
-    - 'other' — допустима для любых типов
-    - 'adaptation' — только между разными типами
-    - остальное — только между одинаковыми типами
+    Проверяет, допустима ли связь между типами произведений по RELATION_SCOPES.
     """
-    if relation_type == WorkRelationTypeChoices.OTHER:
+    scope = RELATION_SCOPES.get(
+        WorkRelationTypeChoices(relation_type), RelationScope.SAME
+    )
+    if scope == RelationScope.ANY:
         return
     same_type = source_ct == target_ct
-    if relation_type == WorkRelationTypeChoices.ADAPTATION and same_type:
+    if scope == RelationScope.DIFFERENT and same_type:
         raise ValidationError(
             f"Связь '{relation_type}' допустима только между произведениями разных типов."
         )
-    if relation_type != WorkRelationTypeChoices.ADAPTATION and not same_type:
+    if scope == RelationScope.SAME and not same_type:
         raise ValidationError(
             f"Связь '{relation_type}' допустима только между произведениями одного типа."
         )

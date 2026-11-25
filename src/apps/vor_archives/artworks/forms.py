@@ -142,6 +142,13 @@ class FilmForm(WorkBaseForm):
             "duration_minutes": {"required": "Укажите длительность"},
         }
 
+    CONDITIONAL_REQUIRED = (
+        {
+            "when": {"filmType": str(FilmTypeChoices.TV_SHOW)},
+            "fields": ["episode_count"],
+        },
+    )
+
     def clean_episode_count(self):
         value = self.cleaned_data.get("episode_count")
         film_type = self.cleaned_data.get("film_type")
@@ -191,6 +198,15 @@ WORK_REQUIRED_FIELDS = {
     type_key: required_field_names(form_class)
     for type_key, form_class in WORK_FORMS.items()
 }
+
+WORK_CONDITIONAL_REQUIRED = [
+    {
+        "workType": type_key,
+        **rule,
+    }
+    for type_key, form_class in WORK_FORMS.items()
+    for rule in getattr(form_class, "CONDITIONAL_REQUIRED", ())
+]
 
 
 class AttachWorkForm(forms.Form):
