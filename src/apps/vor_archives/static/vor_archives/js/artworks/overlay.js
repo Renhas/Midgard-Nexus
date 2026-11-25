@@ -18,23 +18,8 @@ import {
   restoreQuickState as restoreQuickStatePure,
   applyQuickResult as applyQuickResultPure,
 } from "@vor/artworks/pure/quick_state";
+import { getDomainConfig } from "@vor/shared/domain";
 import { VorApi } from "@vor/artworks/api";
-
-const DRAFT_FIELD_LABELS = {
-  title: "Название",
-  description: "Описание",
-  releaseDate: "Дата релиза",
-  ageRating: "Возрастной рейтинг",
-  externalLink: "Ссылка",
-  pages: "Страницы",
-  durationMinutes: "Длительность",
-  episodeCount: "Эпизоды",
-  authors: "Авторы",
-  genres: "Жанры",
-  tags: "Теги",
-  platforms: "Платформы",
-  relations: "Связи",
-};
 
 document.addEventListener("alpine:init", () => {
   getAlpine().data("vorDetailOverlay", (opts = {}) => ({
@@ -115,7 +100,8 @@ document.addEventListener("alpine:init", () => {
       }
       const before = parseDraft(this.snapshot);
       const after = parseDraft(this.buildSnapshot());
-      return dirtyChangesPure(before, after, DRAFT_FIELD_LABELS, Boolean(this.coverFile || this.coverCleared));
+      const draftLabels = getDomainConfig().validation.draftLabels;
+      return dirtyChangesPure(before, after, draftLabels, Boolean(this.coverFile || this.coverCleared));
     },
     tryLeave(proceed) {
       const changes = this.dirtyChanges();

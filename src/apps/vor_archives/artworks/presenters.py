@@ -4,10 +4,7 @@ from django.urls import reverse
 
 from apps.vor_archives.constants import (
     AgeRatingChoices,
-    RELATION_TYPE_OPTIONS,
-    age_rating_options,
     status_choices,
-    status_options,
 )
 from apps.vor_archives.progress import get_progress_info, work_progress
 from .services.catalog import attr_catalog, chip_payload
@@ -82,7 +79,6 @@ def build_overlay_context(
             "workId": work.pk,
             "filmType": getattr(work, "film_type", None) or "movie",
             "status": user_work.status if owned else "planning",
-            "statusChoices": status_options(),
             "attachUrl": reverse("vor_archives:artworks:attach"),
             "rating": (user_work.rating or 0) if owned else 0,
             "isHidden": user_work.is_hidden if owned else False,
@@ -123,7 +119,5 @@ def build_overlay_context(
             "ownedPlatformIds": owned_platform_ids,
             "catalog": catalog,
             "relations": _relations_with_urls(work),
-            "relationTypes": RELATION_TYPE_OPTIONS,
-            "ageChoices": age_rating_options(),
         },
     }

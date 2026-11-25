@@ -36,10 +36,7 @@ def test_add_get_context(client_logged_in):
     assert "attachUrl" in add_opts
     assert "listUrl" in add_opts
     assert "relationSearchUrl" in add_opts
-    assert "relationTypes" in add_opts
     assert "catalogs" in add_opts
-    assert "ageChoices" in add_opts
-    assert "statusChoices" in add_opts
 
 
 def test_add_post_unknown_type_400(client_logged_in):
