@@ -8,7 +8,7 @@ import {
 } from "@vor/artworks/pure/progress";
 
 export function getProgressMixin({ progress = 0, progressMax = null, progressUnit = "", progressStep = 1 } = {}) {
-  const completedStatus = getDomainConfig().statuses?.completed || "completed";
+  const completedStatus = getDomainConfig().statuses.completed;
   return {
     progress,
     progressMax,

@@ -1,18 +1,15 @@
 import { getDomainConfig } from "@vor/shared/domain";
 
-export function getStatusMixin({ status, choices } = {}) {
-  const statusesConfig = getDomainConfig().statuses || {};
-  const defaultStatus = statusesConfig.default || "planning";
-  const resolvedStatus = status ?? defaultStatus;
-  const resolvedChoices = choices ?? statusesConfig.options ?? [];
+export function getStatusMixin({ status } = {}) {
+  const { default: defaultStatus, options } = getDomainConfig().statuses;
 
   return {
-    status: resolvedStatus,
-    statusChoices: resolvedChoices,
+    status: status ?? defaultStatus,
+    statusChoices: options,
     statusOpen: false,
     statusLabel() {
       const found = this.statusChoices.find((item) => item.value === this.status);
-      return found ? found.label : this.status || defaultStatus;
+      return found ? found.label : this.status;
     },
     setStatus(value) {
       this.statusOpen = false;

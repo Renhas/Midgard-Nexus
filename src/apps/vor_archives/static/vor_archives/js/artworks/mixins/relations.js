@@ -6,13 +6,11 @@ import {
   relationLabelFor as pureRelationLabelFor,
 } from "@vor/artworks/pure/relations";
 
-export function getRelationsMixin({ relations = [], relationTypes, isAdd = false } = {}) {
-  const domainRelations = getDomainConfig().relations || {};
-  const resolvedTypes = relationTypes ?? domainRelations.types ?? [];
-  const defaultType = domainRelations.default || "other";
+export function getRelationsMixin({ relations = [], isAdd = false } = {}) {
+  const { default: defaultType, types } = getDomainConfig().relations;
   return {
     relations,
-    relationTypes: resolvedTypes,
+    relationTypes: types,
     isAdd: Boolean(isAdd),
     relAdding: false,
     relQuery: "",

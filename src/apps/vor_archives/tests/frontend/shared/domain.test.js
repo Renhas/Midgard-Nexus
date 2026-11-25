@@ -12,11 +12,8 @@ describe("getDomainConfig", () => {
     document.body.innerHTML = "";
   });
 
-  it("returns safe empty fallback when script tag is missing", () => {
-    const cfg = getDomainConfig();
-    expect(cfg.workTypes.keys).toEqual([]);
-    expect(cfg.relations.types).toEqual([]);
-    expect(cfg.validation.requiredByType).toEqual({});
+  it("throws when script tag is missing", () => {
+    expect(() => getDomainConfig()).toThrow(/vor-domain-config/);
   });
 
   it("parses and caches JSON from #vor-domain-config", () => {
@@ -24,28 +21,27 @@ describe("getDomainConfig", () => {
     script.id = "vor-domain-config";
     script.type = "application/json";
     script.textContent = JSON.stringify({
-      workTypes: { keys: ["book"], default: "book", items: [] },
-      statuses: { default: "planning", completed: "completed", options: [] },
+      workTypes: { keys: ["type_a"], default: "type_a", items: [] },
+      statuses: { default: "st_a", completed: "st_done", options: [] },
     });
     document.body.appendChild(script);
 
     const first = getDomainConfig();
-    expect(first.workTypes.keys).toEqual(["book"]);
-    expect(first.statuses.default).toBe("planning");
+    expect(first.workTypes.keys).toEqual(["type_a"]);
+    expect(first.statuses.default).toBe("st_a");
 
     script.remove();
     const second = getDomainConfig();
     expect(second).toBe(first);
   });
 
-  it("returns fallback when JSON is invalid", () => {
+  it("throws when JSON is malformed", () => {
     const script = document.createElement("script");
     script.id = "vor-domain-config";
     script.type = "application/json";
     script.textContent = "{broken json";
     document.body.appendChild(script);
 
-    const cfg = getDomainConfig();
-    expect(cfg.workTypes.keys).toEqual([]);
+    expect(() => getDomainConfig()).toThrow();
   });
 });
