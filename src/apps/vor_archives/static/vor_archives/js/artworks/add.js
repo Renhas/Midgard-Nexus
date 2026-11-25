@@ -41,7 +41,7 @@ document.addEventListener("alpine:init", () => {
     ...getAttachMixin({ attachUrl: opts.attachUrl }),
     ...getWorkFieldsMixin({ workType: opts.workType || "book" }),
     ...getAgePickerMixin(),
-    ...getValidationMixin({ requiredFieldsByType: opts.requiredFields }),
+    ...getValidationMixin(),
     ...getNumberWheelMixin(),
     ...getAttributeMixin({ catalogs: opts.catalogs }),
     ...getOverlayLifecycleMixin(),
