@@ -31,3 +31,14 @@ def importmap(request):
             specifier: static(path) for specifier, path in IMPORTMAP_PATHS.items()
         }
     }
+
+
+def toast_config(request):
+    """Глобальные настройки уведомлений (задел под настройки профиля)."""
+    return {
+        "toast_config": {
+            "maxVisible": 5,
+            "duration": 4000,
+            "errorDuration": 7000,
+        }
+    }

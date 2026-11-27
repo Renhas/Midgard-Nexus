@@ -2,6 +2,10 @@
     VOR Archives — Common
     ============================================ */
 
+:root {
+  --toast-accent: var(--accent-vor);
+}
+
 html.vor-scroll-lock,
 html.vor-scroll-lock body {
   overflow: hidden;

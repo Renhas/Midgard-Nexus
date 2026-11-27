@@ -52,6 +52,12 @@ VENDOR_IMPORTMAP_PATHS = {
     "@lib/floating-ui": "js/lib/floating-ui.js",
 }
 
+COMMON_IMPORTMAP_PATHS = {
+    "@toast/stack": "js/toast/stack.js",
+    "@toast/store": "js/toast/store.js",
+    "@toast/notify": "js/toast/notify.js",
+}
+
 APP_IMPORTMAP_MODULES = [
     "apps.vor_archives.importmap",
     # future: "apps.fafnir_cave.importmap",
@@ -60,5 +66,6 @@ APP_IMPORTMAP_MODULES = [
 
 IMPORTMAP_PATHS = build_importmap(
     VENDOR_IMPORTMAP_PATHS,
+    COMMON_IMPORTMAP_PATHS,
     *APP_IMPORTMAP_MODULES,
 )

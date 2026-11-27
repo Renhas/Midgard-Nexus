@@ -1,0 +1,238 @@
+/* ============================================
+   Midgard Nexus — Toast Notifications (Sonner-style)
+   ============================================ */
+
+@keyframes app-toast-progress {
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
+}
+
+.app-toast-viewport {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: var(--z-toast);
+  width: min(380px, calc(100vw - 2rem));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.app-toast-controls {
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.app-toast-viewport--expanded .app-toast-controls {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.app-toast-clear-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background-color: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.2;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.app-toast-clear-all:hover {
+  color: var(--text-primary);
+  border-color: var(--toast-accent);
+}
+
+.app-toast-stack {
+  position: relative;
+  width: 100%;
+  display: grid;
+  align-items: end;
+}
+
+.app-toast-viewport--expanded .app-toast-stack {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.55rem;
+}
+
+.app-toast {
+  --toast-border: var(--toast-accent);
+  --toast-icon-color: var(--toast-accent);
+
+  grid-area: 1 / 1;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.75rem 0.85rem 0.85rem;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--toast-border);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
+  pointer-events: auto;
+  transform-origin: top center;
+  transform: translateY(calc(var(--stack-index, 0) * -12px)) scale(calc(1 - var(--stack-index, 0) * 0.04));
+  opacity: calc(1 - var(--stack-index, 0) * 0.16);
+  z-index: calc(20 - var(--stack-index, 0));
+  transition:
+    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease,
+    max-height 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+    padding 0.24s ease,
+    margin 0.24s ease,
+    border-color 0.2s ease;
+}
+
+.app-toast-viewport:not(.app-toast-viewport--expanded) .app-toast {
+  align-self: start;
+  max-height: 4.5rem;
+}
+
+.app-toast-viewport:not(.app-toast-viewport--expanded) .app-toast[style*="--stack-index: 0"] {
+  max-height: 16rem;
+}
+
+.app-toast--success {
+  --toast-border: var(--success);
+  --toast-icon-color: var(--success);
+}
+
+.app-toast--error {
+  --toast-border: var(--error);
+  --toast-icon-color: var(--error);
+}
+
+.app-toast--info {
+  --toast-border: var(--toast-accent);
+  --toast-icon-color: var(--toast-accent);
+}
+
+.app-toast-viewport--expanded .app-toast {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  max-height: 20rem;
+}
+
+.app-toast.app-toast--closing {
+  opacity: 0;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-width: 0;
+  transform: translateX(16px) scale(0.96);
+  pointer-events: none;
+}
+
+.app-toast__icon {
+  flex-shrink: 0;
+  font-size: 1.05rem;
+  line-height: 1.25;
+  color: var(--toast-icon-color);
+}
+
+.app-toast__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.app-toast__message {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  overflow: hidden;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+}
+
+.app-toast-viewport:not(.app-toast-viewport--expanded) .app-toast:not([style*="--stack-index: 0"]) .app-toast__message {
+  -webkit-line-clamp: 2;
+}
+
+.app-toast__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.app-toast__action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.app-toast__action-btn:hover {
+  border-color: var(--toast-border);
+  background-color: rgb(from var(--toast-border) r g b / 12%);
+}
+
+.app-toast__close {
+  flex-shrink: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 0.15rem;
+  line-height: 1;
+  font-size: 0.8rem;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.app-toast__close:hover {
+  color: var(--text-primary);
+}
+
+.app-toast__progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background-color: var(--toast-border);
+  transform-origin: left center;
+  animation: app-toast-progress var(--toast-duration, 4000ms) linear forwards;
+}
+
+.app-toast-viewport--expanded .app-toast__progress {
+  animation-play-state: paused;
+}

@@ -86,6 +86,7 @@ TEMPLATES = [
                 "config.context_processors.modules",
                 "config.context_processors.app_version",
                 "config.context_processors.importmap",
+                "config.context_processors.toast_config",
             ],
         },
     },
