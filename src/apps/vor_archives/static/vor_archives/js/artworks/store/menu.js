@@ -1,4 +1,5 @@
 import { htmx } from "@lib/htmx";
+import { vorNotify } from "@vor/shared/toasts";
 import { VorApi } from "@vor/artworks/api";
 
 export const menuMixin = {
@@ -10,6 +11,7 @@ export const menuMixin = {
     collectionId: null,
     collectionName: "",
     uwId: null,
+    workTitle: "",
     detailUrl: "",
     flyout: false,
     flyoutSide: "right",
@@ -76,6 +78,7 @@ export const menuMixin = {
     this.closeMenu();
     this.menu.kind = "artwork";
     this.menu.uwId = Number(item.dataset.uwId);
+    this.menu.workTitle = item.dataset.previewTitle || "";
     this.menu.detailUrl = item.dataset.detailUrl || "";
     const nested = Boolean(item.closest(".vor-artwork-list__items--nested"));
     const list = document.getElementById("vor-artwork-list__items");
@@ -200,6 +203,8 @@ export const menuMixin = {
   },
   async removeFromCurrentCollection() {
     const collectionId = this.collectionId;
+    const collectionName = this.collectionName;
+    const workTitle = this.menu.workTitle;
     const uwId = this.menu.uwId;
     this.closeMenu();
     if (!collectionId || !uwId) {
@@ -209,7 +214,7 @@ export const menuMixin = {
     if (!data?.ok) {
       return;
     }
-    window.dispatchEvent(new Event("vor:collection-update"));
+    vorNotify.workRemovedFromCollection({ workTitle, collectionName });
     this.reloadList();
   },
   async toggleWorkCollection(item) {
@@ -222,7 +227,19 @@ export const menuMixin = {
       return;
     }
     item.in_collection = adding;
-    window.dispatchEvent(new Event("vor:collection-update"));
+    if (adding) {
+      vorNotify.workAddedToCollection(
+        {
+          id: item.id,
+          workTitle: this.menu.workTitle,
+          collectionName: item.name,
+          isCurrent: Number(this.collectionId) === Number(item.id),
+        },
+        (id, name) => this.selectCollection(id, name),
+      );
+    } else {
+      vorNotify.workRemovedFromCollection({ workTitle: this.menu.workTitle, collectionName: item.name });
+    }
     this.reloadList();
   },
   menuRenameCollection() {

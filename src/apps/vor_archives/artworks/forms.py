@@ -119,7 +119,7 @@ class BookForm(WorkBaseForm):
         fields = WorkBaseForm.Meta.fields + ("pages", "genres")
         labels = {
             **WorkBaseForm.Meta.labels,
-            "pages": "Страниц",
+            "pages": "Страницы",
             "genres": "Жанры",
         }
         widgets = {

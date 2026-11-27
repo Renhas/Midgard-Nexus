@@ -69,9 +69,6 @@
     <template x-for="id in platformIds()" :key="'p'+id">
       <input type="hidden" name="platforms" :value="id">
     </template>
-    {% if work_form.non_field_errors %}
-      <div class="vor-field__errors">{{ work_form.non_field_errors }}</div>
-    {% endif %}
     <h1 class="vor-view__title" x-show="!editing">{{ work.title }}</h1>
     <input class="vor-view__title vor-inline__title"
            name="title"

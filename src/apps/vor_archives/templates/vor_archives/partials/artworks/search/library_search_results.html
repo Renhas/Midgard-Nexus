@@ -44,7 +44,7 @@
           <button type="button"
                   class="sidebar-btn sidebar-btn--add sidebar-btn--icon"
                   title="Добавить"
-                  @click.stop="$store.vorArtworks.attachFromSearch('{{ item.type_key }}', {{ item.work_id }})">
+                  @click.stop="$store.vorArtworks.attachFromSearch('{{ item.type_key }}', {{ item.work_id }}, '{{ item.title|escapejs }}', '{{ item.detail_url|escapejs }}')">
             <i class="bi bi-plus-lg"></i>
           </button>
         </li>

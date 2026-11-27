@@ -1,5 +1,6 @@
 import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
+import { vorNotify } from "@vor/shared/toasts";
 import { getOverlayLifecycleMixin } from "@vor/artworks/mixins/overlay_lifecycle";
 import { getDatePickerMixin } from "@vor/artworks/mixins/datepicker";
 import { getAttachMixin } from "@vor/artworks/mixins/attach";
@@ -67,6 +68,9 @@ document.addEventListener("alpine:init", () => {
     init() {
       this.snapshot = this.buildSnapshot();
       this.serverQuickState = captureQuickStatePure(this);
+      if (opts.nonFieldError) {
+        vorNotify.workUpdateFailed(opts.nonFieldError);
+      }
     },
     buildSnapshot() {
       return serializeDraft({
@@ -246,6 +250,12 @@ document.addEventListener("alpine:init", () => {
     },
     onAttachSuccess() {
       this.attachOpen = false;
+      vorNotify.workAttached({ title: this.title, url: this.workUrl }, (url) => {
+        htmx.ajax("GET", url, {
+          target: "#vor-overlay",
+          swap: "innerHTML",
+        });
+      });
       this.refreshList();
       htmx.ajax("GET", this.workUrl, {
         target: "#vor-overlay",

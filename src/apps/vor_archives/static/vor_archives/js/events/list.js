@@ -1,5 +1,6 @@
 import { getAlpine } from "@lib/alpine";
 import { hasContent } from "@vor/shared/dom";
+import { vorNotify } from "@vor/shared/toasts";
 
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Enter") {
@@ -48,9 +49,22 @@ document.body.addEventListener("vor:reload-tree", () => {
   getAlpine()?.store("vorArtworks")?.reloadCollectionTree();
 });
 
+document.body.addEventListener("vor:collection-created", (event) => {
+  const payload = event.detail?.value ?? event.detail;
+  if (!payload) {
+    return;
+  }
+  vorNotify.collectionCreated(payload, (id, name) => {
+    getAlpine()?.store("vorArtworks")?.selectCollection(id, name);
+  });
+});
+
 document.body.addEventListener("vor:collection-deleted", (event) => {
-  const id = event.detail?.value ?? event.detail;
+  const payload = event.detail?.value ?? event.detail;
+  const id = typeof payload === "object" && payload !== null ? payload.id : payload;
+  const name = typeof payload === "object" && payload !== null ? payload.name : "";
   getAlpine()?.store("vorArtworks")?.onCollectionDeleted(id);
+  vorNotify.collectionDeleted({ name });
 });
 
 document.body.addEventListener("vor:collection-renamed", (event) => {
@@ -65,6 +79,24 @@ document.body.addEventListener("vor:collection-renamed", (event) => {
   store.collectionPath = (store.collectionPath || []).map((part) =>
     String(part.id) === String(payload.id) ? { ...part, name: payload.name || part.name } : part,
   );
+  vorNotify.collectionRenamed({ oldName: payload.oldName, name: payload.name });
+});
+
+document.body.addEventListener("vor:artworks-deleted", (event) => {
+  const payload = event.detail?.value ?? event.detail;
+  vorNotify.artworksDeleted({
+    count: payload?.count ?? 1,
+    title: payload?.title || "",
+  });
+});
+
+document.body.addEventListener("vor:work-saved", (event) => {
+  const payload = event.detail?.value ?? event.detail;
+  vorNotify.workSaved({
+    oldTitle: payload?.oldTitle || "",
+    title: payload?.title || "",
+    changedFields: payload?.changedFields || [],
+  });
 });
 
 document.addEventListener("contextmenu", (event) => {
@@ -153,12 +185,6 @@ document.body.addEventListener("htmx:afterSwap", (event) => {
     store.applyCollectionTreeState();
     store.syncCollectionSortable();
     store.refreshCollectionPath();
-  }
-});
-
-document.body.addEventListener("htmx:afterSwap", (event) => {
-  if (event.detail.elt?.id === "vor-library-search-results") {
-    getAlpine()?.initTree?.(event.detail.elt);
   }
 });
 

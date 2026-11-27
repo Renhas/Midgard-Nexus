@@ -122,6 +122,9 @@ def artwork_add(request):
                 "previewUrl": reverse("vor_archives:artworks:preview"),
                 "attachUrl": reverse("vor_archives:artworks:attach"),
                 "listUrl": reverse("vor_archives:artworks:list"),
+                "workUrlTemplate": reverse(
+                    "vor_archives:artworks:work", args=["__type__", 0]
+                ),
                 "relationSearchUrl": reverse("vor_archives:artworks:relation_search"),
                 "catalogs": all_attr_catalogs(),
             },
@@ -154,8 +157,20 @@ def artwork_work(request, type_key, work_id):
 @require_POST
 def artwork_delete(request):
     ids = parse_ids(request)
-    delete_user_works(request.user, ids)
-    return list_response(request, '{"vor:close-overlay": true}')
+    user_works = list(UserWork.objects.filter(user=request.user, pk__in=ids))
+    single_title = (
+        user_works[0].work.title
+        if len(user_works) == 1 and user_works[0].work is not None
+        else ""
+    )
+    deleted_count = delete_user_works(request.user, ids)
+    return list_response(
+        request,
+        {
+            "vor:close-overlay": True,
+            "vor:artworks-deleted": {"count": deleted_count, "title": single_title},
+        },
+    )
 
 
 def artwork_overlay_response(request, work, user_work=None):
@@ -170,10 +185,21 @@ def artwork_overlay_response(request, work, user_work=None):
             ids = parse_id_list(request, name)
             post.setlist(name, [str(item) for item in ids])
 
+        old_title = work.title
         work_form = work_form_class(post, request.FILES, instance=work)
         relations_form = RelationsForm(post)
 
         if work_form.is_valid() and relations_form.is_valid():
+            changed_fields = [
+                str(work_form.fields[name].label)
+                for name in work_form.changed_data
+                if name in work_form.fields and name != "title"
+            ]
+            if (
+                work_form.data.get("cover_clear") == "1"
+                and "Обложка" not in changed_fields
+            ):
+                changed_fields.append("Обложка")
             try:
                 saved = save_work_with_relations(
                     work_form,
@@ -197,7 +223,16 @@ def artwork_overlay_response(request, work, user_work=None):
                         else None,
                     ),
                 )
-                response["HX-Trigger"] = json.dumps({"vor:reload-list": True})
+                response["HX-Trigger"] = json.dumps(
+                    {
+                        "vor:reload-list": True,
+                        "vor:work-saved": {
+                            "oldTitle": old_title,
+                            "title": saved.title,
+                            "changedFields": changed_fields,
+                        },
+                    }
+                )
                 return response
 
         return render(

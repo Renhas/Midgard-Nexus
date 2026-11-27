@@ -15,6 +15,7 @@ import { getWorkFieldsMixin } from "@vor/artworks/mixins/work_fields";
 import { getValidationMixin } from "@vor/artworks/mixins/validation";
 import { getDomainConfig } from "@vor/shared/domain";
 import { wheelDirection } from "@vor/shared/pure/wheel";
+import { vorNotify } from "@vor/shared/toasts";
 import { VorApi } from "@vor/artworks/api";
 
 document.addEventListener("alpine:init", () => {
@@ -22,6 +23,7 @@ document.addEventListener("alpine:init", () => {
     saveUrl: opts.saveUrl || "",
     searchUrl: opts.searchUrl || "",
     previewUrl: opts.previewUrl || "",
+    workUrlTemplate: opts.workUrlTemplate || "",
     relationSearchUrl: opts.relationSearchUrl || "",
     selectedWorkId: null,
     createdWorkId: null,
@@ -203,8 +205,11 @@ document.addEventListener("alpine:init", () => {
         const data = await VorApi.saveWork(this.saveUrl, body);
         if (!data || !data.ok) {
           this.errors = (data && data.errors) || {};
-          if (!data || !Object.keys(this.errors).length) {
-            this.formError = "Не удалось сохранить произведение";
+          const banner = this.formBanner();
+          if (banner) {
+            vorNotify.workSaveFailed(banner);
+          } else if (data && !Object.keys(this.errors).length) {
+            vorNotify.workSaveFailed();
           }
           return;
         }
@@ -222,9 +227,29 @@ document.addEventListener("alpine:init", () => {
         this.saving = false;
       }
     },
+    createdWorkUrl() {
+      if (!this.workUrlTemplate || !this.createdWorkId || !this.createdWorkType) {
+        return "";
+      }
+      return this.workUrlTemplate
+        .replace("__type__", encodeURIComponent(this.createdWorkType))
+        .replace(/\/0\/?$/, `/${this.createdWorkId}/`);
+    },
+    openCreatedWork(url) {
+      if (!url) {
+        return;
+      }
+      htmx.ajax("GET", url, {
+        target: "#vor-overlay",
+        swap: "innerHTML",
+      });
+    },
     finishCreate() {
       this.doneMessage = "Произведение успешно сохранено в базу данных.";
       this.phase = "done";
+      vorNotify.workCreated({ title: String(this.title || "").trim(), url: this.createdWorkUrl() }, (url) =>
+        this.openCreatedWork(url),
+      );
       this.refreshList();
     },
     dismissModal() {
@@ -266,6 +291,9 @@ document.addEventListener("alpine:init", () => {
         ? "Произведение создано и добавлено в ваш список."
         : "Произведение добавлено в ваш список.";
       this.phase = "done";
+      vorNotify.workAttached({ title: String(this.title || "").trim(), url: this.createdWorkUrl() }, (url) =>
+        this.openCreatedWork(url),
+      );
       this.refreshList();
     },
     onAttachError() {

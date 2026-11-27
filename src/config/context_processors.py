@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.templatetags.static import static
+from django.contrib.messages import get_messages
 
 from config.importmap import IMPORTMAP_PATHS
 
@@ -30,4 +31,29 @@ def importmap(request):
         "importmap_items": {
             specifier: static(path) for specifier, path in IMPORTMAP_PATHS.items()
         }
+    }
+
+
+def toast_config(request):
+    """Глобальные настройки уведомлений (задел под настройки профиля)."""
+    return {
+        "toast_config": {
+            "maxVisible": 5,
+            "duration": 4000,
+            "errorDuration": 7000,
+        }
+    }
+
+
+def django_messages(request):
+    """Передаёт сообщения django.contrib.messages в шаблон для вывода через тосты."""
+    storage = get_messages(request)
+    return {
+        "django_messages": [
+            {
+                "level": msg.level_tag or "info",
+                "message": str(msg.message),
+            }
+            for msg in storage
+        ]
     }

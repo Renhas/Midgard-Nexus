@@ -13,7 +13,7 @@
              placeholder="Название"
              maxlength="255"
              autocomplete="off"
-             autofocus>
+             x-init="$nextTick(() => $el.focus())">
       <div class="vor-modal__actions">
         <button type="button" class="sidebar-btn" @click="$dispatch('vor:close-modal')">Отмена</button>
         <button type="submit" class="sidebar-btn sidebar-btn--primary">{{ submit_label }}</button>

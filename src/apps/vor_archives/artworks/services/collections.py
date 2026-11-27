@@ -53,6 +53,7 @@ def rename_collection(user, pk, name):
     if not name:
         raise ValidationError("Укажите название коллекции.")
     collection = get_user_collection(user, pk)
+    collection._old_name = collection.name
     collection.name = name
     collection.save(update_fields=["name"])
     return collection

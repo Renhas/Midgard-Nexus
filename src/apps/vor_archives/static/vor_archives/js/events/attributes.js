@@ -1,9 +1,25 @@
 import { getAlpine } from "@lib/alpine";
 import { hasContent } from "@vor/shared/dom";
 import { closeModal } from "@vor/shared/modal";
+import { vorNotify } from "@vor/shared/toasts";
+
+document.body.addEventListener("vor:attr-saved", (event) => {
+  const payload = event.detail?.value ?? event.detail;
+  if (payload) {
+    vorNotify.attrSaved(payload);
+  }
+});
+
+document.body.addEventListener("vor:attr-deleted", (event) => {
+  const payload = event.detail?.value ?? event.detail;
+  vorNotify.attrsDeleted({
+    count: payload?.count ?? 1,
+    name: payload?.name || "",
+  });
+});
 
 document.body.addEventListener("vor:close-attr-modal", () => {
-  closeModal();
+  queueMicrotask(closeModal);
   const store = getAlpine()?.store("vorAttributes");
   if (!store) {
     return;

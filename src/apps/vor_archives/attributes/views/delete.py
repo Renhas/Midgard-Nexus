@@ -46,13 +46,19 @@ def attr_delete_preview(request, kind):
 @require_POST
 def attr_delete(request, kind):
     attr_tab_or_404(kind)
+    raw_ids = request.POST.getlist("ids")
     try:
-        delete_attrs(kind, request.POST.getlist("ids"))
+        items = resolve_delete_items(kind, raw_ids)
+        single_name = items[0]["name"] if len(items) == 1 else ""
+        deleted_count = delete_attrs(kind, raw_ids)
     except ValueError:
         raise Http404("Неизвестный тип атрибута")
     return attr_mutation_response(
         request,
         "vor_archives/partials/attributes/attr_empty.html",
         empty_context(kind),
-        extra_trigger={"vor:close-attr-modal": True},
+        extra_trigger={
+            "vor:close-attr-modal": True,
+            "vor:attr-deleted": {"count": deleted_count, "name": single_name},
+        },
     )

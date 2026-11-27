@@ -45,10 +45,10 @@ document.addEventListener("keydown", (event) => {
 
 document.body.addEventListener("vor:close-overlay", () => {
   closeOverlay();
-  closeModal();
+  queueMicrotask(closeModal);
   getAlpine()?.store("vorArtworks")?.exitDeleteMode?.();
 });
 
 document.body.addEventListener("vor:close-modal", () => {
-  closeModal();
+  queueMicrotask(closeModal);
 });

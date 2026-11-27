@@ -63,7 +63,15 @@ def test_attr_new_simple_get_and_post(staff_client):
     # Валидный POST
     ok_resp = staff_client.post(url, {"name": "Steam Deck"})
     assert ok_resp.status_code == 200
-    assert json.loads(ok_resp["HX-Trigger"]) == {"vor:attr-list-refresh": True}
+    assert json.loads(ok_resp["HX-Trigger"]) == {
+        "vor:attr-list-refresh": True,
+        "vor:attr-saved": {
+            "isCreate": True,
+            "oldName": "",
+            "name": "Steam Deck",
+            "changedFields": [],
+        },
+    }
     created = Platform.objects.get(name="Steam Deck")
     assert ok_resp.context["item"]["pk"] == created.pk
 
@@ -110,8 +118,17 @@ def test_attr_new_genre_post_valid_and_invalid(staff_client):
         url,
         {"type_key": "film", "name": "Noir", "description": "Classic noir"},
     )
+    print(ok_resp["HX-Trigger"])
     assert ok_resp.status_code == 200
-    assert json.loads(ok_resp["HX-Trigger"]) == {"vor:attr-list-refresh": True}
+    assert json.loads(ok_resp["HX-Trigger"]) == {
+        "vor:attr-list-refresh": True,
+        "vor:attr-saved": {
+            "isCreate": True,
+            "oldName": "",
+            "name": "Noir",
+            "changedFields": ["Описание"],
+        },
+    }
     created = FilmGenre.objects.get(name="Noir")
     assert created.description == "Classic noir"
     assert ok_resp.context["item"]["key"] == f"film:{created.pk}"
@@ -139,7 +156,15 @@ def test_attr_edit_get_and_post(staff_client):
     # Валидное обновление
     ok_resp = staff_client.post(url, {"name": "NewTag", "text": "Updated"})
     assert ok_resp.status_code == 200
-    assert json.loads(ok_resp["HX-Trigger"]) == {"vor:attr-list-refresh": True}
+    assert json.loads(ok_resp["HX-Trigger"]) == {
+        "vor:attr-list-refresh": True,
+        "vor:attr-saved": {
+            "isCreate": False,
+            "oldName": "OldTag",
+            "name": "NewTag",
+            "changedFields": ["Описание"],
+        },
+    }
     tag.refresh_from_db()
     assert tag.name == "NewTag"
     assert tag.description == "Updated"
@@ -190,7 +215,15 @@ def test_genre_edit_get_post_and_locked_type(staff_client):
         {"type_key": "film", "name": "NewGenre", "description": "Updated"},
     )
     assert ok_resp.status_code == 200
-    assert json.loads(ok_resp["HX-Trigger"]) == {"vor:attr-list-refresh": True}
+    assert json.loads(ok_resp["HX-Trigger"]) == {
+        "vor:attr-list-refresh": True,
+        "vor:attr-saved": {
+            "isCreate": False,
+            "oldName": "OldGenre",
+            "name": "NewGenre",
+            "changedFields": ["Описание"],
+        },
+    }
     genre.refresh_from_db()
     assert genre.name == "NewGenre"
     assert genre.description == "Updated"
