@@ -5,7 +5,6 @@ from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import render
 from django.urls import reverse
 
-from config.toasts import attach_toast
 from ..catalog import SIMPLE_KINDS, genre_type_meta, get_attr_tab
 from ..services import (
     genre_composite_id,
@@ -159,18 +158,11 @@ def form_context(
 
 
 def attr_mutation_response(
-    request,
-    detail_template,
-    detail_context,
-    extra_trigger=None,
-    toast_title: str = "",
-    toast_message: str = "",
+    request, detail_template, detail_context, extra_trigger=None
 ):
     response = render(request, detail_template, detail_context)
     triggers = {"vor:attr-list-refresh": True}
     if extra_trigger:
         triggers.update(extra_trigger)
     response["HX-Trigger"] = json.dumps(triggers)
-    if toast_title:
-        attach_toast(response, "success", toast_title, message=toast_message)
     return response

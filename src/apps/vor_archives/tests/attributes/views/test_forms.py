@@ -65,11 +65,7 @@ def test_attr_new_simple_get_and_post(staff_client):
     assert ok_resp.status_code == 200
     assert json.loads(ok_resp["HX-Trigger"]) == {
         "vor:attr-list-refresh": True,
-        "app:toast": {
-            "level": "success",
-            "title": "Атрибут создан",
-            "message": "Steam Deck",
-        },
+        "vor:attr-saved": {"isCreate": True, "name": "Steam Deck"},
     }
     created = Platform.objects.get(name="Steam Deck")
     assert ok_resp.context["item"]["pk"] == created.pk
@@ -120,11 +116,7 @@ def test_attr_new_genre_post_valid_and_invalid(staff_client):
     assert ok_resp.status_code == 200
     assert json.loads(ok_resp["HX-Trigger"]) == {
         "vor:attr-list-refresh": True,
-        "app:toast": {
-            "level": "success",
-            "title": "Атрибут создан",
-            "message": "Noir",
-        },
+        "vor:attr-saved": {"isCreate": True, "name": "Noir"},
     }
     created = FilmGenre.objects.get(name="Noir")
     assert created.description == "Classic noir"
@@ -155,11 +147,7 @@ def test_attr_edit_get_and_post(staff_client):
     assert ok_resp.status_code == 200
     assert json.loads(ok_resp["HX-Trigger"]) == {
         "vor:attr-list-refresh": True,
-        "app:toast": {
-            "level": "success",
-            "title": "Атрибут обновлён",
-            "message": "NewTag",
-        },
+        "vor:attr-saved": {"isCreate": False, "name": "NewTag"},
     }
     tag.refresh_from_db()
     assert tag.name == "NewTag"
@@ -213,11 +201,7 @@ def test_genre_edit_get_post_and_locked_type(staff_client):
     assert ok_resp.status_code == 200
     assert json.loads(ok_resp["HX-Trigger"]) == {
         "vor:attr-list-refresh": True,
-        "app:toast": {
-            "level": "success",
-            "title": "Атрибут обновлён",
-            "message": "NewGenre",
-        },
+        "vor:attr-saved": {"isCreate": False, "name": "NewGenre"},
     }
     genre.refresh_from_db()
     assert genre.name == "NewGenre"

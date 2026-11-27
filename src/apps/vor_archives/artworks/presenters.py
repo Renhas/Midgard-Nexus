@@ -119,5 +119,8 @@ def build_overlay_context(
             "ownedPlatformIds": owned_platform_ids,
             "catalog": catalog,
             "relations": _relations_with_urls(work),
+            "nonFieldError": " ".join(work_form.non_field_errors())
+            if work_form is not None
+            else "",
         },
     }

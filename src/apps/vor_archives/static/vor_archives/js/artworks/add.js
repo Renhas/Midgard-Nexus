@@ -15,8 +15,8 @@ import { getWorkFieldsMixin } from "@vor/artworks/mixins/work_fields";
 import { getValidationMixin } from "@vor/artworks/mixins/validation";
 import { getDomainConfig } from "@vor/shared/domain";
 import { wheelDirection } from "@vor/shared/pure/wheel";
+import { vorNotify } from "@vor/shared/toasts";
 import { VorApi } from "@vor/artworks/api";
-import { notify } from "@toast/notify";
 
 document.addEventListener("alpine:init", () => {
   getAlpine().data("vorAddOverlay", (opts = {}) => ({
@@ -206,9 +206,9 @@ document.addEventListener("alpine:init", () => {
           this.errors = (data && data.errors) || {};
           const banner = this.formBanner();
           if (banner) {
-            notify.error("Не удалось сохранить произведение", { message: banner });
+            vorNotify.workSaveFailed(banner);
           } else if (data && !Object.keys(this.errors).length) {
-            notify.error("Не удалось сохранить произведение");
+            vorNotify.workSaveFailed();
           }
           return;
         }
@@ -229,7 +229,7 @@ document.addEventListener("alpine:init", () => {
     finishCreate() {
       this.doneMessage = "Произведение успешно сохранено в базу данных.";
       this.phase = "done";
-      notify.success("Произведение создано", { message: String(this.title || "").trim() });
+      vorNotify.workCreated(String(this.title || "").trim());
       this.refreshList();
     },
     dismissModal() {
@@ -271,7 +271,7 @@ document.addEventListener("alpine:init", () => {
         ? "Произведение создано и добавлено в ваш список."
         : "Произведение добавлено в ваш список.";
       this.phase = "done";
-      notify.success("Добавлено в список", { message: String(this.title || "").trim() });
+      vorNotify.workAttached(String(this.title || "").trim());
       this.refreshList();
     },
     onAttachError() {

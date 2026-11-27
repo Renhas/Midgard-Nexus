@@ -1,5 +1,5 @@
 import { notify } from "@toast/notify";
-import { formatHttpErrorToast } from "@toast/stack";
+import { TOAST_MESSAGES, formatHttpErrorToast } from "@toast/messages";
 
 const DJANGO_LEVEL_MAP = {
   success: "success",
@@ -8,30 +8,6 @@ const DJANGO_LEVEL_MAP = {
   info: "info",
   debug: "info",
 };
-
-function parseToastFromTriggerHeader(rawHeader) {
-  if (!rawHeader) {
-    return null;
-  }
-  try {
-    const parsed = JSON.parse(rawHeader);
-    const toast = parsed && typeof parsed === "object" ? parsed["app:toast"] : null;
-    return toast && typeof toast === "object" && toast.title ? toast : null;
-  } catch {
-    return null;
-  }
-}
-
-export function handleHtmxAfterRequest(event) {
-  const xhr = event?.detail?.xhr;
-  if (!xhr) {
-    return;
-  }
-  const toast = parseToastFromTriggerHeader(xhr.getResponseHeader?.("HX-Trigger"));
-  if (toast) {
-    notify.show(toast);
-  }
-}
 
 export function handleHtmxResponseError(event) {
   const xhr = event?.detail?.xhr;
@@ -51,8 +27,8 @@ export function handleHtmxResponseError(event) {
 }
 
 export function handleHtmxSendError() {
-  notify.error("Нет связи с сервером", {
-    message: "Проверьте подключение к сети или состояние контейнера.",
+  notify.error(TOAST_MESSAGES.networkError.title, {
+    message: TOAST_MESSAGES.networkError.message,
   });
 }
 
@@ -80,7 +56,6 @@ export function flushDjangoMessages(scriptId = "app-django-messages") {
   });
 }
 
-document.body.addEventListener("htmx:afterRequest", handleHtmxAfterRequest);
 document.body.addEventListener("htmx:responseError", handleHtmxResponseError);
 document.body.addEventListener("htmx:sendError", handleHtmxSendError);
 

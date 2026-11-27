@@ -108,11 +108,7 @@ def test_attr_delete_simple_deletes_and_triggers_refresh_and_modal_close(staff_c
     assert json.loads(response["HX-Trigger"]) == {
         "vor:attr-list-refresh": True,
         "vor:close-attr-modal": True,
-        "app:toast": {
-            "level": "success",
-            "title": "Удалено",
-            "message": "Удалено атрибутов: 2",
-        },
+        "vor:attr-deleted": {"count": 2},
     }
 
 
@@ -130,11 +126,7 @@ def test_attr_delete_genres_across_types(staff_client):
     assert json.loads(response["HX-Trigger"]) == {
         "vor:attr-list-refresh": True,
         "vor:close-attr-modal": True,
-        "app:toast": {
-            "level": "success",
-            "title": "Удалено",
-            "message": "Атрибут удалён",
-        },
+        "vor:attr-deleted": {"count": 2},
     }
 
 

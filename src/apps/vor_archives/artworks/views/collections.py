@@ -11,7 +11,6 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from config.toasts import attach_toast
 from apps.vor_archives.models import UserWork
 from ..services import (
     add_user_work_to_collection,
@@ -64,17 +63,13 @@ def collection_new(request):
         try:
             collection = create_collection(request.user, name)
             response = _collection_mutation_response()
-            return attach_toast(
-                response,
-                "success",
-                "Коллекция создана",
-                message=collection.name,
-                action={
-                    "label": "Открыть",
-                    "event": "vor:open-collection",
-                    "detail": {"id": collection.pk, "name": collection.name},
-                },
-            )
+            extra = json.loads(response["HX-Trigger"])
+            extra["vor:collection-created"] = {
+                "id": collection.pk,
+                "name": collection.name,
+            }
+            response["HX-Trigger"] = json.dumps(extra)
+            return response
         except ValidationError as exc:
             error = (
                 " ".join(exc.messages) if getattr(exc, "messages", None) else str(exc)
@@ -121,9 +116,7 @@ def collection_update(request, pk):
         extra = json.loads(response["HX-Trigger"])
         extra["vor:collection-renamed"] = {"id": pk, "name": name}
         response["HX-Trigger"] = json.dumps(extra)
-        return attach_toast(
-            response, "success", "Коллекция переименована", message=name
-        )
+        return response
     except ValidationError as exc:
         error = " ".join(exc.messages) if getattr(exc, "messages", None) else str(exc)
         collection = get_user_collection(request.user, pk)
@@ -165,7 +158,7 @@ def collection_delete(request, pk):
     extra = json.loads(response["HX-Trigger"])
     extra["vor:collection-deleted"] = pk
     response["HX-Trigger"] = json.dumps(extra)
-    return attach_toast(response, "success", "Коллекция удалена")
+    return response
 
 
 @login_required

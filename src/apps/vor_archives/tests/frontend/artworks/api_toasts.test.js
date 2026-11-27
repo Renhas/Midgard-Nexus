@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { TOAST_MESSAGES, httpStatusTitle } from "@toast/messages";
 
 const errorMock = vi.fn();
 
@@ -25,8 +26,8 @@ describe("VorApi error notifications", () => {
     const result = await VorApi.quickUpdate("/library/1/quick/", "rating", 8);
 
     expect(result).toBeNull();
-    expect(errorMock).toHaveBeenCalledWith("Нет связи с сервером", {
-      message: "Проверьте подключение к сети или состояние контейнера.",
+    expect(errorMock).toHaveBeenCalledWith(TOAST_MESSAGES.networkError.title, {
+      message: TOAST_MESSAGES.networkError.message,
     });
   });
 
@@ -42,7 +43,7 @@ describe("VorApi error notifications", () => {
     const result = await VorApi.quickUpdate("/library/1/quick/", "owned_platform", 99);
 
     expect(result).toBeNull();
-    expect(errorMock).toHaveBeenCalledWith("Ошибка запроса (400)", {
+    expect(errorMock).toHaveBeenCalledWith(httpStatusTitle(400), {
       message: "Платформа не относится к произведению",
       details: "",
     });
@@ -79,7 +80,7 @@ describe("VorApi error notifications", () => {
     expect(result).toBeNull();
     expect(errorMock).toHaveBeenCalledTimes(1);
     const [title, opts] = errorMock.mock.calls[0];
-    expect(title).toBe("Ошибка сервера (500)");
+    expect(title).toBe(httpStatusTitle(500));
     expect(opts.details).toContain("POST /library/add/ -> 500 Internal Server Error");
   });
 });

@@ -1,5 +1,5 @@
 import { htmx } from "@lib/htmx";
-import { notify } from "@toast/notify";
+import { vorNotify } from "@vor/shared/toasts";
 import { VorApi } from "@vor/artworks/api";
 
 export const menuMixin = {
@@ -211,7 +211,7 @@ export const menuMixin = {
     if (!data?.ok) {
       return;
     }
-    notify.success("Убрано из коллекции", { message: collectionName });
+    vorNotify.workRemovedFromCollection(collectionName);
     this.reloadList();
   },
   async toggleWorkCollection(item) {
@@ -224,17 +224,14 @@ export const menuMixin = {
       return;
     }
     item.in_collection = adding;
-    const isCurrent = Number(this.collectionId) === Number(item.id);
-    notify.success(adding ? "Добавлено в коллекцию" : "Убрано из коллекции", {
-      message: item.name,
-      action:
-        adding && !isCurrent
-          ? {
-              label: "Открыть",
-              onClick: () => this.selectCollection(item.id, item.name),
-            }
-          : null,
-    });
+    if (adding) {
+      vorNotify.workAddedToCollection(
+        { id: item.id, name: item.name, isCurrent: Number(this.collectionId) === Number(item.id) },
+        (id, name) => this.selectCollection(id, name),
+      );
+    } else {
+      vorNotify.workRemovedFromCollection(item.name);
+    }
     this.reloadList();
   },
   menuRenameCollection() {

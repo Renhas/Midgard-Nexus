@@ -7,8 +7,6 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from config.toasts import attach_toast
-
 from apps.vor_archives.registry import WORK_MODELS, WORK_TYPE_REGISTRY
 from apps.vor_archives.models import UserWork
 from apps.vor_archives.artworks.forms import (
@@ -157,14 +155,13 @@ def artwork_work(request, type_key, work_id):
 def artwork_delete(request):
     ids = parse_ids(request)
     delete_user_works(request.user, ids)
-    response = list_response(request, '{"vor:close-overlay": true}')
-    count = len(ids)
-    message = (
-        "Произведение удалено из списка"
-        if count == 1
-        else f"Удалено произведений: {count}"
+    return list_response(
+        request,
+        {
+            "vor:close-overlay": True,
+            "vor:artworks-deleted": {"count": len(ids)},
+        },
     )
-    return attach_toast(response, "success", "Удалено", message=message)
 
 
 def artwork_overlay_response(request, work, user_work=None):
@@ -206,15 +203,15 @@ def artwork_overlay_response(request, work, user_work=None):
                         else None,
                     ),
                 )
-                response["HX-Trigger"] = json.dumps({"vor:reload-list": True})
-                return attach_toast(
-                    response,
-                    "success",
-                    "Изменения сохранены",
-                    message=saved.title,
+                response["HX-Trigger"] = json.dumps(
+                    {
+                        "vor:reload-list": True,
+                        "vor:work-saved": {"title": saved.title},
+                    }
                 )
+                return response
 
-        response = render(
+        return render(
             request,
             "vor_archives/partials/artworks/overlay/artwork_overlay.html",
             build_overlay_context(
@@ -227,15 +224,6 @@ def artwork_overlay_response(request, work, user_work=None):
                 global_edit=True,
             ),
         )
-        non_field = work_form.non_field_errors()
-        if non_field:
-            attach_toast(
-                response,
-                "error",
-                "Не удалось сохранить изменения",
-                message=" ".join(non_field),
-            )
-        return response
 
     start_editing = (
         request.method == "GET"

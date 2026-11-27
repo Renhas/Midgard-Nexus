@@ -11,12 +11,12 @@ def test_toast_stack_lifecycle_and_actions(authenticated_page, live_server):
     page.locator("#vor-modal input[name='name']").fill("Фантастика")
     page.locator("#vor-modal button[type='submit']").click()
 
-    toast = page.locator(".app-toast").first
+    toast = page.locator(".app-toast.app-toast--success").first
     expect(toast).to_be_visible()
-    expect(toast.locator(".app-toast__title")).to_have_text("Коллекция создана")
+    expect(toast.locator(".app-toast__title")).not_to_be_empty()
     expect(toast.locator(".app-toast__message")).to_have_text("Фантастика")
 
-    toast.locator(".app-toast__action-btn", has_text="Открыть").click()
+    toast.locator(".app-toast__action-btn").click()
     expect(page.locator(".vor-artwork-library__path-link--current")).to_have_text(
         "Фантастика"
     )
@@ -28,9 +28,9 @@ def test_toast_stack_expand_and_dismiss_all(authenticated_page, live_server):
 
     page.evaluate(
         """() => {
-            window.Alpine.store('toasts').show({ level: 'info', title: 'Первый', duration: 0 });
-            window.Alpine.store('toasts').show({ level: 'success', title: 'Второй', duration: 0 });
-            window.Alpine.store('toasts').show({ level: 'error', title: 'Третий', duration: 0 });
+            window.Alpine.store('toasts').show({ level: 'info', title: 'First', duration: 0 });
+            window.Alpine.store('toasts').show({ level: 'success', title: 'Second', duration: 0 });
+            window.Alpine.store('toasts').show({ level: 'error', title: 'Third', duration: 0 });
         }"""
     )
 

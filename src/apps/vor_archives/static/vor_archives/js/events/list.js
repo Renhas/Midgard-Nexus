@@ -1,6 +1,6 @@
-import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
 import { hasContent } from "@vor/shared/dom";
+import { vorNotify } from "@vor/shared/toasts";
 
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Enter") {
@@ -49,9 +49,20 @@ document.body.addEventListener("vor:reload-tree", () => {
   getAlpine()?.store("vorArtworks")?.reloadCollectionTree();
 });
 
+document.body.addEventListener("vor:collection-created", (event) => {
+  const payload = event.detail?.value ?? event.detail;
+  if (!payload) {
+    return;
+  }
+  vorNotify.collectionCreated(payload, (id, name) => {
+    getAlpine()?.store("vorArtworks")?.selectCollection(id, name);
+  });
+});
+
 document.body.addEventListener("vor:collection-deleted", (event) => {
   const id = event.detail?.value ?? event.detail;
   getAlpine()?.store("vorArtworks")?.onCollectionDeleted(id);
+  vorNotify.collectionDeleted();
 });
 
 document.body.addEventListener("vor:collection-renamed", (event) => {
@@ -66,28 +77,17 @@ document.body.addEventListener("vor:collection-renamed", (event) => {
   store.collectionPath = (store.collectionPath || []).map((part) =>
     String(part.id) === String(payload.id) ? { ...part, name: payload.name || part.name } : part,
   );
+  vorNotify.collectionRenamed(payload.name);
 });
 
-document.body.addEventListener("vor:open-collection", (event) => {
+document.body.addEventListener("vor:artworks-deleted", (event) => {
   const payload = event.detail?.value ?? event.detail;
-  if (!payload?.id) {
-    return;
-  }
-  getAlpine()
-    ?.store("vorArtworks")
-    ?.selectCollection(payload.id, payload.name || "");
+  vorNotify.artworksDeleted(payload?.count ?? 1);
 });
 
-document.body.addEventListener("vor:open-work", (event) => {
+document.body.addEventListener("vor:work-saved", (event) => {
   const payload = event.detail?.value ?? event.detail;
-  const url = typeof payload === "string" ? payload : payload?.url;
-  if (!url) {
-    return;
-  }
-  htmx.ajax("GET", url, {
-    target: "#vor-overlay",
-    swap: "innerHTML",
-  });
+  vorNotify.workSaved(payload?.title || "");
 });
 
 document.addEventListener("contextmenu", (event) => {

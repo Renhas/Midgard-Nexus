@@ -18,14 +18,16 @@ from .utils import (
 def _handle_attr_form(request, kind, form, *, on_save, **form_ctx_kwargs):
     if request.method == "POST" and form.is_valid():
         detail_context = on_save(form)
-        is_create = bool(form_ctx_kwargs.get("is_create"))
-        item_name = detail_context.get("item", {}).get("name", "")
         return attr_mutation_response(
             request,
             "vor_archives/partials/attributes/attr_detail.html",
             detail_context,
-            toast_title="Атрибут создан" if is_create else "Атрибут обновлён",
-            toast_message=item_name,
+            extra_trigger={
+                "vor:attr-saved": {
+                    "isCreate": bool(form_ctx_kwargs.get("is_create")),
+                    "name": detail_context.get("item", {}).get("name", ""),
+                }
+            },
         )
     return render(
         request,

@@ -9,7 +9,7 @@
  */
 import { getCsrfHeaders } from "@vor/shared/csrf";
 import { notify } from "@toast/notify";
-import { formatHttpErrorToast } from "@toast/stack";
+import { TOAST_MESSAGES, formatHttpErrorToast } from "@toast/messages";
 
 async function requestJson(url, options = {}) {
   const { silent = false, ...fetchOptions } = options;
@@ -24,8 +24,8 @@ async function requestJson(url, options = {}) {
       },
     });
   } catch {
-    notify.error("Нет связи с сервером", {
-      message: "Проверьте подключение к сети или состояние контейнера.",
+    notify.error(TOAST_MESSAGES.networkError.title, {
+      message: TOAST_MESSAGES.networkError.message,
     });
     return null;
   }

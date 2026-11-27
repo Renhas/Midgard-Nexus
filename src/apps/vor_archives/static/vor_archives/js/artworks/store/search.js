@@ -1,5 +1,5 @@
 import { htmx } from "@lib/htmx";
-import { notify } from "@toast/notify";
+import { vorNotify } from "@vor/shared/toasts";
 import { VorApi } from "@vor/artworks/api";
 import { syncPageScrollLock } from "@vor/shared/scroll_lock";
 
@@ -62,7 +62,7 @@ export const searchMixin = {
       if (!data?.ok) {
         return;
       }
-      notify.success("Добавлено в список");
+      vorNotify.workAttached();
       this.reloadList();
       this.runSearch();
     } finally {

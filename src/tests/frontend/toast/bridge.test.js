@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { TOAST_MESSAGES, httpStatusTitle } from "@toast/messages";
 
 const showMock = vi.fn();
 const errorMock = vi.fn();
@@ -10,8 +11,7 @@ vi.mock("@toast/notify", () => ({
   },
 }));
 
-const { handleHtmxAfterRequest, handleHtmxResponseError, handleHtmxSendError, flushDjangoMessages } =
-  await import("@toast/bridge");
+const { handleHtmxResponseError, handleHtmxSendError, flushDjangoMessages } = await import("@toast/bridge");
 
 describe("Toast HTMX and Django messages bridge", () => {
   beforeEach(() => {
@@ -20,42 +20,7 @@ describe("Toast HTMX and Django messages bridge", () => {
     document.body.innerHTML = "";
   });
 
-  it("forwards valid app:toast from HX-Trigger header on htmx:afterRequest", () => {
-    handleHtmxAfterRequest({
-      detail: {
-        xhr: {
-          getResponseHeader: () =>
-            JSON.stringify({
-              "vor:close-modal": true,
-              "app:toast": {
-                level: "success",
-                title: "Сохранено",
-                message: "Изменения применены",
-              },
-            }),
-        },
-      },
-    });
-
-    expect(showMock).toHaveBeenCalledWith({
-      level: "success",
-      title: "Сохранено",
-      message: "Изменения применены",
-    });
-  });
-
-  it("ignores HX-Trigger headers without a valid app:toast title", () => {
-    handleHtmxAfterRequest({
-      detail: {
-        xhr: {
-          getResponseHeader: () => JSON.stringify({ "app:toast": { level: "info" } }),
-        },
-      },
-    });
-    expect(showMock).not.toHaveBeenCalled();
-  });
-
-  it("surfaces readable 400 plain-text/JSON errors without copy details", () => {
+  it("surfaces readable 400 plain-text errors without copy details", () => {
     handleHtmxResponseError({
       detail: {
         xhr: {
@@ -68,7 +33,7 @@ describe("Toast HTMX and Django messages bridge", () => {
       },
     });
 
-    expect(errorMock).toHaveBeenCalledWith("Ошибка запроса (400)", {
+    expect(errorMock).toHaveBeenCalledWith(httpStatusTitle(400), {
       message: "Недостаточно прав",
       details: "",
     });
@@ -89,16 +54,16 @@ describe("Toast HTMX and Django messages bridge", () => {
 
     expect(errorMock).toHaveBeenCalledTimes(1);
     const [title, opts] = errorMock.mock.calls[0];
-    expect(title).toBe("Ошибка сервера (500)");
-    expect(opts.message).toBe("Внутренняя ошибка сервера.");
+    expect(title).toBe(httpStatusTitle(500));
+    expect(opts.message).toBe(TOAST_MESSAGES.serverErrorFallback);
     expect(opts.details).toContain("POST /library/add/ -> 500 Internal Server Error");
     expect(opts.details).toContain("ZeroDivisionError");
   });
 
   it("shows network error toast on htmx:sendError", () => {
     handleHtmxSendError();
-    expect(errorMock).toHaveBeenCalledWith("Нет связи с сервером", {
-      message: "Проверьте подключение к сети или состояние контейнера.",
+    expect(errorMock).toHaveBeenCalledWith(TOAST_MESSAGES.networkError.title, {
+      message: TOAST_MESSAGES.networkError.message,
     });
   });
 

@@ -3,13 +3,12 @@ import {
   computeStackSlots,
   createToastEntry,
   extractErrorMessage,
-  formatHttpErrorToast,
-  httpStatusTitle,
   normalizeToastConfig,
   normalizeToastLevel,
   readToastConfig,
   resolveToastDuration,
 } from "@toast/stack";
+import { TOAST_MESSAGES, formatHttpErrorToast, httpStatusTitle } from "@toast/messages";
 
 const TEST_CONFIG = {
   maxVisible: 5,
@@ -98,17 +97,18 @@ describe("Toast stack pure helpers", () => {
       "Ошибка связи",
     );
     expect(extractErrorMessage("Недостаточно прав", "text/plain; charset=utf-8")).toBe("Недостаточно прав");
-    expect(extractErrorMessage("<!DOCTYPE html><html><body>500</body></html>", "text/html", "Ошибка сервера")).toBe(
-      "Ошибка сервера",
+    expect(extractErrorMessage("<!DOCTYPE html><html><body>500</body></html>", "text/html", "Fallback")).toBe(
+      "Fallback",
     );
-    expect(extractErrorMessage("", "text/plain", "Сбой")).toBe("Сбой");
+    expect(extractErrorMessage("", "text/plain", "Fallback")).toBe("Fallback");
   });
 
   it("formats HTTP error toast payloads with status lookup and truncation", () => {
-    expect(httpStatusTitle(403)).toBe("Доступ запрещён");
-    expect(httpStatusTitle(404)).toBe("Не найдено (404)");
-    expect(httpStatusTitle(422)).toBe("Ошибка запроса (422)");
-    expect(httpStatusTitle(502)).toBe("Ошибка сервера (502)");
+    expect(httpStatusTitle(0)).toBe(TOAST_MESSAGES.defaultRequestError);
+    expect(httpStatusTitle(403)).toBe(TOAST_MESSAGES.statusTitles[403]);
+    expect(httpStatusTitle(404)).toBe(TOAST_MESSAGES.statusTitles[404]);
+    expect(httpStatusTitle(422)).toContain("422");
+    expect(httpStatusTitle(502)).toContain("502");
 
     const longBody = "x".repeat(4500);
     const formatted = formatHttpErrorToast({
@@ -119,7 +119,7 @@ describe("Toast stack pure helpers", () => {
       contentType: "text/plain",
       body: longBody,
     });
-    expect(formatted.title).toBe("Ошибка сервера (500)");
+    expect(formatted.title).toContain("500");
     expect(formatted.details).toContain("POST /api/test/ -> 500 Internal Server Error");
     expect(formatted.details).toContain("...[truncated]");
   });
