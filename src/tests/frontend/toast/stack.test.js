@@ -3,6 +3,8 @@ import {
   computeStackSlots,
   createToastEntry,
   extractErrorMessage,
+  formatHttpErrorToast,
+  httpStatusTitle,
   normalizeToastConfig,
   normalizeToastLevel,
   readToastConfig,
@@ -100,5 +102,25 @@ describe("Toast stack pure helpers", () => {
       "Ошибка сервера",
     );
     expect(extractErrorMessage("", "text/plain", "Сбой")).toBe("Сбой");
+  });
+
+  it("formats HTTP error toast payloads with status lookup and truncation", () => {
+    expect(httpStatusTitle(403)).toBe("Доступ запрещён");
+    expect(httpStatusTitle(404)).toBe("Не найдено (404)");
+    expect(httpStatusTitle(422)).toBe("Ошибка запроса (422)");
+    expect(httpStatusTitle(502)).toBe("Ошибка сервера (502)");
+
+    const longBody = "x".repeat(4500);
+    const formatted = formatHttpErrorToast({
+      method: "post",
+      url: "/api/test/",
+      status: 500,
+      statusText: "Internal Server Error",
+      contentType: "text/plain",
+      body: longBody,
+    });
+    expect(formatted.title).toBe("Ошибка сервера (500)");
+    expect(formatted.details).toContain("POST /api/test/ -> 500 Internal Server Error");
+    expect(formatted.details).toContain("...[truncated]");
   });
 });

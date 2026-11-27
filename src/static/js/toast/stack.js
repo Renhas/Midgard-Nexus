@@ -1,4 +1,11 @@
 const VALID_LEVELS = new Set(["success", "error", "info"]);
+const MAX_ERROR_DETAILS_LENGTH = 4000;
+const HTML_BODY_PATTERN = /<!doctype|<html|<body|<head/i;
+
+const HTTP_STATUS_TITLES = {
+  403: "Доступ запрещён",
+  404: "Не найдено (404)",
+};
 
 export function readToastConfig(scriptId = "app-toast-config") {
   const el = typeof document !== "undefined" ? document.getElementById(scriptId) : null;
@@ -81,6 +88,38 @@ export function computeStackSlots(items, maxVisible) {
   }));
 }
 
+export function isHtmlPayload(rawBody, contentType = "") {
+  return (
+    String(contentType || "")
+      .toLowerCase()
+      .includes("text/html") || HTML_BODY_PATTERN.test(String(rawBody || ""))
+  );
+}
+
+export function httpStatusTitle(status) {
+  const code = Number(status || 0);
+  if (!code) {
+    return "Ошибка запроса";
+  }
+  if (HTTP_STATUS_TITLES[code]) {
+    return HTTP_STATUS_TITLES[code];
+  }
+  return code >= 500 ? `Ошибка сервера (${code})` : `Ошибка запроса (${code})`;
+}
+
+export function buildHttpDetails({ method = "HTTP", url = "", status = 0, statusText = "", body = "" } = {}) {
+  const statusLine = `${String(method).toUpperCase()} ${url} -> ${status} ${statusText}`.trim();
+  const trimmedBody = String(body || "").trim();
+  if (!trimmedBody) {
+    return statusLine;
+  }
+  const clipped =
+    trimmedBody.length > MAX_ERROR_DETAILS_LENGTH
+      ? `${trimmedBody.slice(0, MAX_ERROR_DETAILS_LENGTH)}\n...[truncated]`
+      : trimmedBody;
+  return `${statusLine}\n\n${clipped}`;
+}
+
 export function extractErrorMessage(rawBody, contentType = "", fallback = "Ошибка запроса") {
   const text = String(rawBody || "").trim();
   if (!text) {
@@ -90,25 +129,38 @@ export function extractErrorMessage(rawBody, contentType = "", fallback = "Ош�
   if (lowerType.includes("application/json") || text.startsWith("{")) {
     try {
       const parsed = JSON.parse(text);
-      if (typeof parsed?.error === "string" && parsed.error.trim()) {
-        return parsed.error.trim();
-      }
-      if (typeof parsed?.message === "string" && parsed.message.trim()) {
-        return parsed.message.trim();
-      }
-      const firstAll = parsed?.errors?.__all__?.[0];
-      if (typeof firstAll === "string" && firstAll.trim()) {
-        return firstAll.trim();
-      }
-      if (typeof firstAll?.message === "string" && firstAll.message.trim()) {
-        return firstAll.message.trim();
+      const allErrors = parsed?.errors?.__all__;
+      const firstAll = Array.isArray(allErrors) ? allErrors[0] : allErrors;
+      const candidates = [parsed?.error, parsed?.message, firstAll, firstAll?.message];
+      const found = candidates.find((item) => typeof item === "string" && item.trim());
+      if (found) {
+        return found.trim();
       }
     } catch {
       // fall through to plain-text check
     }
   }
-  if (lowerType.includes("text/html") || /<!doctype|<html|<body|<head/i.test(text)) {
+  if (isHtmlPayload(text, lowerType)) {
     return fallback;
   }
   return text;
+}
+
+export function formatHttpErrorToast({
+  method = "HTTP",
+  url = "",
+  status = 0,
+  statusText = "",
+  contentType = "",
+  body = "",
+} = {}) {
+  const code = Number(status || 0);
+  const fallback = code >= 500 ? "Внутренняя ошибка сервера." : "";
+  const message = extractErrorMessage(body, contentType, fallback);
+  const needsDetails = code >= 500 || isHtmlPayload(body, contentType);
+  return {
+    title: httpStatusTitle(code),
+    message,
+    details: needsDetails ? buildHttpDetails({ method, url, status: code, statusText, body }) : "",
+  };
 }
