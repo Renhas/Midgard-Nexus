@@ -1,4 +1,5 @@
 import { htmx } from "@lib/htmx";
+import { notify } from "@toast/notify";
 import { VorApi } from "@vor/artworks/api";
 import { syncPageScrollLock } from "@vor/shared/scroll_lock";
 
@@ -8,6 +9,7 @@ export const searchMixin = {
   searchOpen: false,
   searchQuery: "",
   searchTimer: null,
+  _attaching: false,
 
   openSearch() {
     if (this.searchOpen) {
@@ -51,12 +53,21 @@ export const searchMixin = {
     });
   },
   async attachFromSearch(typeKey, workId) {
-    const data = await VorApi.attachWorkFromSearch(this.attachUrl, typeKey, workId);
-    if (!data?.ok) {
+    if (this._attaching) {
       return;
     }
-    this.reloadList();
-    this.runSearch();
+    this._attaching = true;
+    try {
+      const data = await VorApi.attachWorkFromSearch(this.attachUrl, typeKey, workId);
+      if (!data?.ok) {
+        return;
+      }
+      notify.success("Добавлено в список");
+      this.reloadList();
+      this.runSearch();
+    } finally {
+      this._attaching = false;
+    }
   },
   openWork(url) {
     this.closeSearch();

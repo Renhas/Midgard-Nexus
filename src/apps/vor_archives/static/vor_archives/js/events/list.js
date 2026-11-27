@@ -1,3 +1,4 @@
+import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
 import { hasContent } from "@vor/shared/dom";
 
@@ -65,6 +66,28 @@ document.body.addEventListener("vor:collection-renamed", (event) => {
   store.collectionPath = (store.collectionPath || []).map((part) =>
     String(part.id) === String(payload.id) ? { ...part, name: payload.name || part.name } : part,
   );
+});
+
+document.body.addEventListener("vor:open-collection", (event) => {
+  const payload = event.detail?.value ?? event.detail;
+  if (!payload?.id) {
+    return;
+  }
+  getAlpine()
+    ?.store("vorArtworks")
+    ?.selectCollection(payload.id, payload.name || "");
+});
+
+document.body.addEventListener("vor:open-work", (event) => {
+  const payload = event.detail?.value ?? event.detail;
+  const url = typeof payload === "string" ? payload : payload?.url;
+  if (!url) {
+    return;
+  }
+  htmx.ajax("GET", url, {
+    target: "#vor-overlay",
+    swap: "innerHTML",
+  });
 });
 
 document.addEventListener("contextmenu", (event) => {
@@ -153,12 +176,6 @@ document.body.addEventListener("htmx:afterSwap", (event) => {
     store.applyCollectionTreeState();
     store.syncCollectionSortable();
     store.refreshCollectionPath();
-  }
-});
-
-document.body.addEventListener("htmx:afterSwap", (event) => {
-  if (event.detail.elt?.id === "vor-library-search-results") {
-    getAlpine()?.initTree?.(event.detail.elt);
   }
 });
 

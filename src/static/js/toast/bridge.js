@@ -9,16 +9,28 @@ const DJANGO_LEVEL_MAP = {
   debug: "info",
 };
 
-export function handleHtmxToast(event) {
-  const detail = event?.detail;
-  if (!detail) {
+function parseToastFromTriggerHeader(rawHeader) {
+  if (!rawHeader) {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(rawHeader);
+    const toast = parsed && typeof parsed === "object" ? parsed["app:toast"] : null;
+    return toast && typeof toast === "object" && toast.title ? toast : null;
+  } catch {
+    return null;
+  }
+}
+
+export function handleHtmxAfterRequest(event) {
+  const xhr = event?.detail?.xhr;
+  if (!xhr) {
     return;
   }
-  const payload = detail.value !== undefined && typeof detail.value === "object" ? detail.value : detail;
-  if (!payload || typeof payload !== "object" || !payload.title) {
-    return;
+  const toast = parseToastFromTriggerHeader(xhr.getResponseHeader?.("HX-Trigger"));
+  if (toast) {
+    notify.show(toast);
   }
-  notify.show(payload);
 }
 
 export function handleHtmxResponseError(event) {
@@ -68,7 +80,7 @@ export function flushDjangoMessages(scriptId = "app-django-messages") {
   });
 }
 
-document.body.addEventListener("app:toast", handleHtmxToast);
+document.body.addEventListener("htmx:afterRequest", handleHtmxAfterRequest);
 document.body.addEventListener("htmx:responseError", handleHtmxResponseError);
 document.body.addEventListener("htmx:sendError", handleHtmxSendError);
 

@@ -1,5 +1,6 @@
 import { htmx } from "@lib/htmx";
 import { Sortable } from "@lib/sortable";
+import { notify } from "@toast/notify";
 import { VorApi } from "@vor/artworks/api";
 import { getCollectionUrl } from "@vor/artworks/pure/collection_urls";
 import { flattenCollectionTree } from "@vor/artworks/pure/collection_tree";
@@ -323,7 +324,19 @@ export const collectionsMixin = {
       return;
     }
     if (data.changed) {
-      window.dispatchEvent(new Event("vor:collection-update"));
+      const targetId = Number(collectionId);
+      const name =
+        this.collectionNode(targetId)?.querySelector(".vor-collection-item__name")?.textContent?.trim() || "";
+      const isCurrent = Number(this.collectionId) === targetId;
+      notify.success("Добавлено в коллекцию", {
+        message: name,
+        action: isCurrent
+          ? null
+          : {
+              label: "Открыть",
+              onClick: () => this.selectCollection(targetId, name),
+            },
+      });
     }
     if (this.collectionId) {
       this.reloadList();

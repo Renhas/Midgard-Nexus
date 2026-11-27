@@ -157,7 +157,14 @@ def artwork_work(request, type_key, work_id):
 def artwork_delete(request):
     ids = parse_ids(request)
     delete_user_works(request.user, ids)
-    return list_response(request, '{"vor:close-overlay": true}')
+    response = list_response(request, '{"vor:close-overlay": true}')
+    count = len(ids)
+    message = (
+        "Произведение удалено из списка"
+        if count == 1
+        else f"Удалено произведений: {count}"
+    )
+    return attach_toast(response, "success", "Удалено", message=message)
 
 
 def artwork_overlay_response(request, work, user_work=None):
@@ -200,7 +207,12 @@ def artwork_overlay_response(request, work, user_work=None):
                     ),
                 )
                 response["HX-Trigger"] = json.dumps({"vor:reload-list": True})
-                return response
+                return attach_toast(
+                    response,
+                    "success",
+                    "Изменения сохранены",
+                    message=saved.title,
+                )
 
         response = render(
             request,

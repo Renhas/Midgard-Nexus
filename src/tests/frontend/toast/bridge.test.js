@@ -10,7 +10,7 @@ vi.mock("@toast/notify", () => ({
   },
 }));
 
-const { handleHtmxToast, handleHtmxResponseError, handleHtmxSendError, flushDjangoMessages } =
+const { handleHtmxAfterRequest, handleHtmxResponseError, handleHtmxSendError, flushDjangoMessages } =
   await import("@toast/bridge");
 
 describe("Toast HTMX and Django messages bridge", () => {
@@ -20,12 +20,20 @@ describe("Toast HTMX and Django messages bridge", () => {
     document.body.innerHTML = "";
   });
 
-  it("forwards valid app:toast HTMX trigger payloads to notify.show", () => {
-    handleHtmxToast({
+  it("forwards valid app:toast from HX-Trigger header on htmx:afterRequest", () => {
+    handleHtmxAfterRequest({
       detail: {
-        level: "success",
-        title: "Сохранено",
-        message: "Изменения применены",
+        xhr: {
+          getResponseHeader: () =>
+            JSON.stringify({
+              "vor:close-modal": true,
+              "app:toast": {
+                level: "success",
+                title: "Сохранено",
+                message: "Изменения применены",
+              },
+            }),
+        },
       },
     });
 
@@ -36,8 +44,14 @@ describe("Toast HTMX and Django messages bridge", () => {
     });
   });
 
-  it("ignores malformed app:toast events without a title", () => {
-    handleHtmxToast({ detail: { level: "info" } });
+  it("ignores HX-Trigger headers without a valid app:toast title", () => {
+    handleHtmxAfterRequest({
+      detail: {
+        xhr: {
+          getResponseHeader: () => JSON.stringify({ "app:toast": { level: "info" } }),
+        },
+      },
+    });
     expect(showMock).not.toHaveBeenCalled();
   });
 

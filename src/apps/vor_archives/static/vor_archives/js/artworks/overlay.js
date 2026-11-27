@@ -1,5 +1,6 @@
 import { htmx } from "@lib/htmx";
 import { getAlpine } from "@lib/alpine";
+import { notify } from "@toast/notify";
 import { getOverlayLifecycleMixin } from "@vor/artworks/mixins/overlay_lifecycle";
 import { getDatePickerMixin } from "@vor/artworks/mixins/datepicker";
 import { getAttachMixin } from "@vor/artworks/mixins/attach";
@@ -246,6 +247,7 @@ document.addEventListener("alpine:init", () => {
     },
     onAttachSuccess() {
       this.attachOpen = false;
+      notify.success("Добавлено в список", { message: this.title });
       this.refreshList();
       htmx.ajax("GET", this.workUrl, {
         target: "#vor-overlay",

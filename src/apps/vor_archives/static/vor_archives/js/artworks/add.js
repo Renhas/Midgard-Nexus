@@ -229,6 +229,7 @@ document.addEventListener("alpine:init", () => {
     finishCreate() {
       this.doneMessage = "Произведение успешно сохранено в базу данных.";
       this.phase = "done";
+      notify.success("Произведение создано", { message: String(this.title || "").trim() });
       this.refreshList();
     },
     dismissModal() {
@@ -270,6 +271,7 @@ document.addEventListener("alpine:init", () => {
         ? "Произведение создано и добавлено в ваш список."
         : "Произведение добавлено в ваш список.";
       this.phase = "done";
+      notify.success("Добавлено в список", { message: String(this.title || "").trim() });
       this.refreshList();
     },
     onAttachError() {
