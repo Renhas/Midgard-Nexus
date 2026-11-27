@@ -2,7 +2,7 @@
 {{ django_messages|json_script:"app-django-messages" }}
 <div class="app-toast-viewport"
      x-data
-     x-init="$store.toasts.init()"
+     x-init="$store.toasts.init(); $store.toasts.observeFrontHeight($refs.stack)"
      :class="{ 'app-toast-viewport--expanded': $store.toasts.expanded }"
      @pointermove="$store.toasts.expand($el)"
      @focusin="$store.toasts.onFocusIn($event)"
@@ -15,9 +15,10 @@
       <span>Закрыть все</span>
     </button>
   </div>
-  <div class="app-toast-stack">
+  <div class="app-toast-stack" x-ref="stack">
     <template x-for="item in $store.toasts.visibleItems" :key="item.id">
       <div class="app-toast"
+           :data-front="item.stackIndex === 0 ? 'true' : null"
            :class="[
                'app-toast--' + item.level,
                { 'app-toast--closing': item.closing }

@@ -29,6 +29,40 @@ export function createToastStore(initialConfig = null) {
       }
     },
 
+    observeFrontHeight(stackEl) {
+      if (!stackEl || typeof ResizeObserver === "undefined") {
+        return;
+      }
+      let currentFront = null;
+      const syncHeight = () => {
+        const front = stackEl.querySelector('.app-toast[data-front="true"]');
+        if (front) {
+          stackEl.style.setProperty("--front-height", `${front.offsetHeight}px`);
+        }
+      };
+      const ro = new ResizeObserver(syncHeight);
+      const bindFront = () => {
+        const front = stackEl.querySelector('.app-toast[data-front="true"]');
+        if (front !== currentFront) {
+          if (currentFront) {
+            ro.unobserve(currentFront);
+          }
+          currentFront = front;
+          if (currentFront) {
+            ro.observe(currentFront);
+            syncHeight();
+          }
+        }
+      };
+      new MutationObserver(bindFront).observe(stackEl, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["data-front"],
+      });
+      bindFront();
+    },
+
     get visibleItems() {
       const limit = this.config?.maxVisible;
       return computeStackSlots(this.items, limit);
