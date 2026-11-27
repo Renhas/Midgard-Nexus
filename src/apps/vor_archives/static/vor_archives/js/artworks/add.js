@@ -16,6 +16,7 @@ import { getValidationMixin } from "@vor/artworks/mixins/validation";
 import { getDomainConfig } from "@vor/shared/domain";
 import { wheelDirection } from "@vor/shared/pure/wheel";
 import { VorApi } from "@vor/artworks/api";
+import { notify } from "@toast/notify";
 
 document.addEventListener("alpine:init", () => {
   getAlpine().data("vorAddOverlay", (opts = {}) => ({
@@ -203,8 +204,11 @@ document.addEventListener("alpine:init", () => {
         const data = await VorApi.saveWork(this.saveUrl, body);
         if (!data || !data.ok) {
           this.errors = (data && data.errors) || {};
-          if (!data || !Object.keys(this.errors).length) {
-            this.formError = "Не удалось сохранить произведение";
+          const banner = this.formBanner();
+          if (banner) {
+            notify.error("Не удалось сохранить произведение", { message: banner });
+          } else if (data && !Object.keys(this.errors).length) {
+            notify.error("Не удалось сохранить произведение");
           }
           return;
         }
