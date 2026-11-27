@@ -70,10 +70,11 @@ export function createToastEntry(payload, id, config) {
   };
 }
 
-export function computeStackSlots(items) {
+export function computeStackSlots(items, maxVisible) {
   const list = items || [];
-  const total = list.length;
-  return list.map((item, idx) => ({
+  const visible = Number.isFinite(maxVisible) && maxVisible >= 1 ? list.slice(-maxVisible) : list;
+  const total = visible.length;
+  return visible.map((item, idx) => ({
     ...item,
     stackIndex: total - 1 - idx,
   }));

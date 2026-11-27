@@ -25,6 +25,10 @@
   pointer-events: none;
 }
 
+.app-toast-viewport--expanded {
+  pointer-events: auto;
+}
+
 .app-toast-controls {
   pointer-events: auto;
   opacity: 0;
@@ -71,7 +75,7 @@
 
 .app-toast-viewport--expanded .app-toast-stack {
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   gap: 0.55rem;
 }
 

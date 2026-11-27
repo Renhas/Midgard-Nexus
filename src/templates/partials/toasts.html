@@ -3,10 +3,9 @@
      x-data
      x-init="$store.toasts.init()"
      :class="{ 'app-toast-viewport--expanded': $store.toasts.expanded }"
-     @mouseenter="$store.toasts.expand()"
-     @mouseleave="$store.toasts.scheduleCollapse()"
+     @pointermove="$store.toasts.expand($el)"
      @focusin="$store.toasts.onFocusIn($event)"
-     @focusout="$store.toasts.onFocusOut()"
+     @focusout="$store.toasts.onFocusOut($event)"
      aria-live="polite"
      aria-atomic="false">
   <div class="app-toast-controls" x-show="$store.toasts.hasMultiple" x-cloak>

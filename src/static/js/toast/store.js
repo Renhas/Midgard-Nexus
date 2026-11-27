@@ -2,16 +2,19 @@ import { getAlpine } from "@lib/alpine";
 import { computeStackSlots, createToastEntry, readToastConfig } from "@toast/stack";
 
 const EXIT_ANIMATION_MS = 220;
-const COLLAPSE_DELAY_MS = 180;
+const MAX_QUEUE_SIZE = 50;
+const HOVER_BOUNDARY_PAD = 8;
 
 export function createToastStore(initialConfig = null) {
   let seq = 0;
-  let collapseTimer = null;
+  let trackHandler = null;
+  let pointerActive = false;
+  let keyboardFocus = false;
 
-  function cancelCollapse() {
-    if (collapseTimer !== null) {
-      window.clearTimeout(collapseTimer);
-      collapseTimer = null;
+  function stopTrackingPointer() {
+    if (trackHandler) {
+      document.removeEventListener("pointermove", trackHandler, true);
+      trackHandler = null;
     }
   }
 
@@ -27,36 +30,63 @@ export function createToastStore(initialConfig = null) {
     },
 
     get visibleItems() {
-      return computeStackSlots(this.items);
+      const limit = this.config?.maxVisible;
+      return computeStackSlots(this.items, limit);
     },
 
     get hasMultiple() {
-      return this.items.length > 1;
+      return this.visibleItems.length > 1;
     },
 
-    expand() {
-      cancelCollapse();
-      if (this.items.length > 0) {
+    expand(viewportEl = null) {
+      if (this.items.length === 0) {
+        return;
+      }
+      pointerActive = true;
+      this.expanded = true;
+      if (viewportEl && !trackHandler) {
+        trackHandler = (event) => {
+          if (!this.expanded) {
+            stopTrackingPointer();
+            return;
+          }
+          const rect = viewportEl.getBoundingClientRect();
+          const inside =
+            event.clientX >= rect.left - HOVER_BOUNDARY_PAD &&
+            event.clientX <= rect.right + HOVER_BOUNDARY_PAD &&
+            event.clientY >= rect.top - HOVER_BOUNDARY_PAD &&
+            event.clientY <= rect.bottom + HOVER_BOUNDARY_PAD;
+          if (!inside) {
+            this.collapse();
+          }
+        };
+        document.addEventListener("pointermove", trackHandler, true);
+      }
+    },
+
+    collapse() {
+      stopTrackingPointer();
+      pointerActive = false;
+      keyboardFocus = false;
+      this.expanded = false;
+    },
+
+    onFocusIn(event) {
+      if (event?.target?.matches?.(":focus-visible") && this.items.length > 0) {
+        keyboardFocus = true;
         this.expanded = true;
       }
     },
 
-    scheduleCollapse() {
-      cancelCollapse();
-      collapseTimer = window.setTimeout(() => {
-        collapseTimer = null;
-        this.expanded = false;
-      }, COLLAPSE_DELAY_MS);
-    },
-
-    onFocusIn(event) {
-      if (event?.target?.matches?.(":focus-visible")) {
-        this.expand();
+    onFocusOut(event) {
+      const nextTarget = event?.relatedTarget;
+      if (nextTarget && event.currentTarget?.contains?.(nextTarget)) {
+        return;
       }
-    },
-
-    onFocusOut() {
-      this.scheduleCollapse();
+      keyboardFocus = false;
+      if (!pointerActive) {
+        this.collapse();
+      }
     },
 
     show(payload) {
@@ -69,12 +99,8 @@ export function createToastStore(initialConfig = null) {
         return null;
       }
       this.items.push(entry);
-      const active = this.items.filter((item) => !item.closing);
-      if (active.length > this.config.maxVisible) {
-        const oldest = active[0];
-        if (oldest) {
-          this.dismiss(oldest.id);
-        }
+      if (this.items.length > MAX_QUEUE_SIZE) {
+        this.items.splice(0, this.items.length - MAX_QUEUE_SIZE);
       }
       return id;
     },
@@ -92,20 +118,18 @@ export function createToastStore(initialConfig = null) {
       window.setTimeout(() => {
         this.items = this.items.filter((item) => item.id !== id);
         if (this.items.length === 0) {
-          cancelCollapse();
-          this.expanded = false;
+          this.collapse();
         }
       }, EXIT_ANIMATION_MS);
     },
 
     dismissAll() {
-      cancelCollapse();
       this.items.forEach((item) => {
         item.closing = true;
       });
       window.setTimeout(() => {
         this.items = [];
-        this.expanded = false;
+        this.collapse();
       }, EXIT_ANIMATION_MS);
     },
 

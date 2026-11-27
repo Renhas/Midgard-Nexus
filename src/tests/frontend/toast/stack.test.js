@@ -75,12 +75,12 @@ describe("Toast stack pure helpers", () => {
     });
   });
 
-  it("computes stack indices from newest to oldest", () => {
-    const slots = computeStackSlots([{ id: 1 }, { id: 2 }, { id: 3 }]);
+  it("computes stack indices from newest to oldest and slices to maxVisible", () => {
+    const slots = computeStackSlots([{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }], 3);
     expect(slots).toEqual([
-      { id: 1, stackIndex: 2 },
-      { id: 2, stackIndex: 1 },
-      { id: 3, stackIndex: 0 },
+      { id: 2, stackIndex: 2 },
+      { id: 3, stackIndex: 1 },
+      { id: 4, stackIndex: 0 },
     ]);
   });
 

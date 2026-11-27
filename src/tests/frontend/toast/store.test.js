@@ -30,19 +30,21 @@ describe("Toast store lifecycle", () => {
     expect(store.items).toHaveLength(0);
   });
 
-  it("evicts oldest active toast when maxVisible limit is exceeded", () => {
+  it("keeps overflow toasts queued and reveals older ones when newer are dismissed", () => {
     const store = createToastStore(TEST_CONFIG);
-    store.show({ message: "1" });
-    store.show({ message: "2" });
-    store.show({ message: "3" });
-    store.show({ message: "4" });
+    store.show({ message: "1", duration: 0 });
+    store.show({ message: "2", duration: 0 });
+    const thirdId = store.show({ message: "3", duration: 0 });
+    store.show({ message: "4", duration: 0 });
 
-    expect(store.items[0].closing).toBe(true);
+    expect(store.visibleItems.map((item) => item.message)).toEqual(["2", "3", "4"]);
+
+    store.dismiss(thirdId);
     vi.advanceTimersByTime(250);
-    expect(store.items.map((item) => item.message)).toEqual(["2", "3", "4"]);
+    expect(store.visibleItems.map((item) => item.message)).toEqual(["1", "2", "4"]);
   });
 
-  it("keeps expanded state briefly on leave and cancels collapse on re-enter", () => {
+  it("keeps expanded state when dismissing an item until pointer leaves", () => {
     const store = createToastStore(TEST_CONFIG);
     const firstId = store.show({ message: "Первый", duration: 0 });
     store.show({ message: "Второй", duration: 0 });
@@ -55,15 +57,7 @@ describe("Toast store lifecycle", () => {
     expect(store.items).toHaveLength(1);
     expect(store.expanded).toBe(true);
 
-    store.scheduleCollapse();
-    expect(store.expanded).toBe(true);
-
-    store.expand();
-    vi.advanceTimersByTime(250);
-    expect(store.expanded).toBe(true);
-
-    store.scheduleCollapse();
-    vi.advanceTimersByTime(200);
+    store.collapse();
     expect(store.expanded).toBe(false);
   });
 
