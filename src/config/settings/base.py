@@ -87,6 +87,7 @@ TEMPLATES = [
                 "config.context_processors.app_version",
                 "config.context_processors.importmap",
                 "config.context_processors.toast_config",
+                "config.context_processors.django_messages",
             ],
         },
     },

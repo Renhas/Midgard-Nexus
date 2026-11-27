@@ -56,6 +56,7 @@ COMMON_IMPORTMAP_PATHS = {
     "@toast/stack": "js/toast/stack.js",
     "@toast/store": "js/toast/store.js",
     "@toast/notify": "js/toast/notify.js",
+    "@toast/bridge": "js/toast/bridge.js",
 }
 
 APP_IMPORTMAP_MODULES = [

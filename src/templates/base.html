@@ -51,6 +51,7 @@
     <script src="{% static 'vendor/floating-ui/dom.umd.min.js' %}"></script>
     <!-- Toasts -->
     <script type="module" src="{% static 'js/toast/store.js' %}"></script>
+    <script type="module" src="{% static 'js/toast/bridge.js' %}"></script>
     {% block extra_js %}{% endblock %}
     {# Deferred and after extra_js so ES modules can subscribe to alpine:init before Alpine.start() fires. #}
     <!-- Alpine.js -->

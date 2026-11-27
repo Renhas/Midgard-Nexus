@@ -1,4 +1,5 @@
 {{ toast_config|json_script:"app-toast-config" }}
+{{ django_messages|json_script:"app-django-messages" }}
 <div class="app-toast-viewport"
      x-data
      x-init="$store.toasts.init()"
