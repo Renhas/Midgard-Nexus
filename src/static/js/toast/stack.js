@@ -77,10 +77,10 @@ export function computeStackSlots(items, maxVisible) {
   const list = items || [];
   const visible = Number.isFinite(maxVisible) && maxVisible >= 1 ? list.slice(-maxVisible) : list;
   const total = visible.length;
-  return visible.map((item, idx) => ({
-    ...item,
-    stackIndex: total - 1 - idx,
-  }));
+  return visible.map((item, idx) => {
+    item.stackIndex = total - 1 - idx;
+    return item;
+  });
 }
 
 export function isHtmlPayload(rawBody, contentType = "") {

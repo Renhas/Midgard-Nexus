@@ -30,9 +30,9 @@ describe("Toast store lifecycle", () => {
     expect(store.items).toHaveLength(1);
 
     store.onProgressEnd(id);
-    expect(store.items[0].closing).toBe(true);
+    expect(store.isClosing(id)).toBe(true);
 
-    vi.advanceTimersByTime(250);
+    vi.advanceTimersByTime(300);
     expect(store.items).toHaveLength(0);
   });
 
@@ -46,7 +46,7 @@ describe("Toast store lifecycle", () => {
     expect(store.visibleItems.map((item) => item.title)).toEqual(["2", "3", "4"]);
 
     store.dismiss(thirdId);
-    vi.advanceTimersByTime(250);
+    vi.advanceTimersByTime(300);
     expect(store.visibleItems.map((item) => item.title)).toEqual(["1", "2", "4"]);
   });
 
@@ -59,7 +59,7 @@ describe("Toast store lifecycle", () => {
     expect(store.expanded).toBe(true);
 
     store.dismiss(firstId);
-    vi.advanceTimersByTime(250);
+    vi.advanceTimersByTime(300);
     expect(store.items).toHaveLength(1);
     expect(store.expanded).toBe(true);
 
@@ -105,7 +105,7 @@ describe("Toast store lifecycle", () => {
     expect(eventSpy).toHaveBeenCalledTimes(1);
     expect(eventSpy.mock.calls[0][0].detail).toEqual({ id: 7 });
 
-    vi.advanceTimersByTime(250);
+    vi.advanceTimersByTime(300);
     expect(store.items).toHaveLength(0);
     document.body.removeEventListener("test:toast-action", eventSpy);
   });

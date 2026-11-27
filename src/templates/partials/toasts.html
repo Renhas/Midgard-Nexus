@@ -21,14 +21,14 @@
            :data-front="item.stackIndex === 0 ? 'true' : null"
            :style="`--stack-index: ${item.stackIndex}`">
         <div class="app-toast"
-             :class="[
-                 'app-toast--' + item.level,
-                 {
-                     'app-toast--closing': item.closing,
-                     'app-toast--bulk-closing': item.closing && item.closingDelay > 0
-                 }
-             ]"
-             :style="`--toast-duration: ${item.duration}ms; --closing-delay: ${item.closingDelay}ms`"
+             :class="{
+                 'app-toast--success': item.level === 'success',
+                 'app-toast--error': item.level === 'error',
+                 'app-toast--info': item.level === 'info',
+                 'app-toast--closing': $store.toasts.isClosing(item.id),
+                 'app-toast--bulk-closing': $store.toasts.isClosing(item.id) && (item.closingDelay || 0) > 0
+             }"
+             :style="`--toast-duration: ${item.duration}ms; --closing-delay: ${item.closingDelay || 0}ms`"
              role="status">
           <div class="app-toast__header">
             <span class="app-toast__icon">

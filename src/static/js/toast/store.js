@@ -22,6 +22,7 @@ export function createToastStore(initialConfig = null) {
 
   return {
     items: [],
+    closingIds: [],
     expanded: false,
     config: initialConfig,
 
@@ -72,6 +73,10 @@ export function createToastStore(initialConfig = null) {
 
     get hasMultiple() {
       return this.visibleItems.length > 1;
+    },
+
+    isClosing(id) {
+      return this.closingIds.includes(id);
     },
 
     expand(viewportEl = null) {
@@ -145,36 +150,48 @@ export function createToastStore(initialConfig = null) {
       this.dismiss(id);
     },
 
+    _finalizeDismiss(id) {
+      this.closingIds = this.closingIds.filter((itemId) => itemId !== id);
+      this.items = this.items.filter((item) => item.id !== id);
+      if (this.items.length === 0) {
+        this.collapse();
+      }
+    },
+
     dismiss(id) {
       const target = this.items.find((item) => item.id === id);
-      if (!target || target.closing) {
+      if (!target || this.isClosing(id)) {
         return;
       }
-      target.closing = true;
-      window.setTimeout(() => {
-        this.items = this.items.filter((item) => item.id !== id);
-        if (this.items.length === 0) {
-          this.collapse();
-        }
-      }, EXIT_ANIMATION_MS);
+      target.closingDelay = 0;
+      this.closingIds = [...this.closingIds, id];
+      window.setTimeout(() => this._finalizeDismiss(id), EXIT_ANIMATION_MS + 40);
     },
 
     dismissAll() {
       const visible = this.visibleItems;
       const delayById = new Map(visible.map((item) => [item.id, item.stackIndex * BULK_EXIT_STEP_MS]));
       let maxDelay = 0;
+      const nextClosing = [...this.closingIds];
       this.items.forEach((item) => {
         const delay = delayById.get(item.id) ?? 0;
         item.closingDelay = delay;
-        item.closing = true;
+        if (!nextClosing.includes(item.id)) {
+          nextClosing.push(item.id);
+        }
         if (delay > maxDelay) {
           maxDelay = delay;
         }
       });
-      window.setTimeout(() => {
-        this.items = [];
-        this.collapse();
-      }, maxDelay + BULK_EXIT_ANIMATION_MS);
+      this.closingIds = nextClosing;
+      window.setTimeout(
+        () => {
+          this.items = [];
+          this.closingIds = [];
+          this.collapse();
+        },
+        maxDelay + BULK_EXIT_ANIMATION_MS + 40,
+      );
     },
 
     triggerAction(item) {
