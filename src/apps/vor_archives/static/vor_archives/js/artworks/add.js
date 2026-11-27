@@ -23,6 +23,7 @@ document.addEventListener("alpine:init", () => {
     saveUrl: opts.saveUrl || "",
     searchUrl: opts.searchUrl || "",
     previewUrl: opts.previewUrl || "",
+    workUrlTemplate: opts.workUrlTemplate || "",
     relationSearchUrl: opts.relationSearchUrl || "",
     selectedWorkId: null,
     createdWorkId: null,
@@ -226,10 +227,29 @@ document.addEventListener("alpine:init", () => {
         this.saving = false;
       }
     },
+    createdWorkUrl() {
+      if (!this.workUrlTemplate || !this.createdWorkId || !this.createdWorkType) {
+        return "";
+      }
+      return this.workUrlTemplate
+        .replace("__type__", encodeURIComponent(this.createdWorkType))
+        .replace(/\/0\/?$/, `/${this.createdWorkId}/`);
+    },
+    openCreatedWork(url) {
+      if (!url) {
+        return;
+      }
+      htmx.ajax("GET", url, {
+        target: "#vor-overlay",
+        swap: "innerHTML",
+      });
+    },
     finishCreate() {
       this.doneMessage = "Произведение успешно сохранено в базу данных.";
       this.phase = "done";
-      vorNotify.workCreated(String(this.title || "").trim());
+      vorNotify.workCreated({ title: String(this.title || "").trim(), url: this.createdWorkUrl() }, (url) =>
+        this.openCreatedWork(url),
+      );
       this.refreshList();
     },
     dismissModal() {
@@ -271,7 +291,9 @@ document.addEventListener("alpine:init", () => {
         ? "Произведение создано и добавлено в ваш список."
         : "Произведение добавлено в ваш список.";
       this.phase = "done";
-      vorNotify.workAttached(String(this.title || "").trim());
+      vorNotify.workAttached({ title: String(this.title || "").trim(), url: this.createdWorkUrl() }, (url) =>
+        this.openCreatedWork(url),
+      );
       this.refreshList();
     },
     onAttachError() {

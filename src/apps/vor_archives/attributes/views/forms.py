@@ -17,6 +17,12 @@ from .utils import (
 
 def _handle_attr_form(request, kind, form, *, on_save, **form_ctx_kwargs):
     if request.method == "POST" and form.is_valid():
+        old_name = getattr(form.instance, "name", "") or ""
+        changed_fields = [
+            str(form.fields[name].label)
+            for name in form.changed_data
+            if name in form.fields and name != "name"
+        ]
         detail_context = on_save(form)
         return attr_mutation_response(
             request,
@@ -25,7 +31,9 @@ def _handle_attr_form(request, kind, form, *, on_save, **form_ctx_kwargs):
             extra_trigger={
                 "vor:attr-saved": {
                     "isCreate": bool(form_ctx_kwargs.get("is_create")),
+                    "oldName": old_name,
                     "name": detail_context.get("item", {}).get("name", ""),
+                    "changedFields": changed_fields,
                 }
             },
         )

@@ -325,10 +325,11 @@ export const collectionsMixin = {
     }
     if (data.changed) {
       const targetId = Number(collectionId);
-      const name =
+      const collectionName =
         this.collectionNode(targetId)?.querySelector(".vor-collection-item__name")?.textContent?.trim() || "";
+      const workTitle = document.querySelector(`.vor-artwork-item[data-uw-id="${uwId}"]`)?.dataset.previewTitle || "";
       vorNotify.workAddedToCollection(
-        { id: targetId, name, isCurrent: Number(this.collectionId) === targetId },
+        { id: targetId, workTitle, collectionName, isCurrent: Number(this.collectionId) === targetId },
         (id, colName) => this.selectCollection(id, colName),
       );
     }

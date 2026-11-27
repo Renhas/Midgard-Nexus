@@ -52,7 +52,7 @@ export const searchMixin = {
       swap: "innerHTML",
     });
   },
-  async attachFromSearch(typeKey, workId) {
+  async attachFromSearch(typeKey, workId, title = "", workUrl = "") {
     if (this._attaching) {
       return;
     }
@@ -62,7 +62,7 @@ export const searchMixin = {
       if (!data?.ok) {
         return;
       }
-      vorNotify.workAttached();
+      vorNotify.workAttached({ title, url: workUrl }, (url) => this.openWork(url));
       this.reloadList();
       this.runSearch();
     } finally {

@@ -12,7 +12,10 @@ document.body.addEventListener("vor:attr-saved", (event) => {
 
 document.body.addEventListener("vor:attr-deleted", (event) => {
   const payload = event.detail?.value ?? event.detail;
-  vorNotify.attrsDeleted(payload?.count ?? 1);
+  vorNotify.attrsDeleted({
+    count: payload?.count ?? 1,
+    name: payload?.name || "",
+  });
 });
 
 document.body.addEventListener("vor:close-attr-modal", () => {

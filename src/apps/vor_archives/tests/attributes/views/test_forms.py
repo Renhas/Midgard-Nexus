@@ -65,7 +65,12 @@ def test_attr_new_simple_get_and_post(staff_client):
     assert ok_resp.status_code == 200
     assert json.loads(ok_resp["HX-Trigger"]) == {
         "vor:attr-list-refresh": True,
-        "vor:attr-saved": {"isCreate": True, "name": "Steam Deck"},
+        "vor:attr-saved": {
+            "isCreate": True,
+            "oldName": "",
+            "name": "Steam Deck",
+            "changedFields": [],
+        },
     }
     created = Platform.objects.get(name="Steam Deck")
     assert ok_resp.context["item"]["pk"] == created.pk
@@ -113,10 +118,16 @@ def test_attr_new_genre_post_valid_and_invalid(staff_client):
         url,
         {"type_key": "film", "name": "Noir", "description": "Classic noir"},
     )
+    print(ok_resp["HX-Trigger"])
     assert ok_resp.status_code == 200
     assert json.loads(ok_resp["HX-Trigger"]) == {
         "vor:attr-list-refresh": True,
-        "vor:attr-saved": {"isCreate": True, "name": "Noir"},
+        "vor:attr-saved": {
+            "isCreate": True,
+            "oldName": "",
+            "name": "Noir",
+            "changedFields": ["Описание"],
+        },
     }
     created = FilmGenre.objects.get(name="Noir")
     assert created.description == "Classic noir"
@@ -147,7 +158,12 @@ def test_attr_edit_get_and_post(staff_client):
     assert ok_resp.status_code == 200
     assert json.loads(ok_resp["HX-Trigger"]) == {
         "vor:attr-list-refresh": True,
-        "vor:attr-saved": {"isCreate": False, "name": "NewTag"},
+        "vor:attr-saved": {
+            "isCreate": False,
+            "oldName": "OldTag",
+            "name": "NewTag",
+            "changedFields": ["Описание"],
+        },
     }
     tag.refresh_from_db()
     assert tag.name == "NewTag"
@@ -201,7 +217,12 @@ def test_genre_edit_get_post_and_locked_type(staff_client):
     assert ok_resp.status_code == 200
     assert json.loads(ok_resp["HX-Trigger"]) == {
         "vor:attr-list-refresh": True,
-        "vor:attr-saved": {"isCreate": False, "name": "NewGenre"},
+        "vor:attr-saved": {
+            "isCreate": False,
+            "oldName": "OldGenre",
+            "name": "NewGenre",
+            "changedFields": ["Описание"],
+        },
     }
     genre.refresh_from_db()
     assert genre.name == "NewGenre"

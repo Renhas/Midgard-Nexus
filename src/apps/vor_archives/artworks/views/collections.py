@@ -111,10 +111,14 @@ def collection_edit(request, pk):
 def collection_update(request, pk):
     name = (request.POST.get("name") or "").strip()
     try:
-        rename_collection(request.user, pk, name)
+        collection = rename_collection(request.user, pk, name)
         response = _collection_mutation_response()
         extra = json.loads(response["HX-Trigger"])
-        extra["vor:collection-renamed"] = {"id": pk, "name": name}
+        extra["vor:collection-renamed"] = {
+            "id": pk,
+            "oldName": getattr(collection, "_old_name", ""),
+            "name": name,
+        }
         response["HX-Trigger"] = json.dumps(extra)
         return response
     except ValidationError as exc:
@@ -153,10 +157,12 @@ def collection_delete_preview(request, pk):
 @login_required
 @require_POST
 def collection_delete(request, pk):
+    collection = get_user_collection(request.user, pk)
+    deleted_name = collection.name
     delete_collection(request.user, pk)
     response = _collection_mutation_response()
     extra = json.loads(response["HX-Trigger"])
-    extra["vor:collection-deleted"] = pk
+    extra["vor:collection-deleted"] = {"id": pk, "name": deleted_name}
     response["HX-Trigger"] = json.dumps(extra)
     return response
 

@@ -108,7 +108,11 @@ def test_collection_update_post_valid(client_logged_in, user):
     )
     assert response.status_code == 200
     trigger = _trigger(response)
-    assert trigger["vor:collection-renamed"] == {"id": collection.pk, "name": "New"}
+    assert trigger["vor:collection-renamed"] == {
+        "id": collection.pk,
+        "oldName": "Old",
+        "name": "New",
+    }
     collection.refresh_from_db()
     assert collection.name == "New"
 
@@ -182,7 +186,10 @@ def test_collection_delete_post(client_logged_in, user):
     )
     assert response.status_code == 200
     trigger = _trigger(response)
-    assert trigger["vor:collection-deleted"] == collection.pk
+    assert trigger["vor:collection-deleted"] == {
+        "id": collection.pk,
+        "name": collection.name,
+    }
     assert not Collection.objects.filter(pk=collection.pk).exists()
 
 

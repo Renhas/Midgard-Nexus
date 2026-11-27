@@ -250,7 +250,12 @@ document.addEventListener("alpine:init", () => {
     },
     onAttachSuccess() {
       this.attachOpen = false;
-      vorNotify.workAttached(this.title);
+      vorNotify.workAttached({ title: this.title, url: this.workUrl }, (url) => {
+        htmx.ajax("GET", url, {
+          target: "#vor-overlay",
+          swap: "innerHTML",
+        });
+      });
       this.refreshList();
       htmx.ajax("GET", this.workUrl, {
         target: "#vor-overlay",
