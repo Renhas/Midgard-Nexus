@@ -1,5 +1,3 @@
-import re
-
 from playwright.sync_api import expect
 
 
@@ -38,7 +36,7 @@ def test_toast_stack_expand_and_dismiss_all(authenticated_page, live_server):
     expect(viewport.locator(".app-toast")).to_have_count(3)
 
     viewport.hover()
-    expect(viewport).to_have_class(re.compile(r"app-toast-viewport--expanded"))
+    expect(viewport).to_have_attribute("data-state", "expanded")
 
     clear_all = viewport.locator(".app-toast-clear-all")
     expect(clear_all).to_be_visible()

@@ -12,6 +12,30 @@
   }
 }
 
+@keyframes app-toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(100%) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes app-toast-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(120px) scale(0.96);
+  }
+}
+
 .app-toast-viewport {
   position: fixed;
   right: 1.5rem;
@@ -25,22 +49,23 @@
   pointer-events: none;
 }
 
-.app-toast-viewport--expanded {
+.app-toast-viewport[data-state="expanded"] {
   pointer-events: auto;
 }
 
 .app-toast-controls {
-  pointer-events: auto;
+  pointer-events: none;
   opacity: 0;
-  transform: translateY(4px);
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
+  transform: translateY(6px);
 }
 
-.app-toast-viewport--expanded .app-toast-controls {
+.app-toast-viewport[data-state="expanded"] .app-toast-controls {
+  pointer-events: auto;
   opacity: 1;
   transform: translateY(0);
+  transition:
+    opacity 0.18s ease 0.06s,
+    transform 0.18s ease 0.06s;
 }
 
 .app-toast-clear-all {
@@ -73,19 +98,42 @@
   align-items: end;
 }
 
-.app-toast-viewport--expanded .app-toast-stack {
+.app-toast-viewport[data-state="expanded"] .app-toast-stack {
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
 }
 
+/* --- Slot: отвечает только за положение и масштаб в стопке --- */
+.app-toast-slot {
+  grid-area: 1 / 1;
+  width: 100%;
+  transform-origin: top center;
+  transform: translateY(calc(var(--stack-index, 0) * -10px)) scale(calc(1 - var(--stack-index, 0) * 0.04));
+  z-index: calc(20 - var(--stack-index, 0));
+  transition:
+    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.app-toast-viewport[data-state="collapsed"] .app-toast-slot:not([data-front="true"]) {
+  height: var(--front-height, auto);
+  pointer-events: none;
+}
+
+.app-toast-viewport[data-state="expanded"] .app-toast-slot {
+  transform: translateY(0) scale(1);
+  height: auto;
+}
+
+/* --- Card: отвечает только за внешний вид и анимации входа/выхода --- */
 .app-toast {
   --toast-accent-color: var(--toast-accent);
 
-  grid-area: 1 / 1;
   position: relative;
   overflow: hidden;
   width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
@@ -96,26 +144,10 @@
   color: var(--text-primary);
   box-shadow: var(--shadow-md);
   pointer-events: auto;
-  transform-origin: top center;
-  transform: translateY(calc(var(--stack-index, 0) * -10px)) scale(calc(1 - var(--stack-index, 0) * 0.04));
-  z-index: calc(20 - var(--stack-index, 0));
-  transition:
-    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.2s ease,
-    height 0.24s cubic-bezier(0.22, 1, 0.36, 1),
-    max-height 0.24s cubic-bezier(0.22, 1, 0.36, 1),
-    padding 0.24s ease,
-    margin 0.24s ease;
+  animation: app-toast-enter 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* В свернутом состоянии все задние карточки повторяют высоту передней
-   и скрывают внутренний текст/кнопки, выступая как аккуратные заглушки. */
-.app-toast-viewport:not(.app-toast-viewport--expanded) .app-toast:not([data-front="true"]) {
-  height: var(--front-height, auto);
-  pointer-events: none;
-}
-
-.app-toast-viewport:not(.app-toast-viewport--expanded) .app-toast:not([data-front="true"]) > * {
+.app-toast-viewport[data-state="collapsed"] .app-toast-slot:not([data-front="true"]) .app-toast > * {
   opacity: 0;
 }
 
@@ -131,21 +163,13 @@
   --toast-accent-color: var(--toast-accent);
 }
 
-.app-toast-viewport--expanded .app-toast {
-  transform: translateY(0) scale(1);
-  height: auto;
-  max-height: 14rem;
+.app-toast--closing {
+  pointer-events: none;
+  animation: app-toast-exit 0.24s cubic-bezier(0.32, 0, 0.67, 0) var(--closing-delay, 0ms) forwards;
 }
 
-.app-toast.app-toast--closing {
-  opacity: 0;
-  height: 0;
-  max-height: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  border-width: 0;
-  transform: translateX(16px) scale(0.96);
-  pointer-events: none;
+.app-toast--bulk-closing {
+  animation-duration: 0.18s;
 }
 
 .app-toast__header {
@@ -251,6 +275,6 @@
   transition: opacity 0.15s ease;
 }
 
-.app-toast-viewport--expanded .app-toast__progress {
+.app-toast-viewport[data-state="expanded"] .app-toast__progress {
   animation-play-state: paused;
 }

@@ -1,7 +1,9 @@
 import { getAlpine } from "@lib/alpine";
 import { computeStackSlots, createToastEntry, readToastConfig } from "@toast/stack";
 
-const EXIT_ANIMATION_MS = 220;
+const EXIT_ANIMATION_MS = 240;
+const BULK_EXIT_STEP_MS = 45;
+const BULK_EXIT_ANIMATION_MS = 180;
 const MAX_QUEUE_SIZE = 50;
 const HOVER_BOUNDARY_PAD = 8;
 
@@ -35,14 +37,14 @@ export function createToastStore(initialConfig = null) {
       }
       let currentFront = null;
       const syncHeight = () => {
-        const front = stackEl.querySelector('.app-toast[data-front="true"]');
+        const front = stackEl.querySelector('.app-toast-slot[data-front="true"]');
         if (front) {
           stackEl.style.setProperty("--front-height", `${front.offsetHeight}px`);
         }
       };
       const ro = new ResizeObserver(syncHeight);
       const bindFront = () => {
-        const front = stackEl.querySelector('.app-toast[data-front="true"]');
+        const front = stackEl.querySelector('.app-toast-slot[data-front="true"]');
         if (front !== currentFront) {
           if (currentFront) {
             ro.unobserve(currentFront);
@@ -158,13 +160,21 @@ export function createToastStore(initialConfig = null) {
     },
 
     dismissAll() {
+      const visible = this.visibleItems;
+      const delayById = new Map(visible.map((item) => [item.id, item.stackIndex * BULK_EXIT_STEP_MS]));
+      let maxDelay = 0;
       this.items.forEach((item) => {
+        const delay = delayById.get(item.id) ?? 0;
+        item.closingDelay = delay;
         item.closing = true;
+        if (delay > maxDelay) {
+          maxDelay = delay;
+        }
       });
       window.setTimeout(() => {
         this.items = [];
         this.collapse();
-      }, EXIT_ANIMATION_MS);
+      }, maxDelay + BULK_EXIT_ANIMATION_MS);
     },
 
     triggerAction(item) {

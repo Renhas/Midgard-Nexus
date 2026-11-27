@@ -69,6 +69,7 @@ export function createToastEntry(payload, id, config) {
     action,
     copied: false,
     closing: false,
+    closingDelay: 0,
   };
 }
 

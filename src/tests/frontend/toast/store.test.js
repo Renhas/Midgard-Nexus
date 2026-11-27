@@ -76,7 +76,7 @@ describe("Toast store lifecycle", () => {
     expect(store.hasMultiple).toBe(true);
     store.dismissAll();
 
-    vi.advanceTimersByTime(250);
+    vi.advanceTimersByTime(400);
     expect(store.items).toHaveLength(0);
     expect(store.expanded).toBe(false);
   });

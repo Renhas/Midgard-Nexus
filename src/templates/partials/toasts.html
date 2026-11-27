@@ -3,7 +3,7 @@
 <div class="app-toast-viewport"
      x-data
      x-init="$store.toasts.init(); $store.toasts.observeFrontHeight($refs.stack)"
-     :class="{ 'app-toast-viewport--expanded': $store.toasts.expanded }"
+     :data-state="$store.toasts.expanded ? 'expanded' : 'collapsed'"
      @pointermove="$store.toasts.expand($el)"
      @focusin="$store.toasts.onFocusIn($event)"
      @focusout="$store.toasts.onFocusOut($event)"
@@ -17,53 +17,59 @@
   </div>
   <div class="app-toast-stack" x-ref="stack">
     <template x-for="item in $store.toasts.visibleItems" :key="item.id">
-      <div class="app-toast"
+      <div class="app-toast-slot"
            :data-front="item.stackIndex === 0 ? 'true' : null"
-           :class="[
-               'app-toast--' + item.level,
-               { 'app-toast--closing': item.closing }
-           ]"
-           :style="`--stack-index: ${item.stackIndex}; --toast-duration: ${item.duration}ms`"
-           role="status">
-        <div class="app-toast__header">
-          <span class="app-toast__icon">
-            <i class="bi"
-               :class="{
-                   'bi-check-circle-fill': item.level === 'success',
-                   'bi-exclamation-circle-fill': item.level === 'error',
-                   'bi-info-circle-fill': item.level === 'info'
-               }"></i>
-          </span>
-          <span class="app-toast__title" x-text="item.title"></span>
-          <button type="button"
-                  class="app-toast__close"
-                  title="Закрыть"
-                  aria-label="Закрыть уведомление"
-                  @click="$store.toasts.dismiss(item.id)">
-            <i class="bi bi-x-lg"></i>
-          </button>
-        </div>
-        <div class="app-toast__message" x-show="item.message" x-text="item.message"></div>
-        <div class="app-toast__actions" x-show="item.action || item.details" x-cloak>
-          <template x-if="item.action">
+           :style="`--stack-index: ${item.stackIndex}`">
+        <div class="app-toast"
+             :class="[
+                 'app-toast--' + item.level,
+                 {
+                     'app-toast--closing': item.closing,
+                     'app-toast--bulk-closing': item.closing && item.closingDelay > 0
+                 }
+             ]"
+             :style="`--toast-duration: ${item.duration}ms; --closing-delay: ${item.closingDelay}ms`"
+             role="status">
+          <div class="app-toast__header">
+            <span class="app-toast__icon">
+              <i class="bi"
+                 :class="{
+                     'bi-check-circle-fill': item.level === 'success',
+                     'bi-exclamation-circle-fill': item.level === 'error',
+                     'bi-info-circle-fill': item.level === 'info'
+                 }"></i>
+            </span>
+            <span class="app-toast__title" x-text="item.title"></span>
             <button type="button"
-                    class="app-toast__action-btn"
-                    @click="$store.toasts.triggerAction(item)"
-                    x-text="item.action.label"></button>
-          </template>
-          <template x-if="item.details">
-            <button type="button"
-                    class="app-toast__action-btn app-toast__action-btn--copy"
-                    @click="$store.toasts.copyDetails(item, $event)"
-                    :title="item.copied ? 'Скопировано' : 'Скопировать детали ошибки'">
-              <i class="bi" :class="item.copied ? 'bi-check2' : 'bi-clipboard'"></i>
-              <span x-text="item.copied ? 'Скопировано' : 'Скопировать'"></span>
+                    class="app-toast__close"
+                    title="Закрыть"
+                    aria-label="Закрыть уведомление"
+                    @click="$store.toasts.dismiss(item.id)">
+              <i class="bi bi-x-lg"></i>
             </button>
-          </template>
+          </div>
+          <div class="app-toast__message" x-show="item.message" x-text="item.message"></div>
+          <div class="app-toast__actions" x-show="item.action || item.details" x-cloak>
+            <template x-if="item.action">
+              <button type="button"
+                      class="app-toast__action-btn"
+                      @click="$store.toasts.triggerAction(item)"
+                      x-text="item.action.label"></button>
+            </template>
+            <template x-if="item.details">
+              <button type="button"
+                      class="app-toast__action-btn app-toast__action-btn--copy"
+                      @click="$store.toasts.copyDetails(item, $event)"
+                      :title="item.copied ? 'Скопировано' : 'Скопировать детали ошибки'">
+                <i class="bi" :class="item.copied ? 'bi-check2' : 'bi-clipboard'"></i>
+                <span x-text="item.copied ? 'Скопировано' : 'Скопировать'"></span>
+              </button>
+            </template>
+          </div>
+          <div class="app-toast__progress"
+               x-show="item.duration > 0"
+               @animationend.self="$store.toasts.onProgressEnd(item.id)"></div>
         </div>
-        <div class="app-toast__progress"
-             x-show="item.duration > 0"
-             @animationend.self="$store.toasts.onProgressEnd(item.id)"></div>
       </div>
     </template>
   </div>
