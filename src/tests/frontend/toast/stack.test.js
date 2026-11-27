@@ -42,12 +42,13 @@ describe("Toast stack pure helpers", () => {
     expect(resolveToastDuration("info", 1500, TEST_CONFIG)).toBe(1500);
   });
 
-  it("creates normalized toast entries from string or object", () => {
+  it("creates normalized toast entries with required title and optional message", () => {
     const simple = createToastEntry("Сохранено", 1, TEST_CONFIG);
     expect(simple).toMatchObject({
       id: 1,
       level: "info",
-      message: "Сохранено",
+      title: "Сохранено",
+      message: "",
       details: "",
       duration: 4000,
       action: null,
@@ -58,14 +59,16 @@ describe("Toast stack pure helpers", () => {
     const rich = createToastEntry(
       {
         level: "error",
-        message: "  Ошибка  ",
+        title: "  Ошибка сохранения  ",
+        message: "  Не удалось обновить запись  ",
         details: "Traceback...",
         action: { label: "Открыть", event: "vor:open", detail: { id: 42 } },
       },
       2,
       TEST_CONFIG,
     );
-    expect(rich.message).toBe("Ошибка");
+    expect(rich.title).toBe("Ошибка сохранения");
+    expect(rich.message).toBe("Не удалось обновить запись");
     expect(rich.details).toBe("Traceback...");
     expect(rich.action).toEqual({
       label: "Открыть",

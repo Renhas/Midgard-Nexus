@@ -45,7 +45,7 @@ export function resolveToastDuration(level, explicitDuration, config) {
 }
 
 export function createToastEntry(payload, id, config) {
-  const data = typeof payload === "string" ? { message: payload } : payload || {};
+  const data = typeof payload === "string" ? { title: payload } : payload || {};
   const level = normalizeToastLevel(data.level);
   const duration = resolveToastDuration(level, data.duration, config);
   const action =
@@ -61,6 +61,7 @@ export function createToastEntry(payload, id, config) {
   return {
     id,
     level,
+    title: String(data.title || "").trim(),
     message: String(data.message || "").trim(),
     details: data.details ? String(data.details) : "",
     duration,

@@ -95,7 +95,7 @@ export function createToastStore(initialConfig = null) {
       }
       const id = ++seq;
       const entry = createToastEntry(payload, id, this.config);
-      if (!entry.message) {
+      if (!entry.title) {
         return null;
       }
       this.items.push(entry);

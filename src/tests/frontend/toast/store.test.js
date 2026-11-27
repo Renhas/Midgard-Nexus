@@ -16,9 +16,15 @@ describe("Toast store lifecycle", () => {
     vi.useRealTimers();
   });
 
+  it("ignores toast payloads without a title", () => {
+    const store = createToastStore(TEST_CONFIG);
+    expect(store.show({ message: "Без заголовка" })).toBeNull();
+    expect(store.items).toHaveLength(0);
+  });
+
   it("adds toasts, dismisses on progress animation end, and removes after exit animation", () => {
     const store = createToastStore(TEST_CONFIG);
-    const id = store.show({ level: "success", message: "Готово", duration: 2000 });
+    const id = store.show({ level: "success", title: "Готово", duration: 2000 });
 
     expect(id).toBe(1);
     expect(store.items).toHaveLength(1);
@@ -32,22 +38,22 @@ describe("Toast store lifecycle", () => {
 
   it("keeps overflow toasts queued and reveals older ones when newer are dismissed", () => {
     const store = createToastStore(TEST_CONFIG);
-    store.show({ message: "1", duration: 0 });
-    store.show({ message: "2", duration: 0 });
-    const thirdId = store.show({ message: "3", duration: 0 });
-    store.show({ message: "4", duration: 0 });
+    store.show({ title: "1", duration: 0 });
+    store.show({ title: "2", duration: 0 });
+    const thirdId = store.show({ title: "3", duration: 0 });
+    store.show({ title: "4", duration: 0 });
 
-    expect(store.visibleItems.map((item) => item.message)).toEqual(["2", "3", "4"]);
+    expect(store.visibleItems.map((item) => item.title)).toEqual(["2", "3", "4"]);
 
     store.dismiss(thirdId);
     vi.advanceTimersByTime(250);
-    expect(store.visibleItems.map((item) => item.message)).toEqual(["1", "2", "4"]);
+    expect(store.visibleItems.map((item) => item.title)).toEqual(["1", "2", "4"]);
   });
 
   it("keeps expanded state when dismissing an item until pointer leaves", () => {
     const store = createToastStore(TEST_CONFIG);
-    const firstId = store.show({ message: "Первый", duration: 0 });
-    store.show({ message: "Второй", duration: 0 });
+    const firstId = store.show({ title: "Первый", duration: 0 });
+    store.show({ title: "Второй", duration: 0 });
 
     store.expand();
     expect(store.expanded).toBe(true);
@@ -63,8 +69,8 @@ describe("Toast store lifecycle", () => {
 
   it("dismisses all toasts at once and resets expanded state", () => {
     const store = createToastStore(TEST_CONFIG);
-    store.show({ message: "Первый", duration: 0 });
-    store.show({ message: "Второй", duration: 0 });
+    store.show({ title: "Первый", duration: 0 });
+    store.show({ title: "Второй", duration: 0 });
     store.expand();
 
     expect(store.hasMultiple).toBe(true);
@@ -82,12 +88,12 @@ describe("Toast store lifecycle", () => {
     document.body.addEventListener("test:toast-action", eventSpy);
 
     store.show({
-      message: "Первое",
+      title: "Первое",
       duration: 0,
       action: { label: "Клик", onClick },
     });
     store.show({
-      message: "Второе",
+      title: "Второе",
       duration: 0,
       action: { label: "Событие", event: "test:toast-action", detail: { id: 7 } },
     });

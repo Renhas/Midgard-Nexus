@@ -8,14 +8,14 @@ export const notify = {
   show(payload) {
     return store()?.show(payload) ?? null;
   },
-  success(message, options = {}) {
-    return this.show({ ...options, level: "success", message });
+  success(title, options = {}) {
+    return this.show({ ...options, level: "success", title });
   },
-  error(message, options = {}) {
-    return this.show({ ...options, level: "error", message });
+  error(title, options = {}) {
+    return this.show({ ...options, level: "error", title });
   },
-  info(message, options = {}) {
-    return this.show({ ...options, level: "info", message });
+  info(title, options = {}) {
+    return this.show({ ...options, level: "info", title });
   },
   dismiss(id) {
     store()?.dismiss(id);

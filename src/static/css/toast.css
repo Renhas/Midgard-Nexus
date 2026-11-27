@@ -88,9 +88,9 @@
   overflow: hidden;
   width: 100%;
   display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
-  padding: 0.75rem 0.85rem 0.85rem;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.7rem 0.85rem 0.8rem;
   border-radius: var(--radius-md);
   background-color: var(--bg-card);
   border: 1px solid var(--border);
@@ -113,11 +113,11 @@
 
 .app-toast-viewport:not(.app-toast-viewport--expanded) .app-toast {
   align-self: start;
-  max-height: 4.5rem;
+  max-height: 5.5rem;
 }
 
 .app-toast-viewport:not(.app-toast-viewport--expanded) .app-toast[style*="--stack-index: 0"] {
-  max-height: 16rem;
+  max-height: 12rem;
 }
 
 .app-toast--success {
@@ -138,7 +138,7 @@
 .app-toast-viewport--expanded .app-toast {
   transform: translateY(0) scale(1);
   opacity: 1;
-  max-height: 20rem;
+  max-height: 14rem;
 }
 
 .app-toast.app-toast--closing {
@@ -151,33 +151,43 @@
   pointer-events: none;
 }
 
+.app-toast__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
 .app-toast__icon {
   flex-shrink: 0;
-  font-size: 1.05rem;
-  line-height: 1.25;
+  display: inline-flex;
+  align-items: center;
+  font-size: 1rem;
+  line-height: 1;
   color: var(--toast-icon-color);
 }
 
-.app-toast__body {
+.app-toast__title {
   flex: 1;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .app-toast__message {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 6;
-  overflow: hidden;
-  font-size: 0.875rem;
-  line-height: 1.35;
-  overflow-wrap: break-word;
-}
-
-.app-toast-viewport:not(.app-toast-viewport--expanded) .app-toast:not([style*="--stack-index: 0"]) .app-toast__message {
   -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--text-secondary);
+  overflow-wrap: break-word;
 }
 
 .app-toast__actions {
@@ -185,6 +195,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.4rem;
+  margin-top: 0.15rem;
 }
 
 .app-toast__action-btn {
@@ -211,10 +222,11 @@
 
 .app-toast__close {
   flex-shrink: 0;
+  margin-left: auto;
   border: 0;
   background: transparent;
   color: var(--text-secondary);
-  padding: 0.15rem;
+  padding: 0.1rem;
   line-height: 1;
   font-size: 0.8rem;
   border-radius: var(--radius-xs);
