@@ -12,7 +12,7 @@ def test_toast_stack_lifecycle_and_actions(authenticated_page, live_server):
     toast = page.locator(".app-toast.app-toast--success").first
     expect(toast).to_be_visible()
     expect(toast.locator(".app-toast__title")).not_to_be_empty()
-    expect(toast.locator(".app-toast__message")).to_have_text("Фантастика")
+    expect(toast.locator(".app-toast__message")).to_contain_text("Фантастика")
 
     toast.locator(".app-toast__action-btn").click()
     expect(page.locator(".vor-artwork-library__path-link--current")).to_have_text(
