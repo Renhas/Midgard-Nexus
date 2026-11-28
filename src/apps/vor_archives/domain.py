@@ -17,6 +17,7 @@ from apps.vor_archives.constants import (
     age_rating_options,
     status_options,
 )
+from apps.vor_archives.progress import ProgressMeta, iter_progress_rules
 from apps.vor_archives.registry import WORK_TYPES, WORK_TYPE_REGISTRY
 
 FIELD_TO_STATE: dict[str, dict[str, Any]] = {
@@ -93,6 +94,36 @@ def _serialize_conditional_rules() -> list[dict[str, Any]]:
     return serialized
 
 
+def _to_state_key(field_name: str | None) -> str | None:
+    if field_name and field_name in FIELD_TO_STATE:
+        return FIELD_TO_STATE[field_name]["key"]
+    return field_name
+
+
+def _serialize_progress_meta(meta: ProgressMeta) -> dict[str, Any]:
+    return {
+        "maxField": _to_state_key(meta.max_field),
+        "unit": meta.unit,
+        "step": meta.step,
+    }
+
+
+def _build_progress() -> dict[str, Any]:
+    subtype_fields: dict[str, str] = {}
+    rules: dict[str, Any] = {}
+    for type_key, subtype_field, subtype, meta in iter_progress_rules():
+        serialized = _serialize_progress_meta(meta)
+        if subtype_field:
+            subtype_fields[type_key] = _to_state_key(subtype_field)
+            rules.setdefault(type_key, {})[subtype] = serialized
+        else:
+            rules[type_key] = serialized
+    return {
+        "subtypeField": subtype_fields,
+        "rules": rules,
+    }
+
+
 def _build_validation() -> dict[str, Any]:
     return {
         "requiredByType": {
@@ -134,5 +165,6 @@ def get_domain_config() -> dict[str, Any]:
             "min": 1,
             "max": 10,
         },
+        "progress": _build_progress(),
         "validation": _build_validation(),
     }

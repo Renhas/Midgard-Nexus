@@ -13,22 +13,59 @@ class ProgressMeta(NamedTuple):
     maximum: int | None
     unit: str
     step: float
+    max_field: str | None = None
+
+
+class SubtypedProgressRules(NamedTuple):
+    subtype_field: str
+    rules: dict[str, ProgressMeta]
+
+
+PROGRESS_RULES: dict[str, ProgressMeta | SubtypedProgressRules] = {
+    "book": ProgressMeta(maximum=None, unit="стр.", step=1, max_field="pages"),
+    "game": ProgressMeta(maximum=None, unit="ч.", step=0.5, max_field=None),
+    "film": SubtypedProgressRules(
+        subtype_field="film_type",
+        rules={
+            str(FilmTypeChoices.MOVIE): ProgressMeta(
+                maximum=None, unit="мин.", step=1, max_field="duration_minutes"
+            ),
+            str(FilmTypeChoices.TV_SHOW): ProgressMeta(
+                maximum=None, unit="эп.", step=1, max_field="episode_count"
+            ),
+        },
+    ),
+}
+
+
+def iter_progress_rules():
+    """Yield ``(type_key, subtype_field, subtype_value, ProgressMeta)`` entries."""
+    for type_key, entry in PROGRESS_RULES.items():
+        if isinstance(entry, SubtypedProgressRules):
+            for subtype, meta in entry.rules.items():
+                yield type_key, entry.subtype_field, subtype, meta
+        else:
+            yield type_key, None, None, entry
+
+
+def resolve_progress_rule(work) -> ProgressMeta | None:
+    """Return declarative ProgressMeta template for a work instance."""
+    entry = PROGRESS_RULES.get(work._meta.model_name)
+    if isinstance(entry, SubtypedProgressRules):
+        subtype = getattr(work, entry.subtype_field, None)
+        return entry.rules.get(str(subtype))
+    return entry
 
 
 def work_progress(work) -> ProgressMeta:
     """Return progress metadata for a work instance (Book, Film, or Game)."""
     if work is None:
         return ProgressMeta(maximum=None, unit="", step=1)
-    model_name = work._meta.model_name
-    if model_name == "book":
-        return ProgressMeta(maximum=work.pages, unit="стр.", step=1)
-    if model_name == "game":
-        return ProgressMeta(maximum=None, unit="ч.", step=0.5)
-    if model_name == "film":
-        if work.film_type == FilmTypeChoices.TV_SHOW:
-            return ProgressMeta(maximum=work.episode_count, unit="эп.", step=1)
-        return ProgressMeta(maximum=work.duration_minutes, unit="мин.", step=1)
-    return ProgressMeta(maximum=None, unit="", step=1)
+    rule = resolve_progress_rule(work)
+    if rule is None:
+        return ProgressMeta(maximum=None, unit="", step=1)
+    maximum = getattr(work, rule.max_field or "", None)
+    return ProgressMeta(maximum=maximum, unit=rule.unit, step=rule.step)
 
 
 def user_work_progress(user_work) -> ProgressMeta:

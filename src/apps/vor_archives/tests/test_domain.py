@@ -15,6 +15,7 @@ from apps.vor_archives.constants import (
     WorkRelationTypeChoices,
 )
 from apps.vor_archives.domain import get_domain_config, FIELD_TO_STATE
+from apps.vor_archives.progress import PROGRESS_RULES, iter_progress_rules
 from apps.vor_archives.registry import WORK_TYPES
 
 
@@ -64,8 +65,30 @@ def test_domain_config_validation_rules():
         assert rule["fields"]
 
 
+def test_domain_config_progress_rules_match_progress_module():
+    cfg = get_domain_config()
+    progress_cfg = cfg["progress"]
+    state_keys = {spec["key"] for spec in FIELD_TO_STATE.values()}
+
+    assert set(progress_cfg["rules"].keys()) == set(PROGRESS_RULES.keys())
+
+    for type_key, subtype_field, subtype, meta in iter_progress_rules():
+        if subtype_field:
+            assert progress_cfg["subtypeField"][type_key] in state_keys
+            serialized = progress_cfg["rules"][type_key][subtype]
+        else:
+            serialized = progress_cfg["rules"][type_key]
+
+        assert serialized["unit"] == meta.unit
+        assert serialized["step"] == meta.step
+        if meta.max_field is not None:
+            assert serialized["maxField"] in state_keys
+        else:
+            assert serialized["maxField"] is None
+
+
 @pytest.mark.parametrize(
-    "section", ["workTypes", "statuses", "relations", "validation"]
+    "section", ["workTypes", "statuses", "relations", "progress", "validation"]
 )
 def test_vor_domain_config_template_tag_renders_valid_json(section):
     tpl = Template("{% load vor_archives_extras %}{% vor_domain_config %}")
